@@ -1,0 +1,2 @@
+[console_scripts]
+academy = academy.__main__:main

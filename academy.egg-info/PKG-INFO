@@ -1,0 +1,44 @@
+Metadata-Version: 2.1
+Name: academy
+Version: 0.0.1
+Summary: Package to train animals
+Home-page: https://delaRochaLab@bitbucket.org/delaRochaLab/academy.git
+Author: Rafael Marín, Juan Garrido
+Author-email: marinraf@gmail.com, garridooliverjuan@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+
+# academy documentation
+
+Package to manage our academy.
+
+## How to use it
+
+1. Open a terminal window, activate your python environment and go to a suitable location.
+
+2. Download the package:
+
+    `git clone https://delaRochaLab@bitbucket.org/delaRochaLab/academy.git`
+
+3. Go to the package directory.
+
+    `cd academy`
+    
+4. Change the branch to new or rat
+
+    `git checkout rat`
+
+4. Install it (remember to have your desired environment activated):
+
+    `pip install -e .`
+    
+7. Run it:
+
+    `academy`
+    
+    
+## New tasks  
