@@ -1,0 +1,177 @@
+date;subject;description;type
+2024/01/08 17:57:29;Academy;Creating new events.csv file;ACTION
+2024/01/08 18:14:13;Academy;Arduino not found;ERROR
+2024/01/08 18:14:13;Academy;Touch device not found;ERROR
+2024/01/08 18:14:13;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/08 18:14:21;Academy;Connection to Bpod failed;ERROR
+2024/01/08 18:14:21;Academy;EXIT;END
+2024/01/10 12:05:25;Academy;Touch device not found;ERROR
+2024/01/10 12:05:25;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 12:05:37;Academy;Connection to Bpod failed;ERROR
+2024/01/10 15:10:24;Academy;Cam1 not found;ERROR
+2024/01/10 15:10:24;Academy;Touch device not found;ERROR
+2024/01/10 15:10:24;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 15:10:36;Academy;Connection to Bpod failed;ERROR
+2024/01/10 15:10:44;Academy;EXIT;END
+2024/01/10 15:14:45;Academy;Cam1 not found;ERROR
+2024/01/10 15:14:45;Academy;Touch device not found;ERROR
+2024/01/10 15:14:45;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 15:14:57;Academy;Connection to Bpod failed;ERROR
+2024/01/10 15:16:54;Academy;Cam1 not found;ERROR
+2024/01/10 15:16:54;Academy;Touch device not found;ERROR
+2024/01/10 15:16:54;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 15:17:06;Academy;Connection to Bpod failed;ERROR
+2024/01/10 15:17:14;Academy;EXIT;END
+2024/01/10 15:26:52;Academy;Cam1 not found;ERROR
+2024/01/10 15:26:52;Academy;Touch device not found;ERROR
+2024/01/10 15:26:52;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 15:26:52;Academy;Connection with Bpod stablished;START
+2024/01/10 15:26:53;Academy;Temperature: nan;ACTION
+2024/01/10 15:27:01;Academy;Subject not found for tag: 041A9DB979;ERROR
+2024/01/10 15:27:10;Academy;Subject not found for tag: 041A9D6C0A;ERROR
+2024/01/10 15:27:11;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:27:11;Academy;Subject not found for tag: 041A9D6C0A;ERROR
+2024/01/10 15:28:31;Academy;Subject not found for tag: 041A9DB979;ERROR
+2024/01/10 15:29:21;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:22;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:32;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:42;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:45;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:51;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:55;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:29:57;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:21;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:30;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:34;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:44;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:55;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:30:57;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:31:03;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:31:17;Academy;EXIT;END
+2024/01/10 15:31:58;Academy;Cam1 not found;ERROR
+2024/01/10 15:31:58;Academy;Touch device not found;ERROR
+2024/01/10 15:31:58;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 15:31:59;Academy;Connection with Bpod stablished;START
+2024/01/10 15:32:00;Academy;Temperature: nan;ACTION
+2024/01/10 15:32:13;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:32:37;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:32:52;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:32:55;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 15:32:58;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:01:49;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:01:52;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:33;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:36;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:45;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:49;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:52;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:54;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:57;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:02:59;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:01;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:05;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:14;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:28;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:41;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:44;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:50;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:03:57;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:07;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:12;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:19;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:29;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:35;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:42;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:47;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:55;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:04:59;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:05:05;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:07:06;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:07:08;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:07:09;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:07:11;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:10:24;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:12;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:14;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:15;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:21;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:31;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:33;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:41;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:13:53;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:26;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:31;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:34;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:36;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:39;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:41;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:44;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:46;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:48;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:17:49;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:18:14;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:18:21;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:18;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:21;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:23;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:24;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:25;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:26;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:27;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:30;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:25:31;Academy;Subject not found for tag: 041A9DA41D;ERROR
+2024/01/10 16:34:58;Academy;Cam1 not found;ERROR
+2024/01/10 16:34:58;Academy;Touch device not found;ERROR
+2024/01/10 16:34:58;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 16:34:59;Academy;Connection with Bpod stablished;START
+2024/01/10 16:34:59;Academy;Temperature: nan;ACTION
+2024/01/10 16:35:38;Academy;Taring the scale;ACTION
+2024/01/10 16:35:47;Academy;weight: 6.28;ACTION
+2024/01/10 16:35:51;Academy;weight: -0.38;ACTION
+2024/01/10 16:35:55;Academy;weight: 5.81;ACTION
+2024/01/10 16:36:05;Academy;weight: 0.02;ACTION
+2024/01/10 16:36:08;Academy;weight: -0.15;ACTION
+2024/01/10 16:36:09;Academy;Taring the scale;ACTION
+2024/01/10 16:36:13;Academy;weight: -0.26;ACTION
+2024/01/10 16:36:15;Academy;Taring the scale;ACTION
+2024/01/10 16:36:22;Academy;weight: 2.54;ACTION
+2024/01/10 16:36:28;Academy;weight: 8.19;ACTION
+2024/01/10 16:36:30;Academy;weight: 2.55;ACTION
+2024/01/10 16:36:32;Academy;weight: 2.75;ACTION
+2024/01/10 16:36:41;Academy;weight: 29.94;ACTION
+2024/01/10 16:36:44;Academy;weight: 2.79;ACTION
+2024/01/10 16:36:58;Academy;weight: 19.41;ACTION
+2024/01/10 16:37:00;Academy;weight: 23.24;ACTION
+2024/01/10 16:39:38;Academy;EXIT;END
+2024/01/10 16:43:36;Academy;Cam1 not found;ERROR
+2024/01/10 16:43:36;Academy;Touch device not found;ERROR
+2024/01/10 16:43:36;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 16:43:37;Academy;Connection with Bpod stablished;START
+2024/01/10 16:43:37;Academy;Temperature: nan;ACTION
+2024/01/10 16:43:41;Academy;Go to state 7;ACTION
+2024/01/10 16:43:44;animal0;Test_Photogates;START
+2024/01/10 16:43:59;animal0;Test_Photogates-1-1;END
+2024/01/10 17:00:02;Academy;Cam1 not found;ERROR
+2024/01/10 17:00:02;Academy;Touch device not found;ERROR
+2024/01/10 17:00:02;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 17:00:02;Academy;Connection with Bpod stablished;START
+2024/01/10 17:00:03;Academy;Temperature: nan;ACTION
+2024/01/10 17:00:13;Academy;Go to state 7;ACTION
+2024/01/10 17:00:17;animal0;Test_Photogates;START
+2024/01/10 17:00:27;animal0;Test_Photogates-1-1;END
+2024/01/10 17:01:32;Academy;Cam1 not found;ERROR
+2024/01/10 17:01:32;Academy;Touch device not found;ERROR
+2024/01/10 17:01:32;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 17:01:33;Academy;Connection with Bpod stablished;START
+2024/01/10 17:01:33;Academy;Temperature: nan;ACTION
+2024/01/10 17:01:34;Academy;Go to state 7;ACTION
+2024/01/10 17:01:39;animal0;Test_Photogate;START
+2024/01/10 17:02:07;animal0;Test_Photogate-1-1;END
+2024/01/10 17:02:15;Academy;Cam1 not found;ERROR
+2024/01/10 17:02:15;Academy;Touch device not found;ERROR
+2024/01/10 17:02:15;Academy;Stablishing connection with Bpod...;ACTION
+2024/01/10 17:02:15;Academy;Connection with Bpod stablished;START
+2024/01/10 17:02:16;Academy;Temperature: nan;ACTION
+2024/01/10 17:02:16;Academy;Go to state 7;ACTION
+2024/01/10 17:02:18;None;Test_Photogate;START
+2024/01/10 17:02:42;None;Test_Photogate-1-1;END
