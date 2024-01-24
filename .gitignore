@@ -1,0 +1,12 @@
+*.swp
+*.pdf
+*.csvdata
+*.csv
+*.ipynb
+**.egg-info/
+**__pycache__/
+**.idea/
+**.spyproject/
+**/.DS_Store
+data/
+user/settings.py
