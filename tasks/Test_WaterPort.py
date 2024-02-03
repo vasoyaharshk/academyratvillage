@@ -75,32 +75,32 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
-class Create_Square(Task):
+class Test_WaterPort(Task):
 
     def __init__(self):
         super().__init__()
 
         self.info = """
-        This tasks only create a square on the screen
+        This task 
         """
 
     def init_variables(self):
-        self.positionx = 10
-        self.positiony = 10
-        self.color =  [0.1, 0.2, 0.5]
+        self.positionx = 2
+        self.positiony = 4
+        self.color =  [0.2, 0.2, 0.2]
         self.width = 4
 
 
 
     def configure_gui(self):
-        self.gui_input = ['positionx', 'color', 'positiony', 'width']
+        self.gui_input = ['positionx', 'color', 'positiony']
 
     def main_loop(self):
 
 
         self.sma.add_state(
             state_name='Display',
-            state_timer=10,
+            state_timer=5,
             state_change_conditions={Bpod.Events.Tup: 'Empty'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 8)]
         )

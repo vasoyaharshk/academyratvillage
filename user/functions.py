@@ -3,6 +3,8 @@ from academy.utils import utils
 from academy.camera import cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
+from user.sound_elements import soundStream, soundVec
+import traceback
 
 # when softcode n is called, function n runs once
 # then loop n runs until another softcode is called
@@ -12,10 +14,10 @@ from user.psychopy_elements import window, square, square2, square3
 def function1():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    # modify contrast
-    # cont = float(utils.task.contrast) - 1
-    # square.fillColor = [cont, cont, cont]
-    # square.lineColor = [cont, cont, cont]
+    # modify contrast: from 1 unchanged to 0
+    cont = float(utils.task.contrast) - 1
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
 def loop1(timing):
     if timing < utils.task.stim_duration:
         square.draw()
@@ -26,9 +28,9 @@ def function2():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
     # modify contrast
-    # cont = float(utils.task.contrast) - 1
-    # square.fillColor = [cont, cont, cont]
-    # square.lineColor = [cont, cont, cont]
+    cont = float(utils.task.contrast) - 1
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
 def loop2(timing):
     square.draw()
     window.flip()
@@ -41,6 +43,15 @@ def function3():
     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     square3.pos = (int(utils.task.x[2] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square3.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    # modify contrast
+    cont = float(utils.task.contrast) - 1
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    square2.fillColor = [cont, cont, cont]
+    square2.lineColor = [cont, cont, cont]
+    square3.fillColor = [cont, cont, cont]
+    square3.lineColor = [cont, cont, cont]
+
 def loop3(timing):
     square.draw()
     square2.draw()
@@ -73,9 +84,45 @@ def function5():
 
 
 
+def function6():
+    try:
+        utils.task.pulse_pal.trigger_pulse(1)
+        cam3.put_state('On')
+    except:
+        print(traceback.format_exc())
+
+def function7():
+    try:
+        utils.task.pulse_pal.trigger_pulse(2)
+        cam3.put_state('On')
+    except:
+        print(traceback.format_exc())
+
+
+
+def function8():
+    square.pos = (int(utils.task.positionx * settings.PIXELS_PER_MM), int(utils.task.positiony * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.fillColor = utils.task.color
+    square.lineColor = utils.task.color
+def loop8(timing):
+    square.draw()
+    window.flip()
+
+def function9():
+    pass
+
+def loop9(timing):
+    window.flip()
+
+
 
 # camera correct and delete screen
 def function11():
+    try:
+        utils.task.pulse_pal.stop_pulse()
+    except:
+        pass
     cam3.put_state('Correct')
 
 def loop11(timing):
@@ -95,6 +142,10 @@ def loop12(timing):
 
 # camera incorrect
 def function13():
+    try:
+        utils.task.pulse_pal.stop_pulse()
+    except:
+        pass
     cam3.put_state('Incorrect')
 
 
@@ -102,6 +153,10 @@ def function13():
 
 # camera incorrect outside theshold with grey screen
 def function14():
+    try:
+        utils.task.pulse_pal.stop_pulse()
+    except:
+        pass
     cam3.put_state('Punish')
 
 def loop14(timing):
