@@ -7,7 +7,7 @@
 // servo1
 #define TIMEOPEN1 200
 #define TIMECLOSE1 300
-#define SERVOPIN1 8
+#define SERVOPIN1 10
 
 
 // servo2

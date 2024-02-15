@@ -1,7 +1,6 @@
 import cv2
 import os
 import numpy as np
-import pandas as pd
 from multiprocessing import Process, JoinableQueue, Value
 from user import settings
 from academy import time_utils
@@ -25,8 +24,7 @@ class FakeVideo:
 class Video(Process):
     def __init__(self, port='0', cam_number=0, name_video=None, path=None, width=None, height=None, fps=None,
                  codec_video='X264', cam_states=None, duration_video=1800, number_of_videos=50,
-                 threshold=0, cage_zone=None, doors1_zone=None, doors2_zone=None,
-                 floor1_zone=None, floor2_zone=None, tracking_position=False):
+                 threshold=0, cage_zone=None, doors1_zone=None, doors2_zone=None, floor1_zone=None, floor2_zone=None):
 
         Process.__init__(self)
 
@@ -48,9 +46,7 @@ class Video(Process):
         self.title = ''
 
         self.tracking_inside = doors1_zone is not None and doors2_zone is not None
-        self.tracking_inside_floor = floor1_zone is not None and floor2_zone is not None
-        self.tracking_position = tracking_position
-
+        self.tracking_inside_floor =  floor1_zone is not None and floor2_zone is not None
         self.cage_zone = cage_zone if cage_zone is not None else [640, 0, 480, 0]
         self.doors1_zone = doors1_zone if doors1_zone is not None else [640, 0, 480, 0]
         self.doors2_zone = doors2_zone if doors2_zone is not None else [640, 0, 480, 0]
@@ -65,9 +61,11 @@ class Video(Process):
         self.timestamps = []
         self.frames = []
         self.states = []
-        self.trials = []
-        self.cxs = []
-        self.cys = []
+
+        self.xmin = min(self.cage_zone[0], self.doors1_zone[0], self.doors2_zone[0])
+        self.xmax = max(self.cage_zone[1], self.doors1_zone[1], self.doors2_zone[1])
+        self.ymin = min(self.cage_zone[2], self.doors1_zone[2], self.doors2_zone[2])
+        self.ymax = max(self.cage_zone[3], self.doors1_zone[3], self.doors2_zone[3])
 
         self.cam_sync = {}
         self.list_states = []
@@ -125,14 +123,6 @@ class Video(Process):
         if not os.path.exists(self.port):
             raise
 
-        self.trial_number = 0
-        self.counter2 = [0, 0, 0, 0]
-        self.cx = 0
-        self.cy = 0
-
-        self.create_mask_flag = True
-        self.mask_mouse = None
-
     def put_state(self, state: str):
         self.command_queue.put(state)
 
@@ -182,10 +172,6 @@ class Video(Process):
 
             if not self.command_queue.empty():
                 state = self.command_queue.get()
-                try:
-                    self.trial_number = int(state)
-                except:
-                    pass
                 if state == 'stop':
                     break
                 elif state == 'day':
@@ -208,21 +194,15 @@ class Video(Process):
                         self.timestamps = []
                         self.frames = []
                         self.states = []
-                        self.trials = []
-                        self.cxs = []
-                        self.cys = []
-                        self.trial_number = 0
                         self.active = True
                         self.chrono.reset()
                         self.path_video = os.path.join(self.path, self.name_video + '.avi')
                         self.path_npz = os.path.join(self.path, self.name_video + '.npz')
-                        self.path_csv = os.path.join(self.path, self.name_video + '.csv')
                         self.out_video = cv2.VideoWriter(self.path_video, self.fourcc_out,
                                                          self.fps, (self.width, self.height))
                 elif state == 'inactive':
                     if self.active:
                         self.active = False
-                        self.trial_number = 0
                         self.image_queue.put(np.zeros(self.frame.shape, np.uint8))
                         if self.cam_number == 1 or self.cam_number == 2:
                             self.save_video1or2()
@@ -238,10 +218,6 @@ class Video(Process):
                     self.timestamps = []
                     self.frames = []
                     self.states = []
-                    self.trials = []
-                    self.cxs = []
-                    self.cys = []
-                    self.trial_number = 0
                     self.active = True
                     self.chrono.reset()
                     name_video = state[4:]
@@ -249,18 +225,12 @@ class Video(Process):
                     if self.cam_number == 2:
                         self.path_video = os.path.join(path, name_video + '_tracking.avi')
                         self.path_npz = os.path.join(path, name_video + '_tracking.npz')
-                        self.path_csv = os.path.join(path, name_video + '_tracking.csv')
                     else:
                         self.title = name_video
                         self.path_video = os.path.join(path, name_video + '.avi')
                         self.path_npz = os.path.join(path, name_video + '.npz')
-                        self.path_csv = os.path.join(path, name_video + '.csv')
                     self.out_video = cv2.VideoWriter(self.path_video, self.fourcc_out, self.fps,
                                                      (self.width, self.height))
-                elif state == "plus":
-                    self.threshold += 1
-                elif state == "minus":
-                    self.threshold -= 1
                 else:
                     self.state = state
 
@@ -298,14 +268,10 @@ class Video(Process):
                 if self.active:
                     (ret, self.frame), self.ctime = self.video.read(), time_utils.now_datetime()
                     if ret:
-                        self.create_mask()
                         self.do_tracking_in()
-                        self.do_tracking_position()
                         self.do_record3()
                         self.add_info_tracking_in()
-                        self.add_info_tracking_position()
                         self.add_info_states()
-                        self.add_info_trials()
                         self.do_stream()
                         self.target_counter += 1
                         if self.target_counter == self.target:
@@ -385,51 +351,6 @@ class Video(Process):
             area_total_floor = area_floor1 + area_floor2
             self.area_total_floor.value = int(area_total_floor)
 
-    def create_mask(self):
-        if self.create_mask_flag:
-            [zdxmin1, zdxmax1, zdymin1, zdymax1] = self.doors1_zone
-            [zdxmin2, zdxmax2, zdymin2, zdymax2] = self.doors2_zone
-            gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-            self.mask_mouse = np.zeros_like(gray_frame)
-            cv2.rectangle(self.mask_mouse, (zdxmin1, zdymin1), (zdxmax1, zdymax1), (255, 255, 255), -1)
-            cv2.rectangle(self.mask_mouse, (zdxmin2, zdymin2), (zdxmax2, zdymax2), (255, 255, 255), -1)
-            self.mask_mouse2 = cv2.bitwise_not(self.mask_mouse)
-
-        self.create_mask_flag = False
-
-    def do_tracking_position(self):
-        if self.tracking_position:
-            gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-
-            # Apply the mask to the grayscale image
-            frame_mouse = cv2.bitwise_and(gray_frame, self.mask_mouse)
-            frame_mouse = cv2.bitwise_or(frame_mouse, self.mask_mouse2)
-
-            _, thresh = cv2.threshold(frame_mouse, self.threshold, 255,
-                                      cv2.THRESH_BINARY_INV)  # Adjust threshold value as needed
-            # Find contours which will detect the mouse
-            contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-            for index, contour in enumerate(contours):
-
-                # You can filter out small contours if needed
-                if cv2.contourArea(contour) < 50:
-                    continue
-
-                # print(index)
-
-                # Add the origin offset to the contour (in this case origin = 0)
-                self.contour2 = contour
-
-                # Find the centroid of the mouse to get its position
-                M = cv2.moments(self.contour2)
-                if M['m00'] != 0:
-                    self.cx = int(M['m10'] / M['m00'])
-                    self.cy = int(M['m01'] / M['m00'])
-                else:
-                    self.cx, self.cy = 0, 0
-
-
     def do_record1(self):
         if time_utils.now_seconds() > self.next_time:
             self.next_time += self.duration_video
@@ -455,10 +376,6 @@ class Video(Process):
         self.delete_old_files()
         self.out_video = cv2.VideoWriter(path, self.fourcc_out, self.fps, (self.width, self.height))
 
-    def add_info_trials(self):
-        cv2.putText(self.frame, "trial: " + str(self.trial_number),
-                    (50, 100), cv2.FONT_HERSHEY_DUPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
-
     def add_info_states(self):
         self.frame_counter += 1
         self.fps_counter += 1
@@ -482,12 +399,9 @@ class Video(Process):
         except KeyError:
             pass
 
-
-        self.frames += [self.frame_counter]
-        self.states += [self.state]
-        self.trials += [self.trial_number]
-        self.cxs += [self.cx]
-        self.cys += [self.cy]
+        if self.state != self.previous_state:
+            self.frames += [self.frame_counter]
+            self.states += [self.cam_sync[self.state]]
 
     def add_info_tracking_out(self):
         try:
@@ -501,17 +415,13 @@ class Video(Process):
                         0.35, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(self.frame, f'{self.state[21:]}', (350, 100), cv2.FONT_HERSHEY_DUPLEX,
                         0.35, (255, 255, 255), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area in the cage: {self.area_cage.value}',
-                        (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
+            cv2.putText(self.frame, f'Area in the cage: {self.area_cage.value}', (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area in door1:    {self.area_doors1.value}',
-                        (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y + 20),
-                        cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 255), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area in door2:    {self.area_doors2.value}',
-                        (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y + 40),
+            cv2.putText(self.frame, f'Area in door1:    {self.area_doors1.value}', (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y+20),
+                        cv2.FONT_HERSHEY_DUPLEX,  0.4, (0, 255, 255), 1, cv2.LINE_AA)
+            cv2.putText(self.frame, f'Area in door2:    {self.area_doors2.value}', (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y+40),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (255, 255, 0), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area total:        {self.area_total.value}',
-                        (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y + 60),
+            cv2.putText(self.frame, f'Area total:        {self.area_total.value}', (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y+60),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (255, 0, 255), 1, cv2.LINE_AA)
 
             cv2.rectangle(self.frame, (zcxmin, zcymin), (zcxmax, zcymax), (0, 255, 0), 2)
@@ -532,6 +442,7 @@ class Video(Process):
                             cv2.FONT_HERSHEY_DUPLEX, 0.4, (255, 0, 255), 1, cv2.LINE_AA)
                 cv2.rectangle(self.frame, (zdxmin1, zdymin1), (zdxmax1, zdymax1), (255, 0, 255), 2)
                 cv2.rectangle(self.frame, (zdxmin2, zdymin2), (zdxmax2, zdymax2), (255, 0, 255), 2)
+
                 for key, value in self.centers.items():
                     cv2.circle(self.frame, value, 7, (255, 255, 255), -1)
 
@@ -543,26 +454,13 @@ class Video(Process):
                 [zdxmin3, zdxmax3, zdymin3, zdymax3] = self.floor1_zone
                 [zdxmin4, zdxmax4, zdymin4, zdymax4] = self.floor2_zone
                 cv2.putText(self.frame, f'Area in the floor: {self.area_total_floor.value}', (10, 420),
-                            cv2.FONT_HERSHEY_DUPLEX, 0.4, (100, 0, 255), 1, cv2.LINE_AA)
+                       cv2.FONT_HERSHEY_DUPLEX, 0.4, (100, 0, 255), 1, cv2.LINE_AA)
                 cv2.rectangle(self.frame, (zdxmin3, zdymin3), (zdxmax3, zdymax3), (100, 0, 255), 2)
                 cv2.rectangle(self.frame, (zdxmin4, zdymin4), (zdxmax4, zdymax4), (100, 0, 255), 2)
 
             except Exception:
                 pass
 
-    def add_info_tracking_position(self):
-        if self.tracking_position:
-
-            cv2.putText(self.frame, 'threshold mouse: ' + str(self.threshold), (10, 200),
-                        cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
-            try:
-                # Draw the contour of the mouse
-                cv2.drawContours(self.frame, [self.contour2], -1, (0, 255, 0), 1)
-                # Draw the centroid of the mouse
-                # cv2.circle(self.frame, (self.cx, self.cy), 5, (255, 255, 0), -1)
-                # Draw the value of luminance of the LED
-            except:
-                pass
 
     def do_stream(self):
         pass
@@ -587,23 +485,10 @@ class Video(Process):
         timestamps = np.array(self.timestamps, dtype='datetime64[ms]')
         frames = np.array(self.frames)
         states = np.array(self.states)
-
-        arrays = [self.timestamps, self.frames, self.trials, self.states, self.cxs, self.cys]
-
-        min_length = min(len(arr) for arr in arrays)
-
-        self.timestamps = self.timestamps[:min_length]
-        self.frames = self.frames[:min_length]
-        self.trials = self.trials[:min_length]
-        self.states = self.states[:min_length]
-        self.cxs = self.cxs[:min_length]
-        self.cys = self.cys[:min_length]
-
-        # save timestamps, frames and states to a df
-        df = pd.DataFrame({'timestamps': timestamps, 'frames': frames, 'trial': self.trials, 'states': states,
-                           'x': self.cxs, 'y': self.cys})
-        # save the df to a csv
-        df.to_csv(self.path_csv, index=False)
+        list_states = np.array(self.list_states)
+        list_circles0 = np.array(self.list_state_circle0)
+        list_circles1 = np.array(self.list_state_circle1)
+        np.savez(self.path_npz, timestamps, frames, states, list_states, list_circles0, list_circles1)
 
     def delete_old_files(self):
         paths = []
@@ -614,7 +499,7 @@ class Video(Process):
         number_to_delete = len(paths) - self.number_of_videos
         paths = sorted(paths)
         for i in range(number_to_delete):
-            try:  # the path can not be ready because it is being created or deleted
+            try: # the path can not be ready because it is being created or deleted
                 os.remove(paths[i])
             except:
                 pass
@@ -624,46 +509,45 @@ class Video(Process):
         v = int(v)
         return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
 
-
 try:
     cam1 = Video(port=settings.CAMERA1_PORT,
-                 cam_number=settings.CAM1_NUMBER,
-                 name_video=settings.CAM1_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM1_NAME_VIDEO,
-                 path=settings.VIDEOS_DIRECTORY,
-                 width=settings.CAM1_WIDTH,
-                 height=settings.CAM1_HEIGHT,
-                 fps=settings.CAM1_FPS,
-                 codec_video=settings.CAM1_CODEC_VIDEO,
-                 cam_states=settings.CAM1_STATES,
-                 duration_video=settings.CAM1_DURATION_VIDEO,
-                 number_of_videos=settings.CAM1_NUMBER_OF_VIDEOS,
-                 threshold=settings.CAM1_THRESHOLD,
-                 cage_zone=settings.CAM1_CAGE_ZONE,
-                 doors1_zone=settings.CAM1_DOORS1_ZONE,
-                 doors2_zone=settings.CAM1_DOORS2_ZONE,
-                 floor1_zone=None,
-                 floor2_zone=None)
+                     cam_number=settings.CAM1_NUMBER,
+                     name_video=settings.CAM1_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM1_NAME_VIDEO,
+                     path=settings.VIDEOS_DIRECTORY,
+                     width=settings.CAM1_WIDTH,
+                     height=settings.CAM1_HEIGHT,
+                     fps=settings.CAM1_FPS,
+                     codec_video=settings.CAM1_CODEC_VIDEO,
+                     cam_states=settings.CAM1_STATES,
+                     duration_video=settings.CAM1_DURATION_VIDEO,
+                     number_of_videos=settings.CAM1_NUMBER_OF_VIDEOS,
+                     threshold=settings.CAM1_THRESHOLD,
+                     cage_zone=settings.CAM1_CAGE_ZONE,
+                     doors1_zone=settings.CAM1_DOORS1_ZONE,
+                     doors2_zone=settings.CAM1_DOORS2_ZONE,
+                     floor1_zone=None,
+                     floor2_zone=None)
 except:
     cam1 = FakeVideo()
 
 try:
     cam2 = Video(port=settings.CAMERA2_PORT,
-                 cam_number=settings.CAM2_NUMBER,
-                 name_video=settings.CAM2_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM2_NAME_VIDEO,
-                 path=settings.VIDEOS_DIRECTORY,
-                 width=settings.CAM2_WIDTH,
-                 height=settings.CAM2_HEIGHT,
-                 fps=settings.CAM2_FPS,
-                 codec_video=settings.CAM2_CODEC_VIDEO,
-                 cam_states=settings.CAM2_STATES,
-                 duration_video=settings.CAM2_DURATION_VIDEO,
-                 number_of_videos=settings.CAM2_NUMBER_OF_VIDEOS,
-                 threshold=settings.CAM2_THRESHOLD,
-                 cage_zone=settings.CAM2_CAGE_ZONE,
-                 doors1_zone=settings.CAM2_DOORS1_ZONE,
-                 doors2_zone=settings.CAM2_DOORS2_ZONE,
-                 floor1_zone=None,
-                 floor2_zone=None)
+                     cam_number=settings.CAM2_NUMBER,
+                     name_video=settings.CAM2_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM2_NAME_VIDEO,
+                     path=settings.VIDEOS_DIRECTORY,
+                     width=settings.CAM2_WIDTH,
+                     height=settings.CAM2_HEIGHT,
+                     fps=settings.CAM2_FPS,
+                     codec_video=settings.CAM2_CODEC_VIDEO,
+                     cam_states=settings.CAM2_STATES,
+                     duration_video=settings.CAM2_DURATION_VIDEO,
+                     number_of_videos=settings.CAM2_NUMBER_OF_VIDEOS,
+                     threshold=settings.CAM2_THRESHOLD,
+                     cage_zone=settings.CAM2_CAGE_ZONE,
+                     doors1_zone=settings.CAM2_DOORS1_ZONE,
+                     doors2_zone=settings.CAM2_DOORS2_ZONE,
+                     floor1_zone=None,
+                     floor2_zone=None)
 except:
     cam2 = FakeVideo()
 
@@ -684,8 +568,7 @@ try:
                  doors1_zone=settings.CAM3_DOORS1_ZONE,
                  doors2_zone=settings.CAM3_DOORS2_ZONE,
                  floor1_zone=settings.CAM3_FLOOR1_ZONE,
-                 floor2_zone=settings.CAM3_FLOOR2_ZONE,
-                 tracking_position=settings.CAM3_TRACKING_POSITION)
+                 floor2_zone=settings.CAM3_FLOOR2_ZONE)
 
 except:
     cam3 = FakeVideo()

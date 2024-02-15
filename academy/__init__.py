@@ -41,3 +41,8 @@ for proc in psutil.process_iter():
     procd = proc.as_dict(attrs=['pid', 'name'])
     if "python" in str(procd['name']) and procd['pid'] != this_proc:
         proc.kill()
+
+for proc in psutil.process_iter():
+    procd = proc.as_dict(attrs=['pid', 'name'])
+    if "academy" in str(procd['name']) and procd['pid'] != this_proc:
+        proc.kill()

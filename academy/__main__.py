@@ -29,6 +29,7 @@ from user import settings
 
 
 def main():
+    os.system('alsactl --file ~/.config/asound.state restore')
     gui.reload()
     try:
         if not cam1.connected:
@@ -598,6 +599,16 @@ def relaunch():
 
     num = str(utils.reading_tags)
 
+    time.sleep(1)
+    cam1.put_state('inactive')
+    cam2.put_state('inactive')
+    cam3.put_state('inactive')
+    for i in range(500):
+        gui.reload()
+    cam1.stop()
+    cam2.stop()
+    cam3.stop()
+
     try:
         p = psutil.Process(os.getpid())
         for handler in p.get_open_files() + p.connections():
@@ -611,7 +622,6 @@ def relaunch():
         os.execl(python, python, sys.argv[0], "-i", num)
     else:
         os.execl(python, python, sys.argv[0], num)
-
 
 if __name__ == "__main__":
     main()

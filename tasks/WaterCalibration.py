@@ -17,7 +17,7 @@ class WaterCalibration(Task):
     def init_variables(self):
         self.trials_max = 100
 
-        self.interval = 0.3
+        self.interval = 1
         self.tolerance = 0.5
 
         self.collection = utils.water_calibration

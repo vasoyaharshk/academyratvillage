@@ -33,7 +33,7 @@ class Test_Photogates(Task):
                                      'PA1_Port3Out': 'Waiting',
                                      'Port3Out': 'Waiting', 'Port1Out': 'Waiting',
                                      'Port4Out': 'Waiting', Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 4)])
+            output_actions=[(Bpod.OutputChannels.LED, 2)])
 
 
     def after_trial(self):

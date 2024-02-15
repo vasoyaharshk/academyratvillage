@@ -21,7 +21,7 @@ class Automatic_Water(Task):
 
         self.stage = 0
         self.substage = 0
-        self.reward_drunk = 600 # deliver 600 ul water
+        self.reward_drunk = 1000 # deliver 1000 ul water
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -40,19 +40,14 @@ class Automatic_Water(Task):
                 state_name='Automatic_water',  # deliver reward
                 state_timer=self.valve_time,
                 state_change_conditions={Bpod.Events.Tup: 'Waiting'},
-                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM4, 5)])
+                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.LED, 1)])
 
         self.sma.add_state(
             state_name='Waiting',
             state_timer=self.duration_min/4,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
-
-        self.sma.add_state(
-            state_name='Exit',
-            state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[])
+
 
 
     def after_trial(self):

@@ -19,8 +19,8 @@ class Test_PurgeValve(Task):
 
     def main_loop(self):
         self.sma.add_state(
-            state_name='Valve_1',
-            state_timer=5,
+            state_name='Valve_8',
+            state_timer=10,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.LED, 1)])
 

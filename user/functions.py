@@ -3,7 +3,7 @@ from academy.utils import utils
 from academy.camera import cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
-from user.sound_elements import soundStream, soundVec
+from user.sound_elements import soundStream, soundVec1, soundVec2
 import traceback
 
 # when softcode n is called, function n runs once
@@ -44,7 +44,8 @@ def function3():
     square3.pos = (int(utils.task.x[2] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     # modify contrast
-    cont = float(utils.task.contrast) - 1
+    #cont = float(utils.task.contrast) - 1
+    cont = 0
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
     square2.fillColor = [cont, cont, cont]
@@ -117,6 +118,8 @@ def loop9(timing):
 
 
 
+
+
 # camera correct and delete screen
 def function11():
     try:
@@ -180,6 +183,19 @@ def loop15(timing):
 def function16():
     #print('softcode 16 received')
     utils.control_softcodes += 1
+
+
+def function17():
+    soundStream.play(soundVec1)
+
+
+def function18():
+    soundStream.play(soundVec2)
+
+
+
+
+
 
 
 # do nothing, used first time you create the bpod to clean old softcodes

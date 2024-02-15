@@ -14,27 +14,27 @@ class Test_Sound(Task):
     def main_loop(self):
         self.sma.add_state(
             state_name='RW_sound_on',
-            state_timer=10,
+            state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'Waiting'},
-            output_actions=[(Bpod.OutputChannels.Valve, 2)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
             state_name='Waiting',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'PNSH_sound_on'},
-            output_actions=[(Bpod.OutputChannels.LED, 4)])
+            output_actions=[])
 
         self.sma.add_state(
             state_name='PNSH_sound_on',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'Waiting2'},
-            output_actions=[(Bpod.OutputChannels.LED, 2)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 18)])
 
         self.sma.add_state(
             state_name='Waiting2',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 3)])
+            output_actions=[])
 
     def after_trial(self):
         pass

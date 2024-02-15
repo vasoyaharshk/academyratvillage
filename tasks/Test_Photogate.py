@@ -20,16 +20,16 @@ class Test_Photogate(Task):
         self.sma.add_state(
             state_name='Waiting',
             state_timer=500,
-            state_change_conditions={'Port1In': 'Cross_corridor',
+            state_change_conditions={'Port2In': 'Cross_corridor',
                                      Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
         self.sma.add_state(
             state_name='Cross_corridor',
             state_timer=500,
-            state_change_conditions={'Port1Out': 'Waiting',
+            state_change_conditions={'Port2Out': 'Waiting',
                                     Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 1)])
+            output_actions=[(Bpod.OutputChannels.LED, 2)])
 
     def after_trial(self):
         pass
