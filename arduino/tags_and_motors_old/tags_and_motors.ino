@@ -1,8 +1,8 @@
 #include <HX711.h>
 #include <Wire.h>
 #include <Servo.h>
-#include <Arduino.h>
-#include "Adafruit_SHT31.h"
+#include "DHT.h"
+
 
 // servo1
 #define TIMEOPEN1 200
@@ -48,7 +48,8 @@ HX711 LoadCell;
 bool scaleOn = false;
 
 // temperature sensor
-Adafruit_SHT31 sht31 = Adafruit_SHT31();
+#define TEMP 13
+DHT dht(TEMP, DHT11);
 
 // led
 #define LED 12
@@ -232,11 +233,9 @@ void turnLedOff()
 
 void tempAndScale()
 {
-  float t = sht31.readTemperature();
-  float h = sht31.readHumidity();
-  Serial.print("Temperature;"); Serial.print(t); Serial.print("\t");
-  Serial.print("Humidity: "); Serial.print(h);
-  
+  float t = dht.readTemperature();
+  Serial.print("Temperature;");
+  Serial.print(t);
   LoadCell.tare();
   scaleOn = true;
 }
@@ -245,13 +244,9 @@ void tempAndScale()
 
 void getTemperature()
 {
-  float t = sht31.readTemperature();
-  float h = sht31.readHumidity();
-  
-  Serial.print("Temperature;"); 
-  Serial.print(t); 
-  Serial.print("Humidity;");
-  Serial.print(h);
+  float t = dht.readTemperature();
+  Serial.print("Temperature;");
+  Serial.print(t);
 }
 
 
@@ -310,13 +305,13 @@ void setup()
 {
   Serial.begin(9600);
   Serial1.begin(9600);
-  sht31.begin(0x44);
 
   pinMode(LED, OUTPUT);
 
   LoadCell.begin(CELL1, CELL2); // start connection to HX711
   LoadCell.set_scale(CELLCALIBRATION);
   LoadCell.tare();
+  dht.begin();
 
   tempAndScale();
 }
