@@ -82,9 +82,11 @@ class Arduino:
                         pass
 
                 elif ';' in tag:
+                    print('Temp Here')
                     try:
                         position = tag.index(';')
-                        temperature = str(float(tag[position + 1:]))
+                        print(tag[position + 1:])
+                        temperature = str(tag[position + 1:])
                         value = 't', temperature
                         queues.tags.put(value)
                     except:

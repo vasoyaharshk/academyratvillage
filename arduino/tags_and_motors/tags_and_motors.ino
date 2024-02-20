@@ -235,7 +235,7 @@ void tempAndScale()
   float t = sht31.readTemperature();
   float h = sht31.readHumidity();
   Serial.print("Temperature;"); Serial.print(t); Serial.print("\t");
-  Serial.print("Humidity: "); Serial.print(h);
+  Serial.print("Humidity; "); Serial.print(h);
   
   LoadCell.tare();
   scaleOn = true;
@@ -248,9 +248,9 @@ void getTemperature()
   float t = sht31.readTemperature();
   float h = sht31.readHumidity();
   
-  Serial.print("Temperature;"); 
+  Serial.print("Temperature; "); 
   Serial.print(t); 
-  Serial.print("Humidity;");
+  Serial.print("H ");
   Serial.print(h);
 }
 
