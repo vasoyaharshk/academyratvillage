@@ -14,7 +14,11 @@ class Habituation(Task):
     
         ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
-        Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
+        Port 2 - PHOTOGATES 2: Photogates next to lickport 
+        Port 3 - PHOTOGATES 3: Photogates 
+        Port 4 - PHOTOGATES 4: Photogates 
+        Port 5 - PHOTOGATES 5: Photogates 
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
         """
 
     def init_variables(self):
@@ -41,33 +45,33 @@ class Habituation(Task):
                 state_timer=self.valve_time,
                 state_change_conditions={Bpod.Events.Tup: 'Start_task2'},
                 output_actions=[(Bpod.OutputChannels.Valve, 1),
-                                (Bpod.OutputChannels.PWM4, 5)])
-                # deliver 100 ul rewar, check inner door is open and global LED ON
+                                (Bpod.OutputChannels.PWM6, 5)])
+                # deliver 100 ul reward, and global LED ON
 
             self.sma.add_state(
                 state_name='Start_task2',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port4In: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
             self.sma.add_state(
                 state_name='Real_start',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Habituation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM4, 5)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM6, 5)])
                 # close corridor door 2 when subject enters to behavioral box
 
         self.sma.add_state(
             state_name='Habituation',
             state_timer=self.duration_min/4,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Exit',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
 
     def after_trial(self):

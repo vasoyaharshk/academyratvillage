@@ -15,12 +15,7 @@ class SoundR:
             device = 1
 
         sd.default.device = device
-        self._Stream = sd.OutputStream(dtype='float32')
-        self._Stream.close()
-        self._sound = []
-        self._playing = Value('i', 0)
-        self._p = Process(target=self._play_sound_background)
-        self._p.daemon = True
+
 
     @staticmethod
     def getDevice():
@@ -38,68 +33,11 @@ class SoundR:
         print('found', devi[result])
         return result
 
-    def load(self, v1, v2=None):
 
-        """ Load audio """
-        if v2 is None:
-            v2 = v1
-        if len(v1) != len(v2):
-            raise ValueError('SoundR: The length of the vectors v1 and v2 has be the same.')
-        try:
-            self.stopSound()
-
-        except AttributeError:
-            pass
-
-        sound = self._create_sound_vec(v1, v2)
-        self._Stream.close()
-        self._Stream = sd.OutputStream(dtype='float32')
-        self._Stream.start()
-        self._sound = sound
-        self._playing.value = 0
-        self._p = Process(target=self._play_sound_background)
-        self._p.daemon = True
-        self._p.start()
-        print('SoundR: Loaded.')
-
-    def playSound(self):
-        if self._sound == []:
-            raise ValueError('SoundR: No sound loaded. Please, use the method load().')
-        self._playing.value = 1
 
     def play(self, soundVec):
         sd.play(soundVec)
 
-    def stopSound(self):
-        self._playing.value = 2
-        try:
-            self._Stream.close()
-            self._p.terminate()
-            print('SoundR: Stop.')
-        except:
-            print('stop without play')
-
-    def finalStop(self):
-        print("-----finalstop-----")
-        self.playSound()
-        time.sleep(0.5)
-        self.stopSound()
-
-    def _play_sound_background(self):
-        while True:
-
-            if self._playing.value == 1:
-                print('SoundR: Play.')
-                if self._sound == []:
-                    print('Error: no sound is loaded.')
-                    self._playing.value = 2
-                    break
-                else:
-                    self._Stream.write(self._sound)
-                    self._playing.value = 2
-                    break
-            elif self._playing.value == 2:
-                break
 
     @staticmethod
     def _create_sound_vec(v1, v2):
@@ -107,7 +45,21 @@ class SoundR:
         return np.ascontiguousarray(sound.T, dtype=np.float32)
 
 
-def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=192000, Fn=10000, randgen=None):
+
+def pureToneGen(amp, freq, toneDuration, FsOut=44800):
+    """generates a given parameters pure tone vector. Gen counterpart using np.empty(s1.shape[?])
+    pureToneGen(amp, freq, toneDuration, FsOut=192000):
+    """
+    if type(amp) is float and type(freq) is int:
+        tvec = np.linspace(0, toneDuration, toneDuration * FsOut)
+        s1 = amp * np.sin(2 * np.pi * freq * tvec)
+        return s1
+    else:
+        raise ValueError('pureToneGen needs (float, int) as arguments')
+
+
+
+def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
     """whiteNoiseGen(amp, band_fs_bot, band_fs_top):
     beware this is not actually whitenoise
     amp: float, amplitude
@@ -140,6 +92,8 @@ def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=192000, Fn=1000
         raise ValueError('whiteNoiseGen needs (float, int, int, num,) as arguments')
 
 
+
+
 class FakeSoundR:
 
     def __init__(self):
@@ -164,8 +118,11 @@ class FakeSoundVec:
 
 try:
     soundStream = SoundR()
-    soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44100, Fn=1000)
-    soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44100, Fn=1000)
+    #soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44800, Fn=1000)
+    #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
+
+    soundVec1 = pureToneGen(1.0, 16000, 1)
+    soundVec2 = pureToneGen(1.0, 4000, 1)
 
 except:
     print("______")

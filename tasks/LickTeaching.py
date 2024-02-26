@@ -13,11 +13,26 @@ class LickTeaching(Task):
         Starts with reward sound ON + water port LED ON + automatic delivery of water.
         Sound and LED stay on until poke or timeup. Global lights always ON.
 
-        ########   PORTS INFO   ########
+        ########   PORTS INFO   OLD   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - BUZZER: valve (16kHz): correct
         Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
+        
+        
+        ########   PORTS INFO   ########
+        Port 1 - WATER PORT: LED, photogates and pump
+        Port 2 - PHOTOGATES 2: Photogates next to lickport 
+        Port 3 - PHOTOGATES 3: Photogates 
+        Port 4 - PHOTOGATES 4: Photogates 
+        Port 5 - PHOTOGATES 5: Photogates 
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
+        
+        
         """
+
+
+
+
 
     def init_variables(self):
         # general
@@ -52,66 +67,66 @@ class LickTeaching(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port4In: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                output_actions=[(Bpod.OutputChannels.PWM6, 5)])
                 # global LED ON
 
             self.sma.add_state(
                 state_name='Real_start',  # close corridor door 2 when subject enters to behavioral box
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM4, 5)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM6, 5)])
         else:
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-                output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+                output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Fixation',  # if mouse licks during fixation, this is started again.
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: floading},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Fixation_break',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-            output_actions=[(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Automatic_reward',
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM4, 5),
-                            (Bpod.OutputChannels.Valve, 2)])
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 5),
+                            (Bpod.OutputChannels.SoftCode, 17)])
             # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(
             state_name='Wait_for_reward',
             state_timer=30,
             state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2), (Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 17), (Bpod.OutputChannels.PWM6, 5)])
             # lickportLED and RWsound remain ON until poke o timeup
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 11), (Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 11), (Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 12),(Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 12),(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Exit',
             state_timer=10,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 15), (Bpod.OutputChannels.PWM4, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 15), (Bpod.OutputChannels.PWM6, 5)])
             # Wait 10 sec for the next automatic reward
 
 

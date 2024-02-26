@@ -183,6 +183,7 @@ class Video(Process):
             if not self.command_queue.empty():
                 state = self.command_queue.get()
                 try:
+                    print(state)
                     self.trial_number = int(state)
                 except:
                     pass
@@ -643,7 +644,9 @@ try:
                  doors2_zone=settings.CAM1_DOORS2_ZONE,
                  floor1_zone=None,
                  floor2_zone=None)
+    print('camera1 OK')
 except:
+    print('error in camera1')
     cam1 = FakeVideo()
 
 try:
@@ -686,8 +689,10 @@ try:
                  floor1_zone=settings.CAM3_FLOOR1_ZONE,
                  floor2_zone=settings.CAM3_FLOOR2_ZONE,
                  tracking_position=settings.CAM3_TRACKING_POSITION)
+    print('camera3 OK')
 
 except:
+    print('error in camera3')
     cam3 = FakeVideo()
 
 cam1.play()

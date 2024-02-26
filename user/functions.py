@@ -85,21 +85,6 @@ def function5():
 
 
 
-def function6():
-    try:
-        utils.task.pulse_pal.trigger_pulse(1)
-        cam3.put_state('On')
-    except:
-        print(traceback.format_exc())
-
-def function7():
-    try:
-        utils.task.pulse_pal.trigger_pulse(2)
-        cam3.put_state('On')
-    except:
-        print(traceback.format_exc())
-
-
 
 def function8():
     square.pos = (int(utils.task.positionx * settings.PIXELS_PER_MM), int(utils.task.positiony * settings.PIXELS_PER_MM))
@@ -117,15 +102,14 @@ def loop9(timing):
     window.flip()
 
 
-
+#Test Photogate:
+def function10():
+    print("Animal Crossed")
+    soundStream.play(soundVec1)
 
 
 # camera correct and delete screen
 def function11():
-    try:
-        utils.task.pulse_pal.stop_pulse()
-    except:
-        pass
     cam3.put_state('Correct')
 
 def loop11(timing):
@@ -145,10 +129,6 @@ def loop12(timing):
 
 # camera incorrect
 def function13():
-    try:
-        utils.task.pulse_pal.stop_pulse()
-    except:
-        pass
     cam3.put_state('Incorrect')
 
 
@@ -156,10 +136,6 @@ def function13():
 
 # camera incorrect outside theshold with grey screen
 def function14():
-    try:
-        utils.task.pulse_pal.stop_pulse()
-    except:
-        pass
     cam3.put_state('Punish')
 
 def loop14(timing):
@@ -186,10 +162,12 @@ def function16():
 
 
 def function17():
+    #sound for correct 16KHz
     soundStream.play(soundVec1)
 
 
 def function18():
+    # sound for incorrect 4kHz
     soundStream.play(soundVec2)
 
 
