@@ -19,6 +19,16 @@ class TouchTeaching(Task):
         Port 2 - BUZZER: valve (16kHz): correct
         Port 3 - PHOTOGATES 4: Photogates end of corridor
         Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
+        
+        
+                ########   PORTS INFO   ########
+        Port 1 - WATER PORT: LED, photogates and pump
+        Port 2 - PHOTOGATES 2: Photogates next to lickport 
+        Port 3 - PHOTOGATES 3: Photogates 
+        Port 4 - PHOTOGATES 4: Photogates 
+        Port 5 - PHOTOGATES 5: Photogates 
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
+        
         """
 
     def init_variables(self):

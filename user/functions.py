@@ -164,15 +164,13 @@ def function16():
 def function17():
     #sound for correct 16KHz
     soundStream.play(soundVec1)
+    print("Reward Sound played")
 
 
 def function18():
     # sound for incorrect 4kHz
     soundStream.play(soundVec2)
-
-
-
-
+    print("Punish Sound played")
 
 
 
