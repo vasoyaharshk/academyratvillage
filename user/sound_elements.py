@@ -122,7 +122,7 @@ try:
     #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
 
     soundVec1 = pureToneGen(1.0, 16000, 1)
-    soundVec2 = pureToneGen(0.1, 4000, 1)
+    soundVec2 = pureToneGen(0.5, 4000, 1)
 
 except:
     print("______")
