@@ -24,13 +24,12 @@ class SoundR:
         result = 0
         idx = 0
         for dev in devi:
-            if dev['name'].startswith('front') and dev['max_output_channels'] == 2:
+            if dev['name'].startswith('UACDemoV1.0') and dev['max_output_channels'] == 2:
                 result = idx
-                print('found')
+                print(' External speaker found')
                 break
 
             idx += 1
-        print('found', devi[result])
         return result
 
 

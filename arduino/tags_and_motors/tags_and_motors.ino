@@ -16,14 +16,14 @@
 #define SERVOPIN2 9
 
 
-// always 24 - 25 degrees from open to close
+// always 90 degrees from open to close
 
 // academy1
-#define ANGLEOPEN1 45
-#define ANGLECLOSE1 16
-#define ANGLEOPEN2 73
-#define ANGLECLOSE2 42
-#define ANGLESEMICLOSE2 55
+#define ANGLEOPEN1 5
+#define ANGLECLOSE1 105
+#define ANGLEOPEN2 160
+#define ANGLECLOSE2 70
+#define ANGLESEMICLOSE2 55 //Harsh: what is this?
 
 //academy2
 //#define ANGLEOPEN1 17

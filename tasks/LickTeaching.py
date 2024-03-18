@@ -37,7 +37,7 @@ class LickTeaching(Task):
     def init_variables(self):
         # general
         self.duration_min = 1200  # 20 mins
-        self.duration_max = 1260
+        self.duration_max = 1260 #21 mins
         self.stage = 0
         self.substage = 0
 
@@ -84,7 +84,7 @@ class LickTeaching(Task):
                 output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
-            state_name='Fixation',  # if mouse licks during fixation, this is started again.
+            state_name='Fixation',  # if animal licks during fixation, this is started again.
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: floading},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)])
@@ -149,4 +149,6 @@ class LickTeaching(Task):
 
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)
+        self.register_value('trial_result', 'correct_first')
+
 

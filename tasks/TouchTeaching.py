@@ -42,17 +42,17 @@ class TouchTeaching(Task):
 
         # screen details
         ########3 to change add 3 stimulussssss ###########33
-        self.x = [60, 200, 340]  # screen width is 401mmm
-        self.y = 125  # screen height is 250mmm
-        self.width = 30
-        self.correct_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2   # full screen
+        self.x = [60, 175, 290]  # screen width is 401mmm
+        self.y = 30  # screen height is 250mmm
+        self.width = 80
+        self.correct_th = settings.WIN_SIZE[0] * 2  # full screen #Harsh?
+        self.repoke_th = settings.WIN_SIZE[0] * 2   # full screen #Harsh?
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1.5
-        self.valve_factor_i = 0.5
+        self.valve_factor_c = 1.5 #More reward for correct
+        self.valve_factor_i = 0.5 #Less reward for misses
 
         # counters
         self.reward_drunk = 0
@@ -69,7 +69,7 @@ class TouchTeaching(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port4In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[])
 
             self.sma.add_state(
@@ -89,7 +89,7 @@ class TouchTeaching(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port3In: 'Fixation'},
+            state_change_conditions={Bpod.Events.Port6In: 'Fixation'},
             output_actions=[])
 
         self.sma.add_state(
@@ -109,8 +109,7 @@ class TouchTeaching(Task):
             state_name='Correct_first',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 17)])
             # waterLED and RWsound remain ON until poke
 
         self.sma.add_state(
@@ -123,7 +122,7 @@ class TouchTeaching(Task):
             state_name='Miss',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Miss_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 4), (Bpod.OutputChannels.SoftCode, 12)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 12)])
             # waterLED ON, global LED ON
 
         self.sma.add_state(

@@ -662,12 +662,14 @@ try:
                  duration_video=settings.CAM2_DURATION_VIDEO,
                  number_of_videos=settings.CAM2_NUMBER_OF_VIDEOS,
                  threshold=settings.CAM2_THRESHOLD,
-                 cage_zone=settings.CAM2_CAGE_ZONE,
-                 doors1_zone=settings.CAM2_DOORS1_ZONE,
-                 doors2_zone=settings.CAM2_DOORS2_ZONE,
+                 cage_zone=None,
+                 doors1_zone=None,
+                 doors2_zone=None,
                  floor1_zone=None,
                  floor2_zone=None)
+    print('camera2 OK')
 except:
+    print('error in camera2')
     cam2 = FakeVideo()
 
 try:
