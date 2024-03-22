@@ -42,7 +42,7 @@ class StageTraining_7B_V1(Task):
         self.duration_tired = 1800  # 30 mins if animal sleeping last 10 mins, finishes task
         self.trials_tired = 5  # if animal does less than this number in the last 10 mins, finishes task
         self.tired = False  # Tired animal indicator
-        self.silent = True
+        self.silent = False
         self.mask = 3
         self.choices = 3
         self.stage = 1
@@ -77,7 +77,7 @@ class StageTraining_7B_V1(Task):
         # screen details
         self.x = 0    # screen width is 401mmm
         self.y = 125  # screen height is 250mmm
-        self.width = 30  # stimulus width
+        self.width = 80  # stimulus width
         self.correct_th = 130 # 1/3 of the screen
         self.repoke_th = settings.WIN_SIZE[0] * 2 # full screen
         self.contrast = 1.2  # 0 black, 1 gray, 2 white. Default 60%
@@ -254,11 +254,11 @@ class StageTraining_7B_V1(Task):
         # Possible positions (screen is 0-400 mm)
 
         if self.choices == 3:  # 3 holes by defoult
-            self.x_positions = [60, 200, 340]
+            self.x_positions = [60, 175, 290]
         elif self.choices == 2:
-            self.x_positions = [60, 340]
+            self.x_positions = [60, 290]
         elif self.choices == 1:
-            self.x_positions = [200]
+            self.x_positions = [175]
 
         # Choose all positions
         if self.current_trial == 0: # Make a list with x values
@@ -396,7 +396,7 @@ class StageTraining_7B_V1(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+                            (Bpod.OutputChannels.SoftCode, 17)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
@@ -425,7 +425,7 @@ class StageTraining_7B_V1(Task):
             state_name='Incorrect',
             state_timer=0.25,
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
-            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.SoftCode, 13)])
+            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.SoftCode, 18)])
             # Incorrect sound
         
         self.sma.add_state(
@@ -440,7 +440,7 @@ class StageTraining_7B_V1(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+                            (Bpod.OutputChannels.SoftCode, 17)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(

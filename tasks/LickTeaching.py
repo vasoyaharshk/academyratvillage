@@ -58,7 +58,7 @@ class LickTeaching(Task):
         print('Trial: ' + str(self.current_trial))
 
         # FLOADING AVOIDANCE
-        if self.miss_acc_counter > 5:
+        if self.miss_acc_counter > 30:  #Balma inititally set it to 5 but changed it to 30 becuase repeating the sound was an issue.
             floading = 'Wait_for_reward'
         else:
             floading = 'Automatic_reward'
@@ -107,14 +107,14 @@ class LickTeaching(Task):
             state_name='Wait_for_reward',
             state_timer=30,
             state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 17), (Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 5)])
             # lickportLED and RWsound remain ON until poke o timeup
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 11), (Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Miss',

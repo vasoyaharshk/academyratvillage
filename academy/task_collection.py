@@ -177,6 +177,7 @@ class Task(object):
                 self.after_trial()
                 self.register_values()
                 self.current_trial += 1
+                cam3.put_state(str(self.current_trial))
 
     def main_loop(self):
         raise NotImplementedError

@@ -86,37 +86,6 @@ def function5():
 
 
 
-def function8():
-    square.pos = (int(utils.task.positionx * settings.PIXELS_PER_MM), int(utils.task.positiony * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.fillColor = utils.task.color
-    square.lineColor = utils.task.color
-def loop8(timing):
-    square.draw()
-    window.flip()
-
-def function9():
-    pass
-
-def loop9(timing):
-    window.flip()
-
-
-#Test Photogate:
-def function10():
-    print("Animal Crossed")
-    soundStream.play(soundVec1)
-
-
-# camera correct and delete screen
-def function11():
-    cam3.put_state('Correct')
-
-def loop11(timing):
-    window.flip()
-
-
-
 
 # camera miss with grey screen
 def function12():
@@ -125,11 +94,6 @@ def function12():
 def loop12(timing):
     # white_screen.draw()
     window.flip()
-
-
-# camera incorrect
-def function13():
-    cam3.put_state('Incorrect')
 
 
 
@@ -160,14 +124,19 @@ def function16():
     #print('softcode 16 received')
     utils.control_softcodes += 1
 
-
+# play a sound and delete the screen
 def function17():
+    cam3.put_state('Correct')
     #sound for correct 16KHz
     soundStream.play(soundVec1)
     print("Reward Sound played")
 
+def loop17(timing):
+    window.flip()
+
 
 def function18():
+    cam3.put_state('Incorrect')
     # sound for incorrect 4kHz
     soundStream.play(soundVec2)
     print("Punish Sound played")

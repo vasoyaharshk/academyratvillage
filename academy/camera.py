@@ -417,8 +417,6 @@ class Video(Process):
                 if cv2.contourArea(contour) < 50:
                     continue
 
-                # print(index)
-
                 # Add the origin offset to the contour (in this case origin = 0)
                 self.contour2 = contour
 
@@ -629,7 +627,7 @@ class Video(Process):
 try:
     cam1 = Video(port=settings.CAMERA1_PORT,
                  cam_number=settings.CAM1_NUMBER,
-                 name_video=settings.CAM1_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM1_NAME_VIDEO,
+                 name_video=settings.CAM1_NAME_VIDEO + '_' + time_utils.now_string_for_files(),
                  path=settings.VIDEOS_DIRECTORY,
                  width=settings.CAM1_WIDTH,
                  height=settings.CAM1_HEIGHT,
@@ -652,7 +650,7 @@ except:
 try:
     cam2 = Video(port=settings.CAMERA2_PORT,
                  cam_number=settings.CAM2_NUMBER,
-                 name_video=settings.CAM2_NAME_VIDEO + '_' + time_utils.now_string_for_files() + '_' + settings.CAM2_NAME_VIDEO,
+                 name_video=settings.CAM2_NAME_VIDEO + '_' + time_utils.now_string_for_files(),
                  path=settings.VIDEOS_DIRECTORY,
                  width=settings.CAM2_WIDTH,
                  height=settings.CAM2_HEIGHT,

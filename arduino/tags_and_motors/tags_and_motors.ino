@@ -5,39 +5,27 @@
 #include "Adafruit_SHT31.h"
 
 // servo1
-#define TIMEOPEN1 200
+#define TIMEOPEN1 150
 #define TIMECLOSE1 300
-#define SERVOPIN1 10
+#define SERVOPIN1 9
 
 
 // servo2
 #define TIMEOPEN2 200
 #define TIMECLOSE2 300
-#define SERVOPIN2 9
+#define SERVOPIN2 10
 
 
 // always 90 degrees from open to close
 
 // academy1
-#define ANGLEOPEN1 5
+#define ANGLEOPEN1 65
 #define ANGLECLOSE1 105
 #define ANGLEOPEN2 160
 #define ANGLECLOSE2 70
 #define ANGLESEMICLOSE2 55 //Harsh: what is this?
 
-//academy2
-//#define ANGLEOPEN1 17
-//#define ANGLECLOSE1 47
-//#define ANGLEOPEN2 150
-//#define ANGLECLOSE2 178
-//#define ANGLESEMICLOSE2 165
 
-// academy3
-//#define ANGLEOPEN1 30
-//#define ANGLECLOSE1 55
-//#define ANGLEOPEN2 135
-//#define ANGLECLOSE2 160
-//#define ANGLESEMICLOSE2 150
 
 
 // scale
