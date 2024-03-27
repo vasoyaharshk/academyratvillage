@@ -62,7 +62,6 @@ def loop3(timing):
 
 # start reading touchscreen
 def function4():
-
     try:
         x = utils.task.x[1]
     except:
@@ -112,6 +111,7 @@ def loop14(timing):
 # camera empty and delete screen
 def function15():
     cam3.put_state('')
+    soundStream.stop(soundVec1)
 
 def loop15(timing):
     window.flip()

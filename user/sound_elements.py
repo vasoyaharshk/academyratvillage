@@ -37,6 +37,8 @@ class SoundR:
     def play(self, soundVec):
         sd.play(soundVec)
 
+    def stop(self, soundVec):
+       sd.stop()
 
     @staticmethod
     def _create_sound_vec(v1, v2):
@@ -120,8 +122,8 @@ try:
     #soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44800, Fn=1000)
     #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
 
-    soundVec1 = pureToneGen(0.3, 16000, 2) #16000
-    soundVec2 = pureToneGen(0.3, 4000, 2) #4000
+    soundVec1 = pureToneGen(0.4, 16000, 1800) #16000
+    soundVec2 = pureToneGen(0.4, 4000, 1800) #4000
 
 except:
     print("______")

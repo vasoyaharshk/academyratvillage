@@ -114,7 +114,7 @@ class LickTeaching(Task):
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 15)])
 
         self.sma.add_state(
             state_name='Miss',

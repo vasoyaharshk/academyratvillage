@@ -34,7 +34,7 @@ class TouchTeaching(Task):
     def init_variables(self):
         # general
         self.duration_min = 1800 # 30 mins
-        self.duration_max = 2100 # 40 mins
+        self.duration_max = 1860 #Balma set it to 40 mins but for rat village set to 31 mins.
         self.stage = 0
         self.substage = 0
         self.response_duration = 120 # 2 min
