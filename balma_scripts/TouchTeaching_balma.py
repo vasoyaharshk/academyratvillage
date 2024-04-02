@@ -20,31 +20,21 @@ class TouchTeaching(Task):
         Port 2 - BUZZER: valve (16kHz): correct
         Port 3 - PHOTOGATES 4: Photogates end of corridor
         Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
-        
-        
-                ########   PORTS INFO   ########
-        Port 1 - WATER PORT: LED, photogates and pump
-        Port 2 - PHOTOGATES 2: Photogates next to lickport 
-        Port 3 - PHOTOGATES 3: Photogates 
-        Port 4 - PHOTOGATES 4: Photogates 
-        Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
-        
         """
 
     def init_variables(self):
         # general
         self.duration_min = 1800 # 30 mins
-        self.duration_max = 2100 # 35 mins
+        self.duration_max = 2100 # 40 mins
         self.stage = 0
         self.substage = 0
         self.response_duration = 120 # 2 min
         self.stim_duration = self.response_duration
 
         # screen details
-        self.x = [60, 175, 290]  # screen width is 401mmm
-        self.y = 30  # screen height is 250mmm
-        self.width = 80
+        self.x = [60, 200, 340]  # screen width is 401mmm
+        self.y = 125  # screen height is 250mmm
+        self.width = 30
         self.correct_th = settings.WIN_SIZE[0] * 2  # full screen
         self.repoke_th = settings.WIN_SIZE[0] * 2   # full screen
         self.contrast= 0.4 #0 black, 1 gray, 2 white. Default 20%
@@ -53,8 +43,8 @@ class TouchTeaching(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1.5 #More reward for correct
-        self.valve_factor_i = 0.5 #Less reward for misses
+        self.valve_factor_c = 1.5
+        self.valve_factor_i = 0.5
 
         # counters
         self.reward_drunk = 0
@@ -71,7 +61,7 @@ class TouchTeaching(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port4In: 'Real_start'},
                 output_actions=[])
 
             self.sma.add_state(
@@ -91,7 +81,7 @@ class TouchTeaching(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Fixation'},
+            state_change_conditions={Bpod.Events.Port3In: 'Fixation'},
             output_actions=[])
 
         self.sma.add_state(
@@ -111,7 +101,8 @@ class TouchTeaching(Task):
             state_name='Correct_first',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 17)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
+                            (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and RWsound remain ON until poke
 
         self.sma.add_state(
@@ -124,7 +115,7 @@ class TouchTeaching(Task):
             state_name='Miss',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Miss_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 12)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 4), (Bpod.OutputChannels.SoftCode, 12)])
             # waterLED ON, global LED ON
 
         self.sma.add_state(

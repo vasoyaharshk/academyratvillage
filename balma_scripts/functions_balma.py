@@ -3,7 +3,7 @@ from academy.utils import utils
 from academy.camera import cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
-from user.sound_elements import soundStream, soundVec1, soundVec2
+from user.sound_elements import soundStream, soundVec
 import traceback
 
 # when softcode n is called, function n runs once
@@ -23,7 +23,6 @@ def loop1(timing):
         square.draw()
     window.flip()
 
-
 # draw a permanent white rectange  with task.x, task.y, task.width
 def function2():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
@@ -36,7 +35,6 @@ def loop2(timing):
     square.draw()
     window.flip()
 
-
 # draw a 3 temporal white rectangles (fot touchteaching)  with task.x, task.y, task.width and task.stim_duration
 def function3():
     square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
@@ -47,7 +45,6 @@ def function3():
     square3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     # modify contrast
     cont = float(utils.task.contrast) - 1
-    #cont = 0
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
     square2.fillColor = [cont, cont, cont]
@@ -86,7 +83,7 @@ def function5():
     cam3.put_state('Resp Win')
 
 
-#Balma script:
+
 def function6():
     try:
         utils.task.pulse_pal.trigger_pulse(1)
@@ -94,13 +91,14 @@ def function6():
     except:
         print(traceback.format_exc())
 
-#Balma script:
 def function7():
     try:
         utils.task.pulse_pal.trigger_pulse(2)
         cam3.put_state('On')
     except:
         print(traceback.format_exc())
+
+
 
 
 # camera correct and delete screen
@@ -115,6 +113,8 @@ def loop11(timing):
     window.flip()
 
 
+
+
 # camera miss with grey screen
 def function12():
     cam3.put_state('Miss')
@@ -124,7 +124,6 @@ def loop12(timing):
     window.flip()
 
 
-#Balma script:
 # camera incorrect
 def function13():
     try:
@@ -132,6 +131,8 @@ def function13():
     except:
         pass
     cam3.put_state('Incorrect')
+
+
 
 
 # camera incorrect outside theshold with grey screen
@@ -147,36 +148,22 @@ def loop14(timing):
     window.flip()
 
 
+
+
 # camera empty and delete screen
 def function15():
     cam3.put_state('')
-    soundStream.stop(soundVec1)
 
 def loop15(timing):
     window.flip()
+
+
 
 
 # communication is ok
 def function16():
     #print('softcode 16 received')
     utils.control_softcodes += 1
-
-
-# play a sound and delete the screen
-def function17():
-    cam3.put_state('Correct')
-    soundStream.play(soundVec1)
-    print("Reward Sound played")
-
-def loop17(timing):
-    window.flip()
-
-
-def function18():
-    cam3.put_state('Incorrect')
-    # sound for incorrect 4kHz
-    soundStream.play(soundVec2)
-    print("Punish Sound played")
 
 
 # do nothing, used first time you create the bpod to clean old softcodes
