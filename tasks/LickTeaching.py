@@ -114,7 +114,7 @@ class LickTeaching(Task):
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 15)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
             state_name='Miss',
@@ -126,7 +126,7 @@ class LickTeaching(Task):
             state_name='Exit',
             state_timer=10,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 15), (Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 17), (Bpod.OutputChannels.PWM6, 5)])
             # Wait 10 sec for the next automatic reward
 
 

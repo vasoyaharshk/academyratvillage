@@ -110,6 +110,8 @@ def function11():
     except:
         pass
     cam3.put_state('Correct')
+    soundStream.play(soundVec1)
+    print("Reward Sound played")
 
 def loop11(timing):
     window.flip()
@@ -132,6 +134,9 @@ def function13():
     except:
         pass
     cam3.put_state('Incorrect')
+    # sound for incorrect 4kHz
+    soundStream.play(soundVec2)
+    print("Punish Sound played")
 
 
 # camera incorrect outside theshold with grey screen
@@ -141,6 +146,8 @@ def function14():
     except:
         pass
     cam3.put_state('Punish')
+    soundStream.play(soundVec2)
+    print("Punish Sound played")
 
 def loop14(timing):
     # white_screen.draw()
@@ -150,7 +157,6 @@ def loop14(timing):
 # camera empty and delete screen
 def function15():
     cam3.put_state('')
-    soundStream.stop(soundVec1)
 
 def loop15(timing):
     window.flip()
@@ -162,21 +168,13 @@ def function16():
     utils.control_softcodes += 1
 
 
-# play a sound and delete the screen
+# camera empty and delete screen
 def function17():
-    cam3.put_state('Correct')
-    soundStream.play(soundVec1)
-    print("Reward Sound played")
+    cam3.put_state('')
+    soundStream.stop(soundVec1)
 
 def loop17(timing):
     window.flip()
-
-
-def function18():
-    cam3.put_state('Incorrect')
-    # sound for incorrect 4kHz
-    soundStream.play(soundVec2)
-    print("Punish Sound played")
 
 
 # do nothing, used first time you create the bpod to clean old softcodes

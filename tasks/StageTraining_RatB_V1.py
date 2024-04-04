@@ -377,7 +377,7 @@ class StageTraining_RatB_V1(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port4In': 'Real_start'},
+                state_change_conditions={'Port2In': 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
                 # show stim inifite time
 
@@ -393,26 +393,26 @@ class StageTraining_RatB_V1(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'PA1_Port1In': 'Fixation1'},
+                state_change_conditions={'Port2In': 'Fixation1'},
                 output_actions=[])
 
         self.sma.add_state(
             state_name='Fixation1',
             state_timer=0,
-            state_change_conditions={'PA1_Port2In': 'Fixation2'},
+            state_change_conditions={'Port3In': 'Fixation2'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim1)])
             # show stimulus now in normal trials, not in controls
 
         self.sma.add_state(
             state_name='Fixation2',
             state_timer=0,
-            state_change_conditions={'PA1_Port3In': 'Fixation3'},
+            state_change_conditions={'Port5In': 'Fixation3'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim2)])
 
         self.sma.add_state(
             state_name='Fixation3',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port3In: 'Pre_Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Pre_Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim3)])
 
         self.sma.add_state(
@@ -434,15 +434,14 @@ class StageTraining_RatB_V1(Task):
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port4In: 'Miss_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 4),
+            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
             # waterLED ON, global LEDs ON
 
@@ -450,7 +449,7 @@ class StageTraining_RatB_V1(Task):
             state_name='Punish',
             state_timer=1,
             state_change_conditions={Bpod.Events.Tup: 'After_punish'},
-            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.LED, 4),
+            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 14)])
             # Incorrect sound, global LEDs on
 
@@ -458,15 +457,15 @@ class StageTraining_RatB_V1(Task):
             state_name='After_punish',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
-                                     Bpod.Events.Port4In: 'Miss_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 4)])
+                                     Bpod.Events.Port2In: 'Miss_reward'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
             # waterLED ON & global LEDs ON
 
         self.sma.add_state(
             state_name='Incorrect',
             state_timer=0.25,
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
-            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.SoftCode, 13)])
+            output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
             # Incorrect sound
 
         self.sma.add_state(
@@ -480,27 +479,26 @@ class StageTraining_RatB_V1(Task):
             state_name='Correct_other',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.Valve, 2),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Correct_first_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 15)])
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
             state_name='Correct_other_reward',
             state_timer=self.valve_time * self.valve_factor_i,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 15)])
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
             state_name='Miss_reward',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 15)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
             state_name='Exit',  # Doors closure when trial ends
