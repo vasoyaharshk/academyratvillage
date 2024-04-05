@@ -100,7 +100,7 @@ class LickTeaching(Task):
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 5),
-                            (Bpod.OutputChannels.SoftCode, 17)])
+                            (Bpod.OutputChannels.SoftCode, 11)])
             # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(

@@ -16,7 +16,7 @@ class Test_Sound(Task):
             state_name='RW_sound_on',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'Waiting'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 11)])
 
         self.sma.add_state(
             state_name='Waiting',
@@ -28,7 +28,7 @@ class Test_Sound(Task):
             state_name='PNSH_sound_on',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'Waiting2'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 18)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 14)])
 
         self.sma.add_state(
             state_name='Waiting2',
