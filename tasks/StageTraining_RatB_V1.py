@@ -451,7 +451,7 @@ class StageTraining_RatB_V1(Task):
             state_change_conditions={Bpod.Events.Tup: 'After_punish'},
             output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 14)])
-            # Incorrect sound, global LEDs on
+            # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
 
         self.sma.add_state(
             state_name='After_punish',
