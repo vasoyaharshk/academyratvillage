@@ -25,7 +25,7 @@ class FakeVideo:
 class Video(Process):
     def __init__(self, port='0', cam_number=0, name_video=None, path=None, width=None, height=None, fps=None,
                  codec_video='X264', cam_states=None, duration_video=1800, number_of_videos=50,
-                 threshold=0, cage_zone=None, doors1_zone=None, doors2_zone=None,
+                 threshold=0, cage_zone=None, cage_zone2=None, doors1_zone=None, doors2_zone=None,
                  floor1_zone=None, floor2_zone=None, tracking_position=False):
 
         Process.__init__(self)
@@ -52,6 +52,7 @@ class Video(Process):
         self.tracking_position = tracking_position
 
         self.cage_zone = cage_zone if cage_zone is not None else [640, 0, 480, 0]
+        self.cage_zone2 = cage_zone2 if cage_zone2 is not None else [640, 0, 480, 0]
         self.doors1_zone = doors1_zone if doors1_zone is not None else [640, 0, 480, 0]
         self.doors2_zone = doors2_zone if doors2_zone is not None else [640, 0, 480, 0]
         self.floor1_zone = floor1_zone if floor1_zone is not None else [640, 0, 480, 0]
@@ -106,6 +107,7 @@ class Video(Process):
         self.centers = {}
 
         self.area_cage = Value('i', 0)
+        self.area_cage2 = Value('i', 0)
         self.area_doors1 = Value('i', 0)
         self.area_doors2 = Value('i', 0)
         self.area_total = Value('i', 0)
@@ -317,27 +319,33 @@ class Video(Process):
 
     def do_tracking_out(self):
         [zcxmin, zcxmax, zcymin, zcymax] = self.cage_zone
+        [zcxmin2, zcxmax2, zcymin2, zcymax2] = self.cage_zone2
         [zdxmin1, zdxmax1, zdymin1, zdymax1] = self.doors1_zone
         [zdxmin2, zdxmax2, zdymin2, zdymax2] = self.doors2_zone
 
         cage_greyscale_frame = cv2.cvtColor(self.frame[zcymin:zcymax, zcxmin:zcxmax], cv2.COLOR_BGR2GRAY)
+        cage_greyscale_frame2 = cv2.cvtColor(self.frame[zcymin2:zcymax2, zcxmin2:zcxmax2], cv2.COLOR_BGR2GRAY)
         doors1_greyscale_frame = cv2.cvtColor(self.frame[zdymin1:zdymax1, zdxmin1:zdxmax1], cv2.COLOR_BGR2GRAY)
         doors2_greyscale_frame = cv2.cvtColor(self.frame[zdymin2:zdymax2, zdxmin2:zdxmax2], cv2.COLOR_BGR2GRAY)
 
         cage_gaussian_frame = cv2.GaussianBlur(cage_greyscale_frame, (5, 5), 0)
+        cage_gaussian_frame2 = cv2.GaussianBlur(cage_greyscale_frame2, (5, 5), 0)
         doors1_gaussian_frame = cv2.GaussianBlur(doors1_greyscale_frame, (5, 5), 0)
         doors2_gaussian_frame = cv2.GaussianBlur(doors2_greyscale_frame, (5, 5), 0)
 
         cage_thresh = cv2.threshold(cage_gaussian_frame, self.threshold2, 225, cv2.THRESH_BINARY_INV)[1]
+        cage_thresh2 = cv2.threshold(cage_gaussian_frame2, self.threshold2, 225, cv2.THRESH_BINARY_INV)[1]
         doors1_thresh = cv2.threshold(doors1_gaussian_frame, self.threshold, 225, cv2.THRESH_BINARY_INV)[1]
         doors2_thresh = cv2.threshold(doors2_gaussian_frame, self.threshold3, 225, cv2.THRESH_BINARY_INV)[1]
 
         area_cage = cv2.countNonZero(cage_thresh)
+        area_cage2 = cv2.countNonZero(cage_thresh2)
         area_doors1 = cv2.countNonZero(doors1_thresh)
         area_doors2 = cv2.countNonZero(doors2_thresh)
 
-        area_total = area_cage + area_doors1 + area_doors2
+        area_total = area_cage + area_cage2 + area_doors1 + area_doors2
         self.area_cage.value = int(area_cage)
+        self.area_cage.value2 = int(area_cage2)
         self.area_doors1.value = int(area_doors1)
         self.area_doors2.value = int(area_doors2)
         self.area_total.value = int(area_total)
@@ -491,6 +499,7 @@ class Video(Process):
     def add_info_tracking_out(self):
         try:
             [zcxmin, zcxmax, zcymin, zcymax] = self.cage_zone
+            [zcxmin2, zcxmax2, zcymin2, zcymax2] = self.cage_zone2
             [zdxmin1, zdxmax1, zdymin1, zdymax1] = self.doors1_zone
             [zdxmin2, zdxmax2, zdymin2, zdymax2] = self.doors2_zone
 
@@ -501,6 +510,9 @@ class Video(Process):
             cv2.putText(self.frame, f'{self.state[21:]}', (350, 100), cv2.FONT_HERSHEY_DUPLEX,
                         0.35, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(self.frame, f'Area in the cage: {self.area_cage.value}',
+                        (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
+                        cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
+            cv2.putText(self.frame, f'Area in the cage: {self.area_cage2.value}',
                         (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
             cv2.putText(self.frame, f'Area in door1:    {self.area_doors1.value}',
@@ -514,6 +526,7 @@ class Video(Process):
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (255, 0, 255), 1, cv2.LINE_AA)
 
             cv2.rectangle(self.frame, (zcxmin, zcymin), (zcxmax, zcymax), (0, 255, 0), 2)
+            cv2.rectangle(self.frame, (zcxmin2, zcymin2), (zcxmax2, zcymax2), (0, 255, 0), 2)
             cv2.rectangle(self.frame, (zdxmin1, zdymin1), (zdxmax1, zdymax1), (0, 255, 255), 2)
             cv2.rectangle(self.frame, (zdxmin2, zdymin2), (zdxmax2, zdymax2), (255, 255, 0), 2)
 
@@ -638,6 +651,7 @@ try:
                  number_of_videos=settings.CAM1_NUMBER_OF_VIDEOS,
                  threshold=settings.CAM1_THRESHOLD,
                  cage_zone=settings.CAM1_CAGE_ZONE,
+                 cage_zone2=settings.CAM1_CAGE_ZONE2,
                  doors1_zone=settings.CAM1_DOORS1_ZONE,
                  doors2_zone=settings.CAM1_DOORS2_ZONE,
                  floor1_zone=None,
@@ -661,6 +675,7 @@ try:
                  number_of_videos=settings.CAM2_NUMBER_OF_VIDEOS,
                  threshold=settings.CAM2_THRESHOLD,
                  cage_zone=None,
+                 cage_zone2=None,
                  doors1_zone=None,
                  doors2_zone=None,
                  floor1_zone=None,

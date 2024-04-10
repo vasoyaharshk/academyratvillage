@@ -21,7 +21,7 @@ class Automatic_Water(Task):
 
         self.stage = 0
         self.substage = 0
-        self.reward_drunk = 25 # deliver 1000 ul water
+        self.reward_drunk = 1000 # deliver 1000 ul water
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
