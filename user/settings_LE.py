@@ -59,9 +59,9 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 20  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE
-NOMICEDOOR1 = 60  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE
-NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE
+NOMICECAGE = 800  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE
+NOMICEDOOR1 = 400  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE
+NOMICEDOOR2 = 700  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE
 ONEMOUSE = 2400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE
 SEVERALMICE = 1600  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
 FLOORMOUSE = 50
@@ -70,9 +70,9 @@ THRESHOLD_DAY_CAGE = 10                                                  # <-- T
 THRESHOLD_DAY_DOOR1 = 10                                                 # <-- TO CHANGE
 THRESHOLD_DAY_DOOR2 = 10                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE = 100                                                # <-- TO CHANGE
-THRESHOLD_NIGHT_DOOR1 = 250                                               # <-- TO CHANGE
-THRESHOLD_NIGHT_DOOR2 = 250                                               # <-- TO CHANGE
+THRESHOLD_NIGHT_CAGE = 80                                                # <-- TO CHANGE
+THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE
+THRESHOLD_NIGHT_DOOR2 = 100                                               # <-- TO CHANGE
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
@@ -94,12 +94,12 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE = [90, 240, 60, 160]       # <-- TO CHANGE
-CAM1_CAGE_ZONE2 = [110, 280, 160, 260]     # <-- TO CHANGE
-CAM1_DOORS1_ZONE = [290, 455, 235, 270]   # <-- TO CHANGE
-CAM1_DOORS2_ZONE = [455, 620, 235, 270]   # <-- TO CHANGE
-CAM1_TEXT_X = 100                         # <-- TO CHANGE
-CAM1_TEXT_Y = 300                         # <-- TO CHANGE
+CAM1_CAGE_ZONE1 = [100, 230, 130, 275]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [110, 280, 275, 360]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [295, 455, 335, 360]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [455, 615, 335, 360]   # <-- TO CHANGE left, right, top, down
+CAM1_TEXT_X = 25                         # <-- TO CHANGE
+CAM1_TEXT_Y = 40                         # <-- TO CHANGE
 
 CAM2_NUMBER = 2
 CAM2_NAME_VIDEO = 'Cam2'
@@ -129,10 +129,10 @@ CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
 CAM3_CAGE_ZONE = None
-CAM3_DOORS1_ZONE = [10, 580, 200, 270]     # <-- TO CHANGE  left, right, top, down
-CAM3_DOORS2_ZONE = [580, 610, 140, 380]    # <-- TO CHANGE
-CAM3_FLOOR1_ZONE = [100, 510, 10, 170]    # <-- TO CHANGE
-CAM3_FLOOR2_ZONE = [100, 510, 310, 470]    # <-- TO CHANGE
+CAM3_DOORS1_ZONE = [20, 540, 200, 270]     # <-- TO CHANGE  left, right, top, down
+CAM3_DOORS2_ZONE = [540, 560, 140, 330]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR1_ZONE = [100, 510, 10, 170]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [100, 510, 310, 470]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 

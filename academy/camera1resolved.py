@@ -25,7 +25,7 @@ class FakeVideo:
 class Video(Process):
     def __init__(self, port='0', cam_number=0, name_video=None, path=None, width=None, height=None, fps=None,
                  codec_video='X264', cam_states=None, duration_video=1800, number_of_videos=50,
-                 threshold=0, cage_zone=None, cage_zone1=None, cage_zone2=None, doors1_zone=None, doors2_zone=None,
+                 threshold=0, cage_zone1=None, cage_zone2=None, doors1_zone=None, doors2_zone=None,
                  floor1_zone=None, floor2_zone=None, tracking_position=False):
 
         Process.__init__(self)
@@ -106,7 +106,7 @@ class Video(Process):
 
         self.centers = {}
 
-        self.area_cage1 = Value('i', 0)          #Harsh - Potential problem here. area_cage should be area_cage1
+        self.area_cage = Value('i', 0)
         self.area_cage2 = Value('i', 0)
         self.area_doors1 = Value('i', 0)
         self.area_doors2 = Value('i', 0)
@@ -344,8 +344,8 @@ class Video(Process):
         area_doors2 = cv2.countNonZero(doors2_thresh)
 
         area_total = area_cage1 + area_cage2 + area_doors1 + area_doors2
-        self.area_cage1.value1 = int(area_cage1)
-        self.area_cage1.value2 = int(area_cage2)
+        self.area_cage.value1 = int(area_cage1)
+        self.area_cage.value2 = int(area_cage2)
         self.area_doors1.value = int(area_doors1)
         self.area_doors2.value = int(area_doors2)
         self.area_total.value = int(area_total)
@@ -509,10 +509,10 @@ class Video(Process):
                         0.35, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(self.frame, f'{self.state[21:]}', (350, 100), cv2.FONT_HERSHEY_DUPLEX,
                         0.35, (255, 255, 255), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area in the cage1: {self.area_cage1.value1}',
+            cv2.putText(self.frame, f'Area in the cage1: {self.area_cage.value1}',
                         (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
-            cv2.putText(self.frame, f'Area in the cage2: {self.area_cage1.value2}',
+            cv2.putText(self.frame, f'Area in the cage2: {self.area_cage.value2}',
                         (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y + 20),
                         cv2.FONT_HERSHEY_DUPLEX, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
             cv2.putText(self.frame, f'Area in door1:    {self.area_doors1.value}',
@@ -674,7 +674,7 @@ try:
                  duration_video=settings.CAM2_DURATION_VIDEO,
                  number_of_videos=settings.CAM2_NUMBER_OF_VIDEOS,
                  threshold=settings.CAM2_THRESHOLD,
-                 cage_zone=None,
+                 cage_zone1=None,
                  cage_zone2=None,
                  doors1_zone=None,
                  doors2_zone=None,
@@ -698,7 +698,7 @@ try:
                  duration_video=settings.CAM3_DURATION_VIDEO,
                  number_of_videos=settings.CAM3_NUMBER_OF_VIDEOS,
                  threshold=settings.CAM3_THRESHOLD,
-                 cage_zone=settings.CAM3_CAGE_ZONE,
+                 cage_zone=settings.CAM3_CAGE_ZONE1,
                  doors1_zone=settings.CAM3_DOORS1_ZONE,
                  doors2_zone=settings.CAM3_DOORS2_ZONE,
                  floor1_zone=settings.CAM3_FLOOR1_ZONE,

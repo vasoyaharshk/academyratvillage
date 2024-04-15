@@ -47,7 +47,7 @@ def function3():
     square3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     # modify contrast
     cont = float(utils.task.contrast) - 1
-    #cont = 0
+    cont = 0
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
     square2.fillColor = [cont, cont, cont]
