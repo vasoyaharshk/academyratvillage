@@ -106,7 +106,7 @@ class Video(Process):
 
         self.centers = {}
 
-        self.area_cage1 = Value('i', 0)          #Harsh - Potential problem here. area_cage should be area_cage1
+        self.area_cage1 = Value('i', 0)
         self.area_cage2 = Value('i', 0)
         self.area_doors1 = Value('i', 0)
         self.area_doors2 = Value('i', 0)
@@ -185,7 +185,6 @@ class Video(Process):
             if not self.command_queue.empty():
                 state = self.command_queue.get()
                 try:
-                    print(state)
                     self.trial_number = int(state)
                 except:
                     pass

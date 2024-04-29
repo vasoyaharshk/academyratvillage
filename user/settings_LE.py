@@ -1,4 +1,3 @@
-# THIS IS A BACKUP FILE. DO NOT CHANGE IT.
 # THE FIRST TIME THE APPLICATION IS LAUNCHED, A COPY OF THIS FILE IS CREATED IN THE USER DIRECTORY.
 # ALWAYS MODIFY THE WORKING VERSION IN THE USER DIRECTORY.
 
@@ -59,20 +58,20 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 800  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE
-NOMICEDOOR1 = 400  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE
-NOMICEDOOR2 = 700  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE
+NOMICECAGE = 800  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 400  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR2 = 700  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 2400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE
 SEVERALMICE = 1600  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
 FLOORMOUSE = 50
 
-THRESHOLD_DAY_CAGE = 10                                                  # <-- TO CHANGE
-THRESHOLD_DAY_DOOR1 = 10                                                 # <-- TO CHANGE
-THRESHOLD_DAY_DOOR2 = 10                                                 # <-- TO CHANGE
+THRESHOLD_DAY_CAGE = 40                                                  # <-- TO CHANGE
+THRESHOLD_DAY_DOOR1 = 60                                                 # <-- TO CHANGE
+THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE = 80                                                # <-- TO CHANGE
-THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE
-THRESHOLD_NIGHT_DOOR2 = 100                                               # <-- TO CHANGE
+THRESHOLD_NIGHT_CAGE = 80                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR2 = 100                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
@@ -167,6 +166,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ['None', 'manual']  # subjects that don't raise alarms and not save data
-TESTING = True  # if true academy works without cams, arduino, screen or bpod
+TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

@@ -99,7 +99,7 @@ class LickTeaching(Task):
             state_name='Automatic_reward',
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 5),
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
                             (Bpod.OutputChannels.SoftCode, 11)])
             # Automatic water, lickportLED, and Reward sound
 
@@ -107,14 +107,14 @@ class LickTeaching(Task):
             state_name='Wait_for_reward',
             state_timer=30,
             state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)])
             # lickportLED and RWsound remain ON until poke o timeup
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 17)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 8)])
 
         self.sma.add_state(
             state_name='Miss',

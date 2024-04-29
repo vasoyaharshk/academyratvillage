@@ -54,6 +54,7 @@ def function3():
     square2.lineColor = [cont, cont, cont]
     square3.fillColor = [cont, cont, cont]
     square3.lineColor = [cont, cont, cont]
+    print('Stimulus Shown')
 
 def loop3(timing):
     square.draw()
@@ -102,6 +103,12 @@ def function7():
     except:
         print(traceback.format_exc())
 
+def function8():
+    cam3.put_state('Correct')
+    soundStream.stop(soundVec1)
+    print("Correct")
+
+
 
 # camera correct and delete screen
 def function11():
@@ -111,7 +118,7 @@ def function11():
         pass
     cam3.put_state('Correct')
     soundStream.play(soundVec1)
-    print("Reward Sound played")
+    print("Correct, Reward Sound played")
 
 def loop11(timing):
     window.flip()
@@ -136,7 +143,7 @@ def function13():
     cam3.put_state('Incorrect')
     # sound for incorrect 4kHz
     soundStream.play(soundVec2)
-    print("Punish Sound played")
+    print("Incorrect, Punish Sound played")
 
 
 # camera incorrect outside theshold with grey screen
@@ -147,7 +154,7 @@ def function14():
         pass
     cam3.put_state('Punish')
     soundStream.play(soundVec2)
-    print("Punish Sound played")
+    print("Punish, Punish Sound played")
 
 def loop14(timing):
     # white_screen.draw()

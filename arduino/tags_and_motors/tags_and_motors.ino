@@ -6,13 +6,13 @@
 
 // servo1
 #define TIMEOPEN1 150
-#define TIMECLOSE1 300
+#define TIMECLOSE1 350
 #define SERVOPIN1 9
 
 
 // servo2
 #define TIMEOPEN2 200
-#define TIMECLOSE2 300
+#define TIMECLOSE2 400
 #define SERVOPIN2 10
 
 
@@ -20,7 +20,7 @@
 
 // academy1
 #define ANGLEOPEN1 65
-#define ANGLECLOSE1 105
+#define ANGLECLOSE1 109
 #define ANGLEOPEN2 160
 #define ANGLECLOSE2 70
 #define ANGLESEMICLOSE2 55 //Harsh: what is this?

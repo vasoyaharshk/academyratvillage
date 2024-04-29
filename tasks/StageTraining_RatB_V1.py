@@ -52,7 +52,7 @@ class StageTraining_RatB_V1(Task):
         self.choices = self.mask
         self.blocks= True
         self.block_size = 20
-        self.prob = 0.33 # random by default
+        self.prob = 0.33   # random by default
         self.stage = 1
         self.substage = 1
 
@@ -82,9 +82,9 @@ class StageTraining_RatB_V1(Task):
         self.trial_type = 'VG'
 
         # screen details
-        self.x = 0  # screen width is 401mmm
-        self.y = 125  # screen height is 250mmm
-        self.width = 30  # stimulus width
+        self.x = 0  # screen width is 401mm for touchscreen and 370mm for monitor
+        self.y = 30  # screen height is 250mm for touchscreen and 300mm for monitor
+        self.width = 80  # stimulus width
         self.correct_th = 130  # 1/3 of the screen
         self.repoke_th = settings.WIN_SIZE[0] * 2  # full screen
         self.contrast= 1.2 #0 black, 1 gray, 2 white. Default 60%

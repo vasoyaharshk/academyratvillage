@@ -209,7 +209,8 @@ def rt_plot(init_time, final_time):
             ax1.axvspan(days_at_20[i], days_at_8[i + 1], facecolor='lightgray', zorder=0)
         palette = sns.color_palette(colors, len(subject_names))
 
-        df = weight_df.groupby(['day', 'subject']).median()
+        df = weight_df[['day', 'subject', 'perc_weight']]
+        df = df.groupby(['day', 'subject']).median()
 
         ax1.eventplot(days, color='black', linelengths=200, lineoffsets=100, linewidths=1)
         sns.lineplot(x='day', y='perc_weight', hue='subject', palette=palette, data=df, linewidth=1, ax=ax1)
@@ -236,7 +237,8 @@ def rt_plot(init_time, final_time):
         for i in range(len(days_at_8) - 1):
             ax2.axvspan(days_at_20[i], days_at_8[i + 1], facecolor='lightgray', zorder=0)
 
-        df = water_df.groupby(['day', 'subject']).sum()
+        df = water_df[['day', 'subject', 'water']]
+        df = df.groupby(['day', 'subject']).sum()
         df['water_ml'] = df['water'] / 1000
         max_water = df.water_ml.max() + 0.5
 

@@ -38,7 +38,7 @@ def select_task(df, subject):
         wait_seconds = 3600 * 24  #longer times for lazy animals
         print('Longer time to enter!')
 
-    if task == 'Automatic_Water': # We want to rcover previous sessions parameters after this emergency water stage
+    if task == 'Automatic_Water': # We want to recover previous sessions parameters after this emergency water stage
         prev_session = df.loc[df['session'] == last_session - 2].iloc[-1]
         wait_seconds = 3600 * 5
         task = prev_session.task

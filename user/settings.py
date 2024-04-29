@@ -58,20 +58,22 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 800  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 400  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
-NOMICEDOOR2 = 700  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 2400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE
-SEVERALMICE = 1600  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
-FLOORMOUSE = 50
+NOMICECAGE = 100  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 100  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
+ONEMOUSE = 810  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done; reduced from 800 to 700 on 2024-04-25 because 2 rats were in BB at same time. Increased from 700 to 810 becuase Sparky couldn't get in.
 
-THRESHOLD_DAY_CAGE = 10                                                  # <-- TO CHANGE
-THRESHOLD_DAY_DOOR1 = 10                                                 # <-- TO CHANGE
-THRESHOLD_DAY_DOOR2 = 10                                                 # <-- TO CHANGE
+#Behavioral Box"
+SEVERALMICE = 1600  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
+FLOORMOUSE = 100
+
+THRESHOLD_DAY_CAGE = 40                                                  # <-- TO CHANGE
+THRESHOLD_DAY_DOOR1 = 60                                                 # <-- TO CHANGE
+THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
 THRESHOLD_NIGHT_CAGE = 80                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_DOOR2 = 100                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR1 = 80                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
@@ -91,12 +93,12 @@ CAM1_FPS = 30
 CAM1_CODEC_VIDEO = 'X264'
 CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
-CAM1_NUMBER_OF_VIDEOS = 100
+CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [100, 230, 130, 275]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [110, 280, 275, 360]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [295, 455, 335, 360]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [455, 615, 335, 360]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [105, 200, 135, 275]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [145, 290, 275, 360]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [290, 465, 330, 370]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [465, 635, 330, 370]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 40                         # <-- TO CHANGE
 
@@ -126,7 +128,7 @@ CAM3_STATES = {"Correct": (600, 30),
                "Resp Win": (600, 160)}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
+CAM3_THRESHOLD = 225                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
 CAM3_CAGE_ZONE = None
 CAM3_DOORS1_ZONE = [20, 540, 200, 270]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [540, 560, 140, 330]    # <-- TO CHANGE left, right, top, down
@@ -139,7 +141,7 @@ CAM3_TRACKING_POSITION = True
 TELEGRAM_TOKEN = '6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc'             # <-- TO CHANGE
 TELEGRAM_CHAT = '-4048080460'                                                  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
+    'Harsh': '5842767043', 'Donna': '6811118356', 'Duncan': '6925304996'
 }
 
 #AWS
@@ -166,6 +168,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ['None', 'manual']  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
