@@ -46,7 +46,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
 XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
-WIN_SIZE = [350, 250]  # in mm
+WIN_SIZE = [410, 250]  # in mm
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
 SCREEN_NUMBER = 0
@@ -128,7 +128,7 @@ CAM3_STATES = {"Correct": (600, 30),
                "Resp Win": (600, 160)}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 225                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
+CAM3_THRESHOLD = 80                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
 CAM3_CAGE_ZONE = None
 CAM3_DOORS1_ZONE = [20, 540, 200, 270]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [540, 560, 140, 330]    # <-- TO CHANGE left, right, top, down
@@ -153,9 +153,9 @@ BOX_NAME = 3                         # <-- TO CHANGE
 
 DEFAULT_TRIALS_MIN = 0
 DEFAULT_DURATION_MIN = 0  # seconds
-DEFAULT_TRIALS_MAX = 1000
+DEFAULT_TRIALS_MAX = 10000
 DEFAULT_DURATION_MAX = 36000  # seconds
-DEFAULT_TRIALS_TIRED = 1000
+DEFAULT_TRIALS_TIRED = 10000
 DEFAULT_DURATION_TIRED = 36000  # seconds
 
 MINIMUM_WATER_24 = 200  # in 24 hours
@@ -167,7 +167,7 @@ MAXIMUM_WEIGHT = 200  # in percentage
 MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
-INACTIVE_SUBJECTS = ['None', 'manual']  # subjects that don't raise alarms and not save data
-TESTING = True  # if true academy works without cams, arduino, screen or bpod
+INACTIVE_SUBJECTS = ['None', 'manual1', 'manual2']  # subjects that don't raise alarms and not save data
+TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

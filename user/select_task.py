@@ -222,10 +222,10 @@ def select_task(df, subject):
                     if last3_stim_dur < change and len(last5_substages)==1: # if stim_dur is the minimum for 3 sessions advance stage
                         next_stage = True  # next substage
 
-            # Bad accuracy or desmotivation -> elongate stim_dur
+            # Bad accuracy or demotivation -> elongate stim_dur
             else:
                 stim_dur = initial # maintain last session value unless ...
-                if n_trials <= 25 and n_trials_prev<= 25:       # Hard desmotivation
+                if n_trials <= 25 and n_trials_prev<= 25:       # Hard demotivation
                     if initial <= max_stim_dur:
                         stim_dur = initial + change
                     else:

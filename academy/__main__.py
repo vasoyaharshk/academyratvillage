@@ -435,7 +435,7 @@ def subject_action(first_time, last_tags):
             utils.log_cam(utils.subject.name, 'Movement in the doors1 area ' + str(doors1), 'ACTION')
     elif total > settings.ONEMOUSE:
         if first_time:
-            utils.log_cam(utils.subject.name, 'Movement in the tunnel ' + str(total), 'ACTION')
+            utils.log_cam(utils.subject.name, 'Movement in the door2 area ' + str(total), 'ACTION')
     elif len(set(last_tags)) > 1:
         if first_time:
             utils.log_cam(utils.subject.name, 'Other subjects detected in the last seconds', 'ACTION')

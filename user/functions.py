@@ -3,7 +3,7 @@ from academy.utils import utils
 from academy.camera import cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
-from user.sound_elements import soundStream, soundVec1, soundVec2
+from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
 import traceback
 
 # when softcode n is called, function n runs once
@@ -18,6 +18,7 @@ def function1():
     cont = float(utils.task.contrast) - 1
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
+    print('Stimulus 1 Shown')
 def loop1(timing):
     if timing < utils.task.stim_duration:
         square.draw()
@@ -32,6 +33,7 @@ def function2():
     cont = float(utils.task.contrast) - 1
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
+    print('Stimulus 2 Shown')
 def loop2(timing):
     square.draw()
     window.flip()
@@ -153,7 +155,7 @@ def function14():
     except:
         pass
     cam3.put_state('Punish')
-    soundStream.play(soundVec2)
+    soundStream.play(soundVec3)
     print("Punish, Punish Sound played")
 
 def loop14(timing):
@@ -182,6 +184,10 @@ def function17():
 
 def loop17(timing):
     window.flip()
+
+def function18():
+    soundStream.stop(soundVec3)
+    print("Punish Sound Stopped")
 
 
 # do nothing, used first time you create the bpod to clean old softcodes

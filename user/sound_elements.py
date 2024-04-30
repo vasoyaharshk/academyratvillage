@@ -123,7 +123,8 @@ try:
     #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
 
     soundVec1 = pureToneGen(0.4, 14000, 1800) #16000
-    soundVec2 = pureToneGen(0.4, 4000, 1800) #4000
+    soundVec2 = pureToneGen(0.4, 4000, 1800) #4000  #Incorrect sound
+    soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
 
 except:
     print("______")
@@ -132,5 +133,6 @@ except:
     soundStream = FakeSoundR()
     soundVec1 = FakeSoundVec()
     soundVec2 = FakeSoundVec()
+    soundVec3 = FakeSoundVec()
 
 

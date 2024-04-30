@@ -91,7 +91,7 @@ class StageTraining_RatB_V1(Task):
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
-        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 10ul per trial normal conditions
+        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
         self.valve_factor_c = 1
         self.valve_factor_i = 0.45
 
@@ -263,7 +263,7 @@ class StageTraining_RatB_V1(Task):
 
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
-        self.x_positions = [60, 200, 340]
+        self.x_positions = [60, 175, 290]
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values
@@ -449,8 +449,7 @@ class StageTraining_RatB_V1(Task):
             state_name='Punish',
             state_timer=1,
             state_change_conditions={Bpod.Events.Tup: 'After_punish'},
-            output_actions=[(Bpod.OutputChannels.LED, 2), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 14)])
+            output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 14)])
             # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
 
         self.sma.add_state(
