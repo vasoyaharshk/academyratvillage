@@ -81,12 +81,12 @@ HOUR_DAY = 8  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 1
 HOUR_NIGHT = 19
 MINUTE_NIGHT = 59
-TIME_TO_ENTER = 5 # time between session and session (hours)            # <-- TO CHANGE
+TIME_TO_ENTER = 3 # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
 # camera
 CAM1_NUMBER = 1
-CAM1_NAME_VIDEO = 'Cam1'
+CAM1_NAME_VIDEO = 'Cor'
 CAM1_WIDTH = 640
 CAM1_HEIGHT = 480
 CAM1_FPS = 30
@@ -103,20 +103,20 @@ CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 40                         # <-- TO CHANGE
 
 CAM2_NUMBER = 2
-CAM2_NAME_VIDEO = 'Cam2'
+CAM2_NAME_VIDEO = 'Lic'
 CAM2_WIDTH = 640
 CAM2_HEIGHT = 480
 CAM2_FPS = 30
 CAM2_CODEC_VIDEO = 'X264'
 CAM2_STATES = {}
 CAM2_DURATION_VIDEO = 1800
-CAM2_NUMBER_OF_VIDEOS = 100
+CAM2_NUMBER_OF_VIDEOS = 10000
 CAM2_THRESHOLD = 30
 CAM2_DOORS1_ZONE = None
 CAM2_DOORS2_ZONE = None
 
 CAM3_NUMBER = 3
-CAM3_NAME_VIDEO = 'Cam3'
+CAM3_NAME_VIDEO = 'BB'
 CAM3_WIDTH = 640
 CAM3_HEIGHT = 480
 CAM3_FPS = 30
@@ -128,7 +128,7 @@ CAM3_STATES = {"Correct": (600, 30),
                "Resp Win": (600, 160)}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 80                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
+CAM3_THRESHOLD = 60                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
 CAM3_CAGE_ZONE = None
 CAM3_DOORS1_ZONE = [20, 540, 200, 270]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [540, 560, 140, 330]    # <-- TO CHANGE left, right, top, down

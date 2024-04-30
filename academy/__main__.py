@@ -441,6 +441,7 @@ def subject_action(first_time, last_tags):
             utils.log_cam(utils.subject.name, 'Other subjects detected in the last seconds', 'ACTION')
     else:
         if time_utils.now_datetime() > utils.super_subject.min_time or utils.super_subject.all_in:
+            #if total > settings.ONEMOUSE
             if utils.super_subject.task is None:
                 utils.log_cam('Academy', 'task: ' + utils.subject.task + 'not found for subject: ' + utils.subject.name,
                               'ERROR')
