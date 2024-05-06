@@ -12,7 +12,7 @@
 
 // servo2
 #define TIMEOPEN2 200
-#define TIMECLOSE2 400
+#define TIMECLOSE2 200
 #define SERVOPIN2 10
 
 
