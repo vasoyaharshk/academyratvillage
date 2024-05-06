@@ -82,7 +82,7 @@ def main():
 
         if arg.inside:
             arduino.open_door2()
-            #bpod.open_inner_door()
+            # bpod.open_inner_door()
             utils.state = 6
 
         gui.update_canvas()
@@ -155,8 +155,12 @@ def main_loop():
             utils.log("Academy", "weight: " + tag, "ACTION")
 
         # day/night light
-        begin_time = time_utils.hour_minute_to_time(settings.HOUR_DAY, settings.MINUTE_DAY)
-        end_time = time_utils.hour_minute_to_time(settings.HOUR_NIGHT, settings.MINUTE_NIGHT)
+        begin_time = time_utils.hour_minute_to_time(
+            settings.HOUR_DAY, settings.MINUTE_DAY
+        )
+        end_time = time_utils.hour_minute_to_time(
+            settings.HOUR_NIGHT, settings.MINUTE_NIGHT
+        )
         now = time_utils.now_time()
         if begin_time < end_time:
             day = begin_time <= now <= end_time
@@ -403,7 +407,6 @@ def stop_and_save_task():
     aws.send_timing2()
 
 
-
 def button_actions(tag):
     if tag == "EXIT_ACADEMY":
         if utils.state == 0:
@@ -440,9 +443,14 @@ def screen_loop():
     if utils.state == 2 or utils.state == 1:
 
         seconds = utils.chrono.get_seconds()
-        last_trials = [item for item in utils.list_of_trial_timings if item > seconds - 600]
+        last_trials = [
+            item for item in utils.list_of_trial_timings if item > seconds - 600
+        ]
 
-        if (seconds > utils.task.duration_tired and len(last_trials) < utils.task.trials_tired) or utils.task.tired:
+        if (
+            seconds > utils.task.duration_tired
+            and len(last_trials) < utils.task.trials_tired
+        ) or utils.task.tired:
             utils.change_to_state = (
                 3  # 3 after min_time, data not saved, animal not back
             )
@@ -465,7 +473,7 @@ def screen_loop():
             if utils.alarm_mice_repetition > 3:
                 utils.alarm_mice_repetition = 0
                 utils.alarm_mice_time = time.time() + 3600
-                 #utils.change_to_state = 10
+                # utils.change_to_state = 10
                 telegram_bot.alarm_mice(cam2.area_total.value)
 
     if cam3.tracking_inside:
@@ -479,7 +487,7 @@ def screen_loop():
             if utils.alarm_mice_repetition > 3:
                 utils.alarm_mice_repetition = 0
                 utils.alarm_mice_time = time.time() + 3600
-                 #utils.change_to_state = 10
+                # utils.change_to_state = 10
                 telegram_bot.alarm_mice(cam3.area_total.value)
 
         if settings.CAM3_FLOOR_ON:
@@ -555,7 +563,8 @@ def subject_action(first_time, last_tags):
                 enter_flag = True
         else:
             if first_time:
-                utils.log_cam(utils.subject.name,
+                utils.log_cam(
+                    utils.subject.name,
                     "Not allowed to enter until: "
                     + time_utils.datetime_to_string(utils.super_subject.min_time),
                     "ACTION",
@@ -580,9 +589,9 @@ def go_to_state(num):
         utils.alarm_trapped_repetition = 0
         utils.list_of_trial_timings = []
         task_collection.subjects_dict = task_collection.create_subjects_dict()
-        #cam2.put_state('inactive')
+        # cam2.put_state('inactive')
         cam3.put_state("inactive")
-        #cam2.put_state('black')
+        # cam2.put_state('black')
         cam3.put_state("black")
         if utils.reading_tags > 0:
             arduino.turn_led_on()
@@ -598,7 +607,7 @@ def go_to_state(num):
         arduino.close_door1()
         arduino.open_door2()
         arduino.turn_led_off()
-        #bpod.close_inner_door()
+        # bpod.close_inner_door()
         utils.task = utils.super_subject.task
         utils.task.init_variables()
 
@@ -626,7 +635,9 @@ def go_to_state(num):
             + str(int(float(utils.task.substage)))
         )
         utils.log_cam(utils.subject.name, name_task, "START")
-        utils.task.set_and_run(utils.subject, utils.subject.name, utils.subject.weight, utils.task_manager)
+        utils.task.set_and_run(
+            utils.subject, utils.subject.name, utils.subject.weight, utils.task_manager
+        )
 
     elif num == 2:  # before min_time
         utils.subject_trapped = False
@@ -658,22 +669,21 @@ def go_to_state(num):
         utils.log("Academy", "Go to state 5", "ACTION")
 
     elif num == 6:  # after max_time, data saved, animal not back
-        #bpod.open_inner_door()
-        #bpod.play_buzzer2()
+        # bpod.open_inner_door()
+        # bpod.play_buzzer2()
         utils.task_real_duration = utils.chrono.get_seconds()
         utils.log("Academy", "Go to state 6", "ACTION")
 
     elif num == 7:  # setting task
-        #cam2.put_state('inactive')
+        # cam2.put_state('inactive')
         cam3.put_state("inactive")
-        #cam2.put_state('black')
+        # cam2.put_state('black')
         cam3.put_state("black")
         arduino.turn_led_off()
         utils.log("Academy", "Go to state 7", "ACTION")
         screen.tag = None
         screen.first = False
         screen.my_loop = lambda *args, **kwargs: None
-
 
     elif num == 8:  # running direct task
 
@@ -689,10 +699,12 @@ def go_to_state(num):
 
         utils.log_cam(subject_name, utils.task.task, "START")
         gui.name = subject_name + " - " + utils.task.task
-        utils.task.set_and_run(gui.subject, subject_name, utils.task.subject_weight, utils.task_manager)
+        utils.task.set_and_run(
+            gui.subject, subject_name, utils.task.subject_weight, utils.task_manager
+        )
 
     elif num == 10:  # multiple animals inside
-        #bpod.open_inner_door()
+        # bpod.open_inner_door()
         utils.log("Academy", "Go to state 10", "ACTION")
 
 
@@ -747,6 +759,7 @@ def relaunch():
         os.execl(python, python, sys.argv[0], "-i", num)
     else:
         os.execl(python, python, sys.argv[0], num)
+
 
 if __name__ == "__main__":
     main()
