@@ -75,7 +75,7 @@ THRESHOLD_NIGHT_CAGE = 80                                                # <-- T
 THRESHOLD_NIGHT_DOOR1 = 80                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
-DURATION_TAG = 1  # seconds the rfid lecture is stored
+DURATION_TAG = 2  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
 HOUR_DAY = 8  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 1

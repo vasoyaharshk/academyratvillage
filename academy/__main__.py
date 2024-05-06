@@ -186,7 +186,7 @@ def main_loop():
 
                     last_tags += [tag]
                     last_time_tags += [last_time_tag]
-                    enter_flag = False
+                    enter_flag = False  #
 
                     indices = []
                     for index, t in enumerate(last_time_tags):
@@ -515,7 +515,7 @@ def screen_loop():
 
 
 def subject_action(first_time, last_tags):
-
+    print('Subject action')
     cage = cam1.area_cage1.value + cam1.area_cage2.value
     doors1 = cam1.area_doors1.value
     total = cam1.area_total.value
@@ -573,6 +573,7 @@ def subject_action(first_time, last_tags):
 
 
 def real_subject_action():
+    print('Real Subject action')
     total = cam1.area_total.value
     if total < settings.ONEMOUSE:
         utils.log_cam(utils.subject.name, "Area is correct " + str(total), "ACTION")
