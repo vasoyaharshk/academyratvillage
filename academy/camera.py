@@ -44,6 +44,7 @@ class Video(Process):
         self.threshold = threshold
         self.threshold2 = 0
         self.threshold3 = 0
+        self.threshold4 = 0
         self.daily_threshold = False
         self.title = ''
 
@@ -175,12 +176,14 @@ class Video(Process):
                     day = now >= begin_time or now <= end_time
                 if day:
                     self.threshold = settings.THRESHOLD_DAY_DOOR1
-                    self.threshold2 = settings.THRESHOLD_DAY_CAGE
+                    self.threshold2 = settings.THRESHOLD_DAY_CAGE1
                     self.threshold3 = settings.THRESHOLD_DAY_DOOR2
+                    self.threshold4 = settings.THRESHOLD_DAY_CAGE2
                 else:
                     self.threshold = settings.THRESHOLD_NIGHT_DOOR1
-                    self.threshold2 = settings.THRESHOLD_NIGHT_CAGE
+                    self.threshold2 = settings.THRESHOLD_NIGHT_CAGE1
                     self.threshold3 = settings.THRESHOLD_NIGHT_DOOR2
+                    self.threshold4 = settings.THRESHOLD_NIGHT_CAGE2
 
             if not self.command_queue.empty():
                 state = self.command_queue.get()
@@ -192,13 +195,15 @@ class Video(Process):
                     break
                 elif state == 'day':
                     self.threshold = settings.THRESHOLD_DAY_DOOR1
-                    self.threshold2 = settings.THRESHOLD_DAY_CAGE
+                    self.threshold2 = settings.THRESHOLD_DAY_CAGE1
                     self.threshold3 = settings.THRESHOLD_DAY_DOOR2
+                    self.threshold4 = settings.THRESHOLD_DAY_CAGE2
                     self.daily_threshold = False
                 elif state == 'night':
                     self.threshold = settings.THRESHOLD_NIGHT_DOOR1
-                    self.threshold2 = settings.THRESHOLD_NIGHT_CAGE
+                    self.threshold2 = settings.THRESHOLD_NIGHT_CAGE1
                     self.threshold3 = settings.THRESHOLD_NIGHT_DOOR2
+                    self.threshold4 = settings.THRESHOLD_NIGHT_CAGE2
                     self.daily_threshold = False
                 elif state == 'daily':
                     self.daily_threshold = True
@@ -333,7 +338,7 @@ class Video(Process):
         doors2_gaussian_frame = cv2.GaussianBlur(doors2_greyscale_frame, (5, 5), 0)
 
         cage_thresh1 = cv2.threshold(cage_gaussian_frame1, self.threshold2, 225, cv2.THRESH_BINARY_INV)[1]
-        cage_thresh2 = cv2.threshold(cage_gaussian_frame2, self.threshold2, 225, cv2.THRESH_BINARY_INV)[1]
+        cage_thresh2 = cv2.threshold(cage_gaussian_frame2, self.threshold4, 225, cv2.THRESH_BINARY_INV)[1]
         doors1_thresh = cv2.threshold(doors1_gaussian_frame, self.threshold, 225, cv2.THRESH_BINARY_INV)[1]
         doors2_thresh = cv2.threshold(doors2_gaussian_frame, self.threshold3, 225, cv2.THRESH_BINARY_INV)[1]
 

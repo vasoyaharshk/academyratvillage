@@ -58,8 +58,8 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 100  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 30  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 20  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 810  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done; reduced from 800 to 700 on 2024-04-25 because 2 rats were in BB at same time. Increased from 700 to 810 becuase Sparky couldn't get in.
 
@@ -67,11 +67,13 @@ ONEMOUSE = 810  # if area_total > ONEMOUSE animal can not enter         # <-- TO
 SEVERALMICE = 100  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
 FLOORMOUSE = 100
 
-THRESHOLD_DAY_CAGE = 40                                                  # <-- TO CHANGE
+THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
+THRESHOLD_DAY_CAGE2 = 40
 THRESHOLD_DAY_DOOR1 = 60                                                 # <-- TO CHANGE
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE = 80                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 60
 THRESHOLD_NIGHT_DOOR1 = 80                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
@@ -95,12 +97,12 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [105, 200, 135, 275]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [120, 290, 275, 370]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [290, 465, 330, 370]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [465, 635, 330, 370]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [60, 140, 70, 185]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [65, 230, 185, 280]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [230, 400, 230, 280]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [400, 600, 230, 280]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
-CAM1_TEXT_Y = 40                         # <-- TO CHANGE
+CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
 CAM2_NUMBER = 2
 CAM2_NAME_VIDEO = 'Lic'
