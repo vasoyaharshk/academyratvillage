@@ -22,7 +22,7 @@ class Test_Global_LED(Task):
             state_name='LED_ON',
             state_timer=60,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 2), (Bpod.OutputChannels.PWM1, 2)]
+            output_actions=[(Bpod.OutputChannels.PWM4, 10)]
         )
 
     def after_trial(self):

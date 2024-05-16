@@ -77,7 +77,7 @@ THRESHOLD_NIGHT_CAGE2 = 60
 THRESHOLD_NIGHT_DOOR1 = 80                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
-DURATION_TAG = 2  # seconds the rfid lecture is stored
+DURATION_TAG = 1.5  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
 HOUR_DAY = 8  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 1
@@ -97,7 +97,7 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [60, 140, 70, 185]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [60, 140, 75, 185]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 230, 185, 280]     # <-- TO CHANGE left, right, top, down
 CAM1_DOORS1_ZONE = [230, 500, 230, 280]   # <-- TO CHANGE left, right, top, down
 CAM1_DOORS2_ZONE = [500, 600, 230, 280]   # <-- TO CHANGE left, right, top, down
@@ -143,7 +143,9 @@ CAM3_TRACKING_POSITION = True
 TELEGRAM_TOKEN = '6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc'             # <-- TO CHANGE
 TELEGRAM_CHAT = '-4048080460'                                                  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043', 'Donna': '6811118356', 'Duncan': '6925304996'
+    'Harsh': '5842767043',
+    'Donna': '6811118356',
+    'Duncan': '6925304996'
 }
 
 #AWS

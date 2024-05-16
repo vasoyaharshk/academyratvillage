@@ -573,7 +573,7 @@ def subject_action(first_time, last_tags):
 
 
 def real_subject_action():
-    #print('Real Subject action')
+    print('Subject allowed to enter')
     total = cam1.area_total.value
     if total < settings.ONEMOUSE:
         utils.log_cam(utils.subject.name, "Area is correct " + str(total), "ACTION")
