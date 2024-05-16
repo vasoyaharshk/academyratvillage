@@ -47,7 +47,7 @@ class StageTraining_RatB_V1(Task):
         self.duration_tired = 1800  # 30 mins if animal sleeping last 10 mins, finishes task
         self.trials_tired = 5  # if animal does less than this number in the last 10 mins, finishes task
         self.tired = False  # Tired animal indicator
-        self.silent = True
+        self.silent = True  #to add silent trials
         self.mask = 3
         self.choices = self.mask
         self.blocks= True
