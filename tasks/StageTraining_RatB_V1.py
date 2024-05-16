@@ -13,6 +13,7 @@ class StageTraining_RatB_V1(Task):
 
         self.info = """
         ########   TASK INFO   ########
+         --> Update: Stimulus control trials included in data collection
         --> Blocks in stage 1.1 & 1.2 to speed the categorization (inactivate by self.blocks= False)
         --> Trial types: VG, DS, DM, DL
         --> No stimulus lenght control trials
@@ -204,6 +205,11 @@ class StageTraining_RatB_V1(Task):
                 if self.substage == 1:  # SUBSTAGE 1: DS CONSOLIDATION
                     self.pvg = 0.2
                     self.pds = 0.8
+                    ## For progressive
+                    #self.pvg = 0.2
+                    #self.pds = 0.3
+                    #self.pdsc1 = 0.25
+                    #self.pdsc2 = 0.25
                     self.correction_bias = 1  # Repeat prev stim position if punish
                     # from trial 20 start reducing stimulus duration of DS
                     if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
@@ -220,6 +226,13 @@ class StageTraining_RatB_V1(Task):
                     self.pvg = 0.1
                     self.pds = 0.45
                     self.pdm = 0.45
+                    ## For progressive
+                    # self.pvg = 0.1
+                    # self.pds = 0.15
+                    # self.pdsc1 = 0.15
+                    # self.pdsc2 = 0.15
+                    # self.pdm = 0.225
+                    # self.pdmc1 = 0.225
 
                     # from trial 20 start reducing stimulus duration of DM
                     if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
@@ -238,6 +251,14 @@ class StageTraining_RatB_V1(Task):
                     self.pds = 0.3
                     self.pdm = 0.3
                     self.pdl = 0.3
+                    ## For progressive
+                    #self.pvg = 0.1
+                    #self.pds = 0.1
+                    #self.pdsc1 = 0.1
+                    #self.pdsc2 = 0.1
+                    #self.pdm = 0.15
+                    #self.pdmc1 = 0.15
+                    #self.pdl = 0.3
 
                     # from trial 20 start reducing stimulus duration of DL
                     if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
@@ -254,9 +275,11 @@ class StageTraining_RatB_V1(Task):
                 self.stim_dur_ds = 0
                 self.stim_dur_dm = 0
                 self.stim_dur_dl = 0
-                self.pvg = 0.1
-                self.pds = 0.3
-                self.pdm = 0.3
+                self.pds = 0.1
+                self.pdsc1 = 0.1
+                self.pdsc2 = 0.1
+                self.pdm = 0.15
+                self.pdmc1 = 0.15
                 self.pdl = 0.3
 
 
