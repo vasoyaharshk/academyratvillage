@@ -33,6 +33,18 @@ class Test_Sound(Task):
         self.sma.add_state(
             state_name='Waiting2',
             state_timer=2,
+            state_change_conditions={Bpod.Events.Tup: 'Incorrect_sound_on'},
+            output_actions=[])
+
+        self.sma.add_state(
+            state_name='Incorrect_sound_on',
+            state_timer=2,
+            state_change_conditions={Bpod.Events.Tup: 'Waiting3'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 13)])
+
+        self.sma.add_state(
+            state_name='Waiting3',
+            state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[])
 

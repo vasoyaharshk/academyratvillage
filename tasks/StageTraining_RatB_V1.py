@@ -16,7 +16,6 @@ class StageTraining_RatB_V1(Task):
          --> Update: Stimulus control trials included in data collection
         --> Blocks in stage 1.1 & 1.2 to speed the categorization (inactivate by self.blocks= False)
         --> Trial types: VG, DS, DM, DL
-        --> No stimulus lenght control trials
         --> Silent trials can appear in stage 3 by activating self.silent = True
         --> First 10 trials EASY
 
@@ -34,11 +33,11 @@ class StageTraining_RatB_V1(Task):
         ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - BUZZER: valve (16kHz): correct; LED (4kHz):punish
-        Port 3 - PHOTOGATES 5: Photogates end of corridor
-        Port 4 - PHOTOGATES 1: Photogates next to lickport & Global LED
-        PAm  1 - PHOTOGATES 2: Photogates start of corridor           
-        PAm  2 - PHOTOGATES 3: Photogates midle-start of corridor
-        PAm  3 - PHOTOGATES 4: Photogates midle-end of corridor     
+        Port 3 - PHOTOGATES 4: Photogates end of corridor
+        Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
+        PAm  1 - PHOTOGATES 1: Photogates start of corridor           
+        PAm  2 - PHOTOGATES 2: Photogates midle-start of corridor
+        PAm  3 - PHOTOGATES 3: Photogates midle-end of corridor     
         """
 
     def init_variables(self):
@@ -394,7 +393,7 @@ class StageTraining_RatB_V1(Task):
 
         # silent trials
         if self.silent == True and self.stage==3 and self.current_trial >10:
-            self.y = np.random.choice([125, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
+            self.y = np.random.choice([30, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
             print('Silent trial')
 
 
@@ -411,7 +410,8 @@ class StageTraining_RatB_V1(Task):
 
             self.sma.add_state(
                 state_name='Real_start',
-                state_timer=self.valve_time * 2,
+                #state_timer=self.valve_time * 2,
+                state_timer=self.valve_time * 20,                           #Deliver 1ml of water to rats at the start
                 state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # close corridor 2 door, and deliver water when animal enter to behav box
