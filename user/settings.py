@@ -63,8 +63,8 @@ NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 1400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done; reduced from 800 to 700 on 2024-04-25 because 2 rats were in BB at same time. Increased from 700 to 810 becuase Sparky couldn't get in.
 
-#Behavioral Box"
-SEVERALMICE = 1000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE
+#Behavioral Box:
+SEVERALMICE = 3000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE. Sparky measured 6213 by the bot
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
@@ -99,8 +99,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 140, 75, 185]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 220, 185, 280]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [220, 500, 230, 280]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [500, 595, 240, 265]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [220, 490, 230, 280]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [490, 595, 240, 265]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
@@ -132,16 +132,16 @@ CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 90                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
 CAM3_CAGE_ZONE = None
-CAM3_DOORS1_ZONE = [60, 640, 180, 290]     # <-- TO CHANGE  left, right, top, down
-CAM3_DOORS2_ZONE = [20, 60, 140, 330]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR1_ZONE = [100, 640, 10, 150]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR2_ZONE = [100, 640, 330, 470]    # <-- TO CHANGE left, right, top, down
+CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
+CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
 TELEGRAM_TOKEN = '6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc'             # <-- TO CHANGE
-TELEGRAM_CHAT = '-4048080460'                                                  # <-- TO CHANGE
+TELEGRAM_CHAT = '-1002111074687'                                                  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
     'Harsh': '5842767043',
     'Donna': '6811118356',

@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class StageTraining_RatB_V1(Task):
+class StageTraining_RatB_Luna(Task):
 
     def __init__(self):
         super().__init__()
@@ -92,7 +92,7 @@ class StageTraining_RatB_V1(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 1
+        self.valve_factor_c = 3
         self.valve_factor_i = 0.45
 
         # counters

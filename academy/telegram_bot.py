@@ -22,7 +22,7 @@ def start(update, context):
 def alarm_mice(area):
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
-        message = 'ALARM: 2 mice in box, area ' + str(int(area))
+        message = 'ALARM: 2 rats in box, area ' + str(int(area))
         utils.alarms.add_new_item({'message': message})
         data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
 
