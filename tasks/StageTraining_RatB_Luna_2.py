@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class StageTraining_RatB_V1(Task):
+class StageTraining_RatB_Luna_2(Task):
 
     def __init__(self):
         super().__init__()
@@ -92,7 +92,7 @@ class StageTraining_RatB_V1(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 1
+        self.valve_factor_c = 3.0
         self.valve_factor_i = 0.45
 
         # counters
@@ -149,7 +149,7 @@ class StageTraining_RatB_V1(Task):
 
             # SUBSTAGE 1: STIMULUS REPOKING ALLOWED, LONG RESP WIN, MORE WATER
             if self.substage == 1:
-                self.valve_factor_c = 1.2
+                self.valve_factor_c = 3.0
                 self.valve_factor_i = 0.6
                 # 10 initial easy trials: all VG
                 if self.current_trial >= 10:
@@ -427,7 +427,7 @@ class StageTraining_RatB_V1(Task):
         self.sma.add_state(
             state_name='Fixation1',
             state_timer=0,
-            state_change_conditions={'Port4In': 'Fixation2'},
+            state_change_conditions={'Port3In': 'Fixation2'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim1)])
             # show stimulus now in normal trials, not in controls
 
