@@ -394,8 +394,9 @@ class StageTraining_RatB_V1(Task):
         # silent trials
         if self.silent == True and self.stage==3 and self.current_trial >10:
             self.y = np.random.choice([30, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
-            print('Silent trial')
-
+            if self.y == 1000:
+                print('Silent trial')
+                print('y position:' + str(self.y))
 
         ############ STATE MACHINE ################
 

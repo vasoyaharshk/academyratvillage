@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class StageTraining_RatB_Luna_1(Task):
+class StageTraining_RatB_Luna(Task):
 
     def __init__(self):
         super().__init__()
@@ -139,7 +139,7 @@ class StageTraining_RatB_Luna_1(Task):
         if self.stage == 1:
             if self.blocks == True:  # Repeat more on side if blocks allowed
                 if self.substage==1:
-                    self.prob = 1.0    #changed to 0.5 for Luna.
+                    self.prob = 0.5    #changed to 0.5 for Luna.
                 elif self.substage ==2:
                     #self.prob = 0.55
                     self.prob = 0.33     #changed to 0.33 gtom 0.55.
@@ -299,14 +299,14 @@ class StageTraining_RatB_Luna_1(Task):
 
             # Create BLOCK list, pseudorandom serie with 3 choices (0:Left, 1:Centre, 2:Right)
             else:
-                self.x_positions = [290]  #Line added fro Luna. Many changes made below for not showing the left stimulus.
+                self.x_positions = [175, 290]  #Line added fro Luna. Many changes made below for not showing the left stimulus.
                 print('Blocks prob: '+str(self.prob))
                 #other_prob = (1 - self.prob) / 2 # calculate non fav probs. It substracts the seld.prob by 1 and divides the other two in 2. Assumes there are 2 non-favorite outcomes (hence dividing by 2).
-                other_prob = (1 - self.prob)  # calculate non fav probs. It substracts the self.prob by 1 and divides the other two in 2. Assumes there are 2 non-favorite outcomes (hence dividing by 2).
+                other_prob = (1 - self.prob) / 1  # calculate non fav probs. It substracts the self.prob by 1 and divides the other two in 2. Assumes there are 2 non-favorite outcomes (hence dividing by 2).
                 #p_list = [other_prob] * 3 # create a list of 3 non-fav probs
-                p_list = [other_prob] * 1  # create a list of 3 non-fav probs
+                p_list = [other_prob] * 2  # create a list of 3 non-fav probs
                 #block_combinations = ['012', '021', '102', '120', '210', '201'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
-                block_combinations = ['0'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
+                block_combinations = ['01', '10'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
                 block_serie = np.random.choice(block_combinations) #choose randomly a block serie
                 for i in range(10): # take 10 pseudorandom block combinations and create a single string
                     next_block = np.random.choice(block_combinations)
@@ -640,4 +640,3 @@ class StageTraining_RatB_Luna_1(Task):
         self.register_value('correction_bias', self.correction_bias)
         self.register_value('trial_length', self.trial_length)
         self.register_value('block_size', self.block_size)
-

@@ -3,7 +3,7 @@ from pybpodapi.protocol import Bpod
 from academy.utils import utils
 from user import settings
 
-class TouchTeaching_Luna(Task):
+class TouchTeaching(Task):
 
     def __init__(self):
         super().__init__()
@@ -34,8 +34,8 @@ class TouchTeaching_Luna(Task):
 
     def init_variables(self):
         # general
-        self.duration_min = 1800 # 30 mins
-        self.duration_max = 2100 # 35 mins
+        self.duration_min = 2100 # 30 mins   #changed from 30 mins to 2100 for Luna
+        self.duration_max = 3000 # 35 mins   #changed from 35 mins to 3000 for Luna
         self.stage = 0
         self.substage = 0
         self.response_duration = 120 # 2 min

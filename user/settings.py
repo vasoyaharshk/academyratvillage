@@ -61,19 +61,19 @@ TIME_BETWEEN_RESPONSES = 0.5
 NOMICECAGE = 30  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 1400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done; reduced from 800 to 700 on 2024-04-25 because 2 rats were in BB at same time. Increased from 700 to 810 becuase Sparky couldn't get in.
+ONEMOUSE = 1600  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
-SEVERALMICE = 3000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- TO CHANGE. Sparky measured 6213 by the bot
+SEVERALMICE = 3000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
 THRESHOLD_DAY_CAGE2 = 40
-THRESHOLD_DAY_DOOR1 = 60                                                 # <-- TO CHANGE
+THRESHOLD_DAY_DOOR1 = 40                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
 THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 60
+THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
@@ -99,8 +99,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 140, 70, 185]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 220, 185, 280]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [220, 470, 235, 280]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [470, 595, 245, 270]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [220, 480, 235, 280]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [480, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
@@ -130,7 +130,7 @@ CAM3_STATES = {"Correct": (600, 30),
                "Resp Win": (600, 160)}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 90                         #100 #0 to 255. 0 is the camera will detect everything black and 255 is the camera will detect everything white. Cannot be more than 120
+CAM3_THRESHOLD = 40                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
 CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
@@ -172,6 +172,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ['None', 'm1']  # subjects that don't raise alarms and not save data
-TESTING = True  # if true academy works without cams, arduino, screen or bpod
+TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
