@@ -58,7 +58,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 30  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 40  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 1600  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
@@ -69,12 +69,12 @@ FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
 THRESHOLD_DAY_CAGE2 = 40
-THRESHOLD_DAY_DOOR1 = 40                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
+THRESHOLD_DAY_DOOR1 = 35                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
 THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_DOOR1 = 100                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR1 = 110                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
@@ -130,7 +130,7 @@ CAM3_STATES = {"Correct": (600, 30),
                "Resp Win": (600, 160)}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 40                         #40 for day. 90 for night
+CAM3_THRESHOLD = 90                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
 CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
