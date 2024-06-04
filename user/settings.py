@@ -74,7 +74,7 @@ THRESHOLD_DAY_DOOR2 = 60                                                 # <-- T
 
 THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_DOOR1 = 110                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR1 = 115                                               # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
@@ -99,8 +99,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 140, 70, 185]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 220, 185, 280]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [220, 480, 235, 280]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [480, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [220, 475, 235, 280]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [475, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
