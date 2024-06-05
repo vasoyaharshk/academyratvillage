@@ -21,6 +21,7 @@ def select_task(df, subject):
 
     # dataframes
     last_session = df.session.max()
+    df_last14 = df.loc[df['session'] > last_session - 14].copy()  # last 14 sessions
     df_last5 = df.loc[df['session'] > last_session - 5].copy()  # last five sessions
     df_last3 = df.loc[df['session'] > last_session - 3].copy()  # last three sessions
     df_last2 = df.loc[df['session'] > last_session - 2].copy()  # last two sessions
@@ -129,6 +130,7 @@ def select_task(df, subject):
         last3_stages = df_last3.stage.unique()
         last3_substages = df_last3.substage.unique()
         last5_substages = df_last5.substage.unique()
+        last14_substages = df_last14.substage.unique()
 
         # accuracies calc
         first_poke_acc = df.first_correct_bool.mean()
@@ -260,10 +262,11 @@ def select_task(df, subject):
             elif substage == 3:
                 stim_dur_dl = stim_dur
                 if next_stage == True:
-                    print('pass') #decide manually when to move them forward
-                    # stage += 1
-                    # substage = float(1)
-                    # stim_dur_dl = 0
+                    print('pass to stage 3')
+                    if len(last14_substages) == 1:
+                        stage += 1
+                        substage = float(1)
+                        stim_dur_dl = 0
                 elif lower_stage == True:
                     substage -=1
                     stim_dur_dm = 0.4

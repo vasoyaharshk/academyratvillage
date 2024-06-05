@@ -137,13 +137,12 @@ class StageTraining_RatB_V1(Task):
 
         ####### STAGE 1: STIMULUS CATEGORIZATION ######
         if self.stage == 1:
-            if self.blocks == True:  # Repeat more on side if blocks allowed
+
+            if self.blocks == True:  # Repeat more un side if blocks allowed
                 if self.substage==1:
-                    self.prob = 0.5    #changed to 0.5 for Luna.
+                    self.prob = 0.75
                 elif self.substage ==2:
-                    #self.prob = 0.55
-                    self.prob = 0.33     #changed to 0.33 gtom 0.55.
-                    self.prob = 0.33     #changed to 0.33 gtom 0.55.
+                    self.prob = 0.55
                 else:
                     self.prob = 0.33
 
@@ -246,18 +245,14 @@ class StageTraining_RatB_V1(Task):
                     self.response_duration = 15
                     self.stim_dur_ds = 0
                     self.stim_dur_dm = 0
+                    self.stim_dur_dl = 0
                     self.pvg = 0.1
-                    self.pds = 0.3
-                    self.pdm = 0.3
+                    self.pds = 0.1
+                    self.pdsc1 = 0.1
+                    self.pdsc2 = 0.1
+                    self.pdm = 0.15
+                    self.pdmc1 = 0.15
                     self.pdl = 0.3
-                    ## For progressive
-                    #self.pvg = 0.1
-                    #self.pds = 0.1
-                    #self.pdsc1 = 0.1
-                    #self.pdsc2 = 0.1
-                    #self.pdm = 0.15
-                    #self.pdmc1 = 0.15
-                    #self.pdl = 0.3
 
                     # from trial 20 start reducing stimulus duration of DL
                     if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
@@ -274,6 +269,7 @@ class StageTraining_RatB_V1(Task):
                 self.stim_dur_ds = 0
                 self.stim_dur_dm = 0
                 self.stim_dur_dl = 0
+                self.pvg = 0.1
                 self.pds = 0.1
                 self.pdsc1 = 0.1
                 self.pdsc2 = 0.1

@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class StageTraining_RatB_Luna(Task):
+class StageTraining_RatB_Luna1(Task):
 
     def __init__(self):
         super().__init__()
@@ -143,6 +143,7 @@ class StageTraining_RatB_Luna(Task):
                 elif self.substage ==2:
                     #self.prob = 0.55
                     self.prob = 0.33     #changed to 0.33 gtom 0.55.
+
                 else:
                     self.prob = 0.33
 
