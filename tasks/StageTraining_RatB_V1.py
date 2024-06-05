@@ -241,18 +241,22 @@ class StageTraining_RatB_V1(Task):
                             self.stim_dur_dm += 0.075
                             print('easier!')
 
-                elif self.substage == 3 and self.current_trial >= 10:  # SUBSTAGE 3: DL CONSOLIDATION
+                elif self.substage == 3 and self.current_trial >= 10:
                     self.response_duration = 15
                     self.stim_dur_ds = 0
                     self.stim_dur_dm = 0
-                    self.stim_dur_dl = 0
                     self.pvg = 0.1
-                    self.pds = 0.1
-                    self.pdsc1 = 0.1
-                    self.pdsc2 = 0.1
-                    self.pdm = 0.15
-                    self.pdmc1 = 0.15
+                    self.pds = 0.3
+                    self.pdm = 0.3
                     self.pdl = 0.3
+                    ## For progressive
+                    #self.pvg = 0.1
+                    #self.pds = 0.1
+                    #self.pdsc1 = 0.1
+                    #self.pdsc2 = 0.1
+                    #self.pdm = 0.15
+                    #self.pdmc1 = 0.15
+                    #self.pdl = 0.3
 
                     # from trial 20 start reducing stimulus duration of DL
                     if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
