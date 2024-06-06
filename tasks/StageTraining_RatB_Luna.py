@@ -287,9 +287,14 @@ class StageTraining_RatB_Luna(Task):
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
         self.x_positions = [60, 175, 290]
+        #self.x_positions = [290]   #Set to make the randomisation start from trial 2.
+
+
 
         # Choose x positions by blocks
-        if self.current_trial == 0:  # Make a list with x values
+        if self.current_trial < 2:
+            self.x_trials = [290, 290]
+        else:                        #  Randomissation begins from trial 2. Change this to 0 to randomise from the start of the session. self.current_trial == 0, and delete the before if condition
             self.block_size = int(self.block_size)
 
             # # Create RANDOM list with 3 choices (0:Left, 1:Centre, 2:Right)
