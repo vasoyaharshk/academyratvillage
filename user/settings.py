@@ -69,7 +69,7 @@ FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
 THRESHOLD_DAY_CAGE2 = 40
-THRESHOLD_DAY_DOOR1 = 35                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
+THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
 THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
