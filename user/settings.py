@@ -79,10 +79,10 @@ THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- T
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
-HOUR_DAY = 8  # night is more restrictive so it last 1 minute more when changing
-MINUTE_DAY = 1
-HOUR_NIGHT = 19
-MINUTE_NIGHT = 59
+HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing. IDIBAPS set to 8
+MINUTE_DAY = 40      #IDIBAPS set to 1
+HOUR_NIGHT = 19     #IDIBAPS set to 19
+MINUTE_NIGHT = 50   #IDIBAPS set to 59
 TIME_TO_ENTER = 3 # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
