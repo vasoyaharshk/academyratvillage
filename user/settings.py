@@ -61,7 +61,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 NOMICECAGE = 40  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 1600  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
+ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
 SEVERALMICE = 3000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
@@ -72,7 +72,7 @@ THRESHOLD_DAY_CAGE2 = 40
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 25                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR1 = 115                                               # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
