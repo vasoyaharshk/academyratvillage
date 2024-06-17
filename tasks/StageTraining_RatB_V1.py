@@ -299,14 +299,10 @@ class StageTraining_RatB_V1(Task):
 
             # Create BLOCK list, pseudorandom serie with 3 choices (0:Left, 1:Centre, 2:Right)
             else:
-                self.x_positions = [175, 290]  #Line added fro Luna. Many changes made below for not showing the left stimulus.
                 print('Blocks prob: '+str(self.prob))
-                #other_prob = (1 - self.prob) / 2 # calculate non fav probs. It substracts the seld.prob by 1 and divides the other two in 2. Assumes there are 2 non-favorite outcomes (hence dividing by 2).
-                other_prob = (1 - self.prob) / 1  # calculate non fav probs. It substracts the self.prob by 1 and divides the other two in 2. Assumes there are 2 non-favorite outcomes (hence dividing by 2).
-                #p_list = [other_prob] * 3 # create a list of 3 non-fav probs
-                p_list = [other_prob] * 2  # create a list of 3 non-fav probs
-                #block_combinations = ['012', '021', '102', '120', '210', '201'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
-                block_combinations = ['01', '10'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
+                other_prob = (1 - self.prob) / 2 # calculate non fav probs
+                p_list = [other_prob] * 3 # create a list of 3 non-fav probs
+                block_combinations = ['012', '021', '102', '120', '210', '201']
                 block_serie = np.random.choice(block_combinations) #choose randomly a block serie
                 for i in range(10): # take 10 pseudorandom block combinations and create a single string
                     next_block = np.random.choice(block_combinations)
@@ -317,9 +313,9 @@ class StageTraining_RatB_V1(Task):
                     block_serie = block_serie + next_block
                 print('blocks serie values: '+str( block_serie))
                 # create block of trials (n= block size value) following the prev serie
-                for idx, i in enumerate(block_serie):        #This loop iterates through each block combination in the sequence (block_serie). idx is the index of the current block combination. i is the current block combination string.
+                for idx, i in enumerate(block_serie):
                     p = p_list.copy()
-                    p[int(i)] = self.prob       #This updates the copiedp_listfor the current block.It sets the probability for the index corresponding to the current block's first character (e.g.,'0' for "favorite") toself.prob.
+                    p[int(i)] = self.prob
                     if idx == 0:
                         self.x_trials = (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
                         print('x pobs: ' + str(p))
