@@ -83,7 +83,7 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 19     #IDIBAPS set to 19
 MINUTE_NIGHT = 50   #IDIBAPS set to 59
-TIME_TO_ENTER = 3 # time between session and session (hours)            # <-- TO CHANGE
+TIME_TO_ENTER = 4 # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
 # camera
@@ -132,10 +132,14 @@ CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 90                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
-CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
-CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
+#CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
+CAM3_DOORS1_ZONE = [550, 610, 125, 350]     # <-- TO CHANGE  left, right, top, down
+#CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
+CAM3_DOORS2_ZONE = [540, 550, 300, 310]    # <-- TO CHANGE left, right, top, down
+#CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR1_ZONE = [1, 550, 10, 170]    # <-- TO CHANGE left, right, top, down
+#CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [1, 550, 310, 470]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
