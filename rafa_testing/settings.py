@@ -86,7 +86,7 @@ NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- T
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 # Behavioral Box:
-SEVERALMICE = 3050  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
+SEVERALMICE = 400  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40  # <-- TO CHANGE
@@ -105,7 +105,7 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40  # IDIBAPS set to 1
 HOUR_NIGHT = 19  # IDIBAPS set to 19
 MINUTE_NIGHT = 50  # IDIBAPS set to 59
-DETECTION_WAITING_MINUTES = 60
+DETECTION_WAITING_MINUTES = 1   #Changing light from 19 to 20 and 7 to 8 when the system will be disabled for this many minutes
 TIME_TO_ENTER = 4  # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = (
     []
