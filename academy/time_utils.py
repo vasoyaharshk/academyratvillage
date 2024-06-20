@@ -36,6 +36,13 @@ def hour_minute_to_time(hour, minute):
     return datetime.time(hour, minute)
 
 
+def add_minutes_to_time(time, minutes):
+    return (
+        datetime.datetime.combine(datetime.date.today(), time)
+        + datetime.timedelta(minutes=minutes)
+    ).time()
+
+
 class Chrono:
     def __init__(self):
         self.init_time = time.time()
@@ -53,19 +60,19 @@ class Chrono:
         s = int(t - h * 3600 - m * 60)
 
         if h < 10:
-            h = '0' + str(h)
+            h = "0" + str(h)
         else:
             h = str(h)
         if m < 10:
-            m = '0' + str(m)
+            m = "0" + str(m)
         else:
             m = str(m)
         if s < 10:
-            s = '0' + str(s)
+            s = "0" + str(s)
         else:
             s = str(s)
 
-        return h + ':' + m + ':' + s
+        return h + ":" + m + ":" + s
 
 
 class Timer:

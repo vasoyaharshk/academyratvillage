@@ -1,6 +1,6 @@
 from user import settings
 from academy.utils import utils
-from academy.camera import cam3
+from academy.camera import cam2, cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
 from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
@@ -75,25 +75,27 @@ def function4():
 
     touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
                         utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM,
-                        utils.task.repoke_th * settings.PIXELS_PER_MM)
-    cam3.put_state('Resp Win')
-
-
+        utils.task.repoke_th * settings.PIXELS_PER_MM,
+    )
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
 
 
 # resume reading
 def function5():
     touch.resume_reading(utils.task.x * settings.PIXELS_PER_MM, utils.task.y * settings.PIXELS_PER_MM,
                          utils.task.correct_th * settings.PIXELS_PER_MM,
-                         utils.task.repoke_th * settings.PIXELS_PER_MM)
-    cam3.put_state('Resp Win')
+        utils.task.repoke_th * settings.PIXELS_PER_MM,
+    )
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
 
 
 #Balma script:
 def function6():
     try:
         utils.task.pulse_pal.trigger_pulse(1)
-        cam3.put_state('On')
+        cam3.put_state("On")
     except:
         print(traceback.format_exc())
 
@@ -101,12 +103,12 @@ def function6():
 def function7():
     try:
         utils.task.pulse_pal.trigger_pulse(2)
-        cam3.put_state('On')
+        cam3.put_state("On")
     except:
         print(traceback.format_exc())
 
 def function8():
-    cam3.put_state('Correct')
+    cam3.put_state("Correct")
     soundStream.stop(soundVec1)
     print("Correct")
 
@@ -118,7 +120,8 @@ def function11():
         utils.task.pulse_pal.stop_pulse()
     except:
         pass
-    cam3.put_state('Correct')
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
     soundStream.play(soundVec1)
     print("Correct, Reward Sound played")
 
@@ -128,7 +131,9 @@ def loop11(timing):
 
 # camera miss with grey screen
 def function12():
-    cam3.put_state('Miss')
+    cam2.put_state("Miss")
+    cam3.put_state("Miss")
+
 
 def loop12(timing):
     # white_screen.draw()
@@ -142,7 +147,8 @@ def function13():
         utils.task.pulse_pal.stop_pulse()
     except:
         pass
-    cam3.put_state('Incorrect')
+    cam2.put_state("Incorrect")
+    cam3.put_state("Incorrect")
     # sound for incorrect 4kHz
     soundStream.play(soundVec2)
     print("Incorrect, Punish Sound played")
@@ -154,7 +160,8 @@ def function14():
         utils.task.pulse_pal.stop_pulse()
     except:
         pass
-    cam3.put_state('Punish')
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
     soundStream.play(soundVec3)
     print("Punish, Punish Sound played")
 
@@ -165,7 +172,9 @@ def loop14(timing):
 
 # camera empty and delete screen
 def function15():
-    cam3.put_state('')
+    cam2.put_state("")
+    cam3.put_state("")
+
 
 def loop15(timing):
     window.flip()
@@ -179,7 +188,8 @@ def function16():
 
 # camera empty and delete screen
 def function17():
-    cam3.put_state('')
+    cam2.put_state("")
+    cam3.put_state("")
     soundStream.stop(soundVec1)
 
 def loop17(timing):

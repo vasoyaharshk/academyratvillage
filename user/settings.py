@@ -83,6 +83,7 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 19     #IDIBAPS set to 19
 MINUTE_NIGHT = 50   #IDIBAPS set to 59
+DETECTION_WAITING_MINUTES = 1
 TIME_TO_ENTER = 4 # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
@@ -105,37 +106,44 @@ CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
 CAM2_NUMBER = 2
-CAM2_NAME_VIDEO = 'Lic'
+CAM2_NAME_VIDEO = "Lic"
 CAM2_WIDTH = 640
 CAM2_HEIGHT = 480
 CAM2_FPS = 30
-CAM2_CODEC_VIDEO = 'X264'
-CAM2_STATES = {}
-CAM2_DURATION_VIDEO = 1800
-CAM2_NUMBER_OF_VIDEOS = 10000
+CAM2_CODEC_VIDEO = "X264"
+CAM2_STATES = {
+    "Correct": (600, 30),
+    "Incorrect": (600, 70),
+    "Punish": (600, 100),
+    "Miss": (600, 130),
+    "Resp Win": (600, 160),
+}
+CAM2_DURATION_VIDEO = 0
+CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 30
-CAM2_DOORS1_ZONE = None
-CAM2_DOORS2_ZONE = None
+CAM2_DOORS1_ZONE = [10, 610, 125, 480]
+CAM2_DOORS2_ZONE = [1, 2, 1, 2]
 
 CAM3_NUMBER = 3
-CAM3_NAME_VIDEO = 'BB'
+CAM3_NAME_VIDEO = "BB"
 CAM3_WIDTH = 640
 CAM3_HEIGHT = 480
 CAM3_FPS = 30
-CAM3_CODEC_VIDEO = 'X264'
+CAM3_CODEC_VIDEO = "X264"
 CAM3_STATES = {"Correct": (600, 30),
                "Incorrect": (600, 70),
                "Punish": (600, 100),
                "Miss": (600, 130),
-               "Resp Win": (600, 160)}
+    "Resp Win": (600, 160),
+}
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 90                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
 #CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
-CAM3_DOORS1_ZONE = [550, 610, 125, 350]     # <-- TO CHANGE  left, right, top, down
+CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
 #CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
-CAM3_DOORS2_ZONE = [540, 550, 300, 310]    # <-- TO CHANGE left, right, top, down
+CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [1, 550, 10, 170]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
@@ -144,8 +152,8 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = '6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc'             # <-- TO CHANGE
-TELEGRAM_CHAT = '-1002111074687'                                                  # <-- TO CHANGE
+TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
+TELEGRAM_CHAT = "-1002111074687"  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
     'Harsh': '5842767043',
     'Donna': '6811118356',
@@ -153,8 +161,8 @@ TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
 }
 
 #AWS
-OPERATION_TABLE = 'operation_times'   # <-- TO CHANGE
-TASK_TABLE = 'task_times'             # <-- TO CHANGE
+OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
+TASK_TABLE = "task_times"  # <-- TO CHANGE
 
 # other
 BOX_NAME = 3                         # <-- TO CHANGE
@@ -175,7 +183,7 @@ MAXIMUM_WEIGHT = 200  # in percentage
 MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
-INACTIVE_SUBJECTS = ['None', 'm1']  # subjects that don't raise alarms and not save data
+INACTIVE_SUBJECTS = ["None", "m1"]  # subjects that don't raise alarms and not save data
 TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

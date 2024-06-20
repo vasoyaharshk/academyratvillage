@@ -31,7 +31,7 @@ class SuperSubject:
 class Task(object):
 
     def __init__(self):
-        self.task = 'UNKNOWN'
+        self.task = "UNKNOWN"
         self.p = None
         self.stage = 1
         self.substage = 1
@@ -57,7 +57,7 @@ class Task(object):
         self.trials_max = settings.DEFAULT_TRIALS_MAX
         self.duration_max = settings.DEFAULT_DURATION_MAX
         self.tired = False
-        self.gui_input_fixed = ['subject_weight']
+        self.gui_input_fixed = ["subject_weight"]
         self.gui_input = []
         self.gui_output = []
         self.info = None
@@ -109,12 +109,12 @@ class Task(object):
             if not os.path.exists(video_directory):
                 os.mkdir(video_directory)
 
-            #cam2.put_state('File' + task_manager.filename)
-            cam3.put_state('File' + task_manager.filename)
+            cam2.put_state("File" + task_manager.filename)
+            cam3.put_state("File" + task_manager.filename)
 
         else:
-            #cam2.put_state('active')
-            cam3.put_state('active')
+            cam2.put_state("active")
+            cam3.put_state("active")
             self.date = time_utils.now_string()[:10]
 
         self.p = Thread(target=self.run_thread, args=(trials,), daemon=True)
@@ -138,12 +138,12 @@ class Task(object):
 
                 if settings.BOX_NAME == 4:
                     if utils.current_trials == utils.control_serials + 5:
-                        print('alarm serial')
+                        print("alarm serial")
                         #telegram_bot.alarm_serials()
                         #utils.force_relaunch = True
 
                     if utils.current_trials == utils.control_softcodes + 5:
-                        print('alarm softcode')
+                        print("alarm softcode")
                         #telegram_bot.alarm_softcodes()
                         #utils.force_relaunch = True
 
@@ -152,27 +152,31 @@ class Task(object):
                 self.sma = StateMachine(self.my_bpod)
 
                 self.my_bpod.manual_override(Bpod.ChannelTypes.OUTPUT, Bpod.ChannelNames.SERIAL,
-                                             channel_number=1, value=16)
+                    channel_number=1,
+                    value=16,
+                )
 
                 if self.current_trial < trials:
                     self.main_loop()
                 else:
                     self.sma.add_state(
-                        state_name='End',
+                        state_name="End",
                         state_timer=100,
-                        state_change_conditions={Bpod.Events.Tup: 'exit'},
-                        output_actions=[]
+                        state_change_conditions={Bpod.Events.Tup: "exit"},
+                        output_actions=[],
                     )
                 if len(self.sma.state_names) == 0:
                     self.sma.add_state(
-                        state_name='End',
+                        state_name="End",
                         state_timer=0,
-                        state_change_conditions={Bpod.Events.Tup: 'exit'},
-                        output_actions=[]
+                        state_change_conditions={Bpod.Events.Tup: "exit"},
+                        output_actions=[],
                     )
                 self.my_bpod.send_state_machine(self.sma)
                 self.my_bpod.run_state_machine(self.sma)
-                self.current_trial_states = self.my_bpod.session.current_trial.states_durations
+                self.current_trial_states = (
+                    self.my_bpod.session.current_trial.states_durations
+                )
                 self.update_response()
                 self.after_trial()
                 self.register_values()
@@ -204,32 +208,32 @@ class Task(object):
             except IndexError:
                 pass
 
-        self.response_x = ','.join(str(e) for e in self.response_x)
-        self.response_y = ','.join(str(e) for e in self.response_y)
+        self.response_x = ",".join(str(e) for e in self.response_x)
+        self.response_y = ",".join(str(e) for e in self.response_y)
 
     def register_value(self, key, value):
         self.my_bpod.register_value(key, value)
 
     def register_values(self):
-        self.my_bpod.register_value('task', self.task)
-        self.my_bpod.register_value('stage', self.stage)
-        self.my_bpod.register_value('checksum', self.checksum)
-        self.my_bpod.register_value('subject', self.subject)
-        self.my_bpod.register_value('subject_weight', self.subject_weight)
-        self.my_bpod.register_value('box', self.box)
-        self.my_bpod.register_value('date', self.date)
+        self.my_bpod.register_value("task", self.task)
+        self.my_bpod.register_value("stage", self.stage)
+        self.my_bpod.register_value("checksum", self.checksum)
+        self.my_bpod.register_value("subject", self.subject)
+        self.my_bpod.register_value("subject_weight", self.subject_weight)
+        self.my_bpod.register_value("box", self.box)
+        self.my_bpod.register_value("date", self.date)
 
         for i in range(len(utils.task.gui_input)):
             name = utils.task.gui_input[i]
             attribute = getattr(utils.task, name)
             self.my_bpod.register_value(name, attribute)
 
-        self.my_bpod.register_value('TRIAL', None)
+        self.my_bpod.register_value("TRIAL", None)
 
 
 class TaskCollection(object):
     def __init__(self):
-        self.tasks_package = 'tasks'
+        self.tasks_package = "tasks"
         self.tasks = []
         self.seen_paths = []
         self.reload_tasks()
@@ -252,13 +256,19 @@ class TaskCollection(object):
 
         for name in active:
             try:
-                subject = utils.subjects.read_last_value_excluding('name', name, 'task',
-                                                                  ['manual_water',
-                                                                   'control_weight', 'basal_weight'])
+                subject = utils.subjects.read_last_value_excluding(
+                    "name",
+                    name,
+                    "task",
+                    ["manual_water", "control_weight", "basal_weight"],
+                )
 
-                index = utils.subjects.read_last_index_excluding('name', name, 'task',
-                                                                ['manual_water',
-                                                                 'control_weight', 'basal_weight'])
+                index = utils.subjects.read_last_index_excluding(
+                    "name",
+                    name,
+                    "task",
+                    ["manual_water", "control_weight", "basal_weight"],
+                )
 
                 min_index = min(index, min_index)
 
@@ -286,11 +296,13 @@ class TaskCollection(object):
 
     def walk_package(self, package):
         try:
-            imported_package = __import__(package, fromlist=['blah'])
+            imported_package = __import__(package, fromlist=["blah"])
         except ModuleNotFoundError:
             return
 
-        for _, pluginname, ispkg in pkgutil.iter_modules(imported_package.__path__, imported_package.__name__ + '.'):
+        for _, pluginname, ispkg in pkgutil.iter_modules(
+            imported_package.__path__, imported_package.__name__ + "."
+        ):
             if not ispkg:
 
                 plugin_module = importlib.import_module(pluginname)
@@ -299,7 +311,7 @@ class TaskCollection(object):
                 # plugin_module = __import__(pluginname, fromlist=['blah'])
 
                 clsmembers = inspect.getmembers(plugin_module, inspect.isclass)
-                for (_, c) in clsmembers:
+                for _, c in clsmembers:
                     if issubclass(c, Task) & (c is not Task):
                         path = inspect.getmodule(c().__class__).__file__
                         name = c.__name__
@@ -321,16 +333,18 @@ class TaskCollection(object):
                 child_pkgs = [p for p in os.listdir(pkg_path) if os.path.isdir(os.path.join(pkg_path, p))]
 
                 for child_pkg in child_pkgs:
-                    self.walk_package(package + '.' + child_pkg)
+                    self.walk_package(package + "." + child_pkg)
 
     def create_checksum(self, name, path):
         filename = os.path.splitext(os.path.basename(path))[0]
         digester = hashlib.md5()
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 digester.update(chunk)
         checksum = digester.hexdigest()
-        new_path = os.path.join(settings.BACKUP_TASKS_DIRECTORY, filename + '_' + checksum + '.py')
+        new_path = os.path.join(
+            settings.BACKUP_TASKS_DIRECTORY, filename + "_" + checksum + ".py"
+        )
         for task in self.tasks:
             if task.task == name:
                 task.checksum = checksum
