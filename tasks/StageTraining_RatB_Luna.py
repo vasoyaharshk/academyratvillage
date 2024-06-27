@@ -52,7 +52,7 @@ class StageTraining_RatB_Luna(Task):
         self.choices = self.mask
         self.blocks= True
         self.block_size = 10
-        self.x_probs = [0.0, 0.0, 1.0]                   #List of probabilities for Left, Centre and Right
+        self.x_probs = [0.0, 0.2, 0.8]                   #List of probabilities for Left, Centre and Right
         #self.prob = 0.33   # random by default
         self.stage = 1
         self.substage = 1
@@ -153,8 +153,8 @@ class StageTraining_RatB_Luna(Task):
                 self.valve_factor_i = 0.6
                 # 10 initial easy trials: all VG
                 if self.current_trial >= 10:
-                    self.pvg = 0.8
-                    self.pds = 0.2
+                    self.pvg = 1.0
+                    self.pds = 0.0
                     self.stim_dur_ds = 0.45
 
             # SUBSTAGE 2: PUNISH INTRODUCTION

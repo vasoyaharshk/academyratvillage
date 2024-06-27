@@ -145,7 +145,7 @@ CAM2_STATES = {
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 30
-CAM2_DOORS1_ZONE = [550, 610, 125, 350]
+CAM2_DOORS1_ZONE = [, 610, 125, 350]
 CAM2_DOORS2_ZONE = None
 
 CAM3_NUMBER = 3
@@ -172,7 +172,7 @@ CAM3_DOORS2_ZONE = [540, 550, 300, 310]  # <-- TO CHANGE left, right, top, down
 # CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [1, 550, 10, 170]  # <-- TO CHANGE left, right, top, down
 # CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR2_ZONE = [1, 550, 310, 470]  # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [1, 550, 320, 470]  # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 

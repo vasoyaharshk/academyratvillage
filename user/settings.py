@@ -64,7 +64,7 @@ NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- T
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
-SEVERALMICE = 3050  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
+SEVERALMICE = 46000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
@@ -120,8 +120,8 @@ CAM2_STATES = {
 }
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
-CAM2_THRESHOLD = 30
-CAM2_DOORS1_ZONE = [10, 610, 125, 480]
+CAM2_THRESHOLD = 90
+CAM2_DOORS1_ZONE = [110, 510, 200, 480]
 CAM2_DOORS2_ZONE = [1, 2, 1, 2]
 
 CAM3_NUMBER = 3
@@ -140,14 +140,14 @@ CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 90                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
-#CAM3_DOORS1_ZONE = [1, 100, 170, 330]     # <-- TO CHANGE  left, right, top, down
+#CAM3_DOORS1_ZONE = [550, 600, 150, 350]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
 #CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
 CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [1, 550, 10, 170]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR2_ZONE = [1, 550, 310, 470]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [1, 550, 330, 470]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
