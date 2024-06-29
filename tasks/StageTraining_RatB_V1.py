@@ -5,7 +5,6 @@ from user import settings
 import random
 import numpy as np
 
-
 class StageTraining_RatB_V1(Task):
 
     def __init__(self):
@@ -92,7 +91,7 @@ class StageTraining_RatB_V1(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats.
+        self.valve_factor_c = 1                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
         self.valve_factor_i = 0.45
 
         # counters

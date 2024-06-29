@@ -83,7 +83,7 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 19     #IDIBAPS set to 19
 MINUTE_NIGHT = 50   #IDIBAPS set to 59
-DETECTION_WAITING_MINUTES = 1
+DETECTION_WAITING_MINUTES = 60   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
 TIME_TO_ENTER = 4 # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
