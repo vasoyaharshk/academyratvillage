@@ -64,7 +64,7 @@ NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- T
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
-SEVERALMICE = 6000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
+SEVERALMICE = 25000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
@@ -72,8 +72,8 @@ THRESHOLD_DAY_CAGE2 = 40
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 25                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 55                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_DOOR1 = 120                                               # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
 
@@ -83,8 +83,8 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 19     #IDIBAPS set to 19
 MINUTE_NIGHT = 50   #IDIBAPS set to 59
-DETECTION_WAITING_MINUTES = 60   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
-TIME_TO_ENTER = 4 # time between session and session (hours)            # <-- TO CHANGE
+DETECTION_WAITING_MINUTES = 1   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
+TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
 # camera
@@ -138,7 +138,7 @@ CAM3_STATES = {"Correct": (600, 30),
 }
 CAM3_DURATION_VIDEO = 0
 CAM3_NUMBER_OF_VIDEOS = 0
-CAM3_THRESHOLD = 90                         #40 for day. 90 for night
+CAM3_THRESHOLD = 70                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
 #CAM3_DOORS1_ZONE = [550, 600, 150, 350]     # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
