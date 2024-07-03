@@ -58,7 +58,7 @@ class Test_Water_Pump(Task):
         print('Trial: ' + str(self.current_trial))
 
         # FLOADING AVOIDANCE
-        if self.miss_acc_counter > 30:  #Task will stop pumping water after 30 trials
+        if self.miss_acc_counter > 100:  #Task will stop pumping water after 30 trials
             floading = 'Wait_for_reward'
         else:
             floading = 'Automatic_reward'

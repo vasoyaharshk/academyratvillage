@@ -590,9 +590,9 @@ def go_to_state(num):
         utils.alarm_trapped_repetition = 0
         utils.list_of_trial_timings = []
         task_collection.subjects_dict = task_collection.create_subjects_dict()
-        # cam2.put_state('inactive')
+        cam2.put_state('inactive')
         cam3.put_state("inactive")
-        # cam2.put_state('black')
+        cam2.put_state('black')
         cam3.put_state("black")
         if utils.reading_tags > 0:
             arduino.turn_led_on()
@@ -676,9 +676,9 @@ def go_to_state(num):
         utils.log("Academy", "Go to state 6", "ACTION")
 
     elif num == 7:  # setting task
-        # cam2.put_state('inactive')
+        cam2.put_state('inactive')
         cam3.put_state("inactive")
-        # cam2.put_state('black')
+        cam2.put_state('black')
         cam3.put_state("black")
         arduino.turn_led_off()
         utils.log("Academy", "Go to state 7", "ACTION")

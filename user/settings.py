@@ -83,7 +83,7 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 19     #IDIBAPS set to 19
 MINUTE_NIGHT = 50   #IDIBAPS set to 59
-DETECTION_WAITING_MINUTES = 1   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
+DETECTION_WAITING_MINUTES = 10   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
 TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
@@ -100,8 +100,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 140, 70, 185]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 220, 185, 280]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [220, 475, 235, 280]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [475, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [220, 465, 235, 280]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [465, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 300                         # <-- TO CHANGE
 
@@ -121,7 +121,7 @@ CAM2_STATES = {
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 90
-CAM2_DOORS1_ZONE = [110, 510, 200, 480]
+CAM2_DOORS1_ZONE = [125, 400, 250, 480]
 CAM2_DOORS2_ZONE = [1, 2, 1, 2]
 
 CAM3_NUMBER = 3

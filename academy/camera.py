@@ -200,7 +200,8 @@ class Video(Process):
                         begin_time, settings.DETECTION_WAITING_MINUTES
                     ):
                         changing_light = True
-                    elif not day and now < time_utils.add_minutes_to_time(
+                    #elif not day and now < time_utils.add_minutes_to_time(
+                    elif not day and now > begin_time and now < time_utils.add_minutes_to_time(
                         end_time, settings.DETECTION_WAITING_MINUTES
                     ):
                         changing_light = True

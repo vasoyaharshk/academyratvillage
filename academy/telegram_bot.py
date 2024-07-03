@@ -238,8 +238,10 @@ def plot(update, context):
                 days = int(context.args[0])
                 if days < 1:
                     days = 3
+                    #days = 14
             except:
                 days = 3
+                #days = 14
 
             try:
                 photo = os.path.join(settings.DATA_DIRECTORY, 'plots.jpg')
