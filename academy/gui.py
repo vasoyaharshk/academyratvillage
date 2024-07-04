@@ -1069,7 +1069,7 @@ class Gui(tk.Frame):
             self.tags_on_off3.configure(style="red.TButton")
             arduino.turn_led_off()
             cam1.put_state("daily")
-            cam2.put_state("daily")
+            #cam2.put_state("daily")
         elif utils.reading_tags == 1:
             self.tags_on_off1.configure(text="Tag read AUTO = ON")
             self.tags_on_off1.configure(style="green.TButton")
@@ -1079,7 +1079,7 @@ class Gui(tk.Frame):
             self.tags_on_off3.configure(style="red.TButton")
             arduino.turn_led_on()
             cam1.put_state("daily")
-            cam2.put_state("daily")
+            #cam2.put_state("daily")
         elif utils.reading_tags == 2:
             self.tags_on_off1.configure(text="Tag read AUTO = OFF")
             self.tags_on_off1.configure(style="red.TButton")
@@ -1089,7 +1089,7 @@ class Gui(tk.Frame):
             self.tags_on_off3.configure(style="red.TButton")
             arduino.turn_led_on()
             cam1.put_state("day")
-            cam2.put_state("day")
+            #cam2.put_state("day")
         else:
             self.tags_on_off1.configure(text="Tag read AUTO = OFF")
             self.tags_on_off1.configure(style="red.TButton")
@@ -1099,7 +1099,7 @@ class Gui(tk.Frame):
             self.tags_on_off3.configure(style="green.TButton")
             arduino.turn_led_on()
             cam1.put_state("night")
-            cam2.put_state("night")
+            #cam2.put_state("night")
 
     @staticmethod
     def close_window():

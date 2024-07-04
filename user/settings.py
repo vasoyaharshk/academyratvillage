@@ -64,7 +64,7 @@ NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- T
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
-SEVERALMICE = 25000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
+SEVERALMICE = 30000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
@@ -120,7 +120,7 @@ CAM2_STATES = {
 }
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
-CAM2_THRESHOLD = 90
+CAM2_THRESHOLD = 70
 CAM2_DOORS1_ZONE = [125, 400, 250, 480]
 CAM2_DOORS2_ZONE = [1, 2, 1, 2]
 
