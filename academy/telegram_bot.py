@@ -17,13 +17,13 @@ except:
 
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def start(update, context):
     update.message.reply_text('Hi! Use /status <hours> to see the status.')
 
 def alarm_mice(area):
+    print("Two rat error here")
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
         message = 'ALARM: 2 rats in box, area ' + str(int(area))
@@ -33,10 +33,12 @@ def alarm_mice(area):
         request.urlopen(url, data.encode('utf-8'))
 
         # Call cam function here
+        print("here here 1")
         cam_2()
+        print("here here 2")
 
-    #     # Capture and send images from cam_1
-    #     image_streams = cam_1()
+    #   Capture and send images from cam_1
+    #   image_streams = cam_2()
     #
     #     if image_streams:
     #         url = 'https://api.telegram.org/bot%s/sendPhoto' % settings.TELEGRAM_TOKEN
@@ -248,80 +250,117 @@ def cam(update, context):
         pass
 
 
-def cam_1():
-    streams = []
+# def cam_1():
+#     streams = []
+#
+#     try:
+#         frame1 = cam1.image_queue.get(timeout=1)
+#         img1 = Image.fromarray(frame1)
+#         stream1 = BytesIO()
+#         img1.save(stream1, format="JPEG")
+#         stream1.seek(0)
+#         streams.append(stream1)
+#     except Exception as e:
+#         print(f"Error capturing image from cam1: {e}")
+#
+#     try:
+#         frame2 = cam2.image_queue.get(timeout=1)
+#         img2 = Image.fromarray(frame2)
+#         stream2 = BytesIO()
+#         img2.save(stream2, format="JPEG")
+#         stream2.seek(0)
+#         streams.append(stream2)
+#     except Exception as e:
+#         print(f"Error capturing image from cam2: {e}")
+#
+#     try:
+#         frame3 = cam3.image_queue.get(timeout=1)
+#         img3 = Image.fromarray(frame3)
+#         stream3 = BytesIO()
+#         img3.save(stream3, format="JPEG")
+#         stream3.seek(0)
+#         streams.append(stream3)
+#     except Exception as e:
+#         print(f"Error capturing image from cam3: {e}")
+#
+#     return streams
 
+def send_photo(chat_id, frame):
     try:
-        frame1 = cam1.image_queue.get(timeout=1)
-        img1 = Image.fromarray(frame1)
-        stream1 = BytesIO()
-        img1.save(stream1, format="JPEG")
-        stream1.seek(0)
-        streams.append(stream1)
-    except Exception as e:
-        print(f"Error capturing image from cam1: {e}")
+        url = 'https://api.telegram.org/bot%s/sendPhoto' % settings.TELEGRAM_TOKEN
+        print("Print here 0")
+        img = Image.fromarray(frame)
+        print("Print here 1")
+        stream = BytesIO()
+        print("Print here 2")
+        img.save(stream, format="JPEG")
+        print("Print here 3")
+        stream.seek(0)
+        print("Print here 5")
+        photo_data = stream.read()
+        print("Print here 6")
 
-    try:
-        frame2 = cam2.image_queue.get(timeout=1)
-        img2 = Image.fromarray(frame2)
-        stream2 = BytesIO()
-        img2.save(stream2, format="JPEG")
-        stream2.seek(0)
-        streams.append(stream2)
-    except Exception as e:
-        print(f"Error capturing image from cam2: {e}")
+        data = parse.urlencode({
+            'chat_id': chat_id,
+            'photo': ('photo.jpg', photo_data, 'image/jpeg')
+        })
+        request.urlopen(url, data.encode('utf-8'))
 
-    try:
-        frame3 = cam3.image_queue.get(timeout=1)
-        img3 = Image.fromarray(frame3)
-        stream3 = BytesIO()
-        img3.save(stream3, format="JPEG")
-        stream3.seek(0)
-        streams.append(stream3)
     except Exception as e:
-        print(f"Error capturing image from cam3: {e}")
-
-    return streams
+        logger.error(f"Error sending photo: {e}")
 
 def cam_2():
-    try:
-        frame1 = cam1.image_queue.get(timeout=1)
-        img1 = Image.fromarray(frame1)
-        stream1 = BytesIO()
-        img1.save(stream1, format="JPEG")
-        stream1.seek(0)
-        #update.message.reply_photo(photo=stream1)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream1)
-    except:
-        pass
+    print("Print here 6")
+    chat_id = settings.TELEGRAM_CHAT
+    print("Print here 7")
+    for cam in [cam1, cam2, cam3]:
+        try:
+            frame = cam.image_queue.get(timeout=1)
+            print("Print here 8")
+            send_photo(chat_id, frame)
+            print("Print here 9")
+        except Exception as e:
+            logger.error(f"Error processing frame from {cam}: {e}")
 
-    try:
-        frame2 = cam2.image_queue.get(timeout=1)
-        img2 = Image.fromarray(frame2)
-        stream2 = BytesIO()
-        img2.save(stream2, format="JPEG")
-        stream2.seek(0)
-        #update.message.reply_photo(photo=stream2)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream2)
-    except:
-        pass
-
-    try:
-        frame3 = cam3.image_queue.get(timeout=1)
-        img3 = Image.fromarray(frame3)
-        stream3 = BytesIO()
-        img3.save(stream3, format="JPEG")
-        stream3.seek(0)
-        #update.message.reply_photo(photo=stream3)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream3)
-    except:
-        pass
+# def cam_2():
+#     try:
+#         frame1 = cam1.image_queue.get(timeout=1)
+#         img1 = Image.fromarray(frame1)
+#         stream1 = BytesIO()
+#         img1.save(stream1, format="JPEG")
+#         stream1.seek(0)
+#         #update.message.reply_photo(photo=stream1)
+#         bot = Bot(token=settings.TELEGRAM_TOKEN)
+#         chat_id = settings.TELEGRAM_CHAT
+#         bot.send_photo(chat_id=chat_id, photo=stream1)
+#     except:
+#         pass
+#
+#     try:
+#         frame2 = cam2.image_queue.get(timeout=1)
+#         img2 = Image.fromarray(frame2)
+#         stream2 = BytesIO()
+#         img2.save(stream2, format="JPEG")
+#         stream2.seek(0)
+#         #update.message.reply_photo(photo=stream2)
+#         bot = Bot(token=settings.TELEGRAM_TOKEN)
+#         chat_id = settings.TELEGRAM_CHAT
+#         bot.send_photo(chat_id=chat_id, photo=stream2)
+#     except:
+#         pass
+#
+#     try:
+#         frame3 = cam3.image_queue.get(timeout=1)
+#         img3 = Image.fromarray(frame3)
+#         stream3 = BytesIO()
+#         img3.save(stream3, format="JPEG")
+#         stream3.seek(0)
+#         #update.message.reply_photo(photo=stream3)
+#         bot = Bot(token=settings.TELEGRAM_TOKEN)
+#         chat_id = settings.TELEGRAM_CHAT
+#         bot.send_photo(chat_id=chat_id, photo=stream3)
+#     except:
+#         pass
 
 
 def plot(update, context):
