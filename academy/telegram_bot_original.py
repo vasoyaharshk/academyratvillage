@@ -1,5 +1,4 @@
 import threading
-import logging
 import os
 import time
 from PIL import Image
@@ -16,12 +15,9 @@ except:
     fig = None
 
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 def start(update, context):
     update.message.reply_text('Hi! Use /status <hours> to see the status.')
+
 
 def alarm_mice(area):
     try:
@@ -31,26 +27,8 @@ def alarm_mice(area):
         data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
 
         request.urlopen(url, data.encode('utf-8'))
-
-        # Call cam function here
-        cam_2()
-
-    #     # Capture and send images from cam_1
-    #     image_streams = cam_1()
-    #
-    #     if image_streams:
-    #         url = 'https://api.telegram.org/bot%s/sendPhoto' % settings.TELEGRAM_TOKEN
-    #         for stream in image_streams:
-    #             files = {'photo': stream}
-    #             data = {'chat_id': settings.TELEGRAM_CHAT}
-    #             response = requests.post(url, data=data, files=files)
-    #             response.raise_for_status()
-    #         logger.info("Camera images sent to Telegram chat")
-    #     else:
-    #         logger.warning("No images captured from cam_1")
-    #
-    except Exception as e:
-        logger.error(f"Error in alarm_mice function: {e}")
+    except:
+        pass
 
 def alarm_mice_floor(subject_name):
     try:
@@ -145,7 +123,6 @@ def alarm_overdetections(text):
     except:
         pass
 
-
 def alarm_subject_trapped():
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
@@ -156,6 +133,7 @@ def alarm_subject_trapped():
         request.urlopen(url, data.encode('utf-8'))
     except:
         pass
+
 
 def alarm_few_trials(n_trials, subject_name):
     try:
@@ -248,82 +226,6 @@ def cam(update, context):
         pass
 
 
-def cam_1():
-    streams = []
-
-    try:
-        frame1 = cam1.image_queue.get(timeout=1)
-        img1 = Image.fromarray(frame1)
-        stream1 = BytesIO()
-        img1.save(stream1, format="JPEG")
-        stream1.seek(0)
-        streams.append(stream1)
-    except Exception as e:
-        print(f"Error capturing image from cam1: {e}")
-
-    try:
-        frame2 = cam2.image_queue.get(timeout=1)
-        img2 = Image.fromarray(frame2)
-        stream2 = BytesIO()
-        img2.save(stream2, format="JPEG")
-        stream2.seek(0)
-        streams.append(stream2)
-    except Exception as e:
-        print(f"Error capturing image from cam2: {e}")
-
-    try:
-        frame3 = cam3.image_queue.get(timeout=1)
-        img3 = Image.fromarray(frame3)
-        stream3 = BytesIO()
-        img3.save(stream3, format="JPEG")
-        stream3.seek(0)
-        streams.append(stream3)
-    except Exception as e:
-        print(f"Error capturing image from cam3: {e}")
-
-    return streams
-
-def cam_2():
-    try:
-        frame1 = cam1.image_queue.get(timeout=1)
-        img1 = Image.fromarray(frame1)
-        stream1 = BytesIO()
-        img1.save(stream1, format="JPEG")
-        stream1.seek(0)
-        #update.message.reply_photo(photo=stream1)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream1)
-    except:
-        pass
-
-    try:
-        frame2 = cam2.image_queue.get(timeout=1)
-        img2 = Image.fromarray(frame2)
-        stream2 = BytesIO()
-        img2.save(stream2, format="JPEG")
-        stream2.seek(0)
-        #update.message.reply_photo(photo=stream2)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream2)
-    except:
-        pass
-
-    try:
-        frame3 = cam3.image_queue.get(timeout=1)
-        img3 = Image.fromarray(frame3)
-        stream3 = BytesIO()
-        img3.save(stream3, format="JPEG")
-        stream3.seek(0)
-        #update.message.reply_photo(photo=stream3)
-        bot = Bot(token=settings.TELEGRAM_TOKEN)
-        chat_id = settings.TELEGRAM_CHAT
-        bot.send_photo(chat_id=chat_id, photo=stream3)
-    except:
-        pass
-
-
 def plot(update, context):
 
     try:
@@ -383,7 +285,6 @@ def telegram_thread():
     dp.add_handler(CommandHandler("plot", plot, pass_args=True))
     dp.add_handler(CommandHandler("cam", cam, pass_args=True))
     dp.add_handler(CommandHandler("report", report, pass_args=True))
-    dp.add_handler(CommandHandler("cam_2", report, pass_args=True))
 
     updater.start_polling()
 
