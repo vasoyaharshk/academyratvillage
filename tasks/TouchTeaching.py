@@ -53,7 +53,7 @@ class TouchTeaching(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 3.0 #More reward for correct. Changed from 1.5 to 3.0 for Luna only.
+        self.valve_factor_c = 1.5 #More reward for correct. Changed from 1.5 to 3.0 for Luna only.
         self.valve_factor_i = 0.5 #Less reward for misses
 
         # counters

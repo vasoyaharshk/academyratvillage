@@ -58,8 +58,8 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
-NOMICECAGE = 40  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 5  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
@@ -68,21 +68,21 @@ SEVERALMICE = 13000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- 
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
-THRESHOLD_DAY_CAGE2 = 40
+THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 30                                                # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 55                                                # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_DOOR1 = 120                                               # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR2 = 80                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_DOOR1 = 105                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR2 = 120                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
 HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing. IDIBAPS set to 8
 MINUTE_DAY = 40      #IDIBAPS set to 1
-HOUR_NIGHT = 19     #IDIBAPS set to 19
-MINUTE_NIGHT = 50   #IDIBAPS set to 59
+HOUR_NIGHT = 20     #IDIBAPS set to 19
+MINUTE_NIGHT = 5   #IDIBAPS set to 59
 DETECTION_WAITING_MINUTES = 20   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
 TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
@@ -98,12 +98,12 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [60, 140, 80, 185]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [65, 220, 185, 280]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [220, 465, 235, 280]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [465, 595, 248, 273]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [65, 140, 92, 195]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [65, 238, 195, 300]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [238, 485, 258, 295]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [485, 595, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
-CAM1_TEXT_Y = 300                         # <-- TO CHANGE
+CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
 CAM2_NUMBER = 2
 CAM2_NAME_VIDEO = "Lic"
@@ -121,7 +121,7 @@ CAM2_STATES = {
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 70
-CAM2_DOORS1_ZONE = [125, 400, 250, 480]
+CAM2_DOORS1_ZONE = [125, 500, 250, 480]
 CAM2_DOORS2_ZONE = [1, 2, 1, 2]
 
 CAM3_NUMBER = 3
@@ -180,7 +180,7 @@ MINIMUM_WATER_48 = 1000  # in 48 hours
 MINIMUM_WEIGHT = 50  # in percentage
 MAXIMUM_WEIGHT = 200  # in percentage
 
-MAXIMUM_TEMPERATURE = 30
+MAXIMUM_TEMPERATURE = 15
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None", "m1"]  # subjects that don't raise alarms and not save data
