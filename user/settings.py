@@ -59,8 +59,8 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 # mouse detection
 NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 5  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
-NOMICEDOOR2 = 100  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 3  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
@@ -83,7 +83,8 @@ HOUR_DAY = 7  # night is more restrictive so it last 1 minute more when changing
 MINUTE_DAY = 40      #IDIBAPS set to 1
 HOUR_NIGHT = 20     #IDIBAPS set to 19
 MINUTE_NIGHT = 5   #IDIBAPS set to 59
-DETECTION_WAITING_MINUTES = 20   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
+#DETECTION_WAITING_MINUTES = 25   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
+DETECTION_WAITING_MINUTES = 60   #This is the amount of time animals are not allowed to enter the box due to the lights changing.
 TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
@@ -100,8 +101,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [65, 140, 92, 195]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 238, 195, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [238, 485, 258, 295]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [485, 595, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [238, 490, 258, 295]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [490, 595, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 

@@ -1,5 +1,6 @@
 import threading
 import logging
+import requests
 import os
 import time
 from PIL import Image
@@ -23,7 +24,6 @@ def start(update, context):
     update.message.reply_text('Hi! Use /status <hours> to see the status.')
 
 def alarm_mice(area):
-    print("Two rat error here")
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
         message = 'ALARM: 2 rats in box, area ' + str(int(area))
@@ -33,9 +33,7 @@ def alarm_mice(area):
         request.urlopen(url, data.encode('utf-8'))
 
         # Call cam function here
-        print("here here 1")
         cam_2()
-        print("here here 2")
 
     #   Capture and send images from cam_1
     #   image_streams = cam_2()
@@ -287,38 +285,29 @@ def cam(update, context):
 
 def send_photo(chat_id, frame):
     try:
-        url = 'https://api.telegram.org/bot%s/sendPhoto' % settings.TELEGRAM_TOKEN
-        print("Print here 0")
+        url = f'https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendPhoto'
         img = Image.fromarray(frame)
-        print("Print here 1")
         stream = BytesIO()
-        print("Print here 2")
         img.save(stream, format="JPEG")
-        print("Print here 3")
         stream.seek(0)
-        print("Print here 5")
-        photo_data = stream.read()
-        print("Print here 6")
+        files = {'photo': ('photo.jpg', stream, 'image/jpeg')}
+        data = {'chat_id': chat_id}
+        response = requests.post(url, data=data, files=files)
+        if response.status_code != 200:
+            logger.error(f"Error sending photo: {response.status_code} - {response.text}")
+        else:
+            logger.info("Photo sent successfully.")
 
-        data = parse.urlencode({
-            'chat_id': chat_id,
-            'photo': ('photo.jpg', photo_data, 'image/jpeg')
-        })
-        request.urlopen(url, data.encode('utf-8'))
 
     except Exception as e:
         logger.error(f"Error sending photo: {e}")
 
 def cam_2():
-    print("Print here 6")
     chat_id = settings.TELEGRAM_CHAT
-    print("Print here 7")
     for cam in [cam1, cam2, cam3]:
         try:
             frame = cam.image_queue.get(timeout=1)
-            print("Print here 8")
             send_photo(chat_id, frame)
-            print("Print here 9")
         except Exception as e:
             logger.error(f"Error processing frame from {cam}: {e}")
 

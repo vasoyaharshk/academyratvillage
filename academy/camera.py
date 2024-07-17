@@ -210,15 +210,19 @@ class Video(Process):
                 if changing_light:  #if the threshold is 255, it doesnt detect anything so if we do not want an animal to enter duuring changing light, put 0. If max, then it will take maximum out of to and if min it will take min out of two.
                     self.threshold = max(
                         settings.THRESHOLD_DAY_DOOR1, settings.THRESHOLD_NIGHT_DOOR1
+                        #0, 0
                     )
                     self.threshold2 = max(
                         settings.THRESHOLD_DAY_CAGE1, settings.THRESHOLD_NIGHT_CAGE1
+                        #255, 255
                     )
                     self.threshold3 = max(
-                        settings.THRESHOLD_DAY_DOOR2, settings.THRESHOLD_NIGHT_DOOR2
+                        #settings.THRESHOLD_DAY_DOOR2, settings.THRESHOLD_NIGHT_DOOR2
+                        #255, 255
                     )
                     self.threshold4 = max(
-                        settings.THRESHOLD_DAY_CAGE2, settings.THRESHOLD_NIGHT_CAGE2
+                        #settings.THRESHOLD_DAY_CAGE2, settings.THRESHOLD_NIGHT_CAGE2
+                        #255, 255
                     )
                 elif day:
                     self.threshold = settings.THRESHOLD_DAY_DOOR1

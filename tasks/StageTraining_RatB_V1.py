@@ -141,7 +141,8 @@ class StageTraining_RatB_V1(Task):
                 if self.substage==1:
                     self.prob = 0.75
                 elif self.substage ==2:
-                    self.prob = 0.55
+                    #self.prob = 0.55           #For other rats
+                    self.prob = 0.33            #For Luna after bias breaking is complete.
                 else:
                     self.prob = 0.33
 
