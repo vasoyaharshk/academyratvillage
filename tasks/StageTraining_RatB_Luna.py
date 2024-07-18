@@ -292,8 +292,8 @@ class StageTraining_RatB_Luna(Task):
 
 
         # Choose x positions by blocks
-        if self.current_trial < 2:
-            self.x_trials = [290, 290]
+        if self.current_trial < 0:
+            self.x_trials = []
         else:                        #  Randomissation begins from trial 2. Change this to 0 to randomise from the start of the session. self.current_trial == 0, and delete the before if condition
             self.block_size = int(self.block_size)
 
