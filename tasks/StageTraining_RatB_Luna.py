@@ -52,7 +52,7 @@ class StageTraining_RatB_Luna(Task):
         self.choices = self.mask
         self.blocks= True
         self.block_size = 10
-        self.x_probs = [0.2, 0.4, 0.4]                   #Probabilities for Left, Centre and Right
+        self.x_probs = [0.335, 0.33, 0.335]                   #Probabilities for Left, Centre and Right
         #self.prob = 0.33   # random by default
         self.stage = 1
         self.substage = 1

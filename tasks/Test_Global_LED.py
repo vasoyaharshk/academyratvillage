@@ -12,7 +12,7 @@ class Test_Global_LED(Task):
         """
 
     def init_variables(self):
-        self.trials_max = 10
+        self.trials_max = 100
 
     def configure_gui(self):
         self.gui_input = ['trials_max']
@@ -20,7 +20,7 @@ class Test_Global_LED(Task):
     def main_loop(self):
         self.sma.add_state(
             state_name='LED_ON',
-            state_timer=60,
+            state_timer=600,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[(Bpod.OutputChannels.LED, 4), (Bpod.OutputChannels.LED, 6)]
         )
