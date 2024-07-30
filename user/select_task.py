@@ -256,9 +256,10 @@ def select_task(df, subject):
                     stim_dur_dm = 0
                     stim_dur_dl = 0.35
                 elif lower_stage == True:
-                    substage -=1
-                    stim_dur_ds = 0.45
-                    stim_dur_dm = 0
+                    if subject.name != "ciri" or subject.name != "sorrel":   #if subject.names not in ["sorrel", "ciri"]:
+                        substage -=1
+                        stim_dur_ds = 0.45
+                        stim_dur_dm = 0
             elif substage == 3:
                 stim_dur_dl = stim_dur
                 if next_stage == True:
