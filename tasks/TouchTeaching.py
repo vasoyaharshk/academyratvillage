@@ -71,7 +71,7 @@ class TouchTeaching(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[])
 
             self.sma.add_state(
@@ -91,7 +91,7 @@ class TouchTeaching(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Fixation'},
+            state_change_conditions={Bpod.Events.Tup: 'Fixation'},
             output_actions=[])
 
         self.sma.add_state(
@@ -110,7 +110,7 @@ class TouchTeaching(Task):
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_first_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and RWsound remain ON until poke
 
@@ -123,7 +123,7 @@ class TouchTeaching(Task):
         self.sma.add_state(
             state_name='Miss',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 12)])
             # waterLED ON, global LED ON
 

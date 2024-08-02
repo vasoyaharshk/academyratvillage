@@ -28,7 +28,7 @@ DROPBOX_SESSIONS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'sessions')
 ARDUINO_SERIAL_PORT = '/dev/ttyACM-Arduino'                                         # <-- TO CHANGE
 ARDUINO_INSIDE_SERIAL_PORT = '/dev/ttyUSB-Arduino_inside'                           # <-- TO CHANGE
 #PYBPOD_SERIAL_PORT = '/dev/ttyACM-Bpod3'                                            # <-- TO CHANGE
-PYBPOD_SERIAL_PORT = '/dev/ttyACM-BPOD'
+PYBPOD_SERIAL_PORT = '/dev/ttyACM0'
 PYBPOD_NET_PORT = 36000  # network port to receive remote commands like softcodes
 TOUCHSCREEN_PORT = '/dev/input/by-id/usb-Touch__KiT_Touch_Computer_INC.-event-if00' # <-- TO CHANGE
 CAMERA1_PORT = "/dev/video-Cam1"
@@ -44,8 +44,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 
 # touchscreen
-#XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-2-1'   # <-- TO CHANGE
 WIN_SIZE = [410, 250]  # in mm
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
@@ -55,7 +54,6 @@ WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.57
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
-
 
 # mouse detection
 NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
@@ -152,13 +150,16 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002111074687"  # <-- TO CHANGE
-TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
-}
+#TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
+TELEGRAM_TOKEN = ""  # <-- TO CHANGE
+#TELEGRAM_CHAT = "-1002111074687"  # <-- TO CHANGE
+TELEGRAM_CHAT = ""  # <-- TO CHANGE
+TELEGRAM_USERS = {}  # dictionary of users that can send telegram messages
+#TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
+ #   'Harsh': '5842767043',
+  #  'Donna': '6811118356',
+   # 'Duncan': '6925304996'
+#}
 
 #AWS
 OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
@@ -184,6 +185,6 @@ MAXIMUM_TEMPERATURE = 15
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None", "m1"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

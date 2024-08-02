@@ -1,21 +1,14 @@
 import os
-from psychopy import visual, logging
+from psychopy import visual, logging, core, event
 from user import settings
-
 
 # to avoid the recurrent psychopy monitor warning
 logging.console.setLevel(logging.CRITICAL)
-
-
 
 # create the window
 window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR,
                        units='pix', fullscr=False, viewPos=settings.VIEW_POSITION)
 os.system('wmctrl -r "PsychoPy" -b add,above')
-
-
-
-
 
 # create all the stimuli you will use in all tasks
 square = visual.Rect(win=window,
@@ -42,7 +35,6 @@ square3 = visual.Rect(win=window,
                      fillColor= [0.2, 0.2, 0.2],
                      pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
-
 # squares = []
 # x_positions=[30, 200, 360]
 # y_positions=125
@@ -55,10 +47,18 @@ square3 = visual.Rect(win=window,
 #                                 fillColor= [0.2, 0.2, 0.2],
 #                                 pos=(x_positions[i], y_positions)))
 
-
 white_screen = visual.Rect(win=window,
                            width=settings.WIN_RESOLUTION[0],
                            height=settings.WIN_RESOLUTION[1],
                            units='pix',
                            fillColor=[1, 1, 1],
                            pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
+#For Stage 1 where the probabilities are 100% blue vs nothing:
+jar1 = visual.ImageStim(win=window, image ='/home/harsh/academy/jars/jar1.png')
+
+#For Stage 2 where the probabilities are 100% blue vs 100% yellow:
+jar2 = visual.ImageStim(win=window, image ='/home/harsh/academy/jars/jar2.png')
+
+#For Stage 3 where the probabilities are 100% yellow vs 50% blue and 50% yellow:
+jar3 = visual.ImageStim(win=window, image ='/home/harsh/academy/jars/jar3.png')
