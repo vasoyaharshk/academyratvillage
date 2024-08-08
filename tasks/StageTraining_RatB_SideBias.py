@@ -292,9 +292,9 @@ class StageTraining_RatB_Luna(Task):
 
 
         # Choose x positions by blocks
-        if self.current_trial < 0:
-            self.x_trials = []
-        else:                        #  Randomissation begins from trial 2. Change this to 0 to randomise from the start of the session. self.current_trial == 0, and delete the before if condition
+        if self.current_trial == 0:
+            #self.x_trials = []
+            #else:                        #  Randomissation begins from trial 2. Change this to 0 to randomise from the start of the session. self.current_trial == 0, and delete the before if condition
             self.block_size = int(self.block_size)
 
             # # Create RANDOM list with 3 choices (0:Left, 1:Centre, 2:Right)
@@ -325,16 +325,16 @@ class StageTraining_RatB_Luna(Task):
                 else:
                     self.x_trials = self.x_trials + (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
 
-        print('x positions list: ' + str(self.x_trials))
+            print('x positions list: ' + str(self.x_trials))
 
-        # Choose x
-        self.x = self.x_trials[self.current_trial]
-        # Correction bias extension
-        if self.correction_bias == 1 and self.current_trial > 10:
-            if self.trial_result == 'punish':
-                self.x = self.last_x
-                print('Correction trial, x position:' + str(self.x))
-        print('x position:' + str(self.x))
+            # Choose x
+            self.x = self.x_trials[self.current_trial]
+            # Correction bias extension
+            if self.correction_bias == 1 and self.current_trial > 10:
+                if self.trial_result == 'punish':
+                    self.x = self.last_x
+                    print('Correction trial, x position:' + str(self.x))
+            print('x position:' + str(self.x))
 
 
         ### CHOOSE TRIAL TYPE
@@ -405,7 +405,7 @@ class StageTraining_RatB_Luna(Task):
                 state_timer=0,
                 state_change_conditions={'Port2In': 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
-                # show stim inifite time
+            # show stim inifite time
 
             self.sma.add_state(
                 state_name='Real_start',
@@ -413,7 +413,7 @@ class StageTraining_RatB_Luna(Task):
                 #state_timer=self.valve_time * 20,                           #Deliver 1ml of water to rats at the start
                 state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
-                # close corridor 2 door, and deliver water when animal enter to behav box
+            # close corridor 2 door, and deliver water when animal enter to behav box
 
         # Other trials
         else:
@@ -428,7 +428,7 @@ class StageTraining_RatB_Luna(Task):
             state_timer=0,
             state_change_conditions={'Port3In': 'Fixation2'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim1)])
-            # show stimulus now in normal trials, not in controls
+        # show stimulus now in normal trials, not in controls
 
         self.sma.add_state(
             state_name='Fixation2',
@@ -447,7 +447,7 @@ class StageTraining_RatB_Luna(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim4)])
-            #show stimulus with timer: VG until RW ends, WMI defined by stim_dur_ds
+        #show stimulus with timer: VG until RW ends, WMI defined by stim_dur_ds
 
         self.sma.add_state(
             state_name='Response_window',
@@ -455,14 +455,14 @@ class StageTraining_RatB_Luna(Task):
             state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss',
                                      'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 4)])
-            # wait for subject response
+        # wait for subject response
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
-            # waterLED and correct sound remain ON until poke
+        # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Miss',
@@ -470,14 +470,14 @@ class StageTraining_RatB_Luna(Task):
             state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
-            # waterLED ON, global LEDs ON
+        # waterLED ON, global LEDs ON
 
         self.sma.add_state(
             state_name='Punish',
             state_timer=1,
             state_change_conditions={Bpod.Events.Tup: 'After_punish'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 14)])
-            # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
+        # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
 
         self.sma.add_state(
             state_name='After_punish',
@@ -485,14 +485,14 @@ class StageTraining_RatB_Luna(Task):
             state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
                                      Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
-            # waterLED ON & global LEDs ON
+        # waterLED ON & global LEDs ON
 
         self.sma.add_state(
             state_name='Incorrect',
             state_timer=0.25,
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
-            # Incorrect sound
+        # Incorrect sound
 
         self.sma.add_state(
             state_name='Response_window2',
@@ -506,7 +506,7 @@ class StageTraining_RatB_Luna(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
-            # waterLED and correct sound remain ON until poke
+        # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Correct_first_reward',

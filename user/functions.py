@@ -2,8 +2,8 @@ from user import settings
 from academy.utils import utils
 from academy.camera import cam2, cam3
 from academy.touch import touch
-from user.psychopy_elements import window, square, square2, square3
-from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
+from user.psychopy_elements import window, square, square2, square3, jar1, jar2, jar3
+from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3, soundVec4
 import traceback
 
 # when softcode n is called, function n runs once
@@ -79,7 +79,7 @@ def function4():
     )
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
-
+    print('Resp Win')
 
 # resume reading
 def function5():
@@ -89,30 +89,53 @@ def function5():
     )
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
+    print('Resp Win')
 
 
 #Balma script:
-def function6():
-    try:
-        utils.task.pulse_pal.trigger_pulse(1)
-        cam3.put_state("On")
-    except:
-        print(traceback.format_exc())
+def function6():  #For Stage 1 where the probabilities are 100% blue vs nothing:
+    jar1.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    jar1.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    print('Stimulus Shown')
 
-#Balma script:
-def function7():
-    try:
-        utils.task.pulse_pal.trigger_pulse(2)
-        cam3.put_state("On")
-    except:
-        print(traceback.format_exc())
+def loop6(timing):
+    jar1.draw()
+    window.flip()
 
+def function7(): #For Stage 2 where the probabilities are 100% blue vs 100% yellow:
+    jar1.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    jar1.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    jar2.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    jar2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    print('Stimulus Shown')
+def loop7(timing):
+    jar1.draw()
+    jar2.draw()
+    window.flip()
 def function8():
     cam3.put_state("Correct")
     soundStream.stop(soundVec1)
     print("Correct")
 
+def function9(): #For Stage 3 where the probabilities are 100% yellow vs 50% blue and 50% yellow:
+    jar2.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    jar2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    jar3.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    jar3.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    print('Stimulus Shown')
+def loop9(timing):
+    jar2.draw()
+    jar3.draw()
+    window.flip()
 
+def function10():
+    cam2.put_state("Miss")
+    cam3.put_state("Miss")
+    soundStream.play(soundVec3)
+    print("No response Sound played")
+
+def loop10(timing):
+    window.flip()
 
 # camera correct and delete screen
 def function11():

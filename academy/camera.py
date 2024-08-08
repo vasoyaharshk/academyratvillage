@@ -208,7 +208,7 @@ class Video(Process):
                 else:  # crosses midnight
                     day = now >= begin_time or now <= end_time
                 if changing_light:  #if the threshold is 255, it doesnt detect anything so if we do not want an animal to enter duuring changing light, put 0. If max, then it will take maximum out of to and if min it will take min out of two.
-                    print("changing light active")
+                    #print("changing light active")
                     self.threshold = min(
                         settings.THRESHOLD_DAY_DOOR1, 0
                         #0, 1

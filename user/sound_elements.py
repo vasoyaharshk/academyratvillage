@@ -125,6 +125,7 @@ try:
     soundVec1 = pureToneGen(0.4, 14000, 1800) #16000
     soundVec2 = pureToneGen(0.4, 4000, 1) #4000  #Incorrect sound
     soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec4 = pureToneGen(0.4, 8000, 1)  # 8000  #Sound plays when response window is over without any action
 
 except:
     print("______")

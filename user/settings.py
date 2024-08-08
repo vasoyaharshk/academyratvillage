@@ -100,8 +100,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [65, 140, 92, 195]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [65, 238, 195, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [238, 490, 258, 295]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [490, 595, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [238, 488, 258, 295]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [488, 595, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
@@ -183,7 +183,7 @@ MAXIMUM_WEIGHT = 200  # in percentage
 MAXIMUM_TEMPERATURE = 15
 MAXIMUM_TIME = 7200  # in seconds
 
-INACTIVE_SUBJECTS = ["None", "m1"]  # subjects that don't raise alarms and not save data
+INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
 TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

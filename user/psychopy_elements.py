@@ -62,3 +62,12 @@ white_screen = visual.Rect(win=window,
                            units='pix',
                            fillColor=[1, 1, 1],
                            pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
+#For Stage 1 where the probabilities are 100% blue vs nothing:
+jar1 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar1.png')
+
+#For Stage 2 where the probabilities are 100% blue vs 100% yellow:
+jar2 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar2.png')
+
+#For Stage 3 where the probabilities are 100% yellow vs 50% blue and 50% yellow:
+jar3 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar3.png')

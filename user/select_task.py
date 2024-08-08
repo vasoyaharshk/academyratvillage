@@ -257,7 +257,7 @@ def select_task(df, subject):
                     stim_dur_dl = 0.35
                 elif lower_stage == True:
                     if subject.name != "ciri" or subject.name != "sorrel":   #if subject.names not in ["sorrel", "ciri"]:
-                        substage -=1
+                        #substage -=1
                         stim_dur_ds = 0.45
                         stim_dur_dm = 0
             elif substage == 3:
@@ -272,5 +272,45 @@ def select_task(df, subject):
                     substage -=1
                     stim_dur_dm = 0.4
                     stim_dur_dl = 0
+
+    elif task == 'Probability_1':
+        if n_trials < 15:
+            my_subject = df.subject.iloc[0]
+            if my_subject not in settings.INACTIVE_SUBJECTS:
+                telegram_bot.alarm_few_trials(n_trials, my_subject)
+
+        # get first and last responses
+        sort = df['response_x'].astype(str).str.split(',', expand=True) # separate reponses in columns
+        df['first_resp'] = sort[0].astype(float)                        # select first reponses
+        df['last_resp'] = sort.apply(func, axis=1).astype(float)        # select last reponses
+        # useful columns
+        df['first_error'] = df['first_resp'] - df['x']  # error calculation
+        df['last_error'] = df['last_resp'] - df['x']
+        df['first_correct_bool'] = np.where(df['correct_th'] / 2 >= df['first_error'].abs(), 1, 0)  # correct bool calc
+        df['last_correct_bool'] = np.where(df['correct_th'] / 2 >= df['last_error'].abs(), 1, 0)
+        df.loc[(df.trial_result == 'miss', ['first_correct_bool', 'last_correct_bool'])] = np.nan  # misses correction
+
+        # last 2 sessions:
+        sort_last2 = df_last2['response_x'].astype(str).str.split(',', expand=True)
+        df_last2['first_resp'] = sort_last2[0].astype(float)
+        df_last2['last_resp'] = sort_last2.apply(func, axis=1).astype(float)
+        df_last2['first_error'] = df_last2['first_resp'] - df_last2['x']
+        df_last2['last_error'] = df_last2['last_resp'] - df_last2['x']
+        df_last2['first_correct_bool'] = np.where(df_last2['correct_th'] / 2 >= df_last3['first_error'].abs(), 1, 0)
+        df_last2['last_correct_bool'] = np.where(df_last2['correct_th'] / 2 >= df_last3['last_error'].abs(), 1, 0)
+
+        # accuracies calc
+        first_poke_acc = df.first_correct_bool.mean()
+        last_poke_acc = df.last_correct_bool.mean()
+        first2_poke_acc = df_last2.first_correct_bool.mean()
+        last2_poke_acc = df_last2.last_correct_bool.mean()
+
+        # last 2 stages lists:
+        last2_stages = df_last2.stage.unique()
+
+        if stage == 1:
+            #if first2_poke_acc >= 0.5 and len(last2_stages) == 1 and n_trials > 40:  # next substage
+            if first2_poke_acc >= 0.5 and len(last2_stages) == 1 and n_trials > 5:  # next substage
+                stage += 1
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
