@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class StageTraining_RatB_Luna(Task):
+class StageTraining_RatB_SideBias(Task):
 
     def __init__(self):
         super().__init__()
