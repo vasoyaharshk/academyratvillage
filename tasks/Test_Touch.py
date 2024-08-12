@@ -58,7 +58,7 @@ class Test_Touch(Task):
             state_name='Fixation',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 3)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
             # show 3 stimuli when crossing end of corridor
 
         self.sma.add_state(
