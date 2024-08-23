@@ -144,6 +144,30 @@ class Screen:
                 if hasattr(functions, 'loop20'):
                     self.chrono.reset()
                     self.my_loop = functions.loop20
+            if self.tag == 21:
+                if hasattr(functions, 'function21'):
+                    functions.function21()
+                if hasattr(functions, 'loop21'):
+                    self.chrono.reset()
+                    self.my_loop = functions.loop21
+            if self.tag == 22:
+                if hasattr(functions, 'function22'):
+                    functions.function22()
+                if hasattr(functions, 'loop22'):
+                    self.chrono.reset()
+                    self.my_loop = functions.loop22
+            if self.tag == 23:
+                if hasattr(functions, 'function23'):
+                    functions.function23()
+                if hasattr(functions, 'loop23'):
+                    self.chrono.reset()
+                    self.my_loop = functions.loop23
+            if self.tag == 24:
+                if hasattr(functions, 'function24'):
+                    functions.function24()
+                if hasattr(functions, 'loop24'):
+                    self.chrono.reset()
+                    self.my_loop = functions.loop24
 
         self.my_loop(self.chrono.get_seconds())
 

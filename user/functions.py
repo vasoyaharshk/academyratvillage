@@ -2,7 +2,7 @@ from user import settings
 from academy.utils import utils
 from academy.camera import cam2, cam3
 from academy.touch import touch
-from user.psychopy_elements import window, square, square2, square3, jar1, jar2, jar3
+from user.psychopy_elements import window, square, square2, square3, jar1, jar2, jar3, correct
 from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3, soundVec4
 import traceback
 
@@ -80,6 +80,7 @@ def function4():
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
     print('Resp Win')
+    print('Stim Correct: ', utils.task.correct_th * settings.PIXELS_PER_MM)
 
 # resume reading
 def function5():
@@ -232,3 +233,95 @@ def function19():
 def function20():
     if utils.state == 1:  # only for non direct tasks
         utils.change_to_state = 2  # first action done, before min_time
+
+
+#Gal-without mask testing functions from 21 to 24:
+
+# start reading touchscreen
+def function21():
+    try:
+        x = utils.task.x[1]
+    except:
+        x = utils.task.x
+
+    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
+                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
+                        )
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win')
+
+#     # Create a red-bordered rectangle for the correct_th area
+#     correct_width_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full width
+#     correct_height_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full height
+#
+#     correct.width = correct_width_px,
+#     correct.height=correct_height_px,
+#     correct.pos=(int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     correct.lineColor=[1, -1, -1],  # Red color for the border
+#     correct.fillColor=None  # No fill color
+#
+#
+# def loop21(timing):
+#     correct.draw()
+#     window.flip()
+
+def function22():
+    try:
+        x = utils.task.x[1]
+    except:
+        x = utils.task.x
+
+    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
+                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
+                        )
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win')
+
+#     # Create a red-bordered rectangle for the correct_th area
+#     correct_width_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full width
+#     correct_height_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full height
+#
+#     correct.width = correct_width_px,
+#     correct.height=correct_height_px,
+#     correct.pos=(int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     correct.lineColor=[1, -1, -1],  # Red color for the border
+#     correct.fillColor=None  # No fill color
+#
+# def loop22(timing):
+#     correct.draw()
+#     window.flip()
+
+def function23():
+    square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    # modify contrast: from 1 unchanged to 0
+    cont = float(utils.task.contrast) - 1
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    print('Stimulus 1 Shown')
+
+def loop23(timing):
+    if timing < utils.task.stim_duration:
+        square.draw()
+    window.flip()
+
+
+# draw a permanent white rectange  with task.x, task.y, task.width
+def function24():
+    square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    # modify contrast
+    cont = float(utils.task.contrast) - 1
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    print('Stimulus 2 Shown')
+
+def loop24(timing):
+    square.draw()
+    window.flip()

@@ -14,26 +14,19 @@ except:
     evdev = None
 
 
-
 class Touch:
 
     def __init__(self, touch_device, only_x, first_touch, win_resolution, touch_resolution, pixels_per_mm):
-
         self.connected = True
-
         self.touch_device = touch_device
         self.win_resolution = win_resolution
         self.touch_resolution = touch_resolution
         self.pixels_per_mm = pixels_per_mm
         self.softcode = softcode
-
-        self.only_x = only_x
+        self.only_x = None
         self.first_touch = first_touch
-
         self.timer = None
-
         self.time_between_responses = 0.5
-
         self.device = evdev.InputDevice(touch_device)
         self.device.grab()
 
@@ -107,10 +100,9 @@ class Touch:
         if answer is None:
             self.softcode.send(3)
             response = []
-
         else:
             xpsy = abs(x)
-            ypsy = abs(y)
+            ypsy = 770  # y is now set to 770
 
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
             try:
@@ -126,9 +118,9 @@ class Touch:
                 else:
                     self.softcode.send(4)
             else:
-                if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th / 2:
+                if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th * 2:
                     self.softcode.send(1)
-                elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th / 2:
+                elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th * 2:
                     self.softcode.send(2)
                 else:
                     self.softcode.send(4)
@@ -151,7 +143,7 @@ class FakeTouch:
 
 
 try:
-    touch = Touch(settings.TOUCHSCREEN_PORT, True, True, settings.WIN_RESOLUTION,
+    touch = Touch(settings.TOUCHSCREEN_PORT, False, True, settings.WIN_RESOLUTION,
                  settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM)
 except Exception:
     touch = FakeTouch()

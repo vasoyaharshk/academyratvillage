@@ -80,14 +80,23 @@ class StageTraining_RatB_Gal_No_Mask(Task):
         self.pdmc1 = 0
         self.trial_type = 'VG'
 
-        # screen details
-        self.x = 0  # screen width is 401mm for touchscreen and 370mm for monitor
-        self.y = 30  # screen height is 250mm for touchscreen and 300mm for monitor
-        self.width = 80  # stimulus width
-        self.h = 120
-        self.correct_th = 130  # 1/3 of the screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.contrast= 1.2 #0 black, 1 gray, 2 white. Default 60%
+        self.x = 0  # Centered horizontally
+        self.y = 100  # Positioned vertically
+        self.width = 60  # Stimulus width in mm
+        self.height = 60  # Stimulus height in mm
+        self.contrast = 1.2  # Contrast level
+
+        # Make the correct_th area to the size of the rectangles:
+
+        # Calculate half-width and half-height
+        self.half_width_mm = self.width / 2
+        self.half_height_mm = self.height / 2
+
+        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
+        self.correct_th = (self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5
+
+        # Repoke threshold (assuming full screen width)
+        self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -286,7 +295,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
 
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
-        self.x_positions = [60, 175, 290]
+        self.x_positions = [65, 190, 310]  #Harsh
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values
@@ -346,45 +355,45 @@ class StageTraining_RatB_Gal_No_Mask(Task):
         # 0 no function called; 1 show stim with timer; 2 show stim infinite time; 3 stop stim and clear cam tags
         if self.trial_type == 'VG':
             self.stim_duration = self.response_duration
-            output_stim1 = 2  # show stimulus initially
+            output_stim1 = 24  # show stimulus initially
             output_stim2 = 0
             output_stim3 = 0
-            output_stim4 = 1  # turn off stim at the eng of Resp Win
+            output_stim4 = 23  # turn off stim at the eng of Resp Win
         elif self.trial_type == 'DS':
             self.stim_duration = self.stim_dur_ds
-            output_stim1 = 2  # show stimulus initially
+            output_stim1 = 24  # show stimulus initially
             output_stim2 = 0
             output_stim3 = 0
-            output_stim4 = 1  # turn off stim in the Resp Win
+            output_stim4 = 23  # turn off stim in the Resp Win
         elif self.trial_type == 'DM':
             self.stim_duration = self.stim_dur_dm
-            output_stim1 = 2  # show stimulus initially
+            output_stim1 = 24  # show stimulus initially
             output_stim2 = 0
-            output_stim3 = 1  # turn off stim in fixation 3
+            output_stim3 = 23  # turn off stim in fixation 3
             output_stim4 = 15
         elif self.trial_type == 'DL':
             self.stim_duration = self.stim_dur_dl
-            output_stim1 = 2  # show stimulus initially
-            output_stim2 = 1  # turn off stim in fixation 2
+            output_stim1 = 24  # show stimulus initially
+            output_stim2 = 23  # turn off stim in fixation 2
             output_stim3 = 15
             output_stim4 = 0
         elif self.trial_type == 'DSc1':
             self.stim_duration = self.stim_dur_ds
             output_stim1 = 0
-            output_stim2 = 2  # show stimulus fixation 2
+            output_stim2 = 24  # show stimulus fixation 2
             output_stim3 = 0
-            output_stim4 = 1  # turn off stim in the Resp Win
+            output_stim4 = 23  # turn off stim in the Resp Win
         elif self.trial_type == 'DSc2':
             self.stim_duration = self.stim_dur_ds
             output_stim1 = 0
             output_stim2 = 0
-            output_stim3 = 2   # show stimulus fixation 2
-            output_stim4 = 1   # turn off stim in the Resp Win
+            output_stim3 = 24   # show stimulus fixation 2
+            output_stim4 = 23   # turn off stim in the Resp Win
         elif self.trial_type == 'DMc1':
             self.stim_duration = self.stim_dur_dm
             output_stim1 = 0
-            output_stim2 = 2  # show stimulus fixation 2
-            output_stim3 = 1  # turn off stim in the fixation 3
+            output_stim2 = 24  # show stimulus fixation 2
+            output_stim3 = 23  # turn off stim in the fixation 3
             output_stim4 = 15
 
         # silent trials
@@ -402,7 +411,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={'Port2In': 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 24)])
                 # show stim inifite time
 
             self.sma.add_state(
@@ -452,7 +461,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss',
                                      'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 4)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 21)])
             # wait for subject response
 
         self.sma.add_state(
@@ -497,7 +506,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
                                      'SoftCode3': 'Miss', 'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 22)])
 
         self.sma.add_state(
             state_name='Correct_other',
@@ -637,4 +646,3 @@ class StageTraining_RatB_Gal_No_Mask(Task):
         self.register_value('correction_bias', self.correction_bias)
         self.register_value('trial_length', self.trial_length)
         self.register_value('block_size', self.block_size)
-
