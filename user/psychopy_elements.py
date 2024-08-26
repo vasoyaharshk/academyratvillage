@@ -42,7 +42,23 @@ square3 = visual.Rect(win=window,
                      fillColor= [0.2, 0.2, 0.2],
                      pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
-correct = visual.Rect(win=window,
+border1 = visual.Rect(win=window,
+                     height=settings.WIN_RESOLUTION[1],
+                     width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM),
+                     units='pix',
+                     lineColor= [0.2, 0.2, 0.2],
+                     fillColor= [0.2, 0.2, 0.2],
+                     pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
+border2 = visual.Rect(win=window,
+                     height=settings.WIN_RESOLUTION[1],
+                     width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM),
+                     units='pix',
+                     lineColor= [0.2, 0.2, 0.2],
+                     fillColor= [0.2, 0.2, 0.2],
+                     pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
+border3 = visual.Rect(win=window,
                      height=settings.WIN_RESOLUTION[1],
                      width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM),
                      units='pix',

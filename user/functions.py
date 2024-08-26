@@ -2,7 +2,7 @@ from user import settings
 from academy.utils import utils
 from academy.camera import cam2, cam3
 from academy.touch import touch
-from user.psychopy_elements import window, square, square2, square3, jar1, jar2, jar3, correct
+from user.psychopy_elements import window, square, square2, square3, jar1, jar2, jar3, border1, border2, border3
 from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3, soundVec4
 import traceback
 
@@ -14,6 +14,7 @@ import traceback
 def function1():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
     # modify contrast: from 1 unchanged to 0
     cont = float(utils.task.contrast) - 1
     square.fillColor = [cont, cont, cont]
@@ -29,11 +30,13 @@ def loop1(timing):
 def function2():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
     # modify contrast
     cont = float(utils.task.contrast) - 1
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
     print('Stimulus 2 Shown')
+
 def loop2(timing):
     square.draw()
     window.flip()
@@ -235,9 +238,9 @@ def function20():
         utils.change_to_state = 2  # first action done, before min_time
 
 
-#Gal-without mask testing functions from 21 to 24:
+#Gal-without mask testing functions from 21 to 25:
 
-# start reading touchscreen
+# start reading touchscreen:
 def function21():
     try:
         x = utils.task.x[1]
@@ -252,20 +255,6 @@ def function21():
     cam3.put_state("Resp Win")
     print('Resp Win')
 
-#     # Create a red-bordered rectangle for the correct_th area
-#     correct_width_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full width
-#     correct_height_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full height
-#
-#     correct.width = correct_width_px,
-#     correct.height=correct_height_px,
-#     correct.pos=(int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     correct.lineColor=[1, -1, -1],  # Red color for the border
-#     correct.fillColor=None  # No fill color
-#
-#
-# def loop21(timing):
-#     correct.draw()
-#     window.flip()
 
 def function22():
     try:
@@ -281,19 +270,6 @@ def function22():
     cam3.put_state("Resp Win")
     print('Resp Win')
 
-#     # Create a red-bordered rectangle for the correct_th area
-#     correct_width_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full width
-#     correct_height_px = utils.task.correct_th * settings.PIXELS_PER_MM * 2  # Full height
-#
-#     correct.width = correct_width_px,
-#     correct.height=correct_height_px,
-#     correct.pos=(int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     correct.lineColor=[1, -1, -1],  # Red color for the border
-#     correct.fillColor=None  # No fill color
-#
-# def loop22(timing):
-#     correct.draw()
-#     window.flip()
 
 def function23():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
@@ -305,9 +281,31 @@ def function23():
     square.lineColor = [cont, cont, cont]
     print('Stimulus 1 Shown')
 
+    # Create a red-bordered rectangle for all the three stim:
+    border1.pos = (int(65 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.fillColor = None  # No fill color
+
+    border2.pos = (int(190 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.fillColor = None  # No fill color
+
+    border3.pos = (int(310 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.fillColor = None  # No fill color
+
 def loop23(timing):
     if timing < utils.task.stim_duration:
         square.draw()
+    border1.draw()
+    border2.draw()
+    border3.draw()
     window.flip()
 
 
@@ -322,6 +320,29 @@ def function24():
     square.lineColor = [cont, cont, cont]
     print('Stimulus 2 Shown')
 
+    # Create a red-bordered rectangle for all the three stim:
+    border1.pos = (int(65 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.fillColor = None  # No fill color
+
+    border2.pos = (int(190 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.fillColor = None  # No fill color
+
+    border3.pos = (int(310 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.fillColor = None  # No fill color
+
 def loop24(timing):
     square.draw()
+    border1.draw()
+    border2.draw()
+    border3.draw()
     window.flip()
+

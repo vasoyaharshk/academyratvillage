@@ -80,13 +80,24 @@ class StageTraining_RatB_Ciri_Sorrel(Task):
         self.pdmc1 = 0
         self.trial_type = 'VG'
 
-        # screen details
-        self.x = 0  # screen width is 401mm for touchscreen and 370mm for monitor
-        self.y = 30  # screen height is 250mm for touchscreen and 300mm for monitor
-        self.width = 80  # stimulus width
-        self.correct_th = 130  # 1/3 of the screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.contrast= 1.2 #0 black, 1 gray, 2 white. Default 60%
+        #Screen Details:
+        self.x = 0  # Centered horizontally
+        self.y = 100  # Positioned vertically
+        self.width = 60  # Stimulus width in mm
+        self.height = 60  # Stimulus height in mm
+        self.contrast = 1.2  # Contrast level
+
+        # Make the correct_th area to the size of the rectangles:
+
+        # Calculate half-width and half-height
+        self.half_width_mm = self.width / 2
+        self.half_height_mm = self.height / 2
+
+        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
+        self.correct_th = (self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5
+
+        # Repoke threshold (assuming full screen width)
+        self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -286,7 +297,8 @@ class StageTraining_RatB_Ciri_Sorrel(Task):
 
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
-        self.x_positions = [60, 175, 290]
+        #self.x_positions = [60, 175, 290]
+        self.x_positions = [65, 190, 310]
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values

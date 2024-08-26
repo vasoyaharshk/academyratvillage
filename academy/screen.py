@@ -168,6 +168,12 @@ class Screen:
                 if hasattr(functions, 'loop24'):
                     self.chrono.reset()
                     self.my_loop = functions.loop24
+            if self.tag == 25:
+                if hasattr(functions, 'function25'):
+                    functions.function25()
+                if hasattr(functions, 'loop25'):
+                    self.chrono.reset()
+                    self.my_loop = functions.loop25
 
         self.my_loop(self.chrono.get_seconds())
 

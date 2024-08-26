@@ -80,6 +80,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
         self.pdmc1 = 0
         self.trial_type = 'VG'
 
+        #Screen Details:
         self.x = 0  # Centered horizontally
         self.y = 100  # Positioned vertically
         self.width = 60  # Stimulus width in mm
