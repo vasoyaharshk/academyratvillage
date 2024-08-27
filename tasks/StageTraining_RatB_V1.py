@@ -80,13 +80,24 @@ class StageTraining_RatB_V1(Task):
         self.pdmc1 = 0
         self.trial_type = 'VG'
 
-        # screen details
-        self.x = 0  # screen width is 401mm for touchscreen and 370mm for monitor
-        self.y = 30  # screen height is 250mm for touchscreen and 300mm for monitor
-        self.width = 80  # stimulus width
-        self.correct_th = 130  # 1/3 of the screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.contrast= 1.2 #0 black, 1 gray, 2 white. Default 60%
+        #Screen Details:
+        self.x = 0  # Centered horizontally
+        self.y = 100  # Positioned vertically
+        self.width = 60  # Stimulus width in mm
+        self.height = 60  # Stimulus height in mm
+        self.contrast = 1.2  # Contrast level
+
+        # Make the correct_th area to the size of the rectangles:
+
+        # Calculate half-width and half-height
+        self.half_width_mm = self.width / 2
+        self.half_height_mm = self.height / 2
+
+        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
+        self.correct_th = (self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5
+
+        # Repoke threshold (assuming full screen width)
+        self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -286,7 +297,8 @@ class StageTraining_RatB_V1(Task):
 
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
-        self.x_positions = [60, 175, 290]
+        #self.x_positions = [60, 175, 290]
+        self.x_positions = [65, 190, 310]
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values
@@ -389,10 +401,11 @@ class StageTraining_RatB_V1(Task):
 
         # silent trials
         if self.silent == True and self.stage==3 and self.current_trial >10:
-            self.y = np.random.choice([30, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
+            self.y = np.random.choice([100, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
             if self.y == 1000:
-                print('Silent trial')
-                print('y position:' + str(self.y))
+                print('Silent trial, y position:' + str(self.y))
+            print('y position:' + str(self.y))
+
 
         ############ STATE MACHINE ################
 
@@ -611,30 +624,5 @@ class StageTraining_RatB_V1(Task):
             self.tired_counter = 0
 
         ############ REGISTER VALUES ################
-        self.register_value('x', self.x)
-        self.register_value('y', self.y)
-        self.register_value('response_x', self.response_x)
-        self.register_value('response_y', self.response_y)
-        self.register_value('mask', self.mask)
-        self.register_value('choices', self.choices)
-        self.register_value('width', self.width)
-        self.register_value('correct_th', self.correct_th)
-        self.register_value('repoke_th', self.repoke_th)
-        self.register_value('stim_dur_ds', self.stim_dur_ds)
-        self.register_value('stim_dur_dm', self.stim_dur_dm)
-        self.register_value('stim_dur_dl', self.stim_dur_dl)
-        self.register_value('trial_type', self.trial_type)
-        self.register_value('trial_result', self.trial_result)
-        self.register_value('pvg', self.pvg)
-        self.register_value('pds', self.pds)
-        self.register_value('pdm', self.pdm)
-        self.register_value('pdl', self.pdl)
-        self.register_value('pdsc1', self.pdsc1)
-        self.register_value('pdsc2', self.pdsc2)
-        self.register_value('pdmc1', self.pdmc1)
-        self.register_value('reward_drunk', self.reward_drunk)
-        self.register_value('reponse_duration', self.response_duration)
-        self.register_value('correction_bias', self.correction_bias)
-        self.register_value('trial_length', self.trial_length)
-        self.register_value('block_size', self.block_size)
+
 

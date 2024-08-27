@@ -102,7 +102,7 @@ class StageTraining_RatB_Gal_No_Mask(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats.
+        self.valve_factor_c = 2
         self.valve_factor_i = 0.45
 
         # counters
@@ -399,10 +399,10 @@ class StageTraining_RatB_Gal_No_Mask(Task):
 
         # silent trials
         if self.silent == True and self.stage==3 and self.current_trial >10:
-            self.y = np.random.choice([30, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
+            self.y = np.random.choice([100, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
             if self.y == 1000:
-                print('Silent trial')
-                print('y position:' + str(self.y))
+                print('Silent trial, y position:' + str(self.y))
+            print('y position:' + str(self.y))
 
         ############ STATE MACHINE ################
 

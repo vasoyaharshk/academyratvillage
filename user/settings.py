@@ -61,7 +61,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 1  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 1800  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
+ONEMOUSE = 2200  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
 SEVERALMICE = 14000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
@@ -78,7 +78,7 @@ THRESHOLD_NIGHT_DOOR1 = 105                                              # <-- T
 THRESHOLD_NIGHT_DOOR2 = 120                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
-DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
+DURATION_TAGS = 5  # seconds tags are stored if there is a tag different than current animal can not enter
 HOUR_DAY = 7  # Day starts after this + DETECTION_WAITING_MINUTES
 MINUTE_DAY = 40      #Day starts after this + DETECTION_WAITING_MINUTES
 HOUR_NIGHT = 19     #Night starts after this + DETECTION_WAITING_MINUTES
@@ -100,8 +100,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 135, 92, 195]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [60, 233, 195, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [233, 483, 258, 295]   # <-- TO CHANGE left, right, top, down
-CAM1_DOORS2_ZONE = [483, 590, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [233, 482, 258, 295]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [482, 590, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
