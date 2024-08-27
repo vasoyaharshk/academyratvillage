@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class StageTraining_RatB_Gal_No_Mask(Task):
+class StageTraining_RatB_No_Mask(Task):
 
     def __init__(self):
         super().__init__()

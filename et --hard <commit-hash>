@@ -1,0 +1,155 @@
+[33mcommit 6bc1b7398a5f467dce604264825eb2e0cd09f9a2[m[33m ([m[1;36mHEAD -> [m[1;32mprototype_20240201[m[33m, [m[1;31morigin/prototype_20240201[m[33m)[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Fri Aug 23 16:03:50 2024 +0200
+
+    GAL WITHOUT MASK SESSION 1
+
+[33mcommit 9e73dbde4610e2e4ca10b7efedb5c0fa74178468[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Mon Aug 19 21:45:36 2024 +0200
+
+    Probability stage 1 working. Gal Luna Sparky in one script now.
+
+[33mcommit ae880c113b872e7be56bc6cffa072b6e37b373ab[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Mon Aug 12 15:34:17 2024 +0200
+
+    Probability stage 1 working. Gal Luna Sparky in one script now.
+
+[33mcommit b248bc50f1ddea075ad8c609ea3ba620b59b31b6[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Aug 8 10:11:19 2024 +0200
+
+    Probability stage 1 working. Gal Luna Sparky in one script now.
+
+[33mcommit 834191fd76467bb59f5b127dc921ab7202a26b24[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Aug 8 10:08:38 2024 +0200
+
+    Probability stage 1 working. Gal Luna Sparky in one script now.
+
+[33mcommit b194c7c14cb88907d36b7335bfd82da01aa5567d[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Tue Jul 30 14:21:54 2024 +0200
+
+    Ciri and Sorrel increased water
+
+[33mcommit 79c67fc5585ca344257383ee1db27e257cbfc8f6[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Tue Jul 30 13:12:10 2024 +0200
+
+    Everything working smoothly
+
+[33mcommit 4ed793ed7e62891c8bb12a90e35c9510858fdf9a[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Tue Jul 23 12:49:20 2024 +0200
+
+    Everything working smoothly
+
+[33mcommit ce4716f8702693eb11ded6d6cea96f3e1d35f3f4[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jul 18 13:36:53 2024 +0200
+
+    Luna all trials are now 0.33 probability
+
+[33mcommit ff4e708866f696360566e2f4cae978ff88157269[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jul 18 12:33:42 2024 +0200
+
+    Changing light working now
+
+[33mcommit a98e3c6b997f982243705f9cf9aad6646efa206a[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jul 18 11:51:53 2024 +0200
+
+    Luna stim probabilities 0.33 to all 3
+
+[33mcommit 05e6e45d9e1214069f67871ae0efee3a40bf5f4f[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Wed Jul 17 15:17:36 2024 +0200
+
+    Telegram Bot Working
+
+[33mcommit 88c08408e4be05371c8d8e3dbc4f4d0facf397b0[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Mon Jul 15 12:28:17 2024 +0200
+
+    Thresholds for the new light system fixed
+
+[33mcommit a80ddd48a4098a0cb1ec6eec5111cde500adeb74[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Wed Jul 10 15:43:21 2024 +0200
+
+    Telegram-bot changes
+
+[33mcommit 8e7563cb59bb2b6003426fbe37a183199ba0cb8b[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Wed Jul 10 14:25:55 2024 +0200
+
+    Camera 2 fixed
+
+[33mcommit 46616d8134d8c0694bbc471fd133e6b7a17e46ec[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Fri Jul 5 14:24:48 2024 +0200
+
+    Camera 2 fixed
+
+[33mcommit 2b8be7d205429a2bcfd49430381e9f27220964f0[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jul 4 21:08:51 2024 +0200
+
+    Camera 2 fixed
+
+[33mcommit dd4ca6ca6d50957cddc517c02c3ed9c2b2a65108[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Wed Jul 3 14:40:30 2024 +0200
+
+    Gal and Sparky get 50ul
+
+[33mcommit 6b3844d1477992d75f77e888f6dfb15a3f0c634a[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Mon Jul 1 10:08:02 2024 +0200
+
+    threshold at night not working
+
+[33mcommit a54a596f28e292aa0e7a20e3d326113c6e36c69e[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Sat Jun 29 18:30:43 2024 +0200
+
+    Gal and Sparky get 50ul
+
+[33mcommit 81d1f01f9d91ca2802c4ff08212a600d14660450[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 27 16:22:51 2024 +0200
+
+    Everything working after camera 2 labelled as camera 3
+
+[33mcommit 4ecc4d8a496da19d8be444f91e23790735830bfd[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 27 11:05:52 2024 +0200
+
+    Everything working after camera 2 labelled as camera 3
+
+[33mcommit 19d78066c3c86168b72c24b25e942a85c5b8b505[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 20 15:10:10 2024 +0200
+
+    Camera 2 (WP) and Camera 3 (screen) now save with labels and changing light added
+
+[33mcommit e6f23fdea22d42cab25a68c6357c76f625c8c209[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 20 15:06:34 2024 +0200
+
+    Camera 2 (WP) and Camera 3 (screen) now save with labels and changing light added
+
+[33mcommit 56cde10067ed7395600d7d85a2b93889ee555333[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 20 15:05:10 2024 +0200
+
+    Camera 2 (WP) and Camera 3 (screen) now save with labels and changing light added
+
+[33mcommit b0d6f4223c9749da4310b9bb3d1ac8e6295d8d36[m
+Author: vasoyaharshk <vasoyaharshkumar@gmail.com>
+Date:   Thu Jun 20 10:22:13 2024 +0200
+
+    Rafa testing folder added
