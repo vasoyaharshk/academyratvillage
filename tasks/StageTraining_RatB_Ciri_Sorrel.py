@@ -624,5 +624,29 @@ class StageTraining_RatB_Ciri_Sorrel(Task):
             self.tired_counter = 0
 
         ############ REGISTER VALUES ################
-
-
+        self.register_value('x', self.x)
+        self.register_value('y', self.y)
+        self.register_value('response_x', self.response_x)
+        self.register_value('response_y', self.response_y)
+        self.register_value('mask', self.mask)
+        self.register_value('choices', self.choices)
+        self.register_value('width', self.width)
+        self.register_value('correct_th', self.correct_th)
+        self.register_value('repoke_th', self.repoke_th)
+        self.register_value('stim_dur_ds', self.stim_dur_ds)
+        self.register_value('stim_dur_dm', self.stim_dur_dm)
+        self.register_value('stim_dur_dl', self.stim_dur_dl)
+        self.register_value('trial_type', self.trial_type)
+        self.register_value('trial_result', self.trial_result)
+        self.register_value('pvg', self.pvg)
+        self.register_value('pds', self.pds)
+        self.register_value('pdm', self.pdm)
+        self.register_value('pdl', self.pdl)
+        self.register_value('pdsc1', self.pdsc1)
+        self.register_value('pdsc2', self.pdsc2)
+        self.register_value('pdmc1', self.pdmc1)
+        self.register_value('reward_drunk', self.reward_drunk)
+        self.register_value('reponse_duration', self.response_duration)
+        self.register_value('correction_bias', self.correction_bias)
+        self.register_value('trial_length', self.trial_length)
+        self.register_value('block_size', self.block_size)
