@@ -78,7 +78,7 @@ def alarm_temperature(temperature):
 def alarm_session_time(seconds, subject_name):
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
-        message = 'ALARM: mouse has been more than ' + str(int(seconds)) + ' seconds in the box' + ', subject: ' + str(subject_name)
+        message = 'ALARM: rat has been more than ' + str(int(seconds)) + ' seconds in the box' + ', subject: ' + str(subject_name)
         utils.alarms.add_new_item({'message': message})
         data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
 

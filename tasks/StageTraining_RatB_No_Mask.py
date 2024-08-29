@@ -52,7 +52,7 @@ class StageTraining_RatB_No_Mask(Task):
         self.blocks= True
         self.block_size = 20
         self.prob = 0.33   # random by default
-        self.stage = 1
+        self.stage = 3
         self.substage = 1
 
         # task variables: by default easy parameters
