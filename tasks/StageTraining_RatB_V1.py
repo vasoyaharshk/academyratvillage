@@ -82,7 +82,7 @@ class StageTraining_RatB_V1(Task):
 
         #Screen Details:
         self.x = 0  # Centered horizontally
-        self.y = 100  # Positioned vertically
+        self.y = 102  # Positioned vertically
         self.width = 60  # Stimulus width in mm
         self.height = 60  # Stimulus height in mm
         self.contrast = 1.2  # Contrast level
@@ -298,7 +298,8 @@ class StageTraining_RatB_V1(Task):
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
         #self.x_positions = [60, 175, 290]
-        self.x_positions = [65, 190, 310]
+        #self.x_positions = [65, 190, 310]
+        self.x_positions = [64, 188, 309]
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values
