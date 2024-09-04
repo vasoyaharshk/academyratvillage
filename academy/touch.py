@@ -113,7 +113,7 @@ class Touch:
             except Exception:
                 ytouch = None
 
-            print('X2: ', xtouch, 'Y2: ', ytouch)
+            #print('X2: ', xtouch, 'Y2: ', ytouch)
             #print(correct_th)
 
             if self.only_x:
