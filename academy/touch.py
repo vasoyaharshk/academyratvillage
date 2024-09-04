@@ -7,6 +7,7 @@ from academy.utils import utils
 from user import settings
 from academy.softcode import softcode
 from academy import time_utils, queues, telegram_bot
+from user.psychopy_elements import window, border1
 
 try:
     import evdev
@@ -102,13 +103,18 @@ class Touch:
             response = []
         else:
             xpsy = abs(x)
-            ypsy = 770  # y is now set to 770
+            ypsy = 750  # y is now set to 770
+            #ypsy = abs(y)  # y is now set to 770
 
+            #print('Touch: ', answer)
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
             try:
                 ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
             except Exception:
                 ytouch = None
+
+            print('X2: ', xtouch, 'Y2: ', ytouch)
+            #print(correct_th)
 
             if self.only_x:
                 if abs(xtouch - xpsy) < correct_th / 2:
@@ -118,12 +124,30 @@ class Touch:
                 else:
                     self.softcode.send(4)
             else:
-                if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th * 2:
+                if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th * 1:
+                    #print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
                     self.softcode.send(1)
-                elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th * 2:
+                elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th * 1:
+                    #print('Formula Incorrect: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
                     self.softcode.send(2)
                 else:
                     self.softcode.send(4)
+
+            # # Define the size of the area that will trigger softcode.send(1)
+            # area_width = correct_th * 1.5 # Set based on the threshold
+            # area_height = correct_th * 1.5  # Assuming a square area, adjust this if needed
+            #
+            # # Create the border rectangle around the area
+            # border1.pos = (xpsy, ypsy)
+            # border1.width = area_width
+            # border1.height = area_height
+            # border1.lineColor = [1, 0, 0]  # Red color for the border
+            # border1.fillColor = None  # No fill color
+            #
+            # # In your main loop or drawing routine, ensure that the border is drawn
+            # border1.draw()
+            # print("Area drawn")
+            # window.flip()
 
             if ytouch is None:
                 ytouch = 0
@@ -147,3 +171,19 @@ try:
                  settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM)
 except Exception:
     touch = FakeTouch()
+
+
+    # #     # Define the region based on border1
+    #     # You need to check if the touch is within the border1 boundaries.
+    #     border1_left = border1.pos[0] - border1.width / 2
+    #     border1_right = border1.pos[0] + border1.width / 2
+    #     border1_top = border1.pos[1] + border1.height / 2
+    #     border1_bottom = border1.pos[1] - border1.height / 2
+    #
+    #     if border1_left <= xtouch <= border1_right and border1_bottom <= ytouch <= border1_top:
+    #         # Touch within the bounds of border1
+    #         self.softcode.send(1)
+    #     elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th * 1.25:
+    #         self.softcode.send(2)
+    #     else:
+    #         self.softcode.send(4)

@@ -93,8 +93,8 @@ class StageTraining_RatB_No_Mask(Task):
         self.half_width_mm = self.width / 2
         self.half_height_mm = self.height / 2
 
-        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
-        self.correct_th = (self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5
+        # Calculate the correct_th as the radius:
+        self.correct_th = ((self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5) + 10
 
         # Repoke threshold (assuming full screen width)
         self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
@@ -297,7 +297,7 @@ class StageTraining_RatB_No_Mask(Task):
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
         #self.x_positions = [65, 190, 310]  #Harsh
-        self.x_positions = [64, 188, 309]
+        self.x_positions = [65, 188, 309]
 
         # Choose x positions by blocks
         if self.current_trial == 0:  # Make a list with x values

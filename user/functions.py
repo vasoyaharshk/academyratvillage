@@ -281,20 +281,20 @@ def function23():
     square.lineColor = [cont, cont, cont]
     print('Stimulus 1 Shown')
 
-    # Create a red-bordered rectangle for all the three stim:
+    # Create a red-bordered rectangle for all the three stim: self.x_positions = [65, 188, 309]
     border1.pos = (int(65 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
     border1.fillColor = None  # No fill color
 
-    border2.pos = (int(190 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
     border2.fillColor = None  # No fill color
 
-    border3.pos = (int(310 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
@@ -320,20 +320,20 @@ def function24():
     square.lineColor = [cont, cont, cont]
     print('Stimulus 2 Shown')
 
-    # Create a red-bordered rectangle for all the three stim:
+    # Create a red-bordered rectangle for all the three stim: self.x_positions = [65, 188, 309]
     border1.pos = (int(65 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
     border1.fillColor = None  # No fill color
 
-    border2.pos = (int(190 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
     border2.fillColor = None  # No fill color
 
-    border3.pos = (int(310 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
