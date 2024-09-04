@@ -145,9 +145,9 @@ CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
 #CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
 CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR1_ZONE = [1, 550, 10, 170]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
 #CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
-CAM3_FLOOR2_ZONE = [1, 550, 330, 470]    # <-- TO CHANGE left, right, top, down
+CAM3_FLOOR2_ZONE = [7, 8, 7, 8]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
