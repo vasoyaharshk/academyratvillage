@@ -47,7 +47,7 @@ class StageTraining_RatB_Gal_Sparky_Luna(Task):
         self.trials_tired = 5  # if animal does less than this number in the last 10 mins, finishes task
         self.tired = False  # Tired animal indicator
         self.silent = True  #to add silent trials
-        self.mask = 3
+        self.mask = 0
         self.choices = self.mask
         self.blocks= True
         self.block_size = 20
