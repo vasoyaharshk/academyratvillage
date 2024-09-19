@@ -153,7 +153,7 @@ CAM3_TRACKING_POSITION = True
 
 # telegram
 TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002111074687"  # <-- TO CHANGE
+TELEGRAM_CHAT = "-1002317343440"  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
     'Harsh': '5842767043',
     'Donna': '6811118356',
