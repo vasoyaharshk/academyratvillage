@@ -21,14 +21,23 @@ class Test_Touch(Task):
         self.stim_duration = self.response_duration
         self.trials_max = 10
 
-        # screen details
-        self.x = [60, 200, 340]  # screen width is 401mmm
-        self.y = 125  # screen height is 250mmm
-        self.width = 30
-        self.correct_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2   # full screen
-        self.contrast= 2 #0 black, 1 gray, 2 white. Default 20%
+        #Screen Details:
+        self.x = 188  # Centered horizontally
+        self.y = 102  # Positioned vertically
+        self.width = 60  # Stimulus width in mm
+        self.height = 60  # Stimulus height in mm
+        self.contrast = 1.2  # Contrast level
 
+        # Make the correct_th area to the size of the rectangles:
+        # Calculate half-width and half-height
+        self.half_width_mm = self.width / 2
+        self.half_height_mm = self.height / 2
+
+        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
+        self.correct_th = ((self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5) + 10
+
+        # Repoke threshold (assuming full screen width)
+        self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
