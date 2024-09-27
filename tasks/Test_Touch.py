@@ -56,12 +56,26 @@ class Test_Touch(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
 
+        if self.current_trial == 0:
+            self.sma.add_state(
+                state_name='Start_task',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
+            # show stim inifite time
 
-        self.sma.add_state(
-            state_name='Start_task',
-            state_timer=2,
-            state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-            output_actions=[])
+            self.sma.add_state(
+                state_name='Real_start',
+                state_timer=self.valve_time * 2,
+                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 20)])
+            # close corridor 2 door, and deliver water when animal enter to behav box
+        else:
+            self.sma.add_state(
+                state_name='Start_task',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
+                output_actions=[])
 
         self.sma.add_state(
             state_name='Fixation',
