@@ -40,6 +40,7 @@ class LickTeaching_Demotivation(Task):
         self.duration_max = 660 #11 mins
         self.stage = 0
         self.substage = 0
+        self.trials_max = 4
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -49,7 +50,6 @@ class LickTeaching_Demotivation(Task):
         # counters
         self.miss_acc_counter = 0
         self.reward_drunk = 0
-
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -77,7 +77,7 @@ class LickTeaching_Demotivation(Task):
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM6, 5)])
-        elif self.current_trial < 4:
+        else:
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
