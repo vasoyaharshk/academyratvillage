@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class StageTraining_RatB_V1(Task):
+class StageTraining_RatB_V1_Demotivation(Task):
 
     def __init__(self):
         super().__init__()
@@ -102,7 +102,7 @@ class StageTraining_RatB_V1(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 1                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
+        self.valve_factor_c = 1 * 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
         self.valve_factor_i = 0.45
 
         # counters
@@ -159,7 +159,7 @@ class StageTraining_RatB_V1(Task):
 
             # SUBSTAGE 1: STIMULUS REPOKING ALLOWED, LONG RESP WIN, MORE WATER
             if self.substage == 1:
-                self.valve_factor_c = 1.2
+                self.valve_factor_c = 1.2 * 2
                 self.valve_factor_i = 0.6
                 # 10 initial easy trials: all VG
                 if self.current_trial >= 10:
@@ -416,16 +416,39 @@ class StageTraining_RatB_V1(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={'Port2In': 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
+                output_actions=[])
                 # show stim inifite time
 
             self.sma.add_state(
                 state_name='Real_start',
-                state_timer=self.valve_time * 2,
-                #state_timer=self.valve_time * 20,                           #Deliver 1ml of water to rats at the start
-                state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Blank1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # close corridor 2 door, and deliver water when animal enter to behav box
+
+            self.sma.add_state(
+                state_name='Blank1',
+                state_timer=1,
+                state_change_conditions={Bpod.Events.Port1In: 'Reward1'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5)])
+
+            self.sma.add_state(
+                state_name='Reward1',
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Blank2'},
+                output_actions=[(Bpod.OutputChannels.Valve, 1)])
+
+            self.sma.add_state(
+                state_name='Blank2',
+                state_timer=1,
+                state_change_conditions={Bpod.Events.Port1In: 'Reward2'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5)])
+
+            self.sma.add_state(
+                state_name='Reward2',
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
+                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 2)])
 
         # Other trials
         else:
