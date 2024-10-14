@@ -128,6 +128,7 @@ def select_task(df, subject):
 
         # last substages lists
         last3_stages = df_last3.stage.unique()
+        last2_substages = df_last2.substage.unique()
         last3_substages = df_last3.substage.unique()
         last5_substages = df_last5.substage.unique()
         last14_substages = df_last14.substage.unique()
@@ -160,9 +161,10 @@ def select_task(df, subject):
             choice = subject.choice
 
         ############ STAGE 1 ############
+        #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
         if stage == 1:
             if substage == 1:
-                if last3_poke_acc >= 0.8 and len(last5_substages) == 1 and n_trials > 60:  # next substage
+                if last3_poke_acc >= 0.8 and len(last2_substages) == 1 and n_trials > 60:  # next substage
                     substage += 1
                 # elif n_trials <= 15 and len(last5_substages) == 1:  # go to Touchteaching
                 #     task = 'TouchTeaching'
@@ -172,14 +174,14 @@ def select_task(df, subject):
             elif substage == 2:
                 stim_pos_acc = vg_df.groupby('x')['first_correct_bool'].mean() # accuracy by stimulus in VG trials
                 stim_pos_acc.to_list()
-                if all(i >= 0.7 for i in stim_pos_acc) and len(last5_substages) == 1 and n_trials > 60 and first3_poke_acc >0.65:  # next substage
+                if all(i >= 0.7 for i in stim_pos_acc) and len(last2_substages) == 1 and n_trials > 60 and first3_poke_acc >0.65:  # next substage
                     substage += 1
                 elif first_poke_acc <= 0.33 and len(last3_substages) == 1:  # lower substage
                     substage -= 1
 
             elif substage == 3:
                 acc_ds = ds_df['first_correct_bool'].mean() # accuracy in delay short
-                if acc_ds >= 0.55 and len(last5_substages) == 1 and n_trials > 60 and first3_poke_acc >0.7:  # next stage
+                if acc_ds >= 0.55 and len(last2_substages) == 1 and n_trials > 60 and first3_poke_acc >0.7:  # next stage
                     stage += 1
                     substage = float(1)
                     stim_dur_ds = 0.45
@@ -221,7 +223,7 @@ def select_task(df, subject):
                     stim_dur = initial - change
                 else:
                     stim_dur = 0
-                    if last3_stim_dur < change and len(last5_substages)==1: # if stim_dur is the minimum for 3 sessions advance stage
+                    if last3_stim_dur < change and len(last2_substages)==1: # if stim_dur is the minimum for 3 sessions advance stage
                         next_stage = True  # next substage
 
             # Bad accuracy or demotivation -> elongate stim_dur
