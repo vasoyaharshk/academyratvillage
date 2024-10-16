@@ -25,6 +25,13 @@ class Probability_Training(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
+        #Non-used variables so that stage training works:
+        self.stim_dur_ds = 0
+        self.stim_dur_dm = 0
+        self.stim_dur_dl = 0
+        self.choices = 0
+        self.substage = 0
+
         # Variables for the task:
         self.duration_max = 3000
         self.duration_min = 2100
@@ -43,7 +50,7 @@ class Probability_Training(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1  # Normal water delivery of 25ul.
+        self.valve_factor_c = 2  # Normal water delivery of 25ul.
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
@@ -63,7 +70,7 @@ class Probability_Training(Task):
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
-        self.height = 140
+        self.height = 190
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -129,7 +136,7 @@ class Probability_Training(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -145,7 +152,7 @@ class Probability_Training(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -275,11 +282,11 @@ class Probability_Training(Task):
         #     self.acc_up = 0
 
         ############ REGISTER VALUES ################
-        # self.register_value('stim_dur_ds', self.stim_dur_ds)
-        # self.register_value('stim_dur_dm', self.stim_dur_dm)
-        # self.register_value('stim_dur_dl', self.stim_dur_dl)
-        # self.register_value('choices', self.choices)
-        # self.register_value('substage', self.substage)
+        self.register_value('stim_dur_ds', self.stim_dur_ds)
+        self.register_value('stim_dur_dm', self.stim_dur_dm)
+        self.register_value('stim_dur_dl', self.stim_dur_dl)
+        self.register_value('choices', self.choices)
+        self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)

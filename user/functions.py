@@ -27,18 +27,21 @@ def function1():
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border1.fillColor = None  # No fill color
 
     border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border2.fillColor = None  # No fill color
 
     border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border3.fillColor = None  # No fill color
 
 def loop1(timing):
@@ -65,18 +68,21 @@ def function2():
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm  # Green color for the border
     border1.fillColor = None  # No fill color
 
     border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border2.fillColor = None  # No fill color
 
     border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border3.fillColor = None  # No fill color
 
 def loop2(timing):
@@ -229,18 +235,21 @@ def function15():
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border1.fillColor = None  # No fill color
 
     border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border2.fillColor = None  # No fill color
 
     border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border3.fillColor = None  # No fill color
 
     cam2.put_state("")
@@ -334,18 +343,21 @@ def function23():
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border1.fillColor = None  # No fill color
 
     border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border2.fillColor = None  # No fill color
 
     border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border3.fillColor = None  # No fill color
 
 def loop23(timing):
@@ -373,18 +385,21 @@ def function24():
     border1.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border1.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border1.lineColor = [1, 1, -1],  # Green color for the border
+    border1.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border1.fillColor = None  # No fill color
 
     border2.pos = (int(188 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border2.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border2.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border2.lineColor = [1, 1, -1],  # Green color for the border
+    border2.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border2.fillColor = None  # No fill color
 
     border3.pos = (int(309 * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     border3.width = int(utils.task.width * settings.PIXELS_PER_MM)
     border3.height = int(utils.task.height * settings.PIXELS_PER_MM)
     border3.lineColor = [1, 1, -1],  # Green color for the border
+    border3.lineWidth = 1 * settings.PIXELS_PER_MM  # This sets the line width to 1 mm
     border3.fillColor = None  # No fill color
 
 def loop24(timing):
@@ -441,18 +456,6 @@ def function31():  # When the blue jar is on left
     except Exception as e:
         print(f"Error occurred: {e}")
 
-    # # Draw the border correcth around the stim:
-    # width = int(utils.task.width * settings.PIXELS_PER_MM)
-    # height = int(utils.task.height * settings.PIXELS_PER_MM)
-    # x = int(utils.task.x_correcth * settings.PIXELS_PER_MM)
-    # y = int(utils.task.y_correcth * settings.PIXELS_PER_MM)
-    #
-    # border1.pos = (x, y)
-    # border1.width = width
-    # border1.height = height
-    # border1.lineColor = [1, 1, -1],  # Green color for the border
-    # border1.fillColor = None  # No fill color
-
 def loop31(timing):
     if timing < utils.task.response_duration:
         image_jar_left.draw()
@@ -501,17 +504,6 @@ def function32():  # When the blue jar is on right
     except Exception as e:
         print(f"Error occurred: {e}")
 
-    # Draw the border correcth around the stim:
-    # width = int(utils.task.width * settings.PIXELS_PER_MM)
-    # height = int(utils.task.height * settings.PIXELS_PER_MM)
-    # x = int(utils.task.x_correcth * settings.PIXELS_PER_MM)
-    # y = int(utils.task.y_correcth * settings.PIXELS_PER_MM)
-    #
-    # border1.pos = (x, y)
-    # border1.width = width
-    # border1.height = height
-    # border1.lineColor = [1, 1, -1],  # Green color for the border
-    # border1.fillColor = None  # No fill color
 
 def loop32(timing):
     if timing < utils.task.response_duration:
