@@ -18,7 +18,7 @@ subjects = {'name': 'animal0',
 
 
 water_calibration = {'port': 1,
-                     'water': 8,
+                     'water': 1,
                      'pulse_duration': 0.01,
                      }
 
