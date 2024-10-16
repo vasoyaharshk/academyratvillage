@@ -275,9 +275,7 @@ def select_task(df, subject):
                         substage -=1
                         stim_dur_dm = 0.4
                         stim_dur_dl = 0
-
-        return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
-
+        #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
         accuracy_criteria = 0.85
@@ -291,19 +289,19 @@ def select_task(df, subject):
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
 
-        # Get the number of trials in the last session and second-to-last session (if exists)
+        #Get the number of trials in the last session and second-to-last session (if exists)
         n_trials_last = df_last_session.trial.max()  # Trials in the last session
-        # if second_last_session is not None:
-        #     df_second_last_session = df_last2[df_last2['session'] == second_last_session].copy()
-        #     n_trials_second_last = df_second_last_session.trial.max()
-        # else:
-        #     n_trials_second_last = 0
+        if second_last_session is not None:
+            df_second_last_session = df_last2[df_last2['session'] == second_last_session].copy()
+            n_trials_second_last = df_second_last_session.trial.max()
+        else:
+            n_trials_second_last = 0
 
         # number of trials
         if n_trials_last < 15:
             my_subject = df.subject.iloc[0]
             if my_subject not in settings.INACTIVE_SUBJECTS:
-                telegram_bot.alarm_few_trials(n_trials, my_subject)
+                telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
         # Calculate accuracy for the last session
         correct_trials_last = df_last_session[df_last_session['trial_result'] == 'correct'].shape[0]
@@ -346,5 +344,6 @@ def select_task(df, subject):
             if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                 print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
                 stage = 4
+                #task = 'Probability_ROR'
 
-        return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
+    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice

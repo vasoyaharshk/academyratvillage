@@ -153,21 +153,20 @@ class Probability_Training(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-            # Starts task and displays stimuli instanly
+                output_actions=[])
 
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Fixation'},
             output_actions=[])
-        # Does Nothing. Make it t close door 3 later when Duncan has fixed it.
+        # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-            output_actions=[])
+            output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Changes the state to response window after photogate near the screen has been crossed.
 
         self.sma.add_state(
