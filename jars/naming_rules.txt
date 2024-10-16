@@ -1,0 +1,3 @@
+blue_yellow_ratio-correct_ratio-incorrect-ratio_number_both for both jars
+blue_yellow_ratio-correct_ratio-incorrect-ratio_number_correct for jar displaying correct
+blue_yellow_ratio-correct_ratio-incorrect-ratio_number_incorrect for jar displaying incorrect

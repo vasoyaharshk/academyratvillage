@@ -29,14 +29,13 @@ class StageTraining_RatB_V1_Demotivation(Task):
         Stage 3: Data collection
         10%VG 30%DS 30%DM 30%DL. No stimulus duration changes. Silent trials can appear
 
-        ########   PORTS INFO   ########
+                ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
-        Port 2 - BUZZER: valve (16kHz): correct; LED (4kHz):punish
-        Port 3 - PHOTOGATES 4: Photogates end of corridor
-        Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
-        PAm  1 - PHOTOGATES 1: Photogates start of corridor           
-        PAm  2 - PHOTOGATES 2: Photogates midle-start of corridor
-        PAm  3 - PHOTOGATES 3: Photogates midle-end of corridor     
+        Port 2 - PHOTOGATES 2: Photogates next to lickport 
+        Port 3 - PHOTOGATES 3: Photogates 
+        Port 4 - PHOTOGATES 4: Photogates 
+        Port 5 - PHOTOGATES 5: Photogates 
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED      
         """
 
     def init_variables(self):
