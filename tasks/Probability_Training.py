@@ -124,7 +124,7 @@ class Probability_Training(Task):
 
 
         ############ STATE MACHINE ################
-
+        #First trial:
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
@@ -140,6 +140,7 @@ class Probability_Training(Task):
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
             # Closes corridor door 2 and delivers initial 50ul water.
 
+        #Other Trials:
         else:
             self.sma.add_state(
                 state_name='Start_task',
@@ -153,14 +154,14 @@ class Probability_Training(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Fixation'},
             output_actions=[])
-        # Does Nothing
+        # Does Nothing. Make it t close door 3 later when Duncan has fixed it.
 
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
             output_actions=[])
-        # Does Nothing
+        # Changes the state to response window after photogate near the screen has been crossed.
 
         self.sma.add_state(
             state_name='Response_window',
@@ -172,7 +173,7 @@ class Probability_Training(Task):
         self.sma.add_state(
             state_name='Correct',
             state_timer=2,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli
 
@@ -193,14 +194,14 @@ class Probability_Training(Task):
         self.sma.add_state(
             state_name='Punish',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
         # Turns on Global LED and water port LED on, plays punish sound and displays incorrect stimuli
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
