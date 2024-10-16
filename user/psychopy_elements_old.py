@@ -1,6 +1,5 @@
 import os
 from psychopy import visual, logging
-from psychopy.visual import Circle
 from user import settings
 
 
@@ -10,11 +9,13 @@ logging.console.setLevel(logging.CRITICAL)
 
 
 # create the window
-window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR, units='pix', fullscr=False, viewPos=settings.VIEW_POSITION)
-
-#window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR, units='pix', fullscr=False)
-
+window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR,
+                       units='pix', fullscr=False, viewPos=settings.VIEW_POSITION)
 os.system('wmctrl -r "PsychoPy" -b add,above')
+
+
+
+
 
 # create all the stimuli you will use in all tasks
 square = visual.Rect(win=window,
@@ -93,9 +94,11 @@ white_screen = visual.Rect(win=window,
                            fillColor=[1, 1, 1],
                            pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
+#For Stage 1 where the probabilities are 100% blue vs nothing:
+jar1 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar1.png')
 
-image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
+#For Stage 2 where the probabilities are 100% blue vs 100% yellow:
+jar2 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar2.png')
 
-image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
-
-circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
+#For Stage 3 where the probabilities are 100% yellow vs 50% blue and 50% yellow:
+jar3 = visual.ImageStim(win=window, image ='/home/ratvillage01/academy/jars/jar3.png')
