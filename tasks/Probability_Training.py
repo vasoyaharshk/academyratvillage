@@ -35,7 +35,7 @@ class Probability_Training(Task):
         # Variables for the task:
         self.duration_max = 3000
         self.duration_min = 2100
-        self.duration_tired = 10
+        self.duration_tired = 1800
         self.trials_tired = 5
         self.tired = False
         self.stage = 1

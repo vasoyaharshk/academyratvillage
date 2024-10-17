@@ -554,8 +554,6 @@ def function34():
     #print('x_incorrect in functions: ', x_incorrect)
 
 
-
-
 #Display camera correct, play correct sound and display correct stimuli.
 def function35():
     soundStream.play(soundVec1)
