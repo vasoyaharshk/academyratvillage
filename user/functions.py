@@ -580,10 +580,10 @@ def loop35(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called == 31:
+        if last_function_called in [31, 41]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called == 32:
+        elif last_function_called in [32, 42]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -639,4 +639,80 @@ def function37():
     print("No response, miss")
 
 def loop37(timing):
+    window.flip()
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is left:
+def function41():  # When the blue jar is on left
+    global last_function_called, image_path
+    last_function_called = 41  # Track that function31 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/ratvillage01/academy/jars/webers_law_{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left: ', random_image_path_left)
+
+        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop41(timing):
+    if timing < utils.task.response_duration:
+        image_jar_left.draw()
+        #border1.draw()
+    window.flip()
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+def function42():  # When the blue jar is on right
+    global last_function_called, image_path
+    last_function_called = 42  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/ratvillage01/academy/jars/webers_law_{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right:', random_image_path_right)
+
+        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop42(timing):
+    if timing < utils.task.response_duration:
+        image_jar_right.draw()
+        #border1.draw()
     window.flip()
