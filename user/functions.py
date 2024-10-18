@@ -457,9 +457,7 @@ def function31():  # When the blue jar is on left
         print(f"Error occurred: {e}")
 
 def loop31(timing):
-    if timing < utils.task.response_duration:
-        image_jar_left.draw()
-        #border1.draw()
+    image_jar_left.draw()
     window.flip()
 
 
@@ -506,9 +504,7 @@ def function32():  # When the blue jar is on right
 
 
 def loop32(timing):
-    if timing < utils.task.response_duration:
-        image_jar_right.draw()
-        #border1.draw()
+    image_jar_right.draw()
     window.flip()
 
 
@@ -556,11 +552,11 @@ def function34():
 
 #Display camera correct, play correct sound and display correct stimuli.
 def function35():
-    soundStream.play(soundVec1)
+    #soundStream.play(soundVec1)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
-    print("Correct, Reward Sound played")
+    #print("Correct, Reward Sound played")
 
     stage = utils.task.stage
     if stage != 1:
@@ -640,3 +636,30 @@ def function37():
 
 def loop37(timing):
     window.flip()
+
+
+#Correct without image display:
+def function38():
+    soundStream.play(soundVec1)
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    print("Correct, Reward Sound played")
+
+
+#Punish without image display:
+def function39():
+    #soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    #print("Punish, Punish Sound played")
+
+
+#Miss:
+def function40():
+    pass
+
+def loop40(timing):
+    window.flip()
+
