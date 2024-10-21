@@ -570,7 +570,7 @@ def function35():
             elif last_function_called == 32:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Correct image path: {image_path_replaced}")
 
 def loop35(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
@@ -607,7 +607,7 @@ def function36():
             elif last_function_called == 32:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Incorrect image path: {image_path_replaced}")
     else:
         pass
 

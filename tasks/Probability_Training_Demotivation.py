@@ -137,16 +137,40 @@ class Probability_Training_Demotivation(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-            # Starts task and displays stimuli instanly
+                state_change_conditions={'Port2In': 'Real_start'},
+                output_actions=[])
+            # show stim inifite time
 
             self.sma.add_state(
                 state_name='Real_start',
-                state_timer=self.valve_time * 2,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Blank1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
-            # Closes corridor door 2 and delivers initial 50ul water.
+            # close corridor 2 door, and deliver water when animal enter to behav box
+
+            self.sma.add_state(
+                state_name='Blank1',
+                state_timer=1,
+                state_change_conditions={Bpod.Events.Port1In: 'Reward1'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5)])
+
+            self.sma.add_state(
+                state_name='Reward1',
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Blank2'},
+                output_actions=[(Bpod.OutputChannels.Valve, 1)])
+
+            self.sma.add_state(
+                state_name='Blank2',
+                state_timer=1,
+                state_change_conditions={Bpod.Events.Port1In: 'Reward2'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5)])
+
+            self.sma.add_state(
+                state_name='Reward2',
+                state_timer=self.valve_time * 4,
+                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, self.stim_trial)])
 
         #Other Trials:
         else:
