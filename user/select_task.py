@@ -284,10 +284,12 @@ def select_task(df, subject):
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None  # The second most recent session
+        third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None  # The third most recent session
 
         # Filter the DataFrame to include only the last two sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
+        df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
 
         #Get the number of trials in the last session and second-to-last session (if exists)
         n_trials_last = df_last_session.trial.max()  # Trials in the last session
@@ -309,6 +311,10 @@ def select_task(df, subject):
         print("Valid trials in session: ", valid_trials_last)
         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
         print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
+
+        if task == 'Probability_Training_Demotivation':
+            if len(df_last3.session.unique()) >= 3:  # Pass after 3 sessions
+                task = 'Probability_Training'
 
         # Calculate accuracy for the second-to-last session (if exists)
         if second_last_session is not None:
