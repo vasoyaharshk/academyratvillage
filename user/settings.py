@@ -179,7 +179,7 @@ MINIMUM_WATER_24 = 200  # in 24 hours
 MINIMUM_WATER_48 = 1000  # in 48 hours
 
 MINIMUM_WEIGHT = 50  # in percentage
-MAXIMUM_WEIGHT = 200  # in percentage
+MAXIMUM_WEIGHT = 400  # in percentage
 
 MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
