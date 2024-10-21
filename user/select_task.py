@@ -1,4 +1,6 @@
 import numpy as np
+from wx.lib.pubsub.py2and3 import print_
+
 from academy import telegram_bot
 from user import settings
 
@@ -312,9 +314,15 @@ def select_task(df, subject):
         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
         print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
 
+        # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
         if task == 'Probability_Training_Demotivation':
-            if len(df_last3.session.unique()) >= 3:  # Pass after 3 sessions
-                task = 'Probability_Training'
+            # Ensure the last three sessions were all 'Probability_Training_Demotivation'
+            if task == 'Probability_Training_Demotivation':
+                # Ensure the last three sessions were all 'Probability_Training_Demotivation'
+                last_three_sessions_tasks = df_last3['task'].unique()
+                if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_Demotivation':
+                    task = 'Probability_Training'
+                    print("Moved from demotivation task to normal task")
 
         # Calculate accuracy for the second-to-last session (if exists)
         if second_last_session is not None:
