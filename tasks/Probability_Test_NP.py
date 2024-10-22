@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Training1(Task):
+class Probability_Test_NP(Task):
     def __init__(self):
         super().__init__()
 
@@ -42,7 +42,6 @@ class Probability_Training1(Task):
         self.substage = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -64,7 +63,6 @@ class Probability_Training1(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
-        self.sameside = [0] # counts the number of times rat chooses same side (left or right)
 
         # Image output stims:
         self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
@@ -74,6 +72,13 @@ class Probability_Training1(Task):
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
         self.height = 190
+
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 3      #After how many trials does side_bias trigger
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -103,13 +108,18 @@ class Probability_Training1(Task):
         self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking != 1:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+            self.stim_trials = self.generate_random_trials(last_trial)
             print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
-        print('Stim Trial: ', self.stim_trial)
+
+        if self.bias_breaking == 0:
+            self.stim_trial = self.stim_trials[self.current_trial]
+        else:
+            self.stim_trial = self.last_stim_trial
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
@@ -138,7 +148,7 @@ class Probability_Training1(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -154,7 +164,7 @@ class Probability_Training1(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -167,7 +177,7 @@ class Probability_Training1(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -202,7 +212,7 @@ class Probability_Training1(Task):
         self.sma.add_state(
             state_name='Flip_screen_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -237,14 +247,14 @@ class Probability_Training1(Task):
         self.sma.add_state(
             state_name='Flip_screen_no_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -319,21 +329,52 @@ class Probability_Training1(Task):
         #     self.acc_up = 0
 
         # Side Bias Breaking formula:
+
+        self.last_stim_trial = self.stim_trial
+
         print('response X:', self.response_x)
+        print(f"Type of response X: {type(response_x)}")
 
-        if 45 < self.response_x < 145:
-            self.sameside = 'left'
-            self.sameside_counter += 1
-        elif 231 < self.response_x < 331:
-            self.sameside = 'right'
-            self.sameside_counter += 1
+        # Append the response to the array:
+        #if self.current_trial_states['miss'][0][0] > 0   #Do not append responses in case of touches outside the area
+        self.response_x_array.append(self.response_x)
+        print(f"Responses so far: {self.response_x_array}")
 
-        if self.sameside_counter = 5:
-            self.bias_breaking = 1
-            if self.sameside = 'left' and self.trial_result != 'correct':
-                self.x_correcth = 281
-            if self.sameside = 'right' and self.trial_result != 'correct':
-                self.x_correcth = 95
+        if len(self.response_x_array) >= self.side_bias_trigger:
+            self.response_x_array = []
+
+            # Check if all responses fall into one of the two defined categories
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+
+            if all_left_side:
+                self.sameside = 'left'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+            elif all_right_side:
+                self.sameside = 'right'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+
+
+        # if 45 < self.response_x < 145:
+        #     self.sameside = 'left'
+        #     self.sameside_counter += 1
+        # elif 231 < self.response_x < 331:
+        #     #self.sameside = 'right'
+        #     self.sameside_counter += 1
+        #
+        # if self.sameside_counter == 5:
+        #     self.bias_breaking = 1
+        #     print('Bias breaking active, side: ', self.sameside)
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        #
+        # # Correction bias extension
+        # if self.bias_breaking == 1:
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        # print('Stim Trial: ', self.stim_trial)
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)

@@ -24,7 +24,7 @@ class SoundR:
         result = 0
         idx = 0
         for dev in devi:
-            if dev['name'].startswith('UACDemoV1.0') and dev['max_output_channels'] == 2:
+            if dev['name'].startswith('USB Audio') and dev['max_output_channels'] == 2:
                 result = idx
                 print(' External speaker found')
                 break
