@@ -108,8 +108,8 @@ def select_task(df, subject):
             # useful columns
             df['first_error'] = df['first_resp'] - df['x']  # error calculation
             df['last_error'] = df['last_resp'] - df['x']
-            df['first_correct_bool'] = np.where(df['correct_th'] / 2 >= df['first_error'].abs(), 1, 0)  # correct bool calc
-            df['last_correct_bool'] = np.where(df['correct_th'] / 2 >= df['last_error'].abs(), 1, 0)
+            df['first_correct_bool'] = np.where(df['correct_th'] >= df['first_error'].abs(), 1, 0)  # correct bool calc
+            df['last_correct_bool'] = np.where(df['correct_th'] >= df['last_error'].abs(), 1, 0)
             df.loc[(df.trial_result == 'miss', ['first_correct_bool', 'last_correct_bool'])] = np.nan  # misses correction
 
             # last 3
@@ -118,8 +118,8 @@ def select_task(df, subject):
             df_last3['last_resp'] = sort_last3.apply(func, axis=1).astype(float)
             df_last3['first_error'] = df_last3['first_resp'] - df_last3['x']
             df_last3['last_error'] = df_last3['last_resp'] - df_last3['x']
-            df_last3['first_correct_bool'] = np.where(df_last3['correct_th'] / 2 >= df_last3['first_error'].abs(), 1, 0)
-            df_last3['last_correct_bool'] = np.where(df_last3['correct_th'] / 2 >= df_last3['last_error'].abs(), 1, 0)
+            df_last3['first_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['first_error'].abs(), 1, 0)
+            df_last3['last_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['last_error'].abs(), 1, 0)
 
             # last 5
             sort_last5 = df_last5['response_x'].astype(str).str.split(',', expand=True)
@@ -127,8 +127,8 @@ def select_task(df, subject):
             df_last5['last_resp'] = sort_last5.apply(func, axis=1).astype(float)
             df_last5['first_error'] = df_last5['first_resp'] - df_last5['x']
             df_last5['last_error'] = df_last5['last_resp'] - df_last5['x']
-            df_last5['last_correct_bool'] = np.where(df_last5['correct_th'] / 2 >= df_last5['last_error'].abs(), 1, 0)
-            df_last5['first_correct_bool'] = np.where(df_last5['correct_th'] / 2 >= df_last5['first_error'].abs(), 1, 0)
+            df_last5['last_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['last_error'].abs(), 1, 0)
+            df_last5['first_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['first_error'].abs(), 1, 0)
 
             # last substages lists
             last3_stages = df_last3.stage.unique()
