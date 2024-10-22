@@ -328,11 +328,11 @@ class Probability_Training1(Task):
             self.sameside = 'right'
             self.sameside_counter += 1
 
-        if self.sameside_counter = 5:
+        if self.sameside_counter == 5:
             self.bias_breaking = 1
-            if self.sameside = 'left' and self.trial_result != 'correct':
+            if self.sameside == 'left' and self.trial_result != 'correct':
                 self.x_correcth = 281
-            if self.sameside = 'right' and self.trial_result != 'correct':
+            if self.sameside == 'right' and self.trial_result != 'correct':
                 self.x_correcth = 95
 
         ############ REGISTER VALUES ################
