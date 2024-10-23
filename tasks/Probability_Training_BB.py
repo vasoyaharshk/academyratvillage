@@ -366,9 +366,11 @@ class Probability_Training_BB(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
+                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
+                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
