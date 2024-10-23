@@ -78,7 +78,8 @@ class Probability_Test_NP(Task):
         self.response_x_array = []      #Stores responses for x till 3 values
         self.sameside_counter = 0       #Counts number of times on same side
         self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger = 4      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
 
     def configure_gui(self):
@@ -356,7 +357,7 @@ class Probability_Test_NP(Task):
         self.response_x_array.append(self.response_x_bias)
         print(f"Responses so far: {self.response_x_array}")
 
-        if len(self.response_x_array) >= self.side_bias_trigger:
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             # Check if all responses fall into one of the two defined categories
             all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
             all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
@@ -412,3 +413,5 @@ class Probability_Test_NP(Task):
         self.register_value('accuracy', self.accuracy)
         self.register_value('bias_breaking', self.bias_breaking)
         self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
