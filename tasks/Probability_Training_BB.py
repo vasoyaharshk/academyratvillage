@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Training(Task):
+class Probability_Training_BB(Task):
     def __init__(self):
         super().__init__()
 
@@ -73,6 +73,15 @@ class Probability_Training(Task):
         self.width = 100  # Stimulus width in mm
         self.height = 190
 
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 4      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
+        self.status = None              #Stores the Touch_outside condition
+
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
 
@@ -101,14 +110,18 @@ class Probability_Training(Task):
         self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            print('x positions list: ' + str(self.stim_trials))
+            #print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
-        print('Stim Trial: ', self.stim_trial)
+
+        if self.bias_breaking == 0:
+            self.stim_trial = self.stim_trials[self.current_trial]
+        else:
+            self.stim_trial = self.last_stim_trial
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
@@ -275,11 +288,12 @@ class Probability_Training(Task):
             self.accwindow = self.accwindow[1:] + [1]
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
+            self.bias_breaking = 0
+            #self.response_x_array = []
 
         # ##### COUNT Touches outside the jar areas :
-        # elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-        #     self.touch_outside += 1
-        #     print('Outside_count: ', self.touch_outside)
+        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+            self.status = 'Touch_Outside'
 
         # End-trial calculations
         #self.last_x = self.x
@@ -316,6 +330,68 @@ class Probability_Training(Task):
         #     self.current_trial = 1
         #     self.acc_up = 0
 
+        # Side Bias Breaking formula:
+
+        self.last_stim_trial = self.stim_trial
+
+        try:
+            # Try converting response_x directly to a float
+            self.response_x_bias = float(self.response_x)
+        except ValueError:
+            print(f"No response_x value or response other: {self.response_x}")
+
+            # Split the string by commas and convert it to a list of floats
+            try:
+                # First, check if the response_x is a string and split it
+                response_x_list = [float(x) for x in self.response_x.split(",")]
+
+                # Use the last element of the list as response_x_bias
+                self.response_x_bias = response_x_list[-1]
+                print(f"Using last value from response_x array: {self.response_x_bias}")
+            except Exception as e:
+                #print(f"Failed to process response_x as array. Error: {e}")
+                return  # Handle this case if needed
+
+        # Append the response to the array:
+        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+        self.response_x_array.append(self.response_x_bias)
+        print(f"Responses so far: {self.response_x_array}")
+
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            # Check if all responses fall into one of the two defined categories
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+
+            if all_left_side:
+                self.sameside = 'left'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+            elif all_right_side:
+                self.sameside = 'right'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+
+            self.response_x_array = []      #Clearing the array
+
+        # if 45 < self.response_x < 145:
+        #     self.sameside = 'left'
+        #     self.sameside_counter += 1
+        # elif 231 < self.response_x < 331:
+        #     #self.sameside = 'right'
+        #     self.sameside_counter += 1
+        #
+        # if self.sameside_counter == 5:
+        #     self.bias_breaking = 1
+        #     print('Bias breaking active, side: ', self.sameside)
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        #
+        # # Correction bias extension
+        # if self.bias_breaking == 1:
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        # print('Stim Trial: ', self.stim_trial)
+
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
@@ -335,3 +411,7 @@ class Probability_Training(Task):
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
+        self.register_value('bias_breaking', self.bias_breaking)
+        self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
