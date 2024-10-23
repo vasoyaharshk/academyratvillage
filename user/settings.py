@@ -45,7 +45,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-1'   # <-- TO CHANGE
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-1-2-1'   # <-- TO CHANGE
 WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
