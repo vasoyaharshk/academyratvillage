@@ -5,12 +5,13 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Test_NP(Task):
+class Probability_Training_Bias_Right(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script includes repoketh, the ability to make correct choices.
+        This script is IF THE BIAS IS TOWARDS THE RIGHT SIDE.
+        This task displays the image of the jars which are touchable.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
@@ -39,7 +40,7 @@ class Probability_Test_NP(Task):
         self.trials_tired = 5
         self.tired = False
         self.stage = 1
-        self.substage = 0
+        self.substage = 1
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -69,6 +70,11 @@ class Probability_Test_NP(Task):
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
+        self.probabilities = []
+        # if substage == 1:
+        #     self.probabilities = [0.9, 0.1]
+        # elif substage == 2:
+        #     self.probabilities = [0.75, 0.25]
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
         self.height = 190
@@ -78,7 +84,7 @@ class Probability_Test_NP(Task):
         self.response_x_array = []      #Stores responses for x till 3 values
         self.sameside_counter = 0       #Counts number of times on same side
         self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 4      #After how many trials does side_bias trigger
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
 
@@ -87,11 +93,15 @@ class Probability_Test_NP(Task):
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
+        if self.substage == 1:
+            self.probabilities = [0.9, 0.1]
+        elif self.substage == 2:
+            self.probabilities = [0.75, 0.25]
         # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+          # Adjust this if you have more than two stimuli
         while len(trials) < 1000:
             # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
+            candidate = random.choices(self.stim, self.probabilities)[0]
             # Ensure no repetition more than twice in sequence
             if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
                 # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
@@ -133,15 +143,15 @@ class Probability_Test_NP(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        # else:  # We have two stimuli after stage 1 with correct and incorrect areas
+            # if self.stim_trial == 31:
+            #     self.x_correcth = self.x_correcth_pos[0]
+            #     self.x_incorrecth = self.x_correcth_pos[1]
+            #     print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            # elif self.stim_trial == 32:
+            #     self.x_correcth = self.x_correcth_pos[1]
+            #     self.x_incorrecth = self.x_correcth_pos[0]
+            #     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
 
         ############ STATE MACHINE ################
@@ -150,7 +160,7 @@ class Probability_Test_NP(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -166,7 +176,7 @@ class Probability_Test_NP(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -179,7 +189,7 @@ class Probability_Test_NP(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -214,7 +224,7 @@ class Probability_Test_NP(Task):
         self.sma.add_state(
             state_name='Flip_screen_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -249,14 +259,14 @@ class Probability_Test_NP(Task):
         self.sma.add_state(
             state_name='Flip_screen_no_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -366,9 +376,11 @@ class Probability_Test_NP(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
+                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
+                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
@@ -415,3 +427,4 @@ class Probability_Test_NP(Task):
         self.register_value('sameside', self.sameside)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
+        self.register_value('probabilities', self.probabilities)
