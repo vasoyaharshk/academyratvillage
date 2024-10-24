@@ -94,9 +94,9 @@ class Probability_Training_Bias_Left(Task):
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         if self.substage == 1:
-            self.probabilities = [0.9, 0.1]
+            self.probabilities = [0.1, 0.9]
         elif self.substage == 2:
-            self.probabilities = [0.75, 0.25]
+            self.probabilities = [0.25, 0.75]
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
         while len(trials) < 1000:
