@@ -78,7 +78,7 @@ class Probability_Training_BB(Task):
         self.response_x_array = []      #Stores responses for x till 3 values
         self.sameside_counter = 0       #Counts number of times on same side
         self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 4      #After how many trials does side_bias trigger
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
 
