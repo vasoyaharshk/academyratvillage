@@ -71,10 +71,6 @@ class Probability_Training_Bias_Left(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.probabilities = []
-        # if substage == 1:
-        #     self.probabilities = [0.9, 0.1]
-        # elif substage == 2:
-        #     self.probabilities = [0.75, 0.25]
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
         self.height = 190
@@ -94,20 +90,19 @@ class Probability_Training_Bias_Left(Task):
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         if self.substage == 1:
-            self.probabilities = [0.1, 0.9]
+            self.probabilities = [0.9, 0.1]
         elif self.substage == 2:
-            self.probabilities = [0.25, 0.75]
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+            self.probabilities = [0.75, 0.25]
+          # Adjust this if you have more than two stimuli
         while len(trials) < 1000:
             # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
-                trials.append(candidate)
+            candidate = random.choices(self.stim, self.probabilities)[0]
+            # # Ensure no repetition more than twice in sequence
+            # if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+            #     # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+            #     if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+            #         continue  # Skip if the first trial of new block matches last trial of previous block
+            trials.append(candidate)
         return trials
 
     def main_loop(self):
@@ -124,7 +119,8 @@ class Probability_Training_Bias_Left(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            print('Substage: ', self.substage, 'Probs: ', self.probabilities)
+            print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
@@ -367,7 +363,8 @@ class Probability_Training_Bias_Left(Task):
         self.response_x_array.append(self.response_x_bias)
         print(f"Responses so far: {self.response_x_array}")
 
-        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
             # Check if all responses fall into one of the two defined categories
             all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
             all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
