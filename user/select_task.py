@@ -340,24 +340,46 @@ def select_task(df, subject):
         last_session_stage = df_last_session['stage'].iloc[0]  # Stage in the last session
         second_last_session_stage = df_second_last_session['stage'].iloc[0] if second_last_session is not None else None
 
+        # Check if the last session and second-to-last session are in different substages
+        last_session_substage_stage = df_last_session['substage'].iloc[0]  # Stage in the last session
+        second_last_session_substage_stage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
+
+        if 'Probability_Training_Bias' in task:
+            if last_session_stage == 1 and second_last_session_stage == 1:
+                if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.1 to stage 1.2 with accuracy in both sessions')
+                        stage = 1
+                        substage = 2
+                elif last_session_stage == 2 and second_last_session_stage == 2:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.2 to stage 1.3 with accuracy in both sessions')
+                        stage = 1
+                        substage = 3
+                        task = 'Probability_Training_BB'
+
         # Check stage-specific conditions for advancement
-        # Stage 1 -> Stage 2 check
-        if last_session_stage == 1 and second_last_session_stage == 1:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
-                stage = 2
+        if task = 'Probability_Training_BB':
+            # Stage 1 -> Stage 2 check
+            if last_session_stage == 1 and second_last_session_stage == 1:
+                if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                    print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
+                    stage = 2
 
-        # Stage 2 -> Stage 3 check
-        elif last_session_stage == 2 and second_last_session_stage == 2:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
-                stage = 3
+            # Stage 2 -> Stage 3 check
+            elif last_session_stage == 2 and second_last_session_stage == 2:
+                if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                    print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
+                    stage = 3
 
-        # Stage 3 -> Stage 4 check
-        elif last_session_stage == 3 and second_last_session_stage == 3:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
-                stage = 4
-                #task = 'Probability_ROR'
+            # Stage 3 -> Stage 4 check
+            elif last_session_stage == 3 and second_last_session_stage == 3:
+                if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                    print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
+                    stage = 3
+                    stage = 3
+                    #task = 'Probability_ROR'
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
