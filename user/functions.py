@@ -295,7 +295,7 @@ def function20():
         utils.change_to_state = 2  # first action done, before min_time
 
 
-#Gal-without mask testing functions from 21 to 25:
+#No mask testing functions from 21 to 25:
 
 # start reading touchscreen:
 def function21():
@@ -304,9 +304,9 @@ def function21():
     except:
         x = utils.task.x
 
-    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
-                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
-                        )
+    touch.start_reading_wm_no_mask(utils.task.response_duration, x * settings.PIXELS_PER_MM,
+                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM,
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -314,14 +314,9 @@ def function21():
 
 
 def function22():
-    try:
-        x = utils.task.x[1]
-    except:
-        x = utils.task.x
-
-    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
-                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
-                        )
+    touch.resume_reading_wm_no_mask(utils.task.x * settings.PIXELS_PER_MM, utils.task.y * settings.PIXELS_PER_MM,
+                         utils.task.correct_th * settings.PIXELS_PER_MM,
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -408,6 +403,8 @@ def loop24(timing):
     border2.draw()
     border3.draw()
     window.flip()
+
+
 
 
 last_function_called = None     # Global variable to track the last function called
@@ -507,26 +504,26 @@ def loop32(timing):
     image_jar_right.draw()
     window.flip()
 
-
-# Start reading touchscreen for Probabilistic inference tasks with all touches processed:
-def function33():
-    width = utils.task.width * settings.PIXELS_PER_MM
-    height = utils.task.height * settings.PIXELS_PER_MM
-    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
-    x_incorrect = utils.task.x_incorrecth
-    y = utils.task.y_correcth * settings.PIXELS_PER_MM
-
-    if x_incorrect is None:
-        touch.start_reading_probability(utils.task.response_duration, x_correct, None, y, width, height)
-    else:
-        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
-
-    cam2.put_state("Resp Win")
-    cam3.put_state("Resp Win")
-    print('Resp Win 1')
-    #print('x_correct in functions: ', x_correct)
-    #print('x_incorrect in functions: ', x_incorrect)
+#
+# # Start reading touchscreen for Probabilistic inference tasks with all touches processed:
+# def function33():
+#     width = utils.task.width * settings.PIXELS_PER_MM
+#     height = utils.task.height * settings.PIXELS_PER_MM
+#     x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+#     x_incorrect = utils.task.x_incorrecth
+#     y = utils.task.y_correcth * settings.PIXELS_PER_MM
+#
+#     if x_incorrect is None:
+#         touch.start_reading_probability(utils.task.response_duration, x_correct, None, y, width, height)
+#     else:
+#         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+#         touch.start_reading_probability(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+#
+#     cam2.put_state("Resp Win")
+#     cam3.put_state("Resp Win")
+#     print('Resp Win 1')
+#     #print('x_correct in functions: ', x_correct)
+#     #print('x_incorrect in functions: ', x_incorrect)
 
 
 # Start reading touchscreen for Probabilistic inference tasks with only one touch processing:

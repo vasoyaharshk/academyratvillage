@@ -46,6 +46,15 @@ class Touch:
         t = Thread(target=self.run, args=(x, y, correct_th, repoke_th,), daemon=True)
         t.start()
 
+    def start_reading_wm_no_mask(self, duration, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2):
+        self.timer = time_utils.Timer(duration)
+        t = Thread(target=self.run_wm_no_mask, args=(x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2), daemon=True)
+        t.start()
+
+    def resume_reading_wm_no_mask(self, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2):
+        t = Thread(target=self.run_wm_no_mask, args=(x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2), daemon=True)
+        t.start()
+
     def create_new_device(self):
         i = 0.001
         error_flag = True
@@ -135,6 +144,85 @@ class Touch:
                     self.softcode.send(2)
                 else:
                     self.softcode.send(4)
+
+            if ytouch is None:
+                ytouch = 0
+
+            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+
+        queues.responses.put(response)
+
+
+    def run_wm_no_mask(self, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2):
+        x_coord = None
+        y_coord = None
+        answer = None
+
+        try:
+            while self.device.read_one() is not None:  # clearing buffer of events
+                pass
+        except Exception:
+            utils.log('Academy', 'lectureError in touchscreen clearing buffer, creating new device', 'ERROR')
+            self.create_new_device()
+
+        while self.timer.get_remaining_time() > 0:
+            event = None
+            try:
+                event = self.device.read_one()
+            except Exception:
+                utils.log('Academy', 'lectureError in touchscreen, creating new device', 'ERROR')
+                self.create_new_device()
+
+            if event is not None:
+                if event.type == evdev.ecodes.EV_ABS:  # if event is a coordinate
+                    if event.code == 0 or event.code == 53:  # x coord
+                        x_coord = event.value
+                    if event.code == 1 or event.code == 54:  # y coord
+                        y_coord = event.value
+                    if self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+                        answer = [x_coord, y_coord]
+                        break
+                elif event.type == evdev.ecodes.EV_KEY and event.value != 1:  # BTN_TOUCH up
+                    if not self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+                        answer = [x_coord, y_coord]
+                        break
+
+        if answer is None:
+            self.softcode.send(3)
+            response = []
+        else:
+            xpsy = abs(x)
+            xpsy_incorrect1 = abs(x_incorrect1)
+            xpsy_incorrect2 = abs(x_incorrect2)
+
+            ypsy = 750  # y is now set to 770
+            #ypsy = abs(y)  # y is now set to 770
+
+            #print('Touch: ', answer)
+            xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
+            try:
+                ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            except Exception:
+                ytouch = None
+
+            #print('X2: ', xtouch, 'Y2: ', ytouch)
+            #print(correct_th)
+
+
+            if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+                #print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                self.softcode.send(1)
+            elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th:
+                #print('Formula Incorrect: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                self.softcode.send(2)
+            elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th or
+                ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th):
+                self.softcode.send(4)
+            elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < repoke_th or
+                ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < repoke_th):
+                self.softcode.send(4)
+            else:
+                self.softcode.send(5)
 
             if ytouch is None:
                 ytouch = 0

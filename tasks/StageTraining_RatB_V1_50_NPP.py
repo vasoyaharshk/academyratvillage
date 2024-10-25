@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class StageTraining_RatB_V1_50(Task):
+class StageTraining_RatB_V1_50_NPP(Task):
 
     def __init__(self):
         super().__init__()
@@ -423,7 +423,7 @@ class StageTraining_RatB_V1_50(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
                 # show stim inifite time
 
@@ -440,26 +440,26 @@ class StageTraining_RatB_V1_50(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Fixation1'},
+                state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[])
 
         self.sma.add_state(
             state_name='Fixation1',
             state_timer=0,
-            state_change_conditions={'Port4In': 'Fixation2'},
+            state_change_conditions={Bpod.Events.Tup: 'Fixation2'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim1)])
             # show stimulus now in normal trials, not in controls
 
         self.sma.add_state(
             state_name='Fixation2',
             state_timer=0,
-            state_change_conditions={'Port5In': 'Fixation3'},
+            state_change_conditions={Bpod.Events.Tup: 'Fixation3'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim2)])
 
         self.sma.add_state(
             state_name='Fixation3',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Pre_Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Pre_Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim3)])
 
         self.sma.add_state(
@@ -480,14 +480,14 @@ class StageTraining_RatB_V1_50(Task):
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_first_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
             # waterLED ON, global LEDs ON
@@ -502,7 +502,7 @@ class StageTraining_RatB_V1_50(Task):
         self.sma.add_state(
             state_name='After_punish',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
+            state_change_conditions={Bpod.Events.Tup: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
                                      Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
             # waterLED ON & global LEDs ON
@@ -524,7 +524,7 @@ class StageTraining_RatB_V1_50(Task):
         self.sma.add_state(
             state_name='Correct_other',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_other_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke
 
