@@ -299,14 +299,12 @@ def function20():
 
 # start reading touchscreen:
 def function21():
-    try:
-        x = utils.task.x[1]
-    except:
-        x = utils.task.x
+    width = (utils.task.width+20) * settings.PIXELS_PER_MM      #+10 becuae we need 1cm more than the stim
+    height = (utils.task.height+20) * settings.PIXELS_PER_MM    #+10 becuae we need 1cm more than the stim
 
-    touch.start_reading_wm_no_mask(utils.task.response_duration, x * settings.PIXELS_PER_MM,
+    touch.start_reading_wm_no_mask(utils.task.response_duration, utils.task.x * settings.PIXELS_PER_MM,
                         utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM,
-        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM)
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -314,9 +312,12 @@ def function21():
 
 
 def function22():
+    width = (utils.task.width+20) * settings.PIXELS_PER_MM      #+10 becuae we need 1cm more than the stim
+    height = (utils.task.height+20) * settings.PIXELS_PER_MM    #+10 becuae we need 1cm more than the stim
+
     touch.resume_reading_wm_no_mask(utils.task.x * settings.PIXELS_PER_MM, utils.task.y * settings.PIXELS_PER_MM,
                          utils.task.correct_th * settings.PIXELS_PER_MM,
-        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM)
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
