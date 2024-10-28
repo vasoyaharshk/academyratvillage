@@ -139,6 +139,7 @@ class Probability_Training_Bias_Right(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+        # else:  # We have two stimuli after stage 1 with correct and incorrect areas
             # if self.stim_trial == 31:
             #     self.x_correcth = self.x_correcth_pos[0]
             #     self.x_incorrecth = self.x_correcth_pos[1]
@@ -360,9 +361,8 @@ class Probability_Training_Bias_Right(Task):
         # Append the response to the array:
         #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
         self.response_x_array.append(self.response_x_bias)
-        print(f"Responses so far: {self.response_x_array}")
+        #print(f"Responses so far: {self.response_x_array}")
 
-        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
         if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
             # Check if all responses fall into one of the two defined categories
             all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
@@ -404,7 +404,8 @@ class Probability_Training_Bias_Right(Task):
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
-        self.register_value('choices', self.choices)
+        self.register_value('choices', self.choices
+
         self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
