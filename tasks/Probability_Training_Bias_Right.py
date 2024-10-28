@@ -404,7 +404,7 @@ class Probability_Training_Bias_Right(Task):
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
-        self.register_value('choices', self.choices
+        self.register_value('choices', self.choices)
 
         self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
