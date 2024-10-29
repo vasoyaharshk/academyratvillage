@@ -331,7 +331,6 @@ class Probability_Training_BB(Task):
         #     self.acc_up = 0
 
         # Side Bias Breaking formula:
-
         self.last_stim_trial = self.stim_trial
 
         try:
