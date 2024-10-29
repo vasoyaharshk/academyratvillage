@@ -311,7 +311,7 @@ class Probability_Training_BB(Task):
 
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
+        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
