@@ -86,6 +86,10 @@ class StageTraining_RatB_V1_Demotivation(Task):
         self.height = 60  # Stimulus height in mm
         self.contrast = 1.2  # Contrast level
 
+        self.x_incorrect1 = 0
+        self.x_incorrect2 = 0
+
+
         # Make the correct_th area to the size of the rectangles:
 
         # Calculate half-width and half-height
@@ -102,7 +106,7 @@ class StageTraining_RatB_V1_Demotivation(Task):
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
         self.valve_factor_c = 1 * 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
-        self.valve_factor_i = 0.45
+        self.valve_factor_i = 0.45 * 2
 
         # counters
         self.valid_counter = 0
@@ -159,7 +163,7 @@ class StageTraining_RatB_V1_Demotivation(Task):
             # SUBSTAGE 1: STIMULUS REPOKING ALLOWED, LONG RESP WIN, MORE WATER
             if self.substage == 1:
                 self.valve_factor_c = 1.2 * 2
-                self.valve_factor_i = 0.6
+                self.valve_factor_i = 0.6 * 2
                 # 10 initial easy trials: all VG
                 if self.current_trial >= 10:
                     self.pvg = 0.8
@@ -345,6 +349,11 @@ class StageTraining_RatB_V1_Demotivation(Task):
                 print('Correction trial, x position:' + str(self.x))
         print('x position:' + str(self.x))
 
+        # Set x1 and x2 as the other two options
+        remaining_x_positions = [pos for pos in self.x_positions if pos != self.x]
+        self.x_incorrect1, self.x_incorrect2 = remaining_x_positions[0], remaining_x_positions[1]
+
+        print(f"Selected x: {self.x}, x_incorrect1: {self.x_incorrect1}, x_incorrect2: {self.x_incorrect2}")
 
         ### CHOOSE TRIAL TYPE
         sum_probs = self.pvg + self.pds+ self.pdm + self.pdl + self.pdsc1 +self.pdsc2 + self.pdmc1
@@ -487,8 +496,8 @@ class StageTraining_RatB_V1_Demotivation(Task):
             state_name='Response_window',
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss',
-                                     'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 4)])
+                                     'SoftCode4': 'Punish', 'SoftCode5': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 21)])
             # wait for subject response
 
         self.sma.add_state(
@@ -532,8 +541,8 @@ class StageTraining_RatB_V1_Demotivation(Task):
             state_name='Response_window2',
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                     'SoftCode3': 'Miss', 'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 5)])
+                                     'SoftCode3': 'Miss', 'SoftCode4': 'Punish', 'SoftCode5': 'Touch_Outside2', Bpod.Events.Tup: 'Miss'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 22)])
 
         self.sma.add_state(
             state_name='Correct_other',
@@ -559,6 +568,20 @@ class StageTraining_RatB_V1_Demotivation(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
+
+        self.sma.add_state(
+            state_name='Touch_Outside',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            output_actions=[])
+        # Goes back to response window in case of touch outside the three regions
+
+        self.sma.add_state(
+            state_name='Touch_Outside2',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
+            output_actions=[])
+        # Goes back to response window in case of touch outside the three regions
 
         self.sma.add_state(
             state_name='Exit',  # Doors closure when trial ends
