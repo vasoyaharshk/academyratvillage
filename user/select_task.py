@@ -1,6 +1,9 @@
 import numpy as np
+from wx.lib.pubsub.py2and3 import print_
+
 from academy import telegram_bot
 from user import settings
+import random
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
@@ -18,6 +21,13 @@ def select_task(df, subject):
     stim_dur_ds= 0
     stim_dur_dm= 0
     stim_dur_dl= 0
+    completed_conditions = []  # To store completed conditions
+    current_condition = None  # To track the current condition in progress
+    current_repetition = 0  # To store how many times the condition has repeated.
+    conditions = []  # Takes the conditions from select task file.
+    trial_counter = 0  # Track the number of trials for the current condition.
+    repetition = 0
+
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
@@ -106,8 +116,8 @@ def select_task(df, subject):
             # useful columns
             df['first_error'] = df['first_resp'] - df['x']  # error calculation
             df['last_error'] = df['last_resp'] - df['x']
-            df['first_correct_bool'] = np.where(df['correct_th'] / 2 >= df['first_error'].abs(), 1, 0)  # correct bool calc
-            df['last_correct_bool'] = np.where(df['correct_th'] / 2 >= df['last_error'].abs(), 1, 0)
+            df['first_correct_bool'] = np.where(df['correct_th'] >= df['first_error'].abs(), 1, 0)  # correct bool calc
+            df['last_correct_bool'] = np.where(df['correct_th'] >= df['last_error'].abs(), 1, 0)
             df.loc[(df.trial_result == 'miss', ['first_correct_bool', 'last_correct_bool'])] = np.nan  # misses correction
 
             # last 3
@@ -116,8 +126,8 @@ def select_task(df, subject):
             df_last3['last_resp'] = sort_last3.apply(func, axis=1).astype(float)
             df_last3['first_error'] = df_last3['first_resp'] - df_last3['x']
             df_last3['last_error'] = df_last3['last_resp'] - df_last3['x']
-            df_last3['first_correct_bool'] = np.where(df_last3['correct_th'] / 2 >= df_last3['first_error'].abs(), 1, 0)
-            df_last3['last_correct_bool'] = np.where(df_last3['correct_th'] / 2 >= df_last3['last_error'].abs(), 1, 0)
+            df_last3['first_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['first_error'].abs(), 1, 0)
+            df_last3['last_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['last_error'].abs(), 1, 0)
 
             # last 5
             sort_last5 = df_last5['response_x'].astype(str).str.split(',', expand=True)
@@ -125,8 +135,8 @@ def select_task(df, subject):
             df_last5['last_resp'] = sort_last5.apply(func, axis=1).astype(float)
             df_last5['first_error'] = df_last5['first_resp'] - df_last5['x']
             df_last5['last_error'] = df_last5['last_resp'] - df_last5['x']
-            df_last5['last_correct_bool'] = np.where(df_last5['correct_th'] / 2 >= df_last5['last_error'].abs(), 1, 0)
-            df_last5['first_correct_bool'] = np.where(df_last5['correct_th'] / 2 >= df_last5['first_error'].abs(), 1, 0)
+            df_last5['last_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['last_error'].abs(), 1, 0)
+            df_last5['first_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['first_error'].abs(), 1, 0)
 
             # last substages lists
             last3_stages = df_last3.stage.unique()
@@ -277,17 +287,19 @@ def select_task(df, subject):
                         stim_dur_dl = 0
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 20
+        trial_criteria = 5
         accuracy_criteria = 0.85
 
         # Identify the last session and second-to-last session
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None  # The second most recent session
+        third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None  # The third most recent session
 
         # Filter the DataFrame to include only the last two sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
+        df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
 
         #Get the number of trials in the last session and second-to-last session (if exists)
         n_trials_last = df_last_session.trial.max()  # Trials in the last session
@@ -310,6 +322,16 @@ def select_task(df, subject):
         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
         print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
 
+        # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
+        if task == 'Probability_Training_Demotivation':
+            # Ensure the last three sessions were all 'Probability_Training_Demotivation'
+            if task == 'Probability_Training_Demotivation':
+                # Ensure the last three sessions were all 'Probability_Training_Demotivation'
+                last_three_sessions_tasks = df_last3['task'].unique()
+                if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_Demotivation':
+                    task = 'Probability_Training_BB'
+                    print("Moved from demotivation task to normal task")
+
         # Calculate accuracy for the second-to-last session (if exists)
         if second_last_session is not None:
             correct_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] == 'correct'].shape[0]
@@ -323,27 +345,108 @@ def select_task(df, subject):
             print("No previous session available.")
 
         # Check if the last session and second-to-last session are in different stages
+        last_session_task = df_last_session['task'].iloc[0]  # Stage in the last session
+        second_last_session_task = df_second_last_session['task'].iloc[0] if second_last_session is not None else None
+
+        # Check if the last session and second-to-last session are in different stages
         last_session_stage = df_last_session['stage'].iloc[0]  # Stage in the last session
         second_last_session_stage = df_second_last_session['stage'].iloc[0] if second_last_session is not None else None
 
-        # Check stage-specific conditions for advancement
-        # Stage 1 -> Stage 2 check
-        if last_session_stage == 1 and second_last_session_stage == 1:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
-                stage = 2
+        # Check if the last session and second-to-last session are in different substages
+        last_session_substage_stage = df_last_session['substage'].iloc[0]  # Stage in the last session
+        second_last_session_substage_stage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
 
-        # Stage 2 -> Stage 3 check
-        elif last_session_stage == 2 and second_last_session_stage == 2:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
-                stage = 3
+        if 'Probability_Training_Bias' in task:
+            if last_session_stage == 1 and second_last_session_stage == 1:
+                if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.1 to stage 1.2')
+                        stage = 1
+                        substage = 2
+                elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.2 to normal task')
+                        task = 'Probability_Training_BB'
+                        stage = 1
+                        substage = 0
+        elif 'WebersLaw' not in task:
+            # Check stage-specific conditions for advancement
+            if last_session_task == second_last_session_task:
+                # Stage 1 -> Stage 2 check
+                if last_session_stage == 1 and second_last_session_stage == 1:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
+                        stage = 2
 
-        # Stage 3 -> Stage 4 check
-        elif last_session_stage == 3 and second_last_session_stage == 3:
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
-                stage = 4
-                #task = 'Probability_ROR'
+                # Stage 2 -> Stage 3 check
+                elif last_session_stage == 2 and second_last_session_stage == 2:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
+                        stage = 3
 
-    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
+                # Stage 3 -> Stage 4 check
+                elif last_session_stage == 3 and second_last_session_stage == 3:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
+                        stage = 1
+                        task = 'WebersLaw_Probability'
+                        conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively
+
+        if 'WebersLaw_Probability' in task:
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
+
+            # Assign each value from the last row to the variables:
+            completed_conditions = last_row['completed_conditions']
+            current_condition = last_row['current_condition']
+            repetition = last_row['repetition']
+            current_repetition = last_row['current_repetition']
+            trial_counter = last_row['trial_counter']
+
+    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
+
+
+def generate_alternating_conditions():
+    # Weber's law conditions
+    easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+    hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+    random.shuffle(easy_conditions)
+    random.shuffle(hard_conditions)
+
+    alternating_sequence = []
+    easy_idx, hard_idx = 0, 0
+    hard_streak = 0
+    retry_candidates = []  # Stores candidates that couldn't be added on the first pass
+
+    # Generate the alternating sequence with rules applied
+    while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+        if retry_candidates:
+            # Process any skipped candidates if there are any
+            candidate = retry_candidates.pop(0)
+        elif not alternating_sequence and easy_idx < len(easy_conditions):
+            candidate = easy_conditions[easy_idx]
+            easy_idx += 1
+            hard_streak = 0
+        elif hard_streak < 2 and hard_idx < len(hard_conditions):
+            candidate = hard_conditions[hard_idx]
+            hard_idx += 1
+            hard_streak += 1
+        elif easy_idx < len(easy_conditions):
+            candidate = easy_conditions[easy_idx]
+            easy_idx += 1
+            hard_streak = 0
+        else:
+            candidate = hard_conditions[hard_idx]
+            hard_idx += 1
+
+        # Check the last two conditions in alternating_sequence to ensure even/odd pattern
+        if len(alternating_sequence) >= 2:
+            last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+            if last_two == [candidate % 2, candidate % 2]:
+                retry_candidates.append(candidate)  # Add to retry list if it breaks the rule
+                continue
+
+        alternating_sequence.append(candidate)
+
+    return alternating_sequence

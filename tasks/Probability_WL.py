@@ -75,66 +75,81 @@ class Probability_WL(Task):
 
         #Randomise blocks and trials:
         self.block = 12   #This is the number of trials one conditions will remain for
-        self.conditions = []  # This holds the 16 conditions pseudorandomised as easy and hard alternatively
+
         self.completed_conditions = []  # To store completed conditions
         self.repetition = 3       #To store how many times the conditions needs to repeat.
         self.current_condition = None  # To track the current condition in progress
-        self.repetition_count = 0       #To store how many times the condition has repeated.
+        self.current_repetition = 0       #To store how many times the condition has repeated.
+        self.conditions = []                #Takes the conditions from select task file.
+        self.trial_counter = 0  # Track the number of trials for the current condition
+    #
+    # def reset_conditions(self):
+    #     """Resets block1 after it is finished and increments the repetition count."""
+    #     if self.current_repetition < self.repetition:
+    #         self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
+    #         self.current_repetition += 1
+    #         print(f"Resetting conditions for the {self.current_repetition} time.")
+    #     else:
+    #         print("Block1 has been repeated 3 times. No more resets.")
+    #
+    # def change_condition(self):
+    #     """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
+    #     if not self.conditions:  # If it is empty, reset it
+    #         self.reset_conditions()
+    #
+    #     if self.conditions:
+    #         # Get the first condition
+    #         self.current_condition = self.conditions.pop(0)
+    #         # Add this condition to completed_conditions
+    #         self.completed_conditions.append(self.current_condition)
+    #         print(f"Condition changed to: {self.current_condition}")
+    #         print(f"Completed conditions: {self.completed_conditions}")
+    #     else:
+    #         print("No more conditions available to assign.")
+    #
+    # def execute_trials(self):
+    #     """Executes the change of condition after every 12 trials."""
+    #     if self.current_trial % self.block == 0 and self.current_trial > 0:
+    #         self.change_condition()
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
-        trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
-                trials.append(candidate)
-        return trials
-
-    def generate_alternating_conditions():   #Weber's law conditions
-        easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
-        hard_conditions = [1, 2, 3, 4, 5, 6, 7, 8]
+    def generate_alternating_conditions(self):
+        easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+        hard_conditions = [1, 2, 3, 4, 5, 6, 7]
         random.shuffle(easy_conditions)
         random.shuffle(hard_conditions)
+
         alternating_sequence = []
-        for easy, hard in zip(easy_conditions, hard_conditions):
-            alternating_sequence.append(easy)
-            alternating_sequence.append(hard)
+        easy_idx, hard_idx, hard_streak = 0, 0, 0
+        retry_candidates = []
+
+        while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+            if retry_candidates:
+                candidate = retry_candidates.pop(0)
+            elif not alternating_sequence and easy_idx < len(easy_conditions):
+                candidate = easy_conditions[easy_idx]
+                easy_idx += 1
+                hard_streak = 0
+            elif hard_streak < 2 and hard_idx < len(hard_conditions):
+                candidate = hard_conditions[hard_idx]
+                hard_idx += 1
+                hard_streak += 1
+            elif easy_idx < len(easy_conditions):
+                candidate = easy_conditions[easy_idx]
+                easy_idx += 1
+                hard_streak = 0
+            else:
+                candidate = hard_conditions[hard_idx]
+                hard_idx += 1
+
+            if len(alternating_sequence) >= 2:
+                last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+                if last_two == [candidate % 2, candidate % 2]:
+                    retry_candidates.append(candidate)
+                    continue
+
+            alternating_sequence.append(candidate)
+
         return alternating_sequence
-
-    def reset_conditions(self):
-        """Resets block1 after it is finished and increments the repetition count."""
-        if self.repetition_count < self.repetition:
-            self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
-            self.repetition_count += 1
-            print(f"Resetting conditions for the {self.repetition_count} time.")
-        else:
-            print("Block1 has been repeated 3 times. No more resets.")
-
-    def change_condition(self):
-        """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
-        if not self.conditions:  # If it is empty, reset it
-            self.reset_conditions()
-
-        if self.conditions:
-            # Get the first condition
-            self.current_condition = self.conditions.pop(0)
-            # Add this condition to completed_conditions
-            self.completed_conditions.append(self.current_condition)
-            print(f"Condition changed to: {self.current_condition}")
-            print(f"Completed conditions: {self.completed_conditions}")
-        else:
-            print("No more conditions available to assign.")
-
-    def execute_trials(self):
-        """Executes the change of condition after every 12 trials."""
-        if self.current_trial % self.block == 0 and self.current_trial > 0:
-            self.change_condition()
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -143,6 +158,33 @@ class Probability_WL(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+
+        ## Trial blocks by conditions:
+        # Check if the current block of trials is complete
+        if self.trial_counter >= self.block:
+            # Move the completed condition to completed_conditions
+            self.completed_conditions.append(self.current_condition)
+
+            # Move to the next condition, if any are left
+            if self.conditions:
+                self.conditions.pop(0)  # Remove the completed condition
+                if self.conditions:
+                    self.current_condition = self.conditions[0]  # Set new current condition
+
+            # If all conditions are completed, prepare for repetition
+            if not self.conditions:
+                self.current_repetition += 1
+                if self.current_repetition < self.repetition:
+                    # Reset conditions from completed_conditions for next repetition
+                    self.conditions = self.completed_conditions[:]
+                    self.conditions = self.generate_alternating_conditions()        #Pseudo randomise the new list of conditions.
+                    self.completed_conditions = []
+                    self.current_condition = self.conditions[0]
+                else:
+                    print("All repetitions completed.")
+
+            # Reset trial counter for the new condition or new repetition cycle
+            self.trial_counter = 0
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
@@ -353,8 +395,10 @@ class Probability_WL(Task):
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
 
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('accuracy', self.accuracy)
-
-
+        self.register_value('block', self.block)
+        self.register_value('conditions', self.conditions)
+        self.register_value('completed_conditions', self.completed_conditions)
+        self.register_value('current_condition', self.current_condition)
+        self.register_value('repetition', self.repetition)
+        self.register_value('current_repetition', self.current_repetition)
+        self.register_value('trial_counter', self.trial_counter)
