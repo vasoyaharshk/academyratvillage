@@ -5,8 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-
-class StageTraining_RatB_SideBias(Task):
+class StageTraining_RatB_V1_50_NPP(Task):
 
     def __init__(self):
         super().__init__()
@@ -30,14 +29,13 @@ class StageTraining_RatB_SideBias(Task):
         Stage 3: Data collection
         10%VG 30%DS 30%DM 30%DL. No stimulus duration changes. Silent trials can appear
 
-        ########   PORTS INFO   ########
+                ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
-        Port 2 - BUZZER: valve (16kHz): correct; LED (4kHz):punish
-        Port 3 - PHOTOGATES 4: Photogates end of corridor
-        Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
-        PAm  1 - PHOTOGATES 1: Photogates start of corridor           
-        PAm  2 - PHOTOGATES 2: Photogates midle-start of corridor
-        PAm  3 - PHOTOGATES 3: Photogates midle-end of corridor     
+        Port 2 - PHOTOGATES 2: Photogates next to lickport 
+        Port 3 - PHOTOGATES 3: Photogates 
+        Port 4 - PHOTOGATES 4: Photogates 
+        Port 5 - PHOTOGATES 5: Photogates 
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED      
         """
 
     def init_variables(self):
@@ -48,12 +46,11 @@ class StageTraining_RatB_SideBias(Task):
         self.trials_tired = 5  # if animal does less than this number in the last 10 mins, finishes task
         self.tired = False  # Tired animal indicator
         self.silent = True  #to add silent trials
-        self.mask = 3
+        self.mask = 0
         self.choices = self.mask
         self.blocks= True
-        self.block_size = 10
-        self.x_probs = [0.335, 0.33, 0.335]                   #Probabilities for Left, Centre and Right
-        #self.prob = 0.33   # random by default
+        self.block_size = 20
+        self.prob = 0.33   # random by default
         self.stage = 1
         self.substage = 1
 
@@ -82,19 +79,34 @@ class StageTraining_RatB_SideBias(Task):
         self.pdmc1 = 0
         self.trial_type = 'VG'
 
-        # screen details
-        self.x = 0  # screen width is 401mm for touchscreen and 370mm for monitor
-        self.y = 30  # screen height is 250mm for touchscreen and 300mm for monitor
-        self.width = 80  # stimulus width
-        self.correct_th = 130  # 1/3 of the screen
-        self.repoke_th = settings.WIN_SIZE[0] * 2  # full screen
-        self.contrast= 1.2 #0 black, 1 gray, 2 white. Default 60%
+        #Screen Details:
+        self.x = 0  # Centered horizontally
+        self.y = 102  # Positioned vertically
+        self.width = 60  # Stimulus width in mm
+        self.height = 60  # Stimulus height in mm
+        self.contrast = 1.2  # Contrast level
+
+        self.x_incorrect1 = 0
+        self.x_incorrect2 = 0
+
+
+        # Make the correct_th area to the size of the rectangles:
+
+        # Calculate half-width and half-height
+        self.half_width_mm = self.width / 2
+        self.half_height_mm = self.height / 2
+
+        # Calculate the correct_th as the diagonal distance from the center to the corners and make that area as correct:
+        self.correct_th = ((self.half_width_mm ** 2 + self.half_height_mm ** 2) ** 0.5) + 10
+
+        # Repoke threshold (assuming full screen width)
+        self.repoke_th = settings.WIN_SIZE[0] * 2  # Full screen
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 2.0
-        self.valve_factor_i = 0.45
+        self.valve_factor_c = 1 * 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
+        self.valve_factor_i = 0.45 * 2
 
         # counters
         self.valid_counter = 0
@@ -138,23 +150,24 @@ class StageTraining_RatB_SideBias(Task):
 
         ####### STAGE 1: STIMULUS CATEGORIZATION ######
         if self.stage == 1:
-            # if self.blocks == True:  # Repeat more on side if blocks allowed
-            #     if self.substage==1:
-            #         #self.prob = 0.5    #changed to 0.5 for Luna.
-            #     elif self.substage ==2:
-            #         #self.prob = 0.55
-            #         #self.prob = 0.33     #changed to 0.33 gtom 0.55.
-            #     else:
-            #         #self.prob = 0.33
+
+            if self.blocks == True:  # Repeat more un side if blocks allowed
+                if self.substage==1:
+                    self.prob = 0.75
+                elif self.substage ==2:
+                    #self.prob = 0.55           #For other rats
+                    self.prob = 0.33            #For Luna after bias breaking is complete.
+                else:
+                    self.prob = 0.33
 
             # SUBSTAGE 1: STIMULUS REPOKING ALLOWED, LONG RESP WIN, MORE WATER
             if self.substage == 1:
-                self.valve_factor_c = 3.0
-                self.valve_factor_i = 0.6
+                self.valve_factor_c = 1.2 * 2
+                self.valve_factor_i = 0.6 * 2
                 # 10 initial easy trials: all VG
                 if self.current_trial >= 10:
-                    self.pvg = 1.0
-                    self.pds = 0.0
+                    self.pvg = 0.8
+                    self.pds = 0.2
                     self.stim_dur_ds = 0.45
 
             # SUBSTAGE 2: PUNISH INTRODUCTION
@@ -242,7 +255,7 @@ class StageTraining_RatB_SideBias(Task):
                             self.stim_dur_dm += 0.075
                             print('easier!')
 
-                elif self.substage == 3 and self.current_trial >= 10:  # SUBSTAGE 3: DL CONSOLIDATION
+                elif self.substage == 3 and self.current_trial >= 10:
                     self.response_duration = 15
                     self.stim_dur_ds = 0
                     self.stim_dur_dm = 0
@@ -274,6 +287,7 @@ class StageTraining_RatB_SideBias(Task):
                 self.stim_dur_ds = 0
                 self.stim_dur_dm = 0
                 self.stim_dur_dl = 0
+                self.pvg = 0.1
                 self.pds = 0.1
                 self.pdsc1 = 0.1
                 self.pdsc2 = 0.1
@@ -286,56 +300,60 @@ class StageTraining_RatB_SideBias(Task):
 
         ### STIMULUS POSITIONS
         # Possible positions (screen is 0-400 mm)
-        self.x_positions = [60, 175, 290]
-        #self.x_positions = [290]   #Set to make the randomisation start from trial 2.
-
-
+        #self.x_positions = [60, 175, 290]
+        #self.x_positions = [65, 190, 310]
+        self.x_positions = [65, 188, 309]
 
         # Choose x positions by blocks
-        if self.current_trial == 0:
-            #self.x_trials = []
-            #else:                        #  Randomissation begins from trial 2. Change this to 0 to randomise from the start of the session. self.current_trial == 0, and delete the before if condition
+        if self.current_trial == 0:  # Make a list with x values
             self.block_size = int(self.block_size)
 
-            # # Create RANDOM list with 3 choices (0:Left, 1:Centre, 2:Right)
-            # if self.prob == 0.33:  # random
-            #     self.x_trials = random.choices(self.x_positions, k=1000)
-            #     print('random')
-            #
-            # # Create BLOCK list, pseudorandom serie with 3 choices (0:Left, 1:Centre, 2:Right)
-            # else:
-            p_list = self.x_probs
-            print('Blocks prob: ' + str(p_list))
-            block_combinations = ['012', '021', '102', '120', '210', '201'] #This defines a list of strings representing six possible block combinations (e.g. , '012' could mean "left, centre, right")
-            block_serie = np.random.choice(block_combinations) #choose randomly a block serie
-            for i in range(10): # take 10 pseudorandom block combinations and create a single string
-                next_block = np.random.choice(block_combinations)
-                while block_serie[-1] == next_block[0]:
+            # Create RANDOM list with 3 choices (0:Left, 1:Centre, 2:Right)
+            if self.prob == 0.33:  # random
+                self.x_trials = random.choices(self.x_positions, k=1000)
+                print('random')
+
+            # Create BLOCK list, pseudorandom serie with 3 choices (0:Left, 1:Centre, 2:Right)
+            else:
+                print('Blocks prob: '+str(self.prob))
+                other_prob = (1 - self.prob) / 2 # calculate non fav probs
+                p_list = [other_prob] * 3 # create a list of 3 non-fav probs
+                block_combinations = ['012', '021', '102', '120', '210', '201']
+                block_serie = np.random.choice(block_combinations) #choose randomly a block serie
+                for i in range(10): # take 10 pseudorandom block combinations and create a single string
                     next_block = np.random.choice(block_combinations)
-                    if block_serie[-1] != next_block[0]:
-                        break
-                block_serie = block_serie + next_block
-            print('blocks serie values: '+str( block_serie))
-            # create block of trials (n= block size value) following the prev serie
-            for idx, i in enumerate(block_serie):        #This loop iterates through each block combination in the sequence (block_serie). idx is the index of the current block combination. i is the current block combination string.
-                p = p_list.copy()
-                if idx == 0:
-                    self.x_trials = (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
-                    print('x probs: ' + str(p))
-                else:
-                    self.x_trials = self.x_trials + (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
+                    while block_serie[-1] == next_block[0]:
+                        next_block = np.random.choice(block_combinations)
+                        if block_serie[-1] != next_block[0]:
+                            break
+                    block_serie = block_serie + next_block
+                print('blocks serie values: '+str( block_serie))
+                # create block of trials (n= block size value) following the prev serie
+                for idx, i in enumerate(block_serie):
+                    p = p_list.copy()
+                    p[int(i)] = self.prob
+                    if idx == 0:
+                        self.x_trials = (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
+                        print('x pobs: ' + str(p))
+                    else:
+                        self.x_trials = self.x_trials + (np.random.choice(self.x_positions, size=self.block_size, p=p)).tolist()
 
             print('x positions list: ' + str(self.x_trials))
 
-            # Choose x
-            self.x = self.x_trials[self.current_trial]
-            # Correction bias extension
-            if self.correction_bias == 1 and self.current_trial > 10:
-                if self.trial_result == 'punish':
-                    self.x = self.last_x
-                    print('Correction trial, x position:' + str(self.x))
-            print('x position:' + str(self.x))
+        # Choose x
+        self.x = self.x_trials[self.current_trial]
+        # Correction bias extension
+        if self.correction_bias == 1 and self.current_trial > 10:
+            if self.trial_result == 'punish':
+                self.x = self.last_x
+                print('Correction trial, x position:' + str(self.x))
+        print('x position:' + str(self.x))
 
+        # Set x1 and x2 as the other two options
+        remaining_x_positions = [pos for pos in self.x_positions if pos != self.x]
+        self.x_incorrect1, self.x_incorrect2 = remaining_x_positions[0], remaining_x_positions[1]
+
+        print(f"Selected x: {self.x}, x_incorrect1: {self.x_incorrect1}, x_incorrect2: {self.x_incorrect2}")
 
         ### CHOOSE TRIAL TYPE
         sum_probs = self.pvg + self.pds+ self.pdm + self.pdl + self.pdsc1 +self.pdsc2 + self.pdmc1
@@ -392,8 +410,10 @@ class StageTraining_RatB_SideBias(Task):
 
         # silent trials
         if self.silent == True and self.stage==3 and self.current_trial >10:
-            self.y = np.random.choice([30, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
-            print('Silent trial')
+            self.y = np.random.choice([102, 1000], p=[0.95, 0.05])  # 5% trials stimulus doesn't appear
+            if self.y == 1000:
+                print('Silent trial, y position:' + str(self.y))
+            print('y position:' + str(self.y))
 
 
         ############ STATE MACHINE ################
@@ -403,9 +423,9 @@ class StageTraining_RatB_SideBias(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 2)])
-            # show stim inifite time
+                # show stim inifite time
 
             self.sma.add_state(
                 state_name='Real_start',
@@ -413,33 +433,33 @@ class StageTraining_RatB_SideBias(Task):
                 #state_timer=self.valve_time * 20,                           #Deliver 1ml of water to rats at the start
                 state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
-            # close corridor 2 door, and deliver water when animal enter to behav box
+                # close corridor 2 door, and deliver water when animal enter to behav box
 
         # Other trials
         else:
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={'Port2In': 'Fixation1'},
+                state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[])
 
         self.sma.add_state(
             state_name='Fixation1',
             state_timer=0,
-            state_change_conditions={'Port3In': 'Fixation2'},
+            state_change_conditions={Bpod.Events.Tup: 'Fixation2'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim1)])
-        # show stimulus now in normal trials, not in controls
+            # show stimulus now in normal trials, not in controls
 
         self.sma.add_state(
             state_name='Fixation2',
             state_timer=0,
-            state_change_conditions={'Port5In': 'Fixation3'},
+            state_change_conditions={Bpod.Events.Tup: 'Fixation3'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim2)])
 
         self.sma.add_state(
             state_name='Fixation3',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Pre_Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Pre_Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim3)])
 
         self.sma.add_state(
@@ -447,66 +467,66 @@ class StageTraining_RatB_SideBias(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, output_stim4)])
-        #show stimulus with timer: VG until RW ends, WMI defined by stim_dur_ds
+            #show stimulus with timer: VG until RW ends, WMI defined by stim_dur_ds
 
         self.sma.add_state(
             state_name='Response_window',
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss',
-                                     'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 4)])
-        # wait for subject response
+                                     'SoftCode4': 'Punish', 'SoftCode5': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 21)])
+            # wait for subject response
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_first_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
-        # waterLED and correct sound remain ON until poke
+            # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
-        # waterLED ON, global LEDs ON
+            # waterLED ON, global LEDs ON
 
         self.sma.add_state(
             state_name='Punish',
             state_timer=1,
             state_change_conditions={Bpod.Events.Tup: 'After_punish'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 14)])
-        # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
+            # Incorrect sound, global LEDs on. Note: In the rat village, there is only one LED
 
         self.sma.add_state(
             state_name='After_punish',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
+            state_change_conditions={Bpod.Events.Tup: 'Miss_reward', Bpod.Events.Port1Out: 'Miss_reward',
                                      Bpod.Events.Port2In: 'Miss_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
-        # waterLED ON & global LEDs ON
+            # waterLED ON & global LEDs ON
 
         self.sma.add_state(
             state_name='Incorrect',
             state_timer=0.25,
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
-        # Incorrect sound
+            # Incorrect sound
 
         self.sma.add_state(
             state_name='Response_window2',
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                     'SoftCode3': 'Miss', 'SoftCode4': 'Punish', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 5)])
+                                     'SoftCode3': 'Miss', 'SoftCode4': 'Punish', 'SoftCode5': 'Touch_Outside2', Bpod.Events.Tup: 'Miss'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 22)])
 
         self.sma.add_state(
             state_name='Correct_other',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_other_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
-        # waterLED and correct sound remain ON until poke
+            # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
             state_name='Correct_first_reward',
@@ -525,6 +545,20 @@ class StageTraining_RatB_SideBias(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
+
+        self.sma.add_state(
+            state_name='Touch_Outside',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            output_actions=[])
+        # Goes back to response window in case of touch outside the three regions
+
+        self.sma.add_state(
+            state_name='Touch_Outside2',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
+            output_actions=[])
+        # Goes back to response window in case of touch outside the three regions
 
         self.sma.add_state(
             state_name='Exit',  # Doors closure when trial ends
@@ -639,3 +673,4 @@ class StageTraining_RatB_SideBias(Task):
         self.register_value('correction_bias', self.correction_bias)
         self.register_value('trial_length', self.trial_length)
         self.register_value('block_size', self.block_size)
+

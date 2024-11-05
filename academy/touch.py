@@ -46,6 +46,15 @@ class Touch:
         t = Thread(target=self.run, args=(x, y, correct_th, repoke_th,), daemon=True)
         t.start()
 
+    def start_reading_wm_no_mask(self, duration, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2, width, height):
+        self.timer = time_utils.Timer(duration)
+        t = Thread(target=self.run_wm_no_mask, args=(x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2, width, height), daemon=True)
+        t.start()
+
+    def resume_reading_wm_no_mask(self, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2, width, height):
+        t = Thread(target=self.run_wm_no_mask, args=(x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2, width, height), daemon=True)
+        t.start()
+
     def create_new_device(self):
         i = 0.001
         error_flag = True
@@ -142,6 +151,101 @@ class Touch:
             response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
 
         queues.responses.put(response)
+
+    def run_wm_no_mask(self, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2, width, height):
+        x_coord = None
+        y_coord = None
+        answer = None
+
+        try:
+            while self.device.read_one() is not None:  # clearing buffer of events
+                pass
+        except Exception:
+            utils.log('Academy', 'lectureError in touchscreen clearing buffer, creating new device', 'ERROR')
+            self.create_new_device()
+
+        while self.timer.get_remaining_time() > 0:
+            event = None
+            try:
+                event = self.device.read_one()
+            except Exception:
+                utils.log('Academy', 'lectureError in touchscreen, creating new device', 'ERROR')
+                self.create_new_device()
+
+            if event is not None:
+                if event.type == evdev.ecodes.EV_ABS:  # if event is a coordinate
+                    if event.code == 0 or event.code == 53:  # x coord
+                        x_coord = event.value
+                    if event.code == 1 or event.code == 54:  # y coord
+                        y_coord = event.value
+                    if self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+                        answer = [x_coord, y_coord]
+                        break
+                elif event.type == evdev.ecodes.EV_KEY and event.value != 1:  # BTN_TOUCH up
+                    if not self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+                        answer = [x_coord, y_coord]
+                        break
+
+        if answer is None:
+            self.softcode.send(3)
+            response = []
+        else:
+            xpsy = abs(x)
+            xpsy_incorrect1 = abs(x_incorrect1)
+            xpsy_incorrect2 = abs(x_incorrect2)
+
+            ypsy = 750  # y is now set to 770
+            #ypsy = abs(y)  # y is now set to 770
+
+            print('Touch: ', answer)
+            xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
+            ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            print('X2: ', xtouch, 'Y2: ', ytouch)
+            print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)
+
+            # Define boundaries for the correct rectangular area:
+            top_boundary = (ypsy + height / 2)
+            bottom_boundary = (ypsy - height / 2)
+
+            # Define boundaries for the incorrect rectangular areas:
+            left_boundary_incorrect1 = (xpsy_incorrect1 - width / 2)
+            right_boundary_incorrect1 = (xpsy_incorrect1 + width / 2)
+            left_boundary_incorrect2 = (xpsy_incorrect2 - width / 2)
+            right_boundary_incorrect2 = (xpsy_incorrect2 + width / 2)
+
+            print('Correcth: ', correct_th, 'Repoketh: ', repoke_th)
+
+            # Condition 1: Check if touch is in the correct area
+            if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+                print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                self.softcode.send(1)
+            # Condition 2: Repoke area in incorrect locations (only if correct_th != repoke_th and outside correct area)
+            elif correct_th != repoke_th and (
+                    (left_boundary_incorrect1 <= xtouch <= right_boundary_incorrect1 and bottom_boundary <= ytouch <= top_boundary) or
+                    (left_boundary_incorrect2 <= xtouch <= right_boundary_incorrect2 and bottom_boundary <= ytouch <= top_boundary)
+            ):
+                print('Touch is in the repoketh area')
+                self.softcode.send(2)
+            # Condition 3: Check if touch is in the incorrect areas (punish area)
+            elif correct_th == repoke_th and (
+                    (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th) or
+                     (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th)
+            ):
+                print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                self.softcode.send(4)
+            # Condition 4: If touch is outside the correct and incorrect areas
+            else:
+                print('Formula Outside: ')
+                self.softcode.send(5)
+
+
+            if ytouch is None:
+                ytouch = 0
+
+            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+
+        queues.responses.put(response)
+
 
     def start_reading_probability_first_touch(self, duration, x_correct, x_incorrect, y, width, height):
         self.timer = time_utils.Timer(duration)
@@ -395,3 +499,153 @@ except Exception:
 #                 self.touch_active = False  # Reset the touch state
 #
 #     queues.responses.put([])  # Default empty response at the end
+
+
+    # def run_wm_no_mask1(self, x, y, correct_th, repoke_th, x_incorrect1, x_incorrect2):
+    #     x_coord = None
+    #     y_coord = None
+    #     answer = None
+    #
+    #     try:
+    #         while self.device.read_one() is not None:  # clearing buffer of events
+    #             pass
+    #     except Exception:
+    #         utils.log('Academy', 'lectureError in touchscreen clearing buffer, creating new device', 'ERROR')
+    #         self.create_new_device()
+    #
+    #     while self.timer.get_remaining_time() > 0:
+    #         event = None
+    #         try:
+    #             event = self.device.read_one()
+    #         except Exception:
+    #             utils.log('Academy', 'lectureError in touchscreen, creating new device', 'ERROR')
+    #             self.create_new_device()
+    #
+    #         if event is not None:
+    #             if event.type == evdev.ecodes.EV_ABS:  # if event is a coordinate
+    #                 if event.code == 0 or event.code == 53:  # x coord
+    #                     x_coord = event.value
+    #                 if event.code == 1 or event.code == 54:  # y coord
+    #                     y_coord = event.value
+    #                 if self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+    #                     answer = [x_coord, y_coord]
+    #                     break
+    #             elif event.type == evdev.ecodes.EV_KEY and event.value != 1:  # BTN_TOUCH up
+    #                 if not self.first_touch and x_coord is not None and (y_coord is not None or self.only_x):
+    #                     answer = [x_coord, y_coord]
+    #                     break
+    #
+    #     if answer is None:
+    #         self.softcode.send(3)
+    #         response = []
+    #     else:
+    #         xpsy = abs(x)
+    #         xpsy_incorrect1 = abs(x_incorrect1)
+    #         xpsy_incorrect2 = abs(x_incorrect2)
+    #
+    #         ypsy = 750  # y is now set to 770
+    #         #ypsy = abs(y)  # y is now set to 770
+    #
+    #         print('Touch: ', answer)
+    #         xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
+    #         ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+    #
+    #         print('X2: ', xtouch, 'Y2: ', ytouch)
+    #         print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)
+    #
+    #         # Condition 1: Check if touch is in the correct area.
+    #         if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+    #             print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #             self.softcode.send(1)
+    #         # Condition 2: Repoke area in incorrect locations (only if correct_th != repoke_th)
+    #         elif correct_th != repoke_th and (
+    #                 ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < repoke_th or
+    #                 ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < repoke_th
+    #         ):
+    #             print('Formula Incorrect in Repoke Area: ',
+    #                   ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #             self.softcode.send(2)
+    #         # Condition 3: Check if touch is in the incorrect areas (punish area)
+    #         elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th or
+    #               ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th):
+    #             print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #             self.softcode.send(4)
+    #         # Condition 4: If touch is outside the correct and incorrect areas
+    #         else:
+    #             print('Formula Outside: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #             self.softcode.send(5)
+    #
+    #         # if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th * 1:
+    #         #     # print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(1)
+    #         # elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th * 1:
+    #         #     # print('Formula Incorrect: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(2)
+    #         # else:
+    #         #     self.softcode.send(4)
+    #
+    #         # # Check if touch is in the correct area
+    #         # if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+    #         #     print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(1)
+    #         # # Check if touch is outside all specified areas
+    #         # elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) >= correct_th and
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) >= correct_th and
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) >= correct_th):
+    #         #     print('Formula Outside: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(5)
+    #         # # Check if touch is in the repoke area (only if correct_th != repoke_th)
+    #         # elif correct_th != repoke_th and ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th:
+    #         #     print('Formula Incorrect (Repoke): ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(2)
+    #         # # Check if touch is in any of the incorrect areas (punish)
+    #         # elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th or
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th):
+    #         #     print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(4)
+    #
+    #         # # Check if touch is in the correct area
+    #         # if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+    #         #     print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(1)
+    #         # # Check if touch is in any of the incorrect areas
+    #         # elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th or
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th):
+    #         #     print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(4)
+    #         # # Check if touch is within the repoke threshold around the correct area
+    #         # elif ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th:
+    #         #     print('Formula Incorrect (Repoke): ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(2)
+    #         # # If touch is outside all specified areas
+    #         # else:
+    #         #     print('Formula Outside: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(5)
+    #
+    #         # # Check if touch is in the correct area
+    #         # if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
+    #         #     print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(1)
+    #         # # Check if touch is in the repoke or incorrect areas simultaneously
+    #         # elif (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < repoke_th or
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < repoke_th or
+    #         #       ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < repoke_th):
+    #         #     if (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th or
+    #         #             ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th):
+    #         #         print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #         self.softcode.send(4)
+    #         #     else:
+    #         #         print('Formula Incorrect (Repoke): ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #         self.softcode.send(2)
+    #         # # If touch is outside all specified areas
+    #         # else:
+    #         #     print('Formula Outside: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+    #         #     self.softcode.send(5)
+    #
+    #
+    #         if ytouch is None:
+    #             ytouch = 0
+    #
+    #         response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+    #
+    #     queues.responses.put(response)
