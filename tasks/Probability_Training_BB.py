@@ -81,6 +81,8 @@ class Probability_Training_BB(Task):
         self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -288,8 +290,14 @@ class Probability_Training_BB(Task):
             self.accwindow = self.accwindow[1:] + [1]
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
-            self.bias_breaking = 0
-            #self.response_x_array = []
+
+            # Check if side bias is active and if the current trial was correct
+            if self.bias_breaking == 1:  # Side bias active
+                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                    self.bias_breaking = 0  # End bias breaking
+                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+
 
         # ##### COUNT Touches outside the jar areas :
         elif self.current_trial_states['Touch_Outside'][0][0] > 0:
@@ -418,3 +426,5 @@ class Probability_Training_BB(Task):
         self.register_value('sameside', self.sameside)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
