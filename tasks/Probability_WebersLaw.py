@@ -103,7 +103,6 @@ class Probability_WebersLaw(Task):
         hard_streak = 0
         retry_candidates = []
         retry_count = {}
-        print('all ok1')
         while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
             if retry_candidates:
                 candidate = retry_candidates.pop(0)
@@ -117,21 +116,17 @@ class Probability_WebersLaw(Task):
                 candidate = easy_conditions[easy_idx]
                 easy_idx += 1
                 hard_streak = 0
-                print('all ok3')
             elif hard_streak < 2 and hard_idx < len(hard_conditions):
                 candidate = hard_conditions[hard_idx]
                 hard_idx += 1
                 hard_streak += 1
-                print('all ok4')
             elif easy_idx < len(easy_conditions):
                 candidate = easy_conditions[easy_idx]
                 easy_idx += 1
                 hard_streak = 0
-                print('all ok5')
             else:
                 candidate = hard_conditions[hard_idx]
                 hard_idx += 1
-                print('all ok6')
             if len(alternating_sequence) >= 2:
                 last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
                 if last_two == [candidate % 2, candidate % 2]:

@@ -391,26 +391,20 @@ def select_task(df, subject):
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 1
-                        print(stage)
                         task = 'Probability_WebersLaw'
-                        print(task)
-                        conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
-                        print(conditions)
+                        conditions = generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
                         current_condition = conditions[0]
-                        print(current_condition)
-
-        if 'Probability_WebersLaw' in task:
-            last_row = df.iloc[-1]  # Get the last row of the DataFrame
-
-            # Assign each value from the last row to the variables:
-            stage = last_row['stage']
-            block = last_row['block']
-            conditions = last_row['conditions']
-            completed_conditions = last_row['completed_conditions']
-            current_condition = last_row['current_condition']
-            repetition = last_row['repetition']
-            current_repetition = last_row['current_repetition']
-            trial_counter = last_row['trial_counter']
+                elif 'WebersLaw' in task:
+                    last_row = df.iloc[-1]  # Get the last row of the DataFrame
+                    # Assign each value from the last row to the variables:
+                    stage = last_row['stage']
+                    block = last_row['block']
+                    conditions = last_row['conditions']
+                    completed_conditions = last_row['completed_conditions']
+                    current_condition = last_row['current_condition']
+                    repetition = last_row['repetition']
+                    current_repetition = last_row['current_repetition']
+                    trial_counter = last_row['trial_counter']
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 
@@ -425,7 +419,6 @@ def generate_alternating_conditions():
     hard_streak = 0
     retry_candidates = []
     retry_count = {}
-    print('all ok1')
     while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
         if retry_candidates:
             candidate = retry_candidates.pop(0)
@@ -439,21 +432,17 @@ def generate_alternating_conditions():
             candidate = easy_conditions[easy_idx]
             easy_idx += 1
             hard_streak = 0
-            print('all ok3')
         elif hard_streak < 2 and hard_idx < len(hard_conditions):
             candidate = hard_conditions[hard_idx]
             hard_idx += 1
             hard_streak += 1
-            print('all ok4')
         elif easy_idx < len(easy_conditions):
             candidate = easy_conditions[easy_idx]
             easy_idx += 1
             hard_streak = 0
-            print('all ok5')
         else:
             candidate = hard_conditions[hard_idx]
             hard_idx += 1
-            print('all ok6')
         if len(alternating_sequence) >= 2:
             last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
             if last_two == [candidate % 2, candidate % 2]:
