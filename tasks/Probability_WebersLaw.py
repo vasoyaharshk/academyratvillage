@@ -93,47 +93,44 @@ class Probability_WebersLaw(Task):
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
 
-        def generate_alternating_conditions(self):
-            easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
-            hard_conditions = [1, 2, 3, 4, 5, 6, 7]
-            random.shuffle(easy_conditions)
-            random.shuffle(hard_conditions)
+    def generate_alternating_conditions(self):
+        easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+        hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+        random.shuffle(easy_conditions)
+        random.shuffle(hard_conditions)
 
-            alternating_sequence = []
-            easy_idx, hard_idx, hard_streak = 0, 0, 0
-            retry_candidates = []
+        alternating_sequence = []
+        easy_idx, hard_idx, hard_streak = 0, 0, 0
+        retry_candidates = []
 
-            while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
-                if retry_candidates:
-                    candidate = retry_candidates.pop(0)
-                elif not alternating_sequence and easy_idx < len(easy_conditions):
-                    candidate = easy_conditions[easy_idx]
-                    easy_idx += 1
-                    hard_streak = 0
-                elif hard_streak < 2 and hard_idx < len(hard_conditions):
-                    candidate = hard_conditions[hard_idx]
-                    hard_idx += 1
-                    hard_streak += 1
-                elif easy_idx < len(easy_conditions):
-                    candidate = easy_conditions[easy_idx]
-                    easy_idx += 1
-                    hard_streak = 0
-                else:
-                    candidate = hard_conditions[hard_idx]
-                    hard_idx += 1
+        while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+            if retry_candidates:
+                candidate = retry_candidates.pop(0)
+            elif not alternating_sequence and easy_idx < len(easy_conditions):
+                candidate = easy_conditions[easy_idx]
+                easy_idx += 1
+                hard_streak = 0
+            elif hard_streak < 2 and hard_idx < len(hard_conditions):
+                candidate = hard_conditions[hard_idx]
+                hard_idx += 1
+                hard_streak += 1
+            elif easy_idx < len(easy_conditions):
+                candidate = easy_conditions[easy_idx]
+                easy_idx += 1
+                hard_streak = 0
+            else:
+                candidate = hard_conditions[hard_idx]
+                hard_idx += 1
 
-                if len(alternating_sequence) >= 2:
-                    last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
-                    if last_two == [candidate % 2, candidate % 2]:
-                        retry_candidates.append(candidate)
-                        continue
+            if len(alternating_sequence) >= 2:
+                last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+                if last_two == [candidate % 2, candidate % 2]:
+                    retry_candidates.append(candidate)
+                    continue
 
-                alternating_sequence.append(candidate)
+            alternating_sequence.append(candidate)
 
-            return alternating_sequence
-
-    def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        return alternating_sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -150,12 +147,19 @@ class Probability_WebersLaw(Task):
                 trials.append(candidate)
         return trials
 
+    def configure_gui(self):
+        self.gui_input = ['stage', 'substage', 'duration_max']
+
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
 
-        ## Trial blocks by conditions:
+        if not self.conditions and self.current_repetition == 0:
+            self.conditions = self.generate_alternating_conditions()
+            self.current_condition = self.conditions[0]
+
+            ## Trial blocks by conditions:
         # Check if the current block of trials is complete
         if self.trial_counter > self.block:
             # Move the completed condition to completed_conditions

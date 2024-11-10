@@ -386,19 +386,24 @@ def select_task(df, subject):
                         print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
                         stage = 3
 
-                # Stage 3 -> Stage 4 check
+                # Stage 3 -> Weber's Law
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 1
+                        print(stage)
                         task = 'Probability_WebersLaw'
+                        print(task)
                         conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
+                        print(conditions)
                         current_condition = conditions[0]
+                        print(current_condition)
 
-        if 'WebersLaw_Probability' in task:
+        if 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
             # Assign each value from the last row to the variables:
+            stage = last_row['stage']
             block = last_row['block']
             conditions = last_row['conditions']
             completed_conditions = last_row['completed_conditions']
