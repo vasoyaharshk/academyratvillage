@@ -484,7 +484,7 @@ class Probability_WL(Task):
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
-        #ROR:
+        #Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)
         self.register_value('completed_conditions', self.completed_conditions)

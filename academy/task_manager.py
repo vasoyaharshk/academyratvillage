@@ -59,7 +59,7 @@ class TaskManager:
             self.df_all.to_csv(subject_path, header=True, index=False, sep=';')
             self.df_all = self.df_all.apply(pd.to_numeric, args=('ignore', ))
 
-            task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice = select_task.select_task(self.df_all, self.subject)
+            task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter = select_task.select_task(self.df_all, self.subject)
 
             if weight:
                 utils.subjects.add_new_item({'task': task,
@@ -70,7 +70,16 @@ class TaskManager:
                                              'water': water,
                                              'stim_dur_ds': stim_dur_ds,
                                              'stim_dur_dm': stim_dur_dm,
-                                             'stim_dur_dl': stim_dur_dl, 'choice': choice}, item=self.subject)
+                                             'stim_dur_dl': stim_dur_dl,
+                                             'choice': choice,
+                                             'block': block,
+                                             'conditions': conditions,
+                                             'completed_conditions': completed_conditions,
+                                             'current_condition': current_condition,
+                                             'repetition': repetition,
+                                             'current_repetition': current_repetition,
+                                             'trial_counter': trial_counter
+                                             }, item=self.subject)
 
             else:
                 utils.subjects.add_new_item({'task': task,
@@ -79,7 +88,16 @@ class TaskManager:
                                              'wait_seconds': wait_seconds,
                                              'stim_dur_ds': stim_dur_ds,
                                              'stim_dur_dm': stim_dur_dm,
-                                             'stim_dur_dl': stim_dur_dl, 'choice': choice}, item=self.subject)
+                                             'stim_dur_dl': stim_dur_dl,
+                                             'choice': choice,
+                                             'block': block,
+                                             'conditions': conditions,
+                                             'completed_conditions': completed_conditions,
+                                             'current_condition': current_condition,
+                                             'repetition': repetition,
+                                             'current_repetition': current_repetition,
+                                             'trial_counter': trial_counter
+                                             }, item=self.subject)
         else:
             pass
 
