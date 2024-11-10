@@ -93,8 +93,7 @@ class Probability_WebersLaw(Task):
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
 
-    def generate_alternating_conditions():
-        # Weber's law conditions
+    def generate_alternating_conditions(self):
         easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
         hard_conditions = [1, 2, 3, 4, 5, 6, 7]
         random.shuffle(easy_conditions)
@@ -102,34 +101,45 @@ class Probability_WebersLaw(Task):
         alternating_sequence = []
         easy_idx, hard_idx = 0, 0
         hard_streak = 0
-        retry_candidates = []  # Stores candidates that couldn't be added on the first pass
-        # Generate the alternating sequence with rules applied
+        retry_candidates = []
+        retry_count = {}
+        print('all ok1')
         while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
             if retry_candidates:
-                # Process any skipped candidates if there are any
                 candidate = retry_candidates.pop(0)
+                retry_count[candidate] = retry_count.get(candidate, 0) + 1
+                print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
+                if retry_count[candidate] > 5:
+                    print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
+                    alternating_sequence.append(candidate)
+                    continue
             elif not alternating_sequence and easy_idx < len(easy_conditions):
                 candidate = easy_conditions[easy_idx]
                 easy_idx += 1
                 hard_streak = 0
+                print('all ok3')
             elif hard_streak < 2 and hard_idx < len(hard_conditions):
                 candidate = hard_conditions[hard_idx]
                 hard_idx += 1
                 hard_streak += 1
+                print('all ok4')
             elif easy_idx < len(easy_conditions):
                 candidate = easy_conditions[easy_idx]
                 easy_idx += 1
                 hard_streak = 0
+                print('all ok5')
             else:
                 candidate = hard_conditions[hard_idx]
                 hard_idx += 1
-            # Check the last two conditions in alternating_sequence to ensure even/odd pattern
+                print('all ok6')
             if len(alternating_sequence) >= 2:
                 last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
                 if last_two == [candidate % 2, candidate % 2]:
-                    retry_candidates.append(candidate)  # Add to retry list if it breaks the rule
+                    retry_candidates.append(candidate)
+                    print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
                     continue
             alternating_sequence.append(candidate)
+            print(f"Candidate {candidate} added to alternating_sequence.")
         return alternating_sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
@@ -220,8 +230,8 @@ class Probability_WebersLaw(Task):
         print(f"Current Condition: {self.current_condition}")
         print(f"Repetition: {self.repetition}")
         print(f"Current Repetition: {self.current_repetition}")
-        print(f"Trial Counter: {self.trial_counter}
-        
+        print(f"Trial Counter: {self.trial_counter}")
+
         ############ STATE MACHINE ################
         #First trial:
         if self.current_trial == 0:
