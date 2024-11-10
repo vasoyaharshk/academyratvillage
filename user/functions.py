@@ -671,7 +671,8 @@ def function41():  # When the correct answer is on left
     try:
         image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         left_images = [f for f in os.listdir(image_folder) if
-                        os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower())]
 
         if not left_images:
             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
@@ -710,7 +711,8 @@ def function42():  # When the correct answer is on right
         # Get all the images based on the stages
         image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         right_images = [f for f in os.listdir(image_folder) if
-                        os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower())]
 
         if not right_images:
             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
