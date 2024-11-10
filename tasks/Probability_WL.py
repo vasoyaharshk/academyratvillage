@@ -10,7 +10,7 @@ class Probability_WL(Task):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script includes repoketh, the ability to make correct choices.
+        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
@@ -31,7 +31,6 @@ class Probability_WL(Task):
         self.stim_dur_dl = 0
         self.choices = 0
         self.substage = 0
-        self.project = 'PI'
 
         # Variables for the task:
         self.duration_max = 3000
@@ -39,9 +38,10 @@ class Probability_WL(Task):
         self.duration_tired = 1800
         self.trials_tired = 5
         self.tired = False
-        self.stage = 4
+        self.stage = 1
         self.substage = 0
         self.response_duration = 60
+        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -73,13 +73,67 @@ class Probability_WL(Task):
         self.width = 100  # Stimulus width in mm
         self.height = 190
 
-        #Randomise blocks and trials:
-        self.block = 12   #This is the number of trials one conditions will remain for
-        self.conditions = []  # This holds the 16 conditions pseudorandomised as easy and hard alternatively
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8            #Accuracy at which side bias will trigger
+        self.status = None              #Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+
+        # Randomise blocks and trials for Weber's Law:
+        self.block = 12  # This is the number of trials one conditions will remain for
+        self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
-        self.repetition = 3       #To store how many times the conditions needs to repeat.
-        self.current_condition = None  # To track the current condition in progress
-        self.repetition_count = 0       #To store how many times the condition has repeated.
+        self.current_condition = 0  # To track the current condition in progress
+        self.repetition = 3  # To store how many times the conditions needs to repeat.
+        self.current_repetition = 0  # To store how many times the condition has repeated.
+        self.trial_counter = 0  # Track the number of trials for the current condition
+
+        def generate_alternating_conditions(self):
+            easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+            hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+            random.shuffle(easy_conditions)
+            random.shuffle(hard_conditions)
+
+            alternating_sequence = []
+            easy_idx, hard_idx, hard_streak = 0, 0, 0
+            retry_candidates = []
+
+            while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+                if retry_candidates:
+                    candidate = retry_candidates.pop(0)
+                elif not alternating_sequence and easy_idx < len(easy_conditions):
+                    candidate = easy_conditions[easy_idx]
+                    easy_idx += 1
+                    hard_streak = 0
+                elif hard_streak < 2 and hard_idx < len(hard_conditions):
+                    candidate = hard_conditions[hard_idx]
+                    hard_idx += 1
+                    hard_streak += 1
+                elif easy_idx < len(easy_conditions):
+                    candidate = easy_conditions[easy_idx]
+                    easy_idx += 1
+                    hard_streak = 0
+                else:
+                    candidate = hard_conditions[hard_idx]
+                    hard_idx += 1
+
+                if len(alternating_sequence) >= 2:
+                    last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+                    if last_two == [candidate % 2, candidate % 2]:
+                        retry_candidates.append(candidate)
+                        continue
+
+                alternating_sequence.append(candidate)
+
+            return alternating_sequence
+
+    def configure_gui(self):
+        self.gui_input = ['stage', 'substage', 'duration_max']
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -96,92 +150,72 @@ class Probability_WL(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_alternating_conditions():   #Weber's law conditions
-        easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
-        hard_conditions = [1, 2, 3, 4, 5, 6, 7, 8]
-        random.shuffle(easy_conditions)
-        random.shuffle(hard_conditions)
-        alternating_sequence = []
-        for easy, hard in zip(easy_conditions, hard_conditions):
-            alternating_sequence.append(easy)
-            alternating_sequence.append(hard)
-        return alternating_sequence
-
-    def reset_conditions(self):
-        """Resets block1 after it is finished and increments the repetition count."""
-        if self.repetition_count < self.repetition:
-            self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
-            self.repetition_count += 1
-            print(f"Resetting conditions for the {self.repetition_count} time.")
-        else:
-            print("Block1 has been repeated 3 times. No more resets.")
-
-    def change_condition(self):
-        """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
-        if not self.conditions:  # If it is empty, reset it
-            self.reset_conditions()
-
-        if self.conditions:
-            # Get the first condition
-            self.current_condition = self.conditions.pop(0)
-            # Add this condition to completed_conditions
-            self.completed_conditions.append(self.current_condition)
-            print(f"Condition changed to: {self.current_condition}")
-            print(f"Completed conditions: {self.completed_conditions}")
-        else:
-            print("No more conditions available to assign.")
-
-    def execute_trials(self):
-        """Executes the change of condition after every 12 trials."""
-        if self.current_trial % self.block == 0 and self.current_trial > 0:
-            self.change_condition()
-
-    def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
-
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+
+        ## Trial blocks by conditions:
+        # Check if the current block of trials is complete
+        if self.trial_counter > self.block:
+            # Move the completed condition to completed_conditions
+            self.completed_conditions.append(self.current_condition)
+
+            # Move to the next condition, if any are left
+            if self.conditions:
+                self.conditions.pop(0)  # Remove the completed condition
+                if self.conditions:
+                    self.current_condition = self.conditions[0]  # Set new current condition
+
+            # If all conditions are completed, prepare for repetition
+            if not self.conditions:
+                self.current_repetition += 1
+                if self.current_repetition < self.repetition:
+                    # Reset conditions from completed_conditions for next repetition
+                    self.conditions = self.completed_conditions[:]
+                    self.conditions = self.generate_alternating_conditions()        #Pseudo randomise the new list of conditions.
+                    self.completed_conditions = []
+                    self.current_condition = self.conditions[0]
+                else:
+                    print("All repetitions completed.")
+
+            # Reset trial counter for the new condition or new repetition cycle
+            self.trial_counter = 0
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            print('x positions list: ' + str(self.stim_trials))
+            #print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
-        print('Stim Trial: ', self.stim_trial)
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        if self.bias_breaking == 0:
+            self.stim_trial = self.stim_trials[self.current_trial]
+        else:
+            self.stim_trial = self.last_stim_trial
 
-        self.block1 = generate_alternating_conditions()
-        self.block2 = generate_alternating_conditions()
-        self.block3 = generate_alternating_conditions()
-        print(self.substage)
+        if self.stim_trial == 41:
+            self.x_correcth = self.x_correcth_pos[0]
+            self.x_incorrecth = self.x_correcth_pos[1]
+            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.stim_trial == 42:
+            self.x_correcth = self.x_correcth_pos[1]
+            self.x_incorrecth = self.x_correcth_pos[0]
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        print(f"Block: {self.block}")
+        print(f"Conditions: {self.conditions}")
+        print(f"Completed Conditions: {self.completed_conditions}")
+        print(f"Current Condition: {self.current_condition}")
+        print(f"Repetition: {self.repetition}")
+        print(f"Current Repetition: {self.current_repetition}")
+        print(f"Trial Counter: {self.trial_counter}")
 
         ############ STATE MACHINE ################
         #First trial:
@@ -189,7 +223,7 @@ class Probability_WL(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -205,7 +239,7 @@ class Probability_WL(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -218,9 +252,9 @@ class Probability_WL(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Changes the state to response window after photogate near the screen has been crossed.
+        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
         self.sma.add_state(
             state_name='Response_window',
@@ -231,17 +265,31 @@ class Probability_WL(Task):
 
         self.sma.add_state(
             state_name='Correct',
-            state_timer=2,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+        # Turns on Water port LED and plays correct sound
+
+        self.sma.add_state(
+            state_name='Correct_image_display',
+            state_timer=self.image_display,
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli
+        # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
         self.sma.add_state(
             state_name='Correct_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-        # Delivers Water and stops the reward sound
+        # Delivers Water and stops the reward sound and flips the screen
+
+        self.sma.add_state(
+            state_name='Flip_screen_reward',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
+        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='Touch_Outside',
@@ -252,15 +300,36 @@ class Probability_WL(Task):
 
         self.sma.add_state(
             state_name='Punish',
-            state_timer=1,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 39)])
+        # Turns on Global LED and water port LED on
+
+        self.sma.add_state(
+            state_name='Punish_image_display',
+            state_timer=self.image_display,
+            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
-        # Turns on Global LED and water port LED on, plays punish sound and displays incorrect stimuli
+        # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
+
+        self.sma.add_state(
+            state_name='After_punish',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+        # Flips the screen after water port poked in.
+
+        self.sma.add_state(
+            state_name='Flip_screen_no_reward',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
+        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -273,6 +342,8 @@ class Probability_WL(Task):
 
 
     def after_trial(self):
+        self.trial_counter += 1
+
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
             self.accwindow = self.accwindow[1:] + [0]
@@ -293,10 +364,17 @@ class Probability_WL(Task):
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
 
+            # Check if side bias is active and if the current trial was correct
+            if self.bias_breaking == 1:  # Side bias active
+                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                    self.bias_breaking = 0  # End bias breaking
+                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+
+
         # ##### COUNT Touches outside the jar areas :
-        # elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-        #     self.touch_outside += 1
-        #     print('Outside_count: ', self.touch_outside)
+        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+            self.status = 'Touch_Outside'
 
         # End-trial calculations
         #self.last_x = self.x
@@ -314,7 +392,7 @@ class Probability_WL(Task):
 
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
+        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
@@ -333,12 +411,58 @@ class Probability_WL(Task):
         #     self.current_trial = 1
         #     self.acc_up = 0
 
+        # Side Bias Breaking formula:
+        self.last_stim_trial = self.stim_trial
+
+        try:
+            # Try converting response_x directly to a float
+            self.response_x_bias = float(self.response_x)
+        except ValueError:
+            print(f"No response_x value or response other: {self.response_x}")
+
+            # Split the string by commas and convert it to a list of floats
+            try:
+                # First, check if the response_x is a string and split it
+                response_x_list = [float(x) for x in self.response_x.split(",")]
+
+                # Use the last element of the list as response_x_bias
+                self.response_x_bias = response_x_list[-1]
+                print(f"Using last value from response_x array: {self.response_x_bias}")
+            except Exception as e:
+                #print(f"Failed to process response_x as array. Error: {e}")
+                return  # Handle this case if needed
+
+        # Append the response to the array:
+        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+        self.response_x_array.append(self.response_x_bias)
+        print(f"Responses so far: {self.response_x_array}")
+
+        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+            # Check if all responses fall into one of the two defined categories
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+
+            if all_left_side:
+                self.sameside = 'left'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+            elif all_right_side:
+                self.sameside = 'right'
+                self.bias_breaking = 1
+                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+                print('Bias breaking active, side:', self.sameside)
+
+            self.response_x_array = []      #Clearing the array
+
         ############ REGISTER VALUES ################
+        #Working Memory:
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
-        self.register_value('substage', self.substage)
+        #PI:
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
@@ -349,12 +473,22 @@ class Probability_WL(Task):
         self.register_value('response_duration', self.response_duration)
         self.register_value('trial_length', self.trial_length)
         self.register_value('stage', self.stage)
+        self.register_value('substage', self.substage)
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
-
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('accuracy', self.accuracy)
-
-
+        #Bias Breaking:
+        self.register_value('bias_breaking', self.bias_breaking)
+        self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        #ROR:
+        self.register_value('block', self.block)
+        self.register_value('conditions', self.conditions)
+        self.register_value('completed_conditions', self.completed_conditions)
+        self.register_value('current_condition', self.current_condition)
+        self.register_value('repetition', self.repetition)
+        self.register_value('current_repetition', self.current_repetition)
+        self.register_value('trial_counter', self.trial_counter)
