@@ -119,6 +119,15 @@ class StageTraining_RatB_V1_50(Task):
         self.dm_accwindow = [0] * self.running_window
         self.dl_accwindow = [0] * self.running_window
 
+        #Required for Weber's law:
+        self.block = 0  # This is the number of trials one conditions will remain for
+        self.conditions = []  # Takes the conditions from select task file.
+        self.completed_conditions = []  # To store completed conditions
+        self.current_condition = 0  # To track the current condition in progress
+        self.repetition = 0  # To store how many times the conditions needs to repeat.
+        self.current_repetition = 0  # To store how many times the condition has repeated.
+        self.trial_counter = 0  # Track the number of trials for the current condition
+
 
     def configure_gui(self): # Variables appearing in the GUI
         self.gui_input = ['stage', 'substage', 'duration_max',
@@ -673,4 +682,13 @@ class StageTraining_RatB_V1_50(Task):
         self.register_value('correction_bias', self.correction_bias)
         self.register_value('trial_length', self.trial_length)
         self.register_value('block_size', self.block_size)
+
+        #Required for Weber's Law:
+        self.register_value('block', self.block)
+        self.register_value('conditions', self.conditions)
+        self.register_value('completed_conditions', self.completed_conditions)
+        self.register_value('current_condition', self.current_condition)
+        self.register_value('repetition', self.repetition)
+        self.register_value('current_repetition', self.current_repetition)
+        self.register_value('trial_counter', self.trial_counter)
 
