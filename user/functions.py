@@ -295,33 +295,29 @@ def function20():
         utils.change_to_state = 2  # first action done, before min_time
 
 
-#Gal-without mask testing functions from 21 to 25:
+#No mask testing functions from 21 to 25:
 
 # start reading touchscreen:
 def function21():
-    try:
-        x = utils.task.x[1]
-    except:
-        x = utils.task.x
+    width = (utils.task.width + 25) * settings.PIXELS_PER_MM      #+25 because we need 1cm more than the stim
+    height = (utils.task.height + 25) * settings.PIXELS_PER_MM    #+25 because we need 1cm more than the stim
 
-    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
-                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
-                        )
+    touch.start_reading_wm_no_mask(utils.task.response_duration, utils.task.x * settings.PIXELS_PER_MM,
+                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM,
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
     print('Resp Win')
 
-
+#Resume Reading
 def function22():
-    try:
-        x = utils.task.x[1]
-    except:
-        x = utils.task.x
+    width = (utils.task.width + 25) * settings.PIXELS_PER_MM      #+25 because we need 1cm more than the stim
+    height = (utils.task.height + 25) * settings.PIXELS_PER_MM    #+25 because we need 1cm more than the stim
 
-    touch.start_reading(utils.task.response_duration, x * settings.PIXELS_PER_MM,
-                        utils.task.y * settings.PIXELS_PER_MM, utils.task.correct_th * settings.PIXELS_PER_MM, utils.task.repoke_th * settings.PIXELS_PER_MM,
-                        )
+    touch.resume_reading_wm_no_mask(utils.task.x * settings.PIXELS_PER_MM, utils.task.y * settings.PIXELS_PER_MM,
+                         utils.task.correct_th * settings.PIXELS_PER_MM,
+        utils.task.repoke_th * settings.PIXELS_PER_MM, utils.task.x_incorrect1 * settings.PIXELS_PER_MM, utils.task.x_incorrect2 * settings.PIXELS_PER_MM, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -457,9 +453,7 @@ def function31():  # When the blue jar is on left
         print(f"Error occurred: {e}")
 
 def loop31(timing):
-    if timing < utils.task.response_duration:
-        image_jar_left.draw()
-        #border1.draw()
+    image_jar_left.draw()
     window.flip()
 
 
@@ -506,31 +500,29 @@ def function32():  # When the blue jar is on right
 
 
 def loop32(timing):
-    if timing < utils.task.response_duration:
-        image_jar_right.draw()
-        #border1.draw()
+    image_jar_right.draw()
     window.flip()
 
-
-# Start reading touchscreen for Probabilistic inference tasks with all touches processed:
-def function33():
-    width = utils.task.width * settings.PIXELS_PER_MM
-    height = utils.task.height * settings.PIXELS_PER_MM
-    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
-    x_incorrect = utils.task.x_incorrecth
-    y = utils.task.y_correcth * settings.PIXELS_PER_MM
-
-    if x_incorrect is None:
-        touch.start_reading_probability(utils.task.response_duration, x_correct, None, y, width, height)
-    else:
-        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
-
-    cam2.put_state("Resp Win")
-    cam3.put_state("Resp Win")
-    print('Resp Win 1')
-    #print('x_correct in functions: ', x_correct)
-    #print('x_incorrect in functions: ', x_incorrect)
+#
+# # Start reading touchscreen for Probabilistic inference tasks with all touches processed:
+# def function33():
+#     width = utils.task.width * settings.PIXELS_PER_MM
+#     height = utils.task.height * settings.PIXELS_PER_MM
+#     x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+#     x_incorrect = utils.task.x_incorrecth
+#     y = utils.task.y_correcth * settings.PIXELS_PER_MM
+#
+#     if x_incorrect is None:
+#         touch.start_reading_probability(utils.task.response_duration, x_correct, None, y, width, height)
+#     else:
+#         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+#         touch.start_reading_probability(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+#
+#     cam2.put_state("Resp Win")
+#     cam3.put_state("Resp Win")
+#     print('Resp Win 1')
+#     #print('x_correct in functions: ', x_correct)
+#     #print('x_incorrect in functions: ', x_incorrect)
 
 
 # Start reading touchscreen for Probabilistic inference tasks with only one touch processing:
@@ -556,11 +548,11 @@ def function34():
 
 #Display camera correct, play correct sound and display correct stimuli.
 def function35():
-    soundStream.play(soundVec1)
+    #soundStream.play(soundVec1)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
-    print("Correct, Reward Sound played")
+    #print("Correct, Reward Sound played")
 
     stage = utils.task.stage
     if stage != 1:
@@ -568,13 +560,13 @@ def function35():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "correct")
             # Update the image path for drawing
-            if last_function_called == 31:
+            if last_function_called in [31, 41]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called == 32:
+            elif last_function_called in [32, 42]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Correct image path: {image_path_replaced}")
 
 def loop35(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
@@ -605,13 +597,13 @@ def function36():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "incorrect")
             # Update the image path for drawing
-            if last_function_called == 31:
+            if last_function_called in [31, 41]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called == 32:
+            elif last_function_called in [32, 42]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Incorrect image path: {image_path_replaced}")
     else:
         pass
 
@@ -619,10 +611,10 @@ def loop36(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called == 31:
+        if last_function_called in [31, 41]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called == 32:
+        elif last_function_called in [32, 42]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -641,16 +633,43 @@ def function37():
 def loop37(timing):
     window.flip()
 
+
+#Correct without image display:
+def function38():
+    soundStream.play(soundVec1)
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    print("Correct, Reward Sound played")
+
+
+#Punish without image display:
+def function39():
+    #soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    #print("Punish, Punish Sound played")
+
+
+#Miss:
+def function40():
+    pass
+
+def loop40(timing):
+    window.flip()
+
+
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
-def function41():  # When the blue jar is on left
+def function41():  # When the correct answer is on left
     global last_function_called, image_path
-    last_function_called = 41  # Track that function31 was called
+    last_function_called = 41  # Track that function41 was called
 
     stage = utils.task.stage
     current_condition = utils.task.current_condition
     left_images = []
     try:
-        image_folder = f'/home/ratvillage01/academy/jars/webers_law_{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         left_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
 
@@ -679,7 +698,7 @@ def loop41(timing):
 
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is right:
-def function42():  # When the blue jar is on right
+def function42():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 42  # Track that function31 was called
 
@@ -689,7 +708,7 @@ def function42():  # When the blue jar is on right
 
     try:
         # Get all the images based on the stages
-        image_folder = f'/home/ratvillage01/academy/jars/webers_law_{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         right_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
 

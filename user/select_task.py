@@ -393,6 +393,7 @@ def select_task(df, subject):
                         stage = 1
                         task = 'WebersLaw_Probability'
                         conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
+                        current_condition = conditions[0]
 
         if 'WebersLaw_Probability' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame

@@ -93,37 +93,6 @@ class Probability_WL(Task):
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
 
-        #
-
-        # def reset_conditions(self):
-        #     """Resets block1 after it is finished and increments the repetition count."""
-        #     if self.current_repetition < self.repetition:
-        #         self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
-        #         self.current_repetition += 1
-        #         print(f"Resetting conditions for the {self.current_repetition} time.")
-        #     else:
-        #         print("Block1 has been repeated 3 times. No more resets.")
-        #
-        # def change_condition(self):
-        #     """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
-        #     if not self.conditions:  # If it is empty, reset it
-        #         self.reset_conditions()
-        #
-        #     if self.conditions:
-        #         # Get the first condition
-        #         self.current_condition = self.conditions.pop(0)
-        #         # Add this condition to completed_conditions
-        #         self.completed_conditions.append(self.current_condition)
-        #         print(f"Condition changed to: {self.current_condition}")
-        #         print(f"Completed conditions: {self.completed_conditions}")
-        #     else:
-        #         print("No more conditions available to assign.")
-        #
-        # def execute_trials(self):
-        #     """Executes the change of condition after every 12 trials."""
-        #     if self.current_trial % self.block == 0 and self.current_trial > 0:
-        #         self.change_condition()
-
         def generate_alternating_conditions(self):
             easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
             hard_conditions = [1, 2, 3, 4, 5, 6, 7]
@@ -188,7 +157,7 @@ class Probability_WL(Task):
 
         ## Trial blocks by conditions:
         # Check if the current block of trials is complete
-        if self.trial_counter >= self.block:
+        if self.trial_counter > self.block:
             # Move the completed condition to completed_conditions
             self.completed_conditions.append(self.current_condition)
 
@@ -231,30 +200,22 @@ class Probability_WL(Task):
         else:
             self.stim_trial = self.last_stim_trial
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        if self.stim_trial == 41:
+            self.x_correcth = self.x_correcth_pos[0]
+            self.x_incorrecth = self.x_correcth_pos[1]
+            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.stim_trial == 42:
+            self.x_correcth = self.x_correcth_pos[1]
+            self.x_incorrecth = self.x_correcth_pos[0]
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-        self.block1 = generate_alternating_conditions()
-        self.block2 = generate_alternating_conditions()
-        self.block3 = generate_alternating_conditions()
-        print(self.substage)
+        print(f"Block: {self.block}")
+        print(f"Conditions: {self.conditions}")
+        print(f"Completed Conditions: {self.completed_conditions}")
+        print(f"Current Condition: {self.current_condition}")
+        print(f"Repetition: {self.repetition}")
+        print(f"Current Repetition: {self.current_repetition}")
+        print(f"Trial Counter: {self.trial_counter}")
 
         ############ STATE MACHINE ################
         #First trial:
@@ -381,6 +342,8 @@ class Probability_WL(Task):
 
 
     def after_trial(self):
+        self.trial_counter += 1
+
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
             self.accwindow = self.accwindow[1:] + [0]
@@ -492,25 +455,6 @@ class Probability_WL(Task):
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
-
-        # if 45 < self.response_x < 145:
-        #     self.sameside = 'left'
-        #     self.sameside_counter += 1
-        # elif 231 < self.response_x < 331:
-        #     #self.sameside = 'right'
-        #     self.sameside_counter += 1
-        #
-        # if self.sameside_counter == 5:
-        #     self.bias_breaking = 1
-        #     print('Bias breaking active, side: ', self.sameside)
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        #
-        # # Correction bias extension
-        # if self.bias_breaking == 1:
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        # print('Stim Trial: ', self.stim_trial)
 
         ############ REGISTER VALUES ################
         #Working Memory:
