@@ -107,9 +107,9 @@ class Probability_WebersLaw(Task):
             if retry_candidates:
                 candidate = retry_candidates.pop(0)
                 retry_count[candidate] = retry_count.get(candidate, 0) + 1
-                print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
+                #print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
                 if retry_count[candidate] > 5:
-                    print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
+                    #print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
                     alternating_sequence.append(candidate)
                     continue
             elif not alternating_sequence and easy_idx < len(easy_conditions):
@@ -131,10 +131,10 @@ class Probability_WebersLaw(Task):
                 last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
                 if last_two == [candidate % 2, candidate % 2]:
                     retry_candidates.append(candidate)
-                    print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
+                    #print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
                     continue
             alternating_sequence.append(candidate)
-            print(f"Candidate {candidate} added to alternating_sequence.")
+            #print(f"Candidate {candidate} added to alternating_sequence.")
         return alternating_sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
