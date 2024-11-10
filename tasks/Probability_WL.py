@@ -39,9 +39,10 @@ class Probability_WL(Task):
         self.duration_tired = 1800
         self.trials_tired = 5
         self.tired = False
-        self.stage = 4
+        self.stage = 1
         self.substage = 0
         self.response_duration = 60
+        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -72,6 +73,15 @@ class Probability_WL(Task):
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
         self.height = 190
+
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
+        self.status = None              #Stores the Touch_outside condition
 
         #Randomise blocks and trials:
         self.block = 12   #This is the number of trials one conditions will remain for
@@ -191,14 +201,18 @@ class Probability_WL(Task):
         self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            print('x positions list: ' + str(self.stim_trials))
+            #print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
-        print('Stim Trial: ', self.stim_trial)
+
+        if self.bias_breaking == 0:
+            self.stim_trial = self.stim_trials[self.current_trial]
+        else:
+            self.stim_trial = self.last_stim_trial
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
@@ -231,7 +245,7 @@ class Probability_WL(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -247,7 +261,7 @@ class Probability_WL(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -260,9 +274,9 @@ class Probability_WL(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Changes the state to response window after photogate near the screen has been crossed.
+        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
         self.sma.add_state(
             state_name='Response_window',
@@ -273,17 +287,31 @@ class Probability_WL(Task):
 
         self.sma.add_state(
             state_name='Correct',
-            state_timer=2,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+        # Turns on Water port LED and plays correct sound
+
+        self.sma.add_state(
+            state_name='Correct_image_display',
+            state_timer=self.image_display,
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli
+        # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
         self.sma.add_state(
             state_name='Correct_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-        # Delivers Water and stops the reward sound
+        # Delivers Water and stops the reward sound and flips the screen
+
+        self.sma.add_state(
+            state_name='Flip_screen_reward',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
+        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='Touch_Outside',
@@ -294,15 +322,36 @@ class Probability_WL(Task):
 
         self.sma.add_state(
             state_name='Punish',
-            state_timer=1,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 39)])
+        # Turns on Global LED and water port LED on
+
+        self.sma.add_state(
+            state_name='Punish_image_display',
+            state_timer=self.image_display,
+            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
-        # Turns on Global LED and water port LED on, plays punish sound and displays incorrect stimuli
+        # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
+
+        self.sma.add_state(
+            state_name='After_punish',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+        # Flips the screen after water port poked in.
+
+        self.sma.add_state(
+            state_name='Flip_screen_no_reward',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
+        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -334,11 +383,12 @@ class Probability_WL(Task):
             self.accwindow = self.accwindow[1:] + [1]
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
+            self.bias_breaking = 0
+            #self.response_x_array = []
 
         # ##### COUNT Touches outside the jar areas :
-        # elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-        #     self.touch_outside += 1
-        #     print('Outside_count: ', self.touch_outside)
+        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+            self.status = 'Touch_Outside'
 
         # End-trial calculations
         #self.last_x = self.x
