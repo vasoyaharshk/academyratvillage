@@ -165,11 +165,8 @@ class Probability_WebersLaw(Task):
         print('Accuracy: ', self.accuracy)
 
         if not self.conditions and self.current_repetition == 0:
-            print('here01')
             self.conditions = self.generate_alternating_conditions()
-            print('here001')
             self.current_condition = self.conditions[0]
-        print('here0001')
 
         # Check if the current block of trials is complete
         if self.trial_counter > self.block:
@@ -196,7 +193,6 @@ class Probability_WebersLaw(Task):
 
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
-        print('here2')
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
