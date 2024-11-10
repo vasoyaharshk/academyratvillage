@@ -24,7 +24,7 @@ def select_task(df, subject):
     block = 12
     conditions = []  # Takes the conditions from task file after first session.
     completed_conditions = []  # To store completed conditions
-    current_condition = None  # To track the current condition in progress
+    current_condition = 0  # To track the current condition in progress
     repetition = 0
     current_repetition = 0  # To store how many times the condition has repeated.
     trial_counter = 0  # Track the number of trials for the current condition.

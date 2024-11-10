@@ -617,6 +617,14 @@ def go_to_state(num):
         utils.subject.stim_dur_ds = float(utils.subject.stim_dur_ds)
         utils.subject.stim_dur_dm = float(utils.subject.stim_dur_dm)
         utils.subject.stim_dur_dl = float(utils.subject.stim_dur_dl)
+        #PI variables:
+        utils.subject.block = int(utils.subject.block)  # Cast to int
+        utils.subject.conditions = list(map(int, utils.subject.conditions))  # Cast to list of ints
+        utils.subject.completed_conditions = list(map(int, utils.subject.completed_conditions))  # Cast to list of ints
+        utils.subject.current_condition = int(utils.subject.current_condition)  # Cast to int
+        utils.subject.repetition = int(utils.subject.repetition)  # Cast to int
+        utils.subject.current_repetition = int(utils.subject.current_repetition)  # Cast to int
+        utils.subject.trial_counter = int(utils.subject.trial_counter)  # Cast to int
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -624,6 +632,14 @@ def go_to_state(num):
         utils.task.stim_dur_dm = utils.subject.stim_dur_dm
         utils.task.stim_dur_dl = utils.subject.stim_dur_dl
         utils.task.choice = utils.subject.choice
+        #PI variables:
+        utils.task.block = utils.subject.block
+        utils.task.conditions = utils.subject.conditions
+        utils.task.completed_conditions = utils.subject.completed_conditions
+        utils.task.current_condition = utils.subject.current_condition
+        utils.task.repetition = utils.subject.repetition
+        utils.task.current_repetition = utils.subject.current_repetition
+        utils.task.trial_counter = utils.subject.trial_counter
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
