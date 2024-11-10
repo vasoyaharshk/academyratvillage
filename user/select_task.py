@@ -287,7 +287,7 @@ def select_task(df, subject):
                         stim_dur_dl = 0
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 5
+        trial_criteria = 2
         accuracy_criteria = 0.85
 
         # Identify the last session and second-to-last session
@@ -389,9 +389,9 @@ def select_task(df, subject):
                 # Stage 3 -> Stage 4 check
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
+                        print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 1
-                        task = 'Probability_WL'
+                        task = 'Probability_WebersLaw'
                         conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
                         current_condition = conditions[0]
 

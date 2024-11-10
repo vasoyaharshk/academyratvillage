@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_WL(Task):
+class Probability_WebersLaw(Task):
     def __init__(self):
         super().__init__()
 
