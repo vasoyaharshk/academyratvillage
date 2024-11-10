@@ -21,7 +21,7 @@ def select_task(df, subject):
     stim_dur_ds= 0
     stim_dur_dm= 0
     stim_dur_dl= 0
-    block = 12
+    block = 0
     conditions = []  # Takes the conditions from task file after first session.
     completed_conditions = []  # To store completed conditions
     current_condition = 0  # To track the current condition in progress
