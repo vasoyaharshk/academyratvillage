@@ -81,6 +81,8 @@ class Probability_Training_BB(Task):
         self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -288,8 +290,14 @@ class Probability_Training_BB(Task):
             self.accwindow = self.accwindow[1:] + [1]
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
-            self.bias_breaking = 0
-            #self.response_x_array = []
+
+            # Check if side bias is active and if the current trial was correct
+            if self.bias_breaking == 1:  # Side bias active
+                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                    self.bias_breaking = 0  # End bias breaking
+                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+
 
         # ##### COUNT Touches outside the jar areas :
         elif self.current_trial_states['Touch_Outside'][0][0] > 0:
@@ -311,7 +319,7 @@ class Probability_Training_BB(Task):
 
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
+        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
@@ -331,7 +339,6 @@ class Probability_Training_BB(Task):
         #     self.acc_up = 0
 
         # Side Bias Breaking formula:
-
         self.last_stim_trial = self.stim_trial
 
         try:
@@ -357,7 +364,8 @@ class Probability_Training_BB(Task):
         self.response_x_array.append(self.response_x_bias)
         print(f"Responses so far: {self.response_x_array}")
 
-        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
             # Check if all responses fall into one of the two defined categories
             all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
             all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
@@ -399,6 +407,7 @@ class Probability_Training_BB(Task):
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
+
         self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
@@ -417,3 +426,5 @@ class Probability_Training_BB(Task):
         self.register_value('sameside', self.sameside)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
