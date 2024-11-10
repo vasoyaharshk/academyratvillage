@@ -148,7 +148,7 @@ class Probability_WebersLaw(Task):
         return trials
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['duration_max']
 
     def main_loop(self):
         print('')
