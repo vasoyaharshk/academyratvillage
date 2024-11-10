@@ -10,7 +10,7 @@ class Probability_WL(Task):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script includes repoketh, the ability to make correct choices.
+        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
@@ -31,7 +31,6 @@ class Probability_WL(Task):
         self.stim_dur_dl = 0
         self.choices = 0
         self.substage = 0
-        self.project = 'PI'
 
         # Variables for the task:
         self.duration_max = 3000
@@ -80,89 +79,96 @@ class Probability_WL(Task):
         self.sameside_counter = 0       #Counts number of times on same side
         self.sameside = None             # To track which side is being triggered
         self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
+        self.side_bias_trigger_acc = 0.8            #Accuracy at which side bias will trigger
         self.status = None              #Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
-        #Randomise blocks and trials:
-        self.block = 12   #This is the number of trials one conditions will remain for
+        # def reset_conditions(self):
+        #     """Resets block1 after it is finished and increments the repetition count."""
+        #     if self.current_repetition < self.repetition:
+        #         self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
+        #         self.current_repetition += 1
+        #         print(f"Resetting conditions for the {self.current_repetition} time.")
+        #     else:
+        #         print("Block1 has been repeated 3 times. No more resets.")
+        #
+        # def change_condition(self):
+        #     """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
+        #     if not self.conditions:  # If it is empty, reset it
+        #         self.reset_conditions()
+        #
+        #     if self.conditions:
+        #         # Get the first condition
+        #         self.current_condition = self.conditions.pop(0)
+        #         # Add this condition to completed_conditions
+        #         self.completed_conditions.append(self.current_condition)
+        #         print(f"Condition changed to: {self.current_condition}")
+        #         print(f"Completed conditions: {self.completed_conditions}")
+        #     else:
+        #         print("No more conditions available to assign.")
+        #
+        # def execute_trials(self):
+        #     """Executes the change of condition after every 12 trials."""
+        #     if self.current_trial % self.block == 0 and self.current_trial > 0:
+        #         self.change_condition()
 
-        self.completed_conditions = []  # To store completed conditions
-        self.repetition = 3       #To store how many times the conditions needs to repeat.
-        self.current_condition = None  # To track the current condition in progress
-        self.current_repetition = 0       #To store how many times the condition has repeated.
-        self.conditions = []                #Takes the conditions from select task file.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-    #
-    # def reset_conditions(self):
-    #     """Resets block1 after it is finished and increments the repetition count."""
-    #     if self.current_repetition < self.repetition:
-    #         self.conditions = generate_alternating_conditions()  # Reset block1 to its original state
-    #         self.current_repetition += 1
-    #         print(f"Resetting conditions for the {self.current_repetition} time.")
-    #     else:
-    #         print("Block1 has been repeated 3 times. No more resets.")
-    #
-    # def change_condition(self):
-    #     """Changes the current condition every 12 trials and handles resetting block1 after it's finished."""
-    #     if not self.conditions:  # If it is empty, reset it
-    #         self.reset_conditions()
-    #
-    #     if self.conditions:
-    #         # Get the first condition
-    #         self.current_condition = self.conditions.pop(0)
-    #         # Add this condition to completed_conditions
-    #         self.completed_conditions.append(self.current_condition)
-    #         print(f"Condition changed to: {self.current_condition}")
-    #         print(f"Completed conditions: {self.completed_conditions}")
-    #     else:
-    #         print("No more conditions available to assign.")
-    #
-    # def execute_trials(self):
-    #     """Executes the change of condition after every 12 trials."""
-    #     if self.current_trial % self.block == 0 and self.current_trial > 0:
-    #         self.change_condition()
+        def generate_alternating_conditions(self):
+            easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+            hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+            random.shuffle(easy_conditions)
+            random.shuffle(hard_conditions)
 
-    def generate_alternating_conditions(self):
-        easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
-        hard_conditions = [1, 2, 3, 4, 5, 6, 7]
-        random.shuffle(easy_conditions)
-        random.shuffle(hard_conditions)
+            alternating_sequence = []
+            easy_idx, hard_idx, hard_streak = 0, 0, 0
+            retry_candidates = []
 
-        alternating_sequence = []
-        easy_idx, hard_idx, hard_streak = 0, 0, 0
-        retry_candidates = []
+            while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+                if retry_candidates:
+                    candidate = retry_candidates.pop(0)
+                elif not alternating_sequence and easy_idx < len(easy_conditions):
+                    candidate = easy_conditions[easy_idx]
+                    easy_idx += 1
+                    hard_streak = 0
+                elif hard_streak < 2 and hard_idx < len(hard_conditions):
+                    candidate = hard_conditions[hard_idx]
+                    hard_idx += 1
+                    hard_streak += 1
+                elif easy_idx < len(easy_conditions):
+                    candidate = easy_conditions[easy_idx]
+                    easy_idx += 1
+                    hard_streak = 0
+                else:
+                    candidate = hard_conditions[hard_idx]
+                    hard_idx += 1
 
-        while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
-            if retry_candidates:
-                candidate = retry_candidates.pop(0)
-            elif not alternating_sequence and easy_idx < len(easy_conditions):
-                candidate = easy_conditions[easy_idx]
-                easy_idx += 1
-                hard_streak = 0
-            elif hard_streak < 2 and hard_idx < len(hard_conditions):
-                candidate = hard_conditions[hard_idx]
-                hard_idx += 1
-                hard_streak += 1
-            elif easy_idx < len(easy_conditions):
-                candidate = easy_conditions[easy_idx]
-                easy_idx += 1
-                hard_streak = 0
-            else:
-                candidate = hard_conditions[hard_idx]
-                hard_idx += 1
+                if len(alternating_sequence) >= 2:
+                    last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+                    if last_two == [candidate % 2, candidate % 2]:
+                        retry_candidates.append(candidate)
+                        continue
 
-            if len(alternating_sequence) >= 2:
-                last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
-                if last_two == [candidate % 2, candidate % 2]:
-                    retry_candidates.append(candidate)
-                    continue
+                alternating_sequence.append(candidate)
 
-            alternating_sequence.append(candidate)
-
-        return alternating_sequence
+            return alternating_sequence
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
+
+    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+        trials = []
+        # Define a 50% probability for each stimulus (two stimuli)
+        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        while len(trials) < 1000:
+            # Use random.choices to select a candidate with 50% probability for each stimulus
+            candidate = random.choices(self.stim, probabilities)[0]
+            # Ensure no repetition more than twice in sequence
+            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                    continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
+        return trials
 
     def main_loop(self):
         print('')
@@ -383,8 +389,14 @@ class Probability_WL(Task):
             self.accwindow = self.accwindow[1:] + [1]
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
-            self.bias_breaking = 0
-            #self.response_x_array = []
+
+            # Check if side bias is active and if the current trial was correct
+            if self.bias_breaking == 1:  # Side bias active
+                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                    self.bias_breaking = 0  # End bias breaking
+                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+
 
         # ##### COUNT Touches outside the jar areas :
         elif self.current_trial_states['Touch_Outside'][0][0] > 0:
@@ -406,7 +418,7 @@ class Probability_WL(Task):
 
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
+        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
@@ -425,12 +437,77 @@ class Probability_WL(Task):
         #     self.current_trial = 1
         #     self.acc_up = 0
 
+        # Side Bias Breaking formula:
+        self.last_stim_trial = self.stim_trial
+
+        try:
+            # Try converting response_x directly to a float
+            self.response_x_bias = float(self.response_x)
+        except ValueError:
+            print(f"No response_x value or response other: {self.response_x}")
+
+            # Split the string by commas and convert it to a list of floats
+            try:
+                # First, check if the response_x is a string and split it
+                response_x_list = [float(x) for x in self.response_x.split(",")]
+
+                # Use the last element of the list as response_x_bias
+                self.response_x_bias = response_x_list[-1]
+                print(f"Using last value from response_x array: {self.response_x_bias}")
+            except Exception as e:
+                #print(f"Failed to process response_x as array. Error: {e}")
+                return  # Handle this case if needed
+
+        # Append the response to the array:
+        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+        self.response_x_array.append(self.response_x_bias)
+        print(f"Responses so far: {self.response_x_array}")
+
+        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+            # Check if all responses fall into one of the two defined categories
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+
+            if all_left_side:
+                self.sameside = 'left'
+                self.bias_breaking = 1
+                print('Bias breaking active, side:', self.sameside)
+                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+            elif all_right_side:
+                self.sameside = 'right'
+                self.bias_breaking = 1
+                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+                print('Bias breaking active, side:', self.sameside)
+
+            self.response_x_array = []      #Clearing the array
+
+        # if 45 < self.response_x < 145:
+        #     self.sameside = 'left'
+        #     self.sameside_counter += 1
+        # elif 231 < self.response_x < 331:
+        #     #self.sameside = 'right'
+        #     self.sameside_counter += 1
+        #
+        # if self.sameside_counter == 5:
+        #     self.bias_breaking = 1
+        #     print('Bias breaking active, side: ', self.sameside)
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        #
+        # # Correction bias extension
+        # if self.bias_breaking == 1:
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        # print('Stim Trial: ', self.stim_trial)
+
         ############ REGISTER VALUES ################
+        #Working Memory:
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
-        self.register_value('substage', self.substage)
+        #PI:
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
@@ -441,10 +518,18 @@ class Probability_WL(Task):
         self.register_value('response_duration', self.response_duration)
         self.register_value('trial_length', self.trial_length)
         self.register_value('stage', self.stage)
+        self.register_value('substage', self.substage)
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
-
+        #Bias Breaking:
+        self.register_value('bias_breaking', self.bias_breaking)
+        self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        #ROR:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)
         self.register_value('completed_conditions', self.completed_conditions)

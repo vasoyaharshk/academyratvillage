@@ -21,13 +21,13 @@ def select_task(df, subject):
     stim_dur_ds= 0
     stim_dur_dm= 0
     stim_dur_dl= 0
+    block = 12
+    conditions = []  # Takes the conditions from task file after first session.
     completed_conditions = []  # To store completed conditions
     current_condition = None  # To track the current condition in progress
-    current_repetition = 0  # To store how many times the condition has repeated.
-    conditions = []  # Takes the conditions from select task file.
-    trial_counter = 0  # Track the number of trials for the current condition.
     repetition = 0
-
+    current_repetition = 0  # To store how many times the condition has repeated.
+    trial_counter = 0  # Track the number of trials for the current condition.
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
@@ -392,19 +392,21 @@ def select_task(df, subject):
                         print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
                         stage = 1
                         task = 'WebersLaw_Probability'
-                        conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively
+                        conditions = self.generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
 
         if 'WebersLaw_Probability' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
             # Assign each value from the last row to the variables:
+            block = last_row['block']
+            conditions = last_row['conditions']
             completed_conditions = last_row['completed_conditions']
             current_condition = last_row['current_condition']
             repetition = last_row['repetition']
             current_repetition = last_row['current_repetition']
             trial_counter = last_row['trial_counter']
 
-    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
+    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 
 
 def generate_alternating_conditions():
