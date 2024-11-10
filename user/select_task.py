@@ -371,7 +371,7 @@ def select_task(df, subject):
                         task = 'Probability_Training_BB'
                         stage = 1
                         substage = 0
-        elif 'WebersLaw' not in task:
+        elif 'Probability_WebersLaw' not in task:
             # Check stage-specific conditions for advancement
             if last_session_task == second_last_session_task:
                 # Stage 1 -> Stage 2 check
@@ -392,19 +392,19 @@ def select_task(df, subject):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 1
                         task = 'Probability_WebersLaw'
-                        conditions = generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
-                        current_condition = conditions[0]
-                elif 'WebersLaw' in task:
-                    last_row = df.iloc[-1]  # Get the last row of the DataFrame
-                    # Assign each value from the last row to the variables:
-                    stage = last_row['stage']
-                    block = last_row['block']
-                    conditions = last_row['conditions']
-                    completed_conditions = last_row['completed_conditions']
-                    current_condition = last_row['current_condition']
-                    repetition = last_row['repetition']
-                    current_repetition = last_row['current_repetition']
-                    trial_counter = last_row['trial_counter']
+                        # conditions = generate_alternating_conditions() # This holds the 16 conditions pseudorandomised as easy and hard alternatively. No more than two odd numbers or even numbers are also together
+                        # current_condition = conditions[0]
+        elif 'Probability_WebersLaw' in task:
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
+            # Assign each value from the last row to the variables:
+            stage = last_row['stage']
+            block = last_row['block']
+            conditions = last_row['conditions']
+            completed_conditions = last_row['completed_conditions']
+            current_condition = last_row['current_condition']
+            repetition = last_row['repetition']
+            current_repetition = last_row['current_repetition']
+            trial_counter = last_row['trial_counter']
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 
