@@ -10,6 +10,7 @@ class Probability_WebersLaw(Task):
         super().__init__()
 
         self.info = """
+        This is the real weber's law file.
         This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
