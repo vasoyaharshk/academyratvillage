@@ -421,12 +421,10 @@ def generate_alternating_conditions():
     hard_conditions = [1, 2, 3, 4, 5, 6, 7]
     random.shuffle(easy_conditions)
     random.shuffle(hard_conditions)
-
     alternating_sequence = []
     easy_idx, hard_idx = 0, 0
     hard_streak = 0
     retry_candidates = []  # Stores candidates that couldn't be added on the first pass
-
     # Generate the alternating sequence with rules applied
     while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
         if retry_candidates:
@@ -447,14 +445,11 @@ def generate_alternating_conditions():
         else:
             candidate = hard_conditions[hard_idx]
             hard_idx += 1
-
         # Check the last two conditions in alternating_sequence to ensure even/odd pattern
         if len(alternating_sequence) >= 2:
             last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
             if last_two == [candidate % 2, candidate % 2]:
                 retry_candidates.append(candidate)  # Add to retry list if it breaks the rule
                 continue
-
         alternating_sequence.append(candidate)
-
     return alternating_sequence

@@ -93,18 +93,20 @@ class Probability_WebersLaw(Task):
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
 
-    def generate_alternating_conditions(self):
+    def generate_alternating_conditions():
+        # Weber's law conditions
         easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
         hard_conditions = [1, 2, 3, 4, 5, 6, 7]
         random.shuffle(easy_conditions)
         random.shuffle(hard_conditions)
-
         alternating_sequence = []
-        easy_idx, hard_idx, hard_streak = 0, 0, 0
-        retry_candidates = []
-
+        easy_idx, hard_idx = 0, 0
+        hard_streak = 0
+        retry_candidates = []  # Stores candidates that couldn't be added on the first pass
+        # Generate the alternating sequence with rules applied
         while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
             if retry_candidates:
+                # Process any skipped candidates if there are any
                 candidate = retry_candidates.pop(0)
             elif not alternating_sequence and easy_idx < len(easy_conditions):
                 candidate = easy_conditions[easy_idx]
@@ -121,15 +123,13 @@ class Probability_WebersLaw(Task):
             else:
                 candidate = hard_conditions[hard_idx]
                 hard_idx += 1
-
+            # Check the last two conditions in alternating_sequence to ensure even/odd pattern
             if len(alternating_sequence) >= 2:
                 last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
                 if last_two == [candidate % 2, candidate % 2]:
-                    retry_candidates.append(candidate)
+                    retry_candidates.append(candidate)  # Add to retry list if it breaks the rule
                     continue
-
             alternating_sequence.append(candidate)
-
         return alternating_sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
@@ -151,15 +151,16 @@ class Probability_WebersLaw(Task):
         self.gui_input = ['duration_max']
 
     def main_loop(self):
-        print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
 
         if not self.conditions and self.current_repetition == 0:
+            print('here01')
             self.conditions = self.generate_alternating_conditions()
+            print('here001')
             self.current_condition = self.conditions[0]
+        print('here0001')
 
-            ## Trial blocks by conditions:
         # Check if the current block of trials is complete
         if self.trial_counter > self.block:
             # Move the completed condition to completed_conditions
@@ -185,7 +186,7 @@ class Probability_WebersLaw(Task):
 
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
-
+        print('here2')
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
@@ -219,8 +220,8 @@ class Probability_WebersLaw(Task):
         print(f"Current Condition: {self.current_condition}")
         print(f"Repetition: {self.repetition}")
         print(f"Current Repetition: {self.current_repetition}")
-        print(f"Trial Counter: {self.trial_counter}")
-
+        print(f"Trial Counter: {self.trial_counter}
+        
         ############ STATE MACHINE ################
         #First trial:
         if self.current_trial == 0:
