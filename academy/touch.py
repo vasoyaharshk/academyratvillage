@@ -200,6 +200,7 @@ class Touch:
             print('Touch: ', answer)
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
             ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            #ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1])) - yz
             print('X2: ', xtouch, 'Y2: ', ytouch)
             print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)
 

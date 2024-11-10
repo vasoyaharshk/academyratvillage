@@ -39,6 +39,14 @@ class Task(object):
         self.stim_dur_ds = 0  # by default
         self.stim_dur_dm = 0  # by default
         self.stim_dur_dl = 0.1  # by default
+        #PI Variables:
+        self.block = 12  # This is the number of trials one conditions will remain for
+        self.conditions = []  # Takes the conditions from select task file.
+        self.completed_conditions = []  # To store completed conditions
+        self.current_condition = 0  # To track the current condition in progress
+        self.repetition = 3  # To store how many times the conditions needs to repeat.
+        self.current_repetition = 0  # To store how many times the condition has repeated.
+        self.trial_counter = 0  # Track the number of trials for the current condition
 
         self.checksum = None
         self.subject_class = None
