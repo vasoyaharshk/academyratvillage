@@ -13,6 +13,7 @@ from academy.task_manager import TaskManager
 from academy.softcode import softcode
 from academy.camera import cam1, cam2, cam3
 from user import settings
+import ast
 
 
 # 0 waiting
