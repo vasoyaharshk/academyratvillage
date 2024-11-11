@@ -619,8 +619,12 @@ def go_to_state(num):
         utils.subject.stim_dur_dl = float(utils.subject.stim_dur_dl)
         #PI variables:
         utils.subject.block = int(utils.subject.block)  # Cast to int
-        utils.subject.conditions = list(map(int, utils.subject.conditions))  # Cast to list of ints
-        utils.subject.completed_conditions = list(map(int, utils.subject.completed_conditions))  # Cast to list of ints
+        if isinstance(utils.subject.conditions, str):
+            utils.subject.conditions = ast.literal_eval(utils.subject.conditions)
+        utils.subject.conditions = list(map(int, utils.subject.conditions))
+        if isinstance(utils.subject.completed_conditions, str):
+            utils.subject.completed_conditions = ast.literal_eval(utils.subject.completed_conditions)
+        utils.subject.completed_conditions = list(map(int, utils.subject.completed_conditions))
         utils.subject.current_condition = int(utils.subject.current_condition)  # Cast to int
         utils.subject.repetition = int(utils.subject.repetition)  # Cast to int
         utils.subject.current_repetition = int(utils.subject.current_repetition)  # Cast to int
