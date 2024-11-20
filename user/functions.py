@@ -692,9 +692,7 @@ def function41():  # When the correct answer is on left
         print(f"Error occurred: {e}")
 
 def loop41(timing):
-    if timing < utils.task.response_duration:
-        image_jar_left.draw()
-        #border1.draw()
+    image_jar_left.draw()
     window.flip()
 
 
@@ -733,7 +731,5 @@ def function42():  # When the correct answer is on right
 
 
 def loop42(timing):
-    if timing < utils.task.response_duration:
-        image_jar_right.draw()
-        #border1.draw()
+    image_jar_right.draw()
     window.flip()
