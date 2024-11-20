@@ -10,11 +10,14 @@ class Probability_Extra_Training(Task):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This task displays the image of the jars which are touchable. This script is for the extra training if rats are struggling to discriminate between stimuli.
+        
         ########   TASK INFO   ########
-        Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination 2: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Extra Training 1.1: a single blue peg - either on left or right, like Indication
+        Extra Training 1.2: a single blue peg vs a single yellow peg - side counterbalanced
+        Extra Training 1.3: two blue pegs vs two yellow pegs - side counterbalanced
+        Extra Training 1.4: 5 blue pegs vs 5 yellow pegs - side counterbalanced
+        Extra Training 1.5: 10 blue pegs vs 10 yellow pegs - side counterbalanced
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump

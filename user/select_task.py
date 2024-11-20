@@ -371,7 +371,42 @@ def select_task(df, subject):
                         task = 'Probability_Training_BB'
                         stage = 1
                         substage = 0
-        elif 'Probability_WebersLaw' not in task:
+
+        elif 'Probability_Extra_Training' in task:
+            if last_session_stage == 1 and second_last_session_stage == 1:
+                if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.1 to stage 1.2')
+                        stage = 1
+                        substage = 2
+                elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.2 to 1.3')
+                        stage = 1
+                        substage = 3
+                elif last_session_substage_stage == 3 and second_last_session_substage_stage == 3:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.3 to 1.4')
+                        stage = 1
+                        substage = 4
+                elif last_session_substage_stage == 4 and second_last_session_substage_stage == 4:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.4 to 1.5')
+                        stage = 1
+                        substage = 5
+                elif last_session_substage_stage == 5 and second_last_session_substage_stage == 5:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        print(f'Advancing from stage 1.5 to normal task')
+                        task = 'Probability_Training_BB'
+                        stage = 1
+                        substage = 0
+
+        elif 'Probability_Training_BB' in task:
             # Check stage-specific conditions for advancement
             if last_session_task == second_last_session_task:
                 # Stage 1 -> Stage 2 check
@@ -379,19 +414,18 @@ def select_task(df, subject):
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
                         stage = 2
-
                 # Stage 2 -> Stage 3 check
                 elif last_session_stage == 2 and second_last_session_stage == 2:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
                         stage = 3
-
                 # Stage 3 -> Weber's Law
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 1
                         task = 'Probability_WebersLaw'
+
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
             # Assign each value from the last row to the variables:
