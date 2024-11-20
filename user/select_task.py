@@ -390,8 +390,8 @@ def select_task(df, subject):
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
-                        #stage = 1
-                        #task = 'Probability_WebersLaw'
+                        stage = 1
+                        task = 'Probability_WebersLaw'
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
             # Assign each value from the last row to the variables:
@@ -407,46 +407,46 @@ def select_task(df, subject):
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 
 
-def generate_alternating_conditions():
-    easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
-    hard_conditions = [1, 2, 3, 4, 5, 6, 7]
-    random.shuffle(easy_conditions)
-    random.shuffle(hard_conditions)
-    alternating_sequence = []
-    easy_idx, hard_idx = 0, 0
-    hard_streak = 0
-    retry_candidates = []
-    retry_count = {}
-    while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
-        if retry_candidates:
-            candidate = retry_candidates.pop(0)
-            retry_count[candidate] = retry_count.get(candidate, 0) + 1
-            #print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
-            if retry_count[candidate] > 5:
-                #print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
-                alternating_sequence.append(candidate)
-                continue
-        elif not alternating_sequence and easy_idx < len(easy_conditions):
-            candidate = easy_conditions[easy_idx]
-            easy_idx += 1
-            hard_streak = 0
-        elif hard_streak < 2 and hard_idx < len(hard_conditions):
-            candidate = hard_conditions[hard_idx]
-            hard_idx += 1
-            hard_streak += 1
-        elif easy_idx < len(easy_conditions):
-            candidate = easy_conditions[easy_idx]
-            easy_idx += 1
-            hard_streak = 0
-        else:
-            candidate = hard_conditions[hard_idx]
-            hard_idx += 1
-        if len(alternating_sequence) >= 2:
-            last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
-            if last_two == [candidate % 2, candidate % 2]:
-                retry_candidates.append(candidate)
-                #print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
-                continue
-        alternating_sequence.append(candidate)
-        #print(f"Candidate {candidate} added to alternating_sequence.")
-    return alternating_sequence
+# def generate_alternating_conditions():
+#     easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+#     hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+#     random.shuffle(easy_conditions)
+#     random.shuffle(hard_conditions)
+#     alternating_sequence = []
+#     easy_idx, hard_idx = 0, 0
+#     hard_streak = 0
+#     retry_candidates = []
+#     retry_count = {}
+#     while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
+#         if retry_candidates:
+#             candidate = retry_candidates.pop(0)
+#             retry_count[candidate] = retry_count.get(candidate, 0) + 1
+#             #print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
+#             if retry_count[candidate] > 5:
+#                 #print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
+#                 alternating_sequence.append(candidate)
+#                 continue
+#         elif not alternating_sequence and easy_idx < len(easy_conditions):
+#             candidate = easy_conditions[easy_idx]
+#             easy_idx += 1
+#             hard_streak = 0
+#         elif hard_streak < 2 and hard_idx < len(hard_conditions):
+#             candidate = hard_conditions[hard_idx]
+#             hard_idx += 1
+#             hard_streak += 1
+#         elif easy_idx < len(easy_conditions):
+#             candidate = easy_conditions[easy_idx]
+#             easy_idx += 1
+#             hard_streak = 0
+#         else:
+#             candidate = hard_conditions[hard_idx]
+#             hard_idx += 1
+#         if len(alternating_sequence) >= 2:
+#             last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
+#             if last_two == [candidate % 2, candidate % 2]:
+#                 retry_candidates.append(candidate)
+#                 #print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
+#                 continue
+#         alternating_sequence.append(candidate)
+#         #print(f"Candidate {candidate} added to alternating_sequence.")
+#     return alternating_sequence
