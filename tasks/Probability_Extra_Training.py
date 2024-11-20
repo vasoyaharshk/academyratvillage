@@ -137,7 +137,7 @@ class Probability_Extra_Training(Task):
         else:
             self.stim_trial = self.last_stim_trial
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
+        if self.substage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
             if self.stim_trial == 31:
                 self.x_correcth = self.x_correcth_pos[0]
