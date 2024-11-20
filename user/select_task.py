@@ -423,7 +423,7 @@ def select_task(df, subject):
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
-                        stage = 1
+                        stage = 4
                         task = 'Probability_WebersLaw'
 
         elif 'Probability_WebersLaw' in task:

@@ -121,7 +121,7 @@ class Probability_Extra_Training(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [51, 52]  # These are the functions being called. 51 is for the correct answer is on the left and 52 is when the correct answer is on the right
 
         # Stimulus generation logic
         if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
@@ -138,21 +138,58 @@ class Probability_Extra_Training(Task):
             self.stim_trial = self.last_stim_trial
 
         if self.substage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 51 displays stimulus with correct answer on the left (x=115) and 52 displays stimulus with correct answer on right (x=295)
+            self.width = 100
+            self.height = 190
+            if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
+            elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
+        elif self.substage == 2:
+            self.width = 100
+            self.height = 190
+            if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
+            elif self.stim_trial == 52:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.substage == 3:
+            self.width = 100
+            self.height = 190
+            if self.stim_trial == 51:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 52:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.substage == 4:
+            self.width = 100
+            self.height = 190
+            if self.stim_trial == 51:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 52:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.substage == 5:
+            self.width = 100
+            self.height = 190
+            if self.stim_trial == 51:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
@@ -386,11 +423,11 @@ class Probability_Extra_Training(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+                self.last_stim_trial = 52               #Ensure last_stim_trial is 52
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
-                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+                self.last_stim_trial = 51                  #Ensure last_stim_trial is 51
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
