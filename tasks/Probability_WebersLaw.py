@@ -71,8 +71,8 @@ class Probability_WebersLaw(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 120  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
+        self.width = 110  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
+        self.height = 205   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
