@@ -828,6 +828,10 @@ class Gui(tk.Frame):
             idx = 0
             for event in last_events:
                 label = self.event_labels[idx]
+                # if event and hasattr(event, 'date'):
+                #     #print(f"Event Date: {event.date}")
+                # else:
+                #     #print("Event is None or lacks a 'date' attribute")
                 text = (
                     event.date
                     + "     "
