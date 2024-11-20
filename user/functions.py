@@ -560,10 +560,10 @@ def function35():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "correct")
             # Update the image path for drawing
-            if last_function_called in [31, 41]:
+            if last_function_called in [31, 41, 51]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called in [32, 42]:
+            elif last_function_called in [32, 42, 52]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
         print(f"Correct image path: {image_path_replaced}")
@@ -572,10 +572,10 @@ def loop35(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called in [31, 41]:
+        if last_function_called in [31, 41, 51]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called in [32, 42]:
+        elif last_function_called in [32, 42, 52]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -597,10 +597,10 @@ def function36():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "incorrect")
             # Update the image path for drawing
-            if last_function_called in [31, 41]:
+            if last_function_called in [31, 41, 51]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called in [32, 42]:
+            elif last_function_called in [32, 42, 52]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
         print(f"Incorrect image path: {image_path_replaced}")
@@ -611,10 +611,10 @@ def loop36(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called in [31, 41]:
+        if last_function_called in [31, 41, 51]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called in [32, 42]:
+        elif last_function_called in [32, 42, 52]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -731,5 +731,117 @@ def function42():  # When the correct answer is on right
 
 
 def loop42(timing):
+    image_jar_right.draw()
+    window.flip()
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is left:
+def function51():  # When the blue jar is on left
+    global last_function_called, image_path
+    last_function_called = 51  # Track that function31 was called
+
+    substage = utils.task.substage
+    left_images = []
+    try:
+        # Get all the images based on the stages
+        if substage == 1:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_1_indication'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
+        elif substage == 2:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_2_discrimination_1'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif substage == 3:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_3_discrimination_2'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif substage == 4:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_4_discrimination_3'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif substage == 5:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_5_discrimination_4'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left: ', random_image_path_left)
+
+        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop51(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+def function52():  # When the blue jar is on right
+    global last_function_called, image_path
+    last_function_called = 52  # Track that function31 was called
+
+    substage = utils.task.substage
+    right_images = []
+    try:
+        # Get all the images based on the stages
+        if substage == 1:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_1_indication'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
+        elif substage == 2:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_2_discrimination_1'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif substage == 3:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_3_discrimination_2'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif substage == 4:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_4_discrimination_3'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif substage == 5:
+            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_5_discrimination_4'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right:', random_image_path_right)
+
+        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop52(timing):
     image_jar_right.draw()
     window.flip()
