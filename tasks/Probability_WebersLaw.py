@@ -11,11 +11,9 @@ class Probability_WebersLaw(Task):
 
         self.info = """
         This is the real weber's law file.
-        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This task displays the image of the jars which are touchable. This script is for Weber's law and the bias breaking is not active.
         ########   TASK INFO   ########
-        Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination 2: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Every 12 trials, the condition will change to a new one. 
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -74,7 +72,7 @@ class Probability_WebersLaw(Task):
         self.width = 110  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
         self.height = 225   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
 
-        #Bias breaking variables:
+        #Bias breaking variables, not used in Weber's Law:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
         self.response_x_array = []      #Stores responses for x till 3 values
         self.sameside_counter = 0       #Counts number of times on same side
@@ -142,7 +140,7 @@ class Probability_WebersLaw(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
+        while len(trials) < 12:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -153,8 +151,23 @@ class Probability_WebersLaw(Task):
                 trials.append(candidate)
         return trials
 
+    # Generate randomized trials with balanced distribution
+    def generate_random_trials_ror1(self, last_trial=None):
+        trials = []
+        # Define trial types explicitly
+        trial_types = [43, 44]  # 41 = Left, 42 = Right
+        sizes = ["small", "big"]
+
+        while len(trials) < 12:  # Generate 12 trials per block
+            for trial_type in trial_types:
+                for size in sizes:
+                    if trials.count(trial_type) < 6:  # Max 6 per side
+                        trials.append((trial_type, size))  # Add trial with size (small/big)
+        random.shuffle(trials)  # Shuffle to randomize order
+        return trials
+
     def configure_gui(self):
-        self.gui_input = ['duration_max']
+        self.gui_input = ['current_condition', 'duration_max']
 
     def main_loop(self):
         print('Trial: ' + str(self.current_trial))
@@ -190,22 +203,30 @@ class Probability_WebersLaw(Task):
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
         ### Randomizing the stimulus positions for both the images:
-        # Choose x positions:
-        self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
-        # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+        # Choose x positions:
+        if self.current_condition in [1, 2]:
+            self.stim = [43,44]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        else:
+            self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+
+        # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
+        if self.current_trial % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+            # Check if current condition is 1 or 2 and call the appropriate trial generator
+            if self.current_condition in [1, 2]:
+                self.stim_trials = self.generate_random_trials_ror1(last_trial)
+            else:
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            print('Stimulus trials generated: ', self.stim_trials)
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
         if self.bias_breaking == 0:
             self.stim_trial = self.stim_trials[self.current_trial]
-        else:
-            self.stim_trial = self.last_stim_trial
+        # else:
+        #     self.stim_trial = self.last_stim_trial
 
         if self.stim_trial == 41:
             self.x_correcth = self.x_correcth_pos[0]
@@ -371,12 +392,12 @@ class Probability_WebersLaw(Task):
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
 
-            # Check if side bias is active and if the current trial was correct
-            if self.bias_breaking == 1:  # Side bias active
-                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
-                    self.bias_breaking = 0  # End bias breaking
-                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+            # # Check if side bias is active and if the current trial was correct
+            # if self.bias_breaking == 1:  # Side bias active
+            #     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+            #     if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+            #         self.bias_breaking = 0  # End bias breaking
+            #         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
         # ##### COUNT Touches outside the jar areas :
@@ -418,50 +439,50 @@ class Probability_WebersLaw(Task):
         #     self.current_trial = 1
         #     self.acc_up = 0
 
-        # Side Bias Breaking formula:
-        self.last_stim_trial = self.stim_trial
-
-        try:
-            # Try converting response_x directly to a float
-            self.response_x_bias = float(self.response_x)
-        except ValueError:
-            print(f"No response_x value or response other: {self.response_x}")
-
-            # Split the string by commas and convert it to a list of floats
-            try:
-                # First, check if the response_x is a string and split it
-                response_x_list = [float(x) for x in self.response_x.split(",")]
-
-                # Use the last element of the list as response_x_bias
-                self.response_x_bias = response_x_list[-1]
-                print(f"Using last value from response_x array: {self.response_x_bias}")
-            except Exception as e:
-                #print(f"Failed to process response_x as array. Error: {e}")
-                return  # Handle this case if needed
-
-        # Append the response to the array:
-        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-        self.response_x_array.append(self.response_x_bias)
-        print(f"Responses so far: {self.response_x_array}")
-
-        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-            # Check if all responses fall into one of the two defined categories
-            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
-
-            if all_left_side:
-                self.sameside = 'left'
-                self.bias_breaking = 1
-                print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
-            elif all_right_side:
-                self.sameside = 'right'
-                self.bias_breaking = 1
-                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
-                print('Bias breaking active, side:', self.sameside)
-
-            self.response_x_array = []      #Clearing the array
+        # # Side Bias Breaking formula:
+        # self.last_stim_trial = self.stim_trial
+        #
+        # try:
+        #     # Try converting response_x directly to a float
+        #     self.response_x_bias = float(self.response_x)
+        # except ValueError:
+        #     print(f"No response_x value or response other: {self.response_x}")
+        #
+        #     # Split the string by commas and convert it to a list of floats
+        #     try:
+        #         # First, check if the response_x is a string and split it
+        #         response_x_list = [float(x) for x in self.response_x.split(",")]
+        #
+        #         # Use the last element of the list as response_x_bias
+        #         self.response_x_bias = response_x_list[-1]
+        #         print(f"Using last value from response_x array: {self.response_x_bias}")
+        #     except Exception as e:
+        #         #print(f"Failed to process response_x as array. Error: {e}")
+        #         return  # Handle this case if needed
+        #
+        # # Append the response to the array:
+        # #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+        # self.response_x_array.append(self.response_x_bias)
+        # print(f"Responses so far: {self.response_x_array}")
+        #
+        # #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+        #     # Check if all responses fall into one of the two defined categories
+        #     all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+        #     all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+        #
+        #     if all_left_side:
+        #         self.sameside = 'left'
+        #         self.bias_breaking = 1
+        #         print('Bias breaking active, side:', self.sameside)
+        #         self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+        #     elif all_right_side:
+        #         self.sameside = 'right'
+        #         self.bias_breaking = 1
+        #         self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+        #         print('Bias breaking active, side:', self.sameside)
+        #
+        #     self.response_x_array = []      #Clearing the array
 
         ############ REGISTER VALUES ################
         #Working Memory:
