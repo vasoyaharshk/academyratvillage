@@ -11,11 +11,9 @@ class Probability_WebersLaw(Task):
 
         self.info = """
         This is the real weber's law file.
-        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This task displays the image of the jars which are touchable. This script is for Weber's law and the bias breaking is not active.
         ########   TASK INFO   ########
-        Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination 2: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Every 12 trials, the condition will change to a new one. 
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
