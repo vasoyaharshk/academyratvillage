@@ -734,6 +734,21 @@ def loop42(timing):
     image_jar_right.draw()
     window.flip()
 
+
+#Function 43 adn 44 are for conditions 1 and 2 for ror 1 in weber's law:
+def function43():
+
+def loop43(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+def function44():
+
+def loop44(timing):
+    image_jar_right.draw()
+    window.flip()
+
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
 def function51():  # When the blue jar is on left
     global last_function_called, image_path

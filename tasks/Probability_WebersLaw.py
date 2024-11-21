@@ -140,7 +140,7 @@ class Probability_WebersLaw(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
+        while len(trials) < 12:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -149,6 +149,21 @@ class Probability_WebersLaw(Task):
                 if last_trial is not None and len(trials) == 0 and candidate == last_trial:
                     continue  # Skip if the first trial of new block matches last trial of previous block
                 trials.append(candidate)
+        return trials
+
+    # Generate randomized trials with balanced distribution
+    def generate_random_trials_ror1(self, last_trial=None):
+        trials = []
+        # Define trial types explicitly
+        trial_types = [43, 44]  # 41 = Left, 42 = Right
+        sizes = ["small", "big"]
+
+        while len(trials) < 12:  # Generate 12 trials per block
+            for trial_type in trial_types:
+                for size in sizes:
+                    if trials.count(trial_type) < 6:  # Max 6 per side
+                        trials.append((trial_type, size))  # Add trial with size (small/big)
+        random.shuffle(trials)  # Shuffle to randomize order
         return trials
 
     def configure_gui(self):
@@ -191,12 +206,16 @@ class Probability_WebersLaw(Task):
         # Choose x positions:
         self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
-        # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+        # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
+        if self.current_trial % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
-            self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            # Check if current condition is 1 or 2 and call the appropriate trial generator
+            if self.current_condition in [1, 2]:
+                self.stim_trials = self.generate_random_trials_ror1(last_trial)
+            else:
+                self.stim_trials = self.generate_random_trials(last_trial)
+            print('Stimulus trials generated: ', self.stim_trials)
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
