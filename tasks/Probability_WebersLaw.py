@@ -218,7 +218,7 @@ class Probability_WebersLaw(Task):
             if self.current_condition in [1, 2]:
                 self.stim_trials = self.generate_random_trials_ror1(last_trial)
             else:
-            self.stim_trials = self.generate_random_trials(last_trial)
+                self.stim_trials = self.generate_random_trials(last_trial)
             print('Stimulus trials generated: ', self.stim_trials)
 
         self.stim_trial = self.stim_trials[self.current_trial]
