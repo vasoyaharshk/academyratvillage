@@ -5,13 +5,14 @@ from user import settings
 import random
 import numpy as np
 
+
 class Probability_Extra_Training(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is for the extra training if rats are struggling to discriminate between stimuli.
-        
+
         ########   TASK INFO   ########
         Extra Training 1.1: a single blue peg - either on left or right, like Indication
         Extra Training 1.2: a single blue peg vs a single yellow peg - side counterbalanced
@@ -28,7 +29,7 @@ class Probability_Extra_Training(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-        #Non-used variables so that stage training works:
+        # Non-used variables so that stage training works:
         self.stim_dur_ds = 0
         self.stim_dur_dm = 0
         self.stim_dur_dl = 0
@@ -44,25 +45,25 @@ class Probability_Extra_Training(Task):
         self.stage = 1
         self.substage = 0
         self.response_duration = 60
-        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
+        self.image_display = 3  # Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
-        #self.acc_up = 0.85
-        #self.acc_down = 0.4
+        # self.acc_up = 0.85
+        # self.acc_down = 0.4
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
         self.valve_factor_c = 2  # Normal water delivery of 25ul.
-        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
+        # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
         self.valid_counter = 0
         self.tired_counter = 0
         self.touch_outside = 0
         self.reward_drunk = 0
-        #self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
+        # self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
@@ -73,21 +74,21 @@ class Probability_Extra_Training(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 100  # Stimulus width in mm. Original size for jar is 70mm.
+        self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
 
-        #Bias breaking variables:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        # Bias breaking variables:
+        self.bias_breaking = 0  # If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []  # Stores responses for x till 3 values
+        self.sameside_counter = 0  # Counts number of times on same side
+        self.sameside = None  # To track which side is being triggered
+        self.side_bias_trigger = 5  # After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+        self.status = None  # Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0  # This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3  ##This is the number of corrrects the rat needs to do to end bias breaking
 
-        #Required for Weber's law:
+        # Required for Weber's law:
         self.block = 0  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
@@ -128,7 +129,7 @@ class Probability_Extra_Training(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            # print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
@@ -155,48 +156,55 @@ class Probability_Extra_Training(Task):
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
         elif self.substage == 3:
             self.width = 100
             self.height = 190
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
         elif self.substage == 4:
             self.width = 100
             self.height = 190
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
         elif self.substage == 5:
             self.width = 100
             self.height = 190
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
 
         ############ STATE MACHINE ################
-        #First trial:
+        # First trial:
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
@@ -212,7 +220,7 @@ class Probability_Extra_Training(Task):
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
             # Closes corridor door 2 and delivers initial 50ul water.
 
-        #Other Trials:
+        # Other Trials:
         else:
             self.sma.add_state(
                 state_name='Start_task',
@@ -237,7 +245,8 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Response_window',
             state_timer=self.response_duration,
-            state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish', Bpod.Events.Tup: 'No_Touch'},
+            state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
+                                     Bpod.Events.Tup: 'No_Touch'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
         # Starts to read the touchscreen with one touch processing
 
@@ -280,14 +289,16 @@ class Probability_Extra_Training(Task):
             state_name='Punish',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 39)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                            (Bpod.OutputChannels.SoftCode, 39)])
         # Turns on Global LED and water port LED on
 
         self.sma.add_state(
             state_name='Punish_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                            (Bpod.OutputChannels.SoftCode, 36)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
@@ -301,7 +312,8 @@ class Probability_Extra_Training(Task):
             state_name='Flip_screen_no_reward',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                            (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
@@ -317,7 +329,6 @@ class Probability_Extra_Training(Task):
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[])
-
 
     def after_trial(self):
         ##### COUNT MISSES:
@@ -343,7 +354,7 @@ class Probability_Extra_Training(Task):
             # Check if side bias is active and if the current trial was correct
             if self.bias_breaking == 1:  # Side bias active
                 self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
                     self.bias_breaking = 0  # End bias breaking
                     self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
@@ -353,7 +364,7 @@ class Probability_Extra_Training(Task):
             self.status = 'Touch_Outside'
 
         # End-trial calculations
-        #self.last_x = self.x
+        # self.last_x = self.x
         self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
         print('Trial length: ' + str(self.trial_length))
 
@@ -367,7 +378,7 @@ class Probability_Extra_Training(Task):
             self.tired_counter = 0
 
         # Accuracy for running trials:
-        #self.accuracy = sum(self.accwindow) / len(self.accwindow)
+        # self.accuracy = sum(self.accwindow) / len(self.accwindow)
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         # # Stage progression based on conditions:
@@ -405,32 +416,33 @@ class Probability_Extra_Training(Task):
                 self.response_x_bias = response_x_list[-1]
                 print(f"Using last value from response_x array: {self.response_x_bias}")
             except Exception as e:
-                #print(f"Failed to process response_x as array. Error: {e}")
+                # print(f"Failed to process response_x as array. Error: {e}")
                 return  # Handle this case if needed
 
         # Append the response to the array:
-        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+        # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
         self.response_x_array.append(self.response_x_bias)
         print(f"Responses so far: {self.response_x_array}")
 
-        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
         if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
             # Check if all responses fall into one of the two defined categories
-            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+            all_right_side = all(
+                231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
 
             if all_left_side:
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 52               #Ensure last_stim_trial is 52
+                self.last_stim_trial = 52  # Ensure last_stim_trial is 52
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
-                self.last_stim_trial = 51                  #Ensure last_stim_trial is 51
+                self.last_stim_trial = 51  # Ensure last_stim_trial is 51
                 print('Bias breaking active, side:', self.sameside)
 
-            self.response_x_array = []      #Clearing the array
+            self.response_x_array = []  # Clearing the array
 
         # if 45 < self.response_x < 145:
         #     self.sameside = 'left'
