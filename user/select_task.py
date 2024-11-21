@@ -424,6 +424,8 @@ def select_task(df, subject):
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 4
+                        block = 12
+                        repetition = 3
                         task = 'Probability_WebersLaw'
 
         elif 'Probability_WebersLaw' in task:
