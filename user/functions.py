@@ -737,6 +737,7 @@ def loop42(timing):
 
 #Function 43 adn 44 are for conditions 1 and 2 for ror 1 in weber's law:
 def function43():
+    pass
 
 def loop43(timing):
     image_jar_left.draw()
@@ -744,6 +745,7 @@ def loop43(timing):
 
 
 def function44():
+    pass
 
 def loop44(timing):
     image_jar_right.draw()
