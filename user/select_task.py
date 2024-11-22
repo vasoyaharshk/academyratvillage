@@ -288,7 +288,7 @@ def select_task(df, subject):
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 4
-        accuracy_criteria = 0.85
+        accuracy_criteria = 0.5
 
         # Identify the last session and second-to-last session
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order

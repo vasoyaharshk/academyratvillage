@@ -991,3 +991,79 @@ def function52():  # When the blue jar is on right
 def loop52(timing):
     image_jar_right.draw()
     window.flip()
+
+
+#Display camera correct, play correct sound and display correct stimuli.
+def function55():
+    #soundStream.play(soundVec1)
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    #print("Correct, Reward Sound played")
+
+    substage = utils.task.substage
+    if substage != 1:
+        # Replace "both" with "correct" in the image path
+        if image_path and "both" in image_path:
+            image_path_replaced = image_path.replace("both", "correct")
+            # Update the image path for drawing
+            if last_function_called in [31, 41, 51]:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            elif last_function_called in [32, 42, 52]:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+        print(f"Correct image path: {image_path_replaced}")
+
+def loop55(timing):
+    # Check which function (31 or 32) was last called and display the corresponding image:
+    substage = utils.task.substage
+    if substage != 1:
+        if last_function_called in [31, 41, 51]:
+            #print("Last function called: ", last_function_called)
+            image_jar_left.draw()
+        elif last_function_called in [32, 42, 52]:
+            #print("Last function called: ", last_function_called)
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
+
+
+# Display camera correct, play punish sound and display incorrect stimuli.
+def function56():
+    soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+    substage = utils.task.substage
+    if substage != 1:
+        # Replace "both" with "correct" in the image path
+        if image_path and "both" in image_path:
+            image_path_replaced = image_path.replace("both", "incorrect")
+            # Update the image path for drawing
+            if last_function_called in [31, 41, 51]:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            elif last_function_called in [32, 42, 52]:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+        print(f"Incorrect image path: {image_path_replaced}")
+    else:
+        pass
+
+def loop56(timing):
+    # Check which function (31 or 32) was last called and display the corresponding image:
+    substage = utils.task.substage
+    if substage != 1:
+        if last_function_called in [31, 41, 51]:
+            #print("Last function called: ", last_function_called)
+            image_jar_left.draw()
+        elif last_function_called in [32, 42, 52]:
+            #print("Last function called: ", last_function_called)
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
