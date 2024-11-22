@@ -219,7 +219,7 @@ class Probability_Extra_Training(Task):
             state_name='Correct_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 55)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
         self.sma.add_state(
@@ -256,7 +256,7 @@ class Probability_Extra_Training(Task):
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 36)])
+                            (Bpod.OutputChannels.SoftCode, 56)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
