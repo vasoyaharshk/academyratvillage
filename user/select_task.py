@@ -424,9 +424,14 @@ def select_task(df, subject):
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         stage = 4
-                        block = 12
-                        repetition = 3
                         task = 'Probability_WebersLaw'
+                        block = 12  # This is the number of trials one conditions will remain for
+                        conditions = []  # Takes the conditions from select task file.
+                        completed_conditions = []  # To store completed conditions
+                        current_condition = 0  # To track the current condition in progress
+                        repetition = 3  # To store how many times the conditions needs to repeat.
+                        current_repetition = 0  # To store how many times the condition has repeated.
+                        trial_counter = 0  # Track the number of trials for the current condition
 
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame

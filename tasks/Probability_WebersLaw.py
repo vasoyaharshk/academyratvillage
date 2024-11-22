@@ -93,8 +93,8 @@ class Probability_WebersLaw(Task):
         self.trial_counter = 0  # Track the number of trials for the current condition
 
     def generate_alternating_conditions(self):
-        easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
-        hard_conditions = [1, 2, 3, 4, 5, 6, 7]
+        easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
+        hard_conditions = [1, 2, 3, 4, 5, 6, 7, 8]
         random.shuffle(easy_conditions)
         random.shuffle(hard_conditions)
         alternating_sequence = []
@@ -151,19 +151,20 @@ class Probability_WebersLaw(Task):
                 trials.append(candidate)
         return trials
 
-    # Generate randomized trials with balanced distribution
+    # Generate randomized trials with balanced distribution generate_random_trials_ror1
     def generate_random_trials_ror1(self, last_trial=None):
         trials = []
-        # Define trial types explicitly
-        trial_types = [43, 44]  # 41 = Left, 42 = Right
-        sizes = ["small", "big"]
-
-        while len(trials) < 12:  # Generate 12 trials per block
-            for trial_type in trial_types:
-                for size in sizes:
-                    if trials.count(trial_type) < 6:  # Max 6 per side
-                        trials.append((trial_type, size))  # Add trial with size (small/big)
-        random.shuffle(trials)  # Shuffle to randomize order
+        # Define a 50% probability for each stimulus (two stimuli)
+        probabilities = [0.25, 0.25, 0.25, 0.25]  # Adjust this if you have more than two stimuli
+        while len(trials) < 12:
+            # Use random.choices to select a candidate with 50% probability for each stimulus
+            candidate = random.choices(self.stim, probabilities)[0]
+            # Ensure no repetition more than twice in sequence
+            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                    continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
         return trials
 
     def configure_gui(self):
@@ -206,7 +207,7 @@ class Probability_WebersLaw(Task):
 
         # Choose x positions:
         if self.current_condition in [1, 2]:
-            self.stim = [43,44]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+            self.stim = [43, 44, 45, 46]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
         else:
             self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
@@ -228,11 +229,11 @@ class Probability_WebersLaw(Task):
         # else:
         #     self.stim_trial = self.last_stim_trial
 
-        if self.stim_trial == 41:
+        if self.stim_trial in [41, 43, 45]:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
             print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial == 42:
+        elif self.stim_trial in [42, 44, 46]:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
