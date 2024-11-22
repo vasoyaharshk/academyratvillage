@@ -534,10 +534,11 @@ def function34():
     y = utils.task.y_correcth * settings.PIXELS_PER_MM
 
     if x_incorrect is None:
-        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+        #touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+        pass
     else:
         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+        #touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
