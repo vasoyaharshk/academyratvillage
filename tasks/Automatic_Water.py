@@ -17,7 +17,7 @@ class Automatic_Water(Task):
 
     def init_variables(self):
         self.duration_min = 120 # 2 mins
-        self.duration_max = 180
+        self.duration_max = 300 # 5 mins
 
         self.stage = 0
         self.substage = 0
