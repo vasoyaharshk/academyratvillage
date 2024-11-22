@@ -421,16 +421,16 @@ def function31():  # When the blue jar is on left
     try:
         # Get all the images based on the stages
         if stage == 1:
-            image_folder = '/home/ratvillage01/academy/jars/1_indication'
+            image_folder = '/home/harsh/academy/jars/1_indication'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
         elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/jars/2_discrimination_1'
+            image_folder = '/home/harsh/academy/jars/2_discrimination_1'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
         elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/jars/3_discrimination_2'
+            image_folder = '/home/harsh/academy/jars/3_discrimination_2'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
@@ -467,16 +467,16 @@ def function32():  # When the blue jar is on right
     try:
         # Get all the images based on the stages
         if stage == 1:
-            image_folder = '/home/ratvillage01/academy/jars/1_indication'
+            image_folder = '/home/harsh/academy/jars/1_indication'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
         elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/jars/2_discrimination_1'
+            image_folder = '/home/harsh/academy/jars/2_discrimination_1'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
         elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/jars/3_discrimination_2'
+            image_folder = '/home/harsh/academy/jars/3_discrimination_2'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
@@ -669,7 +669,7 @@ def function41():  # When the correct answer is on left
     current_condition = utils.task.current_condition
     left_images = []
     try:
-        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
         left_images = [f for f in os.listdir(image_folder) if
                        os.path.isfile(os.path.join(image_folder, f)) and
                        ('left' in f.lower() and 'both' in f.lower())]
@@ -707,7 +707,7 @@ def function42():  # When the correct answer is on right
 
     try:
         # Get all the images based on the stages
-        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
         right_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and
                         ('right' in f.lower() and 'both' in f.lower())]
@@ -735,9 +735,36 @@ def loop42(timing):
     window.flip()
 
 
-#Function 43 adn 44 are for conditions 1 and 2 for ror 1 in weber's law:
+#Function 43 adn 44 are for conditions 1 and 2 for ror 1 in weber's law 43 is for Left-Small, 44 for for Right-Small, 45 is for Left-Big, 46 for for Right-Big:
 def function43():
-    pass
+    global last_function_called, image_path
+    last_function_called = 43  # Track that function41 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left, small jar: ', random_image_path_left)
+
+        image_path = random_image_path_left  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 def loop43(timing):
     image_jar_left.draw()
@@ -745,11 +772,113 @@ def loop43(timing):
 
 
 def function44():
-    pass
+    global last_function_called, image_path
+    last_function_called = 44  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right, small jar:', random_image_path_right)
+
+        image_path = random_image_path_right  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 def loop44(timing):
     image_jar_right.draw()
     window.flip()
+
+
+def function45():
+    global last_function_called, image_path
+    last_function_called = 45  # Track that function41 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left, big jar: ', random_image_path_left)
+
+        image_path = random_image_path_left  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop45(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+def function46():
+    global last_function_called, image_path
+    last_function_called = 44  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right, big jar:', random_image_path_right)
+
+        image_path = random_image_path_right  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop46(timing):
+    image_jar_right.draw()
+    window.flip()
+
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
 def function51():  # When the blue jar is on left
@@ -761,26 +890,26 @@ def function51():  # When the blue jar is on left
     try:
         # Get all the images based on the stages
         if substage == 1:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_1_indication'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_1_indication'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
         elif substage == 2:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_2_discrimination_1'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_2_discrimination_1'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
         elif substage == 3:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_3_discrimination_2'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_3_discrimination_2'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
         elif substage == 4:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_4_discrimination_3'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_4_discrimination_3'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
         elif substage == 5:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_5_discrimination_4'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_5_discrimination_4'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
@@ -817,26 +946,26 @@ def function52():  # When the blue jar is on right
     try:
         # Get all the images based on the stages
         if substage == 1:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_1_indication'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_1_indication'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
         elif substage == 2:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_2_discrimination_1'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_2_discrimination_1'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
         elif substage == 3:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_3_discrimination_2'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_3_discrimination_2'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
         elif substage == 4:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_4_discrimination_3'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_4_discrimination_3'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
         elif substage == 5:
-            image_folder = '/home/ratvillage01/academy/jars/0_extra_training/1_5_discrimination_4'
+            image_folder = '/home/harsh/academy/jars/0_extra_training/1_5_discrimination_4'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]

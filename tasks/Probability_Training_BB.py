@@ -392,25 +392,6 @@ class Probability_Training_BB(Task):
 
             self.response_x_array = []      #Clearing the array
 
-        # if 45 < self.response_x < 145:
-        #     self.sameside = 'left'
-        #     self.sameside_counter += 1
-        # elif 231 < self.response_x < 331:
-        #     #self.sameside = 'right'
-        #     self.sameside_counter += 1
-        #
-        # if self.sameside_counter == 5:
-        #     self.bias_breaking = 1
-        #     print('Bias breaking active, side: ', self.sameside)
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        #
-        # # Correction bias extension
-        # if self.bias_breaking == 1:
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        # print('Stim Trial: ', self.stim_trial)
-
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)

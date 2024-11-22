@@ -42,7 +42,7 @@ class Probability_Extra_Training(Task):
         self.trials_tired = 5
         self.tired = False
         self.stage = 1
-        self.substage = 0
+        self.substage = 1
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -71,10 +71,10 @@ class Probability_Extra_Training(Task):
         self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
 
         # Correcth location and size:
-        self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
+        self.x_correcth_pos = [75, 315]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 160    # Stimulus width in mm. Original size for peg is 120mm.
+        self.height = 235   # Stimulus height in mm. Original size for jar is 110mm.
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -115,20 +115,22 @@ class Probability_Extra_Training(Task):
         return trials
 
     def main_loop(self):
+        ### Randomizing the stimulus positions for both the images:
+        # Choose x positions:
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [51, 52]  # These are the functions being called. 51 is for the correct answer is on the left and 52 is when the correct answer is on the right
+        self.stim = [51, 52]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
         if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            # print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
@@ -138,9 +140,7 @@ class Probability_Extra_Training(Task):
             self.stim_trial = self.last_stim_trial
 
         if self.substage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 51 displays stimulus with correct answer on the left (x=115) and 52 displays stimulus with correct answer on right (x=295)
-            self.width = 100
-            self.height = 190
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
@@ -149,50 +149,17 @@ class Probability_Extra_Training(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        elif self.substage == 2:
-            self.width = 100
-            self.height = 190
+        else:  # We have two stimuli after stage 1 with correct and incorrect areas
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.substage == 3:
-            self.width = 100
-            self.height = 190
-            if self.stim_trial == 51:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 52:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.substage == 4:
-            self.width = 100
-            self.height = 190
-            if self.stim_trial == 51:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 52:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.substage == 5:
-            self.width = 100
-            self.height = 190
-            if self.stim_trial == 51:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 52:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
 
 
         ############ STATE MACHINE ################
@@ -201,7 +168,7 @@ class Probability_Extra_Training(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -217,7 +184,7 @@ class Probability_Extra_Training(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -230,7 +197,7 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -251,7 +218,7 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Correct_image_display',
             state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
@@ -265,7 +232,7 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Flip_screen_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -286,7 +253,7 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Punish_image_display',
             state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
@@ -300,14 +267,14 @@ class Probability_Extra_Training(Task):
         self.sma.add_state(
             state_name='Flip_screen_no_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -370,23 +337,6 @@ class Probability_Extra_Training(Task):
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
-        # # Stage progression based on conditions:
-        # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 1 to stage 2 with accuracy {self.accuracy}')
-        #     self.stage = 2
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 2 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 3
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 3 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 4
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-
         # Side Bias Breaking formula:
         self.last_stim_trial = self.stim_trial
 
@@ -431,25 +381,6 @@ class Probability_Extra_Training(Task):
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
-
-        # if 45 < self.response_x < 145:
-        #     self.sameside = 'left'
-        #     self.sameside_counter += 1
-        # elif 231 < self.response_x < 331:
-        #     #self.sameside = 'right'
-        #     self.sameside_counter += 1
-        #
-        # if self.sameside_counter == 5:
-        #     self.bias_breaking = 1
-        #     print('Bias breaking active, side: ', self.sameside)
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        #
-        # # Correction bias extension
-        # if self.bias_breaking == 1:
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        # print('Stim Trial: ', self.stim_trial)
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
