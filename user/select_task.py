@@ -446,9 +446,11 @@ def select_task(df, subject):
             trial_counter = last_row['trial_counter']
 
         elif task == 'Automatic_Water':  # We want to recover previous sessions parameters after this emergency water stage
+            # variables by default
+            task = subject.task
             stage = float(subject.stage)
             substage = float(subject.substage)
-            choice = subject.choice
+            choice = 0
             wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
             stim_dur_ds = 0
             stim_dur_dm = 0
