@@ -16,7 +16,7 @@ def select_task(df, subject):
     task = subject.task
     stage = float(subject.stage)
     substage = float(subject.substage)
-    choice = subject.choice
+    choice = 0
     wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
     stim_dur_ds= 0
     stim_dur_dm= 0
@@ -444,6 +444,23 @@ def select_task(df, subject):
             repetition = last_row['repetition']
             current_repetition = last_row['current_repetition']
             trial_counter = last_row['trial_counter']
+
+        elif task == 'Automatic_Water':  # We want to recover previous sessions parameters after this emergency water stage
+            stage = float(subject.stage)
+            substage = float(subject.substage)
+            choice = subject.choice
+            wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
+            stim_dur_ds = 0
+            stim_dur_dm = 0
+            stim_dur_dl = 0
+            block = 0
+            conditions = []  # Takes the conditions from task file after first session.
+            completed_conditions = []  # To store completed conditions
+            current_condition = 0  # To track the current condition in progress
+            repetition = 0
+            current_repetition = 0  # To store how many times the condition has repeated.
+            trial_counter = 0  # Track the number of trials for the current condition.
+
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 
