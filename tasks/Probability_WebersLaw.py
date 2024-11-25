@@ -62,6 +62,7 @@ class Probability_WebersLaw(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
+        self.stim_trial_counter = 0
 
         # Image output stims:
         self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
@@ -171,6 +172,7 @@ class Probability_WebersLaw(Task):
         self.gui_input = ['current_condition', 'duration_max']
 
     def main_loop(self):
+        print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
 
@@ -214,6 +216,7 @@ class Probability_WebersLaw(Task):
         # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
         if self.current_trial % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
+            self.stim_trial_counter = 0
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             # Check if current condition is 1 or 2 and call the appropriate trial generator
             if self.current_condition in [1, 2]:
@@ -222,12 +225,12 @@ class Probability_WebersLaw(Task):
                 self.stim_trials = self.generate_random_trials(last_trial)
             print('Stimulus trials generated: ', self.stim_trials)
 
-        self.stim_trial = self.stim_trials[self.current_trial]
-
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
+            self.stim_trial = self.stim_trials[self.current_trial % 12]
         # else:
         #     self.stim_trial = self.last_stim_trial
+
+        print('Stimulus trial: ', self.stim_trial)
 
         if self.stim_trial in [41, 43, 45]:
             self.x_correcth = self.x_correcth_pos[0]
@@ -372,6 +375,7 @@ class Probability_WebersLaw(Task):
 
     def after_trial(self):
         self.trial_counter += 1
+        self.stim_trial_counter += 1
 
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
