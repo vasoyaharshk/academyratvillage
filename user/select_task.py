@@ -29,6 +29,7 @@ def select_task(df, subject):
     current_repetition = 0  # To store how many times the condition has repeated.
     trial_counter = 0  # Track the number of trials for the current condition.
 
+
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
         # dataframes
@@ -287,8 +288,8 @@ def select_task(df, subject):
                         stim_dur_dl = 0
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 20
-        accuracy_criteria = 0.85
+        trial_criteria = 2
+        accuracy_criteria = 0.5
 
         # Identify the last session and second-to-last session
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
@@ -463,6 +464,9 @@ def select_task(df, subject):
             current_repetition = 0  # To store how many times the condition has repeated.
             trial_counter = 0  # Track the number of trials for the current condition.
 
+        my_subject = df.subject.iloc[0]
+        if my_subject == 'm2':
+            wait_seconds = 10
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter
 

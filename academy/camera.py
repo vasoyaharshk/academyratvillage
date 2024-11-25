@@ -456,8 +456,8 @@ class Video(Process):
         area_doors2 = cv2.countNonZero(doors2_thresh)
 
         area_total = area_cage1 + area_cage2 + area_doors1 + area_doors2
-        self.area_cage1.value1 = int(area_cage1)
-        self.area_cage1.value2 = int(area_cage2)
+        self.area_cage1.value = int(area_cage1)
+        self.area_cage2.value = int(area_cage2)
         self.area_doors1.value = int(area_doors1)
         self.area_doors2.value = int(area_doors2)
         self.area_total.value = int(area_total)
@@ -705,7 +705,7 @@ class Video(Process):
             )
             cv2.putText(
                 self.frame,
-                f"Area in the cage1: {self.area_cage1.value1}",
+                f"Area in the cage1: {self.area_cage1.value}",
                 (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y),
                 cv2.FONT_HERSHEY_DUPLEX,
                 0.4,
@@ -715,7 +715,7 @@ class Video(Process):
             )
             cv2.putText(
                 self.frame,
-                f"Area in the cage2: {self.area_cage1.value2}",
+                f"Area in the cage2: {self.area_cage2.value}",
                 (settings.CAM1_TEXT_X, settings.CAM1_TEXT_Y + 20),
                 cv2.FONT_HERSHEY_DUPLEX,
                 0.4,
