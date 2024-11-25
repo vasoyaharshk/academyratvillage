@@ -214,10 +214,10 @@ class Probability_WebersLaw(Task):
             self.stim = [41, 42]  # These are the functions being called. 41 is for the correct answer is on the left and 42 is when the correct answer is on the right
 
         # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
-        if self.current_trial % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
+        if self.trial_counter % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             self.stim_trial_counter = 0
-            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+            last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
             # Check if current condition is 1 or 2 and call the appropriate trial generator
             if self.current_condition in [1, 2]:
                 self.stim_trials = self.generate_random_trials_ror1(last_trial)

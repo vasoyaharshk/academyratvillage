@@ -744,7 +744,7 @@ def function43():
     current_condition = utils.task.current_condition
     left_images = []
     try:
-        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         left_images = [f for f in os.listdir(image_folder) if
                        os.path.isfile(os.path.join(image_folder, f)) and
                        ('left' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
@@ -781,7 +781,7 @@ def function44():
 
     try:
         # Get all the images based on the stages
-        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         right_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and
                         ('right' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
@@ -816,7 +816,7 @@ def function45():
     current_condition = utils.task.current_condition
     left_images = []
     try:
-        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         left_images = [f for f in os.listdir(image_folder) if
                        os.path.isfile(os.path.join(image_folder, f)) and
                        ('left' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
@@ -853,7 +853,7 @@ def function46():
 
     try:
         # Get all the images based on the stages
-        image_folder = f'/home/harsh/academy/jars/4_webers_law/{current_condition}'
+        image_folder = f'/home/ratvillage01/academy/jars/4_webers_law/{current_condition}'
         right_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and
                         ('right' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
