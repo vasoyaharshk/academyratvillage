@@ -546,7 +546,7 @@ def function34():
     #print('x_incorrect in functions: ', x_incorrect)
 
 
-#Display camera correct, play correct sound and display correct stimuli.
+#Display camera correct, play correct sound and display correct stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW.
 def function35():
     #soundStream.play(soundVec1)
 
@@ -583,7 +583,7 @@ def loop35(timing):
         window.flip()
 
 
-# Display camera correct, play punish sound and display incorrect stimuli.
+# Display camera correct, play punish sound and display incorrect stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW.
 def function36():
     soundStream.play(soundVec3)
 
@@ -659,7 +659,7 @@ def function40():
 def loop40(timing):
     window.flip()
 
-
+## FUNCTIONS FROM 40 TO 46 ARE FOR WEBER'S LAW.
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
 def function41():  # When the correct answer is on left
     global last_function_called, image_path
@@ -880,6 +880,7 @@ def loop46(timing):
     window.flip()
 
 
+## FUNCTIONS FROM 50 TO 56 ARE FOR EASY TRAINING.
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
 def function51():  # When the blue jar is on left
     global last_function_called, image_path
@@ -993,7 +994,7 @@ def loop52(timing):
     window.flip()
 
 
-#Display camera correct, play correct sound and display correct stimuli.
+#Display camera correct, play correct sound and display correct stimuli for EASY TRAINING:.
 def function55():
     #soundStream.play(soundVec1)
 
