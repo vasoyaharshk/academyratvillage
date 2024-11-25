@@ -207,9 +207,9 @@ class Probability_WebersLaw(Task):
 
         # Choose x positions:
         if self.current_condition in [1, 2]:
-            self.stim = [43, 44, 45, 46]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+            self.stim = [43, 44, 45, 46]  # These are the functions being called. Odds are for the correct answer is on the left and Evens are when the correct answer is on the right
         else:
-            self.stim = [41, 42]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+            self.stim = [41, 42]  # These are the functions being called. 41 is for the correct answer is on the left and 42 is when the correct answer is on the right
 
         # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
         if self.current_trial % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
