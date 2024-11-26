@@ -154,19 +154,39 @@ class Probability_WebersLaw(Task):
 
     # Generate randomized trials with balanced distribution generate_random_trials_ror1
     def generate_random_trials_ror1(self, last_trial=None):
-        trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.25, 0.25, 0.25, 0.25]  # Adjust this if you have more than two stimuli
-        while len(trials) < 12:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
-                trials.append(candidate)
-        return trials
+        stim = [43, 44, 45, 46]  # Define stimuli
+        repetition_count = 3  # Each stimulus should appear 3 times
+        def generate_trials():
+            all_trials = stim * repetition_count
+            random.shuffle(all_trials)  # Start with a random shuffle
+            trials = []
+            max_attempts = 1000  # Maximum iterations to prevent infinite loop
+            attempts = 0  # Counter for attempts
+            def is_valid_candidate(candidate, trials):
+                if len(trials) < 2:
+                    return True
+                # Check for side repetition (odds = left, evens = right)
+                if candidate % 2 == trials[-1] % 2 == trials[-2] % 2:
+                    return False
+                # Check for size repetition (43/44 = small, 45/46 = big)
+                if (candidate <= 44) == (trials[-1] <= 44) == (trials[-2] <= 44):
+                    return False
+                return True
+            while len(trials) < 12:
+                if attempts >= max_attempts:
+                    return None  # Signal failure
+                candidate = all_trials.pop(0)  # Take the next candidate
+                attempts += 1
+                # Ensure the first trial doesn't repeat the last trial from the previous block
+                if len(trials) == 0 and last_trial is not None and candidate == last_trial:
+                    all_trials.append(candidate)  # Requeue and skip this candidate
+                    continue
+                # Check candidate validity
+                if is_valid_candidate(candidate, trials):
+                    trials.append(candidate)
+                else:
+                    all_trials.append(candidate)  # Requeue invalid candidates
+            return trials
 
     def configure_gui(self):
         self.gui_input = ['current_condition', 'duration_max']
