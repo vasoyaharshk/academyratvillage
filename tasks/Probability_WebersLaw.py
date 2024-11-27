@@ -295,7 +295,7 @@ class Probability_WebersLaw(Task):
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter',stim_trial_counter)
+        print('Stimulus Trial Counter',self.stim_trial_counter)
 
         ############ STATE MACHINE ################
         #First trial:
