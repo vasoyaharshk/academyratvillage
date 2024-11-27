@@ -62,10 +62,6 @@ class Probability_WebersLaw(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
-        self.stim_trial_counter = 0
-
-        # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
@@ -92,6 +88,11 @@ class Probability_WebersLaw(Task):
         self.repetition = 3  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
+        # Image output stims:
+        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.stim_trial = 0
+        self.stim_trials = None
+        self.stim_trial_counter = 0
 
     def generate_alternating_conditions(self):
         easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
@@ -152,41 +153,59 @@ class Probability_WebersLaw(Task):
                 trials.append(candidate)
         return trials
 
-    # Generate randomized trials with balanced distribution generate_random_trials_ror1
     def generate_random_trials_ror1(self, last_trial=None):
-        stim = [43, 44, 45, 46]  # Define stimuli
-        repetition_count = 3  # Each stimulus should appear 3 times
+        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
+        repetition_count = 3
+
         def generate_trials():
-            all_trials = stim * repetition_count
-            random.shuffle(all_trials)  # Start with a random shuffle
+            all_trials = self.stim * repetition_count
+            random.shuffle(all_trials)
             trials = []
-            max_attempts = 1000  # Maximum iterations to prevent infinite loop
-            attempts = 0  # Counter for attempts
+            max_attempts = 1000
+            attempts = 0
+
             def is_valid_candidate(candidate, trials):
                 if len(trials) < 2:
                     return True
-                # Check for side repetition (odds = left, evens = right)
-                if candidate % 2 == trials[-1] % 2 == trials[-2] % 2:
-                    return False
-                # Check for size repetition (43/44 = small, 45/46 = big)
-                if (candidate <= 44) == (trials[-1] <= 44) == (trials[-2] <= 44):
-                    return False
-                return True
+                return (
+                        (candidate % 2 != trials[-1] % 2 or candidate % 2 != trials[-2] % 2)
+                        and ((candidate <= 44) != (trials[-1] <= 44) or (candidate <= 44) != (trials[-2] <= 44))
+                )
+
             while len(trials) < 12:
-                if attempts >= max_attempts:
-                    return None  # Signal failure
-                candidate = all_trials.pop(0)  # Take the next candidate
                 attempts += 1
-                # Ensure the first trial doesn't repeat the last trial from the previous block
+                if attempts >= max_attempts:
+                    print("Reached max_attempts in generate_trials.")
+                    return None
+
+                if not all_trials:
+                    print("No candidates left in all_trials. Reinitializing.")
+                    all_trials = self.stim * repetition_count
+                    random.shuffle(all_trials)
+
+                candidate = all_trials.pop(0)
+
                 if len(trials) == 0 and last_trial is not None and candidate == last_trial:
-                    all_trials.append(candidate)  # Requeue and skip this candidate
                     continue
-                # Check candidate validity
+
                 if is_valid_candidate(candidate, trials):
                     trials.append(candidate)
                 else:
-                    all_trials.append(candidate)  # Requeue invalid candidates
+                    all_trials.append(candidate)
+
+            print("Generated trials:", trials)
             return trials
+
+        try:
+            result = generate_trials()
+            if result is None:
+                print("generate_trials returned None.")
+            else:
+                print(f"Generated trials successfully: {result}")
+            return result
+        except Exception as e:
+            print(f"Error in generate_random_trials_ror1: {e}")
+            return None
 
     def configure_gui(self):
         self.gui_input = ['current_condition', 'duration_max']
@@ -225,8 +244,16 @@ class Probability_WebersLaw(Task):
 
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
-        ### Randomizing the stimulus positions for both the images:
 
+        print(f"Block: {self.block}")
+        print(f"Conditions: {self.conditions}")
+        print(f"Completed Conditions: {self.completed_conditions}")
+        print(f"Current Condition: {self.current_condition}")
+        print(f"Repetition: {self.repetition}")
+        print(f"Current Repetition: {self.current_repetition}")
+        print(f"Trial Counter: {self.trial_counter}")
+
+        ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         if self.current_condition in [1, 2]:
             self.stim = [43, 44, 45, 46]  # These are the functions being called. Odds are for the correct answer is on the left and Evens are when the correct answer is on the right
@@ -238,20 +265,26 @@ class Probability_WebersLaw(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             self.stim_trial_counter = 0
             last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            # Check if current condition is 1 or 2 and call the appropriate trial generator
+
             if self.current_condition in [1, 2]:
+                print(f"Current condition is {self.current_condition}. Using generate_random_trials_ror1.")
                 self.stim_trials = self.generate_random_trials_ror1(last_trial)
+                print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                while self.stim_trials is None:
+                    print("Retrying to generate stimulus trials...")
+                    self.stim_trials = self.generate_random_trials_ror1(last_trial)
+                    if self.stim_trials is None:
+                        print("generate_random_trials_ror1 returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
             else:
                 self.stim_trials = self.generate_random_trials(last_trial)
-            print('Stimulus trials generated: ', self.stim_trials)
+                print('Stimulus List: ', self.stim_trials)
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial % 12]
+            self.stim_trial = self.stim_trials[self.trial_counter % 12]
         # else:
         #     self.stim_trial = self.last_stim_trial
-
-        print('Stimulus trial: ', self.stim_trial)
-
         if self.stim_trial in [41, 43, 45]:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
@@ -261,13 +294,8 @@ class Probability_WebersLaw(Task):
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-        print(f"Block: {self.block}")
-        print(f"Conditions: {self.conditions}")
-        print(f"Completed Conditions: {self.completed_conditions}")
-        print(f"Current Condition: {self.current_condition}")
-        print(f"Repetition: {self.repetition}")
-        print(f"Current Repetition: {self.current_repetition}")
-        print(f"Trial Counter: {self.trial_counter}")
+        print('Stimulus trial: ', self.stim_trial)
+        print('Stimulus Trial Counter',stim_trial_counter)
 
         ############ STATE MACHINE ################
         #First trial:
@@ -545,3 +573,6 @@ class Probability_WebersLaw(Task):
         self.register_value('repetition', self.repetition)
         self.register_value('current_repetition', self.current_repetition)
         self.register_value('trial_counter', self.trial_counter)
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
