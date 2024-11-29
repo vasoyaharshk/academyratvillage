@@ -87,20 +87,14 @@ class Probability_Extra_Training(Task):
         self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
-        # Randomise blocks and trials for Weber's Law:
-        self.block = 12  # This is the number of trials one conditions will remain for
+        #Required for Weber's law:
+        self.block = 0  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 3  # To store how many times the conditions needs to repeat.
+        self.repetition = 0  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
-        self.stim_trial = 0
-        self.stim_trials = []
-        self.stim_trial_counter = 0
-
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']

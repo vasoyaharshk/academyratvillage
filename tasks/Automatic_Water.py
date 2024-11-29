@@ -28,20 +28,19 @@ class Automatic_Water(Task):
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
         print(self.valve_time)
 
-        # Randomise blocks and trials for Weber's Law:
-        self.block = 12  # This is the number of trials one conditions will remain for
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 3  # To store how many times the conditions needs to repeat.
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
-        self.stim_trial = 0
-        self.stim_trials = []
-        self.stim_trial_counter = 0
-
+        # #Non-used variables so that stage training works:
+        # self.stim_dur_ds = 0
+        # self.stim_dur_dm = 0
+        # self.stim_dur_dl = 0
+        # self.choice = 0
+        # self.substage = 0
+        # self.block = 0  # This is the number of trials one conditions will remain for
+        # self.conditions = []  # Takes the conditions from select task file.
+        # self.completed_conditions = []  # To store completed conditions
+        # self.current_condition = 0  # To track the current condition in progress
+        # self.repetition = 0  # To store how many times the conditions needs to repeat.
+        # self.current_repetition = 0  # To store how many times the condition has repeated.
+        # self.trial_counter = 0  # Track the number of trials for the current condition
 
 
     def configure_gui(self):

@@ -68,6 +68,7 @@ class Probability_WebersLaw(Task):
         self.y_correcth = 110
         self.width = 110  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
         self.height = 225   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
+        self.stim = [0]  # Calls functions to display Blue 1.png and function 26 to display Blue 2.png respectively.
 
         #Bias breaking variables, not used in Weber's Law:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -89,7 +90,6 @@ class Probability_WebersLaw(Task):
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
         # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
