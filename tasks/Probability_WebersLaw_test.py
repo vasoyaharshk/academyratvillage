@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_WebersLaw(Task):
+class Probability_WebersLaw_test(Task):
     def __init__(self):
         super().__init__()
 
@@ -13,7 +13,7 @@ class Probability_WebersLaw(Task):
         This is the real weber's law file.
         This task displays the image of the jars which are touchable. This script is for Weber's law and the bias breaking is not active.
         ########   TASK INFO   ########
-        Every 12 trials, the condition will change to a new one. 
+        Every 4 trials, the condition will change to a new one. 
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -58,7 +58,7 @@ class Probability_WebersLaw(Task):
         self.tired_counter = 0
         self.touch_outside = 0
         self.reward_drunk = 0
-        self.running_window = 12  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
+        self.running_window = 4 # This is the number of trials the accuracy is measured by. It will take accuracy for every 4 trials.
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
@@ -82,7 +82,7 @@ class Probability_WebersLaw(Task):
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
         # Randomise blocks and trials for Weber's Law:
-        self.block = 12  # This is the number of trials one conditions will remain for
+        self.block = 4  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
@@ -142,7 +142,7 @@ class Probability_WebersLaw(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 12:
+        while len(trials) < 4:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -172,7 +172,7 @@ class Probability_WebersLaw(Task):
                         and ((candidate <= 44) != (trials[-1] <= 44) or (candidate <= 44) != (trials[-2] <= 44))
                 )
 
-            while len(trials) < 12:
+            while len(trials) < 4:
                 attempts += 1
                 if attempts >= max_attempts:
                     print("Reached max_attempts in generate_trials.")
@@ -243,11 +243,7 @@ class Probability_WebersLaw(Task):
                     self.stage = 5
                     self.tired = True
                     print("All repetitions completed. Task ending. Stage = 5")
-                    self.sma.add_state(
-                        state_name='Exit',
-                        state_timer=0,
-                        state_change_conditions={Bpod.Events.Tup: 'exit'},
-                        output_actions=[])
+
 
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
@@ -268,8 +264,8 @@ class Probability_WebersLaw(Task):
         else:
             self.stim = [41, 42]  # These are the functions being called. 41 is for the correct answer is on the left and 42 is when the correct answer is on the right
 
-        # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
-        if self.trial_counter % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
+        # Stimulus generation logic: every 4 trials the stimulus location will be regenerated.
+        if self.trial_counter % 4 == 0 and self.bias_breaking == 0:  # Re-randomize every 4 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             self.stim_trial_counter = 0
             last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
@@ -290,7 +286,7 @@ class Probability_WebersLaw(Task):
                 print('Stimulus List: ', self.stim_trials)
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.trial_counter % 12]
+            self.stim_trial = self.stim_trials[self.trial_counter % 4]
         # else:
         #     self.stim_trial = self.last_stim_trial
         if self.stim_trial in [41, 43, 45]:
@@ -421,6 +417,7 @@ class Probability_WebersLaw(Task):
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
+
         self.sma.add_state(
             state_name='Exit',
             state_timer=0,
@@ -482,9 +479,9 @@ class Probability_WebersLaw(Task):
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
-        # Measure accuracy for every 12 trials using running_window
+        # Measure accuracy for every 4 trials using running_window
         if self.trial_counter % self.running_window == 0:
-            trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
+            trials_in_window = self.accwindow[-self.running_window:]  # Last 4 trials
             window_accuracy = sum(trials_in_window) / len(trials_in_window)
             print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
 

@@ -21,7 +21,7 @@ class Automatic_Water(Task):
 
         self.stage = 0
         self.substage = 0
-        self.reward_drunk = 500 # deliver 1000 ul water
+        self.reward_drunk = 100 # deliver 1000 ul water
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -59,9 +59,37 @@ class Automatic_Water(Task):
 
         self.sma.add_state(
             state_name='Waiting',
-            state_timer=self.duration_min/4,
+            state_timer=self.duration_min,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[])
+
+        self.valve_time = self.reward_drunk * self.valve_time / self.valve_reward
+        self.sma.add_state(
+            state_name='Automatic_water',  # deliver reward
+            state_timer=self.valve_time,
+            state_change_conditions={Bpod.Events.Tup: 'Waiting'},
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.LED, 1)])
+
+        self.sma.add_state(
+            state_name='Waiting',
+            state_timer=self.duration_min,
+            state_change_conditions={Bpod.Events.Tup: 'exit'},
+            output_actions=[])
+
+        self.valve_time = self.reward_drunk * self.valve_time / self.valve_reward
+        self.sma.add_state(
+            state_name='Automatic_water',  # deliver reward
+            state_timer=self.valve_time,
+            state_change_conditions={Bpod.Events.Tup: 'Waiting'},
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.LED, 1)])
+
+        self.sma.add_state(
+            state_name='Waiting',
+            state_timer=self.duration_min,
+            state_change_conditions={Bpod.Events.Tup: 'exit'},
+            output_actions=[])
+
+
 
 
 
