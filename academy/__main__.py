@@ -630,6 +630,12 @@ def go_to_state(num):
         utils.subject.repetition = int(utils.subject.repetition)  # Cast to int
         utils.subject.current_repetition = int(utils.subject.current_repetition)  # Cast to int
         utils.subject.trial_counter = int(utils.subject.trial_counter)  # Cast to int
+        utils.subject.stim_trial = int(utils.subject.stim_trial)  # Cast to int.
+        if isinstance(utils.subject.stim_trials, str):
+            utils.subject.stim_trials = ast.literal_eval(utils.subject.stim_trials)
+        utils.subject.stim_trials = list(map(int, utils.subject.stim_trials))
+        utils.subject.stim_trial_counter = int(utils.subject.stim_trial_counter)  # Cast to int
+
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -645,6 +651,10 @@ def go_to_state(num):
         utils.task.repetition = utils.subject.repetition
         utils.task.current_repetition = utils.subject.current_repetition
         utils.task.trial_counter = utils.subject.trial_counter
+        utils.task.stim_trial = utils.subject.stim_trial
+        utils.task.stim_trials = utils.subject.stim_trials
+        utils.task.stim_trial_counter = utils.subject.stim_trial_counter
+
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
