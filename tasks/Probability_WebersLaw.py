@@ -213,7 +213,7 @@ class Probability_WebersLaw(Task):
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-        print('Accuracy: ', self.accuracy)
+        print('Total Accuracy for session: ', self.accuracy)
 
         if not self.conditions and self.current_repetition == 0:
             self.conditions = self.generate_alternating_conditions()
@@ -474,6 +474,12 @@ class Probability_WebersLaw(Task):
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+
+        # Measure accuracy for every 12 trials using running_window
+        if self.trial_counter % self.running_window == 0:
+            trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
+            window_accuracy = sum(trials_in_window) / len(trials_in_window)
+            print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
