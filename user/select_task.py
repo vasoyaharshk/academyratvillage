@@ -462,6 +462,9 @@ def select_task(df, subject):
             stim_trials = last_row['stim_trials']
             stim_trial_counter = last_row['stim_trial_counter']
 
+            if stage == 5:
+                task = 'Automatic_Water'
+
     elif task == 'Automatic_Water':  # We want to recover previous sessions parameters after this emergency water stage
         # variables by default
         task = subject.task
@@ -486,7 +489,7 @@ def select_task(df, subject):
 
     my_subject = df.subject.iloc[0]
     if my_subject == 'm2':
-        wait_seconds = 10
+        wait_seconds = 5
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter
 

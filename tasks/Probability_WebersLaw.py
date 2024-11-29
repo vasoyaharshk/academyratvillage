@@ -24,7 +24,7 @@ class Probability_WebersLaw(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-        #Non-used variables so that stage training works:
+        #Non-used variables so that working memory works:
         self.stim_dur_ds = 0
         self.stim_dur_dm = 0
         self.stim_dur_dl = 0
@@ -240,7 +240,10 @@ class Probability_WebersLaw(Task):
                     self.completed_conditions = []
                     self.current_condition = self.conditions[0]
                 else:
-                    print("All repetitions completed.")
+                    self.stage = 5
+                    self.tired = True
+                    print("All repetitions completed. Task ending. Stage = 5")
+
 
             # Reset trial counter for the new condition or new repetition cycle
             self.trial_counter = 0
@@ -480,23 +483,6 @@ class Probability_WebersLaw(Task):
             trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
             window_accuracy = sum(trials_in_window) / len(trials_in_window)
             print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
-
-        # # Stage progression based on conditions:
-        # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 1 to stage 2 with accuracy {self.accuracy}')
-        #     self.stage = 2
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 2 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 3
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 3 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 4
-        #     self.current_trial = 1
-        #     self.acc_up = 0
 
         # # Side Bias Breaking formula:
         # self.last_stim_trial = self.stim_trial
