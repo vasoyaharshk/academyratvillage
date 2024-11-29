@@ -490,8 +490,6 @@ def select_task(df, subject):
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter
 
 
-
-
 # def generate_alternating_conditions():
 #     easy_conditions = [8, 9, 10, 11, 12, 13, 14, 15, 16]
 #     hard_conditions = [1, 2, 3, 4, 5, 6, 7]
