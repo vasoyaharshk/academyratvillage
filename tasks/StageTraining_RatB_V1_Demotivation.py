@@ -127,6 +127,10 @@ class StageTraining_RatB_V1_Demotivation(Task):
         self.repetition = 0  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
+        # Image output stims:
+        self.stim_trial = 0
+        self.stim_trials = []
+        self.stim_trial_counter = 0
 
     def configure_gui(self): # Variables appearing in the GUI
         self.gui_input = ['stage', 'substage', 'duration_max',
