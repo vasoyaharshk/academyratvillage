@@ -54,42 +54,11 @@ class Probability_WebersLaw(Task):
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
-        self.accuracy = 0
-
-        # Correcth location and size:
-        self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
-        self.y_correcth = 110
-        self.width = 110  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
-        self.height = 225   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
-
-        #Bias breaking variables, not used in Weber's Law:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8            #Accuracy at which side bias will trigger
-        self.status = None              #Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        # Randomise blocks and trials for Weber's Law:
-        self.block = 12  # This is the number of trials one conditions will remain for
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 3  # To store how many times the conditions needs to repeat.
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
-        self.stim_trial = 0
-        self.stim_trials = []
-        self.stim_trial_counter = 0.valid_counter = 0
+        self.valid_counter = 0
         self.tired_counter = 0
         self.touch_outside = 0
         self.reward_drunk = 0
-        self.running_window = 12  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
+        self.running_window = 12  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
@@ -296,26 +265,21 @@ class Probability_WebersLaw(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             self.stim_trial_counter = 0
             last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            #print("conditions type1:", type(self.conditions))
-            #print("Stim trials type1:", type(self.stim_trials))
 
             if self.current_condition in [1, 2]:
                 print(f"Current condition is {self.current_condition}. Using generate_random_trials_ror1.")
                 self.stim_trials = self.generate_random_trials_ror1(last_trial)
-                #print("Stim trials type:", type(self.stim_trials))
-                print('Stimulus List: ', self.stim_trials)
+                print(f"Stimulus trials after first attempt: {self.stim_trials}")
                 while self.stim_trials is None:
                     print("Retrying to generate stimulus trials...")
                     self.stim_trials = self.generate_random_trials_ror1(last_trial)
                     if self.stim_trials is None:
                         print("generate_random_trials_ror1 returned None. Retrying...")
                     else:
-                        print('Stimulus List: ', self.stim_trials)
-                        #print("Stim trials type:", type(self.stim_trials))
+                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
             else:
                 self.stim_trials = self.generate_random_trials(last_trial)
                 print('Stimulus List: ', self.stim_trials)
-                #print("Stim trials type:", type(self.stim_trials))
 
         if self.bias_breaking == 0:
             self.stim_trial = self.stim_trials[self.trial_counter % 12]
