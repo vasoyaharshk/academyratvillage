@@ -119,14 +119,20 @@ class StageTraining_RatB_V1_50(Task):
         self.dm_accwindow = [0] * self.running_window
         self.dl_accwindow = [0] * self.running_window
 
-        #Required for Weber's law:
-        self.block = 0  # This is the number of trials one conditions will remain for
+        # Randomise blocks and trials for Weber's Law:
+        self.block = 12  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0  # To store how many times the conditions needs to repeat.
+        self.repetition = 3  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
+        # Image output stims:
+        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.stim_trial = 0
+        self.stim_trials = []
+        self.stim_trial_counter = 0
+
 
 
     def configure_gui(self): # Variables appearing in the GUI

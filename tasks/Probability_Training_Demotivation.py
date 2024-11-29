@@ -73,14 +73,20 @@ class Probability_Training_Demotivation(Task):
         self.width = 100  # Stimulus width in mm
         self.height = 190
 
-        #Required for Weber's law:
-        self.block = 0  # This is the number of trials one conditions will remain for
+        # Randomise blocks and trials for Weber's Law:
+        self.block = 12  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0  # To store how many times the conditions needs to repeat.
+        self.repetition = 3  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
+        # Image output stims:
+        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.stim_trial = 0
+        self.stim_trials = []
+        self.stim_trial_counter = 0
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -368,12 +374,3 @@ class Probability_Training_Demotivation(Task):
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
-
-        #Required for Weber's Law:
-        self.register_value('block', self.block)
-        self.register_value('conditions', self.conditions)
-        self.register_value('completed_conditions', self.completed_conditions)
-        self.register_value('current_condition', self.current_condition)
-        self.register_value('repetition', self.repetition)
-        self.register_value('current_repetition', self.current_repetition)
-        self.register_value('trial_counter', self.trial_counter)
