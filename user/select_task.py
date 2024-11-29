@@ -486,6 +486,7 @@ def select_task(df, subject):
         stim_trial = 0
         stim_trials = []
         stim_trial_counter = 0
+        print("rat drank water")
 
     my_subject = df.subject.iloc[0]
     if my_subject == 'm2':
