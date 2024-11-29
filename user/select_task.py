@@ -293,8 +293,8 @@ def select_task(df, subject):
                         stim_dur_dl = 0
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        #trial_criteria = 2
-        #accuracy_criteria = 0.5
+        #trial_criteria = 20
+        #accuracy_criteria = 0.85
         trial_criteria = 20
         accuracy_criteria = 0.85
 
