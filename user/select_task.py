@@ -295,8 +295,8 @@ def select_task(df, subject):
     elif 'Probability' in task:     #Includes all the task without the word Probability
         #trial_criteria = 20
         #accuracy_criteria = 0.85
-        trial_criteria = 20
-        accuracy_criteria = 0.85
+        trial_criteria = 2
+        accuracy_criteria = 0.5
 
         # Identify the last session and second-to-last session
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
@@ -381,38 +381,39 @@ def select_task(df, subject):
                         substage = 0
 
         elif 'Probability_Extra_Training' in task:
-            if last_session_stage == 1 and second_last_session_stage == 1:
-                if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.1 to stage 1.2')
-                        stage = 1
-                        substage = 2
-                elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.2 to 1.3')
-                        stage = 1
-                        substage = 3
-                elif last_session_substage_stage == 3 and second_last_session_substage_stage == 3:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.3 to 1.4')
-                        stage = 1
-                        substage = 4
-                elif last_session_substage_stage == 4 and second_last_session_substage_stage == 4:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.4 to 1.5')
-                        stage = 1
-                        substage = 5
-                elif last_session_substage_stage == 5 and second_last_session_substage_stage == 5:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.5 to normal task')
-                        task = 'Probability_Training_BB'
-                        stage = 1
-                        substage = 0
+            if last_session_task == second_last_session_task:
+                if last_session_stage == 1 and second_last_session_stage == 1:
+                    if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.1 to stage 1.2')
+                            stage = 1
+                            substage = 2
+                    elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.2 to 1.3')
+                            stage = 1
+                            substage = 3
+                    elif last_session_substage_stage == 3 and second_last_session_substage_stage == 3:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.3 to 1.4')
+                            stage = 1
+                            substage = 4
+                    elif last_session_substage_stage == 4 and second_last_session_substage_stage == 4:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.4 to 1.5')
+                            stage = 1
+                            substage = 5
+                    elif last_session_substage_stage == 5 and second_last_session_substage_stage == 5:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.5 to normal task')
+                            task = 'Probability_Training_BB'
+                            stage = 1
+                            substage = 0
 
         elif 'Probability_Training_BB' in task:
             # Check stage-specific conditions for advancement
