@@ -376,6 +376,7 @@ class Probability_Training_BB(Task):
         #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
         self.response_x_array.append(self.response_x_bias)
         print(f"Responses so far: {self.response_x_array}")
+        print(f"Conditions: {self.conditions}")
 
         #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
         if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
