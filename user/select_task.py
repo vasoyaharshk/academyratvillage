@@ -381,6 +381,8 @@ def select_task(df, subject):
                         substage = 0
 
         elif 'Probability_Extra_Training' in task:
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
+            conditions = last_row['conditions']
             if last_session_task == second_last_session_task:
                 if last_session_stage == 1 and second_last_session_stage == 1:
                     if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
@@ -416,6 +418,8 @@ def select_task(df, subject):
                             substage = 0
 
         elif 'Probability_Training_BB' in task:
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
+            conditions = last_row['conditions']
             # Check stage-specific conditions for advancement
             if last_session_task == second_last_session_task:
                 # Stage 1 -> Stage 2 check
