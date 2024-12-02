@@ -236,7 +236,7 @@ def select_task(df, subject):
                     change = 0.025
 
                 # Good accuracy -> shorten stim_dur
-                if acc > acc_up and n_trials>55:
+                if acc > acc_up and n_trials>35:            #n_trials were changed from 55 to 35 on 2024-12-02 for Ciri, Luna, Sorrel due to low motivation.
                     if initial >= change:
                         stim_dur = initial - change
                     else:
