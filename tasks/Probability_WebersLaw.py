@@ -96,48 +96,101 @@ class Probability_WebersLaw(Task):
         self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
     def generate_alternating_conditions(self):
+        # Define easy and hard conditions
         easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
         hard_conditions = [1, 2, 3, 4, 5, 6, 7, 8]
-        random.shuffle(easy_conditions)
-        random.shuffle(hard_conditions)
-        alternating_sequence = []
-        easy_idx, hard_idx = 0, 0
-        hard_streak = 0
-        retry_candidates = []
-        retry_count = {}
-        while easy_idx < len(easy_conditions) or hard_idx < len(hard_conditions) or retry_candidates:
-            if retry_candidates:
-                candidate = retry_candidates.pop(0)
-                retry_count[candidate] = retry_count.get(candidate, 0) + 1
-                #print(f'Retrying candidate: {candidate} - Retry Count: {retry_count[candidate]}')
-                if retry_count[candidate] > 5:
-                    #print(f"Warning: Candidate {candidate} reached retry limit. Forcing addition.")
-                    alternating_sequence.append(candidate)
-                    continue
-            elif not alternating_sequence and easy_idx < len(easy_conditions):
-                candidate = easy_conditions[easy_idx]
-                easy_idx += 1
-                hard_streak = 0
-            elif hard_streak < 2 and hard_idx < len(hard_conditions):
-                candidate = hard_conditions[hard_idx]
-                hard_idx += 1
-                hard_streak += 1
-            elif easy_idx < len(easy_conditions):
-                candidate = easy_conditions[easy_idx]
-                easy_idx += 1
-                hard_streak = 0
-            else:
-                candidate = hard_conditions[hard_idx]
-                hard_idx += 1
-            if len(alternating_sequence) >= 2:
-                last_two = [alternating_sequence[-2] % 2, alternating_sequence[-1] % 2]
-                if last_two == [candidate % 2, candidate % 2]:
-                    retry_candidates.append(candidate)
-                    #print(f"Candidate {candidate} added to retry_candidates due to consecutive pattern.")
-                    continue
-            alternating_sequence.append(candidate)
-            #print(f"Candidate {candidate} added to alternating_sequence.")
-        return alternating_sequence
+        max_retries = 1000  # Limit retries to prevent excessive computation
+
+        for attempt in range(max_retries):
+            # Shuffle conditions for randomness
+            random.shuffle(easy_conditions)
+            random.shuffle(hard_conditions)
+            total_conditions = len(easy_conditions) + len(hard_conditions)
+            alternating_sequence = []
+
+            def is_valid_candidate(sequence, candidate, is_easy):
+                # Rule 1: No more than two hard or two easy in a row
+                if len(sequence) >= 2 and (
+                    all(c in hard_conditions for c in sequence[-2:]) and not is_easy or
+                    all(c in easy_conditions for c in sequence[-2:]) and is_easy
+                ):
+                    return False
+                # Rule 2: No more than two conditions in a row with same parity
+                if len(sequence) >= 2 and sequence[-1] % 2 == sequence[-2] % 2 == candidate % 2:
+                    return False
+                # Rule 3: Always start with an easy condition
+                if len(sequence) == 0 and not is_easy:
+                    return False
+                # Rule 4: Conditions 1 and 2 must be followed by an easy condition
+                if len(sequence) > 0 and sequence[-1] in {1, 2} and not is_easy:
+                    return False
+                return True
+
+            def backtrack(sequence, easy_idx, hard_idx):
+                # If the sequence is complete, return it
+                if len(sequence) == total_conditions:
+                    return sequence
+                # Try adding an easy condition if possible
+                if easy_idx < len(easy_conditions):
+                    candidate = easy_conditions[easy_idx]
+                    if is_valid_candidate(sequence, candidate, True):
+                        sequence.append(candidate)
+                        result = backtrack(sequence, easy_idx + 1, hard_idx)
+                        if result:
+                            return result
+                        sequence.pop()  # Backtrack
+                # Try adding a hard condition if possible
+                if hard_idx < len(hard_conditions):
+                    candidate = hard_conditions[hard_idx]
+                    if is_valid_candidate(sequence, candidate, False):
+                        sequence.append(candidate)
+                        result = backtrack(sequence, easy_idx, hard_idx + 1)
+                        if result:
+                            return result
+                        sequence.pop()  # Backtrack
+                return None  # No valid sequence found
+
+            # Attempt to generate a sequence
+            result = backtrack([], 0, 0)
+            if result:
+                return result  # Successfully generated a sequence
+
+        # If all retries fail, raise an error
+        raise RuntimeError("Unable to generate a valid sequence after multiple retries.")
+
+    def validate_sequence(self, sequence):
+        # Define easy and hard conditions
+        easy_conditions = set([9, 10, 11, 12, 13, 14, 15, 16])
+        hard_conditions = set([1, 2, 3, 4, 5, 6, 7, 8])
+
+        # Dictionary to track rule violations
+        rule_violations = {
+            "no_more_than_two_hard_or_easy_in_a_row": False,
+            "no_more_than_two_same_parity_in_a_row": False,
+            "always_start_with_easy": False,
+            "condition_1_2_followed_by_easy": False,
+        }
+
+        # Rule 3: Always start with an easy condition
+        if len(sequence) == 0 or sequence[0] not in easy_conditions:
+            rule_violations["always_start_with_easy"] = True
+
+        for i in range(len(sequence)):
+            # Rule 1: No more than two hard or two easy in a row
+            if i >= 2 and (
+                all(c in hard_conditions for c in sequence[i - 2:i + 1]) or
+                all(c in easy_conditions for c in sequence[i - 2:i + 1])
+            ):
+                rule_violations["no_more_than_two_hard_or_easy_in_a_row"] = True
+            # Rule 2: No more than two conditions in a row with same parity
+            if i >= 2 and sequence[i] % 2 == sequence[i - 1] % 2 == sequence[i - 2] % 2:
+                rule_violations["no_more_than_two_same_parity_in_a_row"] = True
+            # Rule 4: Conditions 1 and 2 must be followed by an easy condition
+            if sequence[i] in {1, 2} and i < len(sequence) - 1 and sequence[i + 1] not in easy_conditions:
+                rule_violations["condition_1_2_followed_by_easy"] = True
+
+        # Return rule violations
+        return rule_violations
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -217,7 +270,12 @@ class Probability_WebersLaw(Task):
         print('Total Accuracy for session: ', self.accuracy)
 
         if not self.conditions and self.current_repetition == 0:
-            self.conditions = self.generate_alternating_conditions()
+            while True:  # Retry until a valid sequence is generated
+                self.conditions = self.generate_alternating_conditions()
+                validation_results = self.validate_sequence(self.conditions)
+                if not any(validation_results.values()):  # Ensure no rule violations
+                    print("Conditions generated following the rules")
+                    break  # Exit the loop if the sequence is valid
             self.current_condition = self.conditions[0]
 
         # Check if the current block of trials is complete
@@ -235,9 +293,12 @@ class Probability_WebersLaw(Task):
             if not self.conditions:
                 self.current_repetition += 1
                 if self.current_repetition <= self.repetition:
-                    # Reset conditions from completed_conditions for next repetition
-                    self.conditions = self.completed_conditions[:]
-                    self.conditions = self.generate_alternating_conditions()        #Pseudo randomise the new list of conditions.
+                    while True:  # Retry until a valid sequence is generated
+                        self.conditions = self.generate_alternating_conditions()
+                        validation_results = self.validate_sequence(self.conditions)
+                        if not any(validation_results.values()):  # Ensure no rule violations
+                            print("Conditions generated following the rules")
+                            break  # Exit the loop if the sequence is valid
                     self.completed_conditions = []
                     self.current_condition = self.conditions[0]
                 else:
