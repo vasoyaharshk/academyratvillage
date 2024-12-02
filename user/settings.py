@@ -74,8 +74,8 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 40                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 45                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_CAGE1 = 45                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR1 = 85                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 120                                               # <-- TO CHANGE Harsh-Done
 
@@ -103,7 +103,7 @@ CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 135, 92, 195]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [60, 227, 195, 300]     # <-- TO CHANGE left, right, top, down
 CAM1_DOORS1_ZONE = [227, 477, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [477, 585, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [477, 585, 265, 288]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
