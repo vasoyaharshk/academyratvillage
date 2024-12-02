@@ -686,8 +686,7 @@ class StageTraining_RatB_V1_50(Task):
         self.register_value('correction_bias', self.correction_bias)
         self.register_value('trial_length', self.trial_length)
         self.register_value('block_size', self.block_size)
-
-        #Required for Weber's Law:
+        #Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)
         self.register_value('completed_conditions', self.completed_conditions)
@@ -695,4 +694,7 @@ class StageTraining_RatB_V1_50(Task):
         self.register_value('repetition', self.repetition)
         self.register_value('current_repetition', self.current_repetition)
         self.register_value('trial_counter', self.trial_counter)
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
 
