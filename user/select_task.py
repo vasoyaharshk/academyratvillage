@@ -295,7 +295,7 @@ def select_task(df, subject):
     elif 'Probability' in task:     #Includes all the task without the word Probability
         #trial_criteria = 20
         #accuracy_criteria = 0.85
-        trial_criteria = 20
+        trial_criteria = 2
         accuracy_criteria = 0.85
 
         # Identify the last session and second-to-last session

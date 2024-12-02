@@ -61,7 +61,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 5  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
@@ -76,7 +76,7 @@ THRESHOLD_DAY_DOOR2 = 60                                                 # <-- T
 
 THRESHOLD_NIGHT_CAGE1 = 40                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 45                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR1 = 95                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR1 = 85                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 120                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
@@ -101,9 +101,9 @@ CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 135, 92, 195]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [60, 219, 195, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [219, 470, 258, 295]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [470, 585, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [60, 227, 195, 300]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [227, 479, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_DOORS2_ZONE = [479, 585, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 

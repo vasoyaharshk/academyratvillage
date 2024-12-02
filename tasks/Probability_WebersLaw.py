@@ -58,7 +58,6 @@ class Probability_WebersLaw(Task):
         self.tired_counter = 0
         self.touch_outside = 0
         self.reward_drunk = 0
-        self.running_window = 12  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
@@ -93,6 +92,8 @@ class Probability_WebersLaw(Task):
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
+
+        self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
     def generate_alternating_conditions(self):
         easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
@@ -142,7 +143,7 @@ class Probability_WebersLaw(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 12:
+        while len(trials) < self.block:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -172,7 +173,7 @@ class Probability_WebersLaw(Task):
                         and ((candidate <= 44) != (trials[-1] <= 44) or (candidate <= 44) != (trials[-2] <= 44))
                 )
 
-            while len(trials) < 12:
+            while len(trials) < self.block:
                 attempts += 1
                 if attempts >= max_attempts:
                     print("Reached max_attempts in generate_trials.")
@@ -269,7 +270,7 @@ class Probability_WebersLaw(Task):
             self.stim = [41, 42]  # These are the functions being called. 41 is for the correct answer is on the left and 42 is when the correct answer is on the right
 
         # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
-        if self.trial_counter % 12 == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
+        if self.trial_counter % self.block == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             self.stim_trial_counter = 0
             last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
@@ -290,7 +291,7 @@ class Probability_WebersLaw(Task):
                 print('Stimulus List: ', self.stim_trials)
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.trial_counter % 12]
+            self.stim_trial = self.stim_trials[self.trial_counter % self.block]
         # else:
         #     self.stim_trial = self.last_stim_trial
         if self.stim_trial in [41, 43, 45]:
