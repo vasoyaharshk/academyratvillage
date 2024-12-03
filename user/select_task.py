@@ -460,11 +460,11 @@ def select_task(df, subject):
             current_condition = last_row['current_condition']
             repetition = last_row['repetition']
             current_repetition = last_row['current_repetition']
-            trial_counter = last_row['trial_counter'] + 1
+            trial_counter = last_row['trial_counter']
             # Image output stims:
             stim_trial = last_row['stim_trial']
             stim_trials = last_row['stim_trials']
-            stim_trial_counter = last_row['stim_trial_counter'] + 1
+            stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
                 task = 'Water_Filler'
