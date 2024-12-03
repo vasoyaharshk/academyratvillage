@@ -262,7 +262,7 @@ class Probability_WebersLaw(Task):
             return None
 
     def configure_gui(self):
-        self.gui_input = ['current_condition', 'duration_max']
+        self.gui_input = ['duration_max']
 
     def main_loop(self):
         print('')
