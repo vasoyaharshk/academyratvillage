@@ -437,9 +437,9 @@ class Probability_Training_Bias_Right(Task):
         self.register_value('sameside', self.sameside)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
-        self.register_value('probabilities', self.probabilities)
-
-        #Required for Weber's Law:
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        #Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)
         self.register_value('completed_conditions', self.completed_conditions)
@@ -447,3 +447,6 @@ class Probability_Training_Bias_Right(Task):
         self.register_value('repetition', self.repetition)
         self.register_value('current_repetition', self.current_repetition)
         self.register_value('trial_counter', self.trial_counter)
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
