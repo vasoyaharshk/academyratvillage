@@ -279,7 +279,7 @@ class Probability_WebersLaw(Task):
             self.current_condition = self.conditions[0]
 
         # Check if the current block of trials is complete
-        if self.trial_counter > self.block:
+        if self.trial_counter >= self.block:
             # Move the completed condition to completed_conditions
             self.completed_conditions.append(self.current_condition)
 
