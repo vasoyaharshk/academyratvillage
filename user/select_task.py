@@ -34,6 +34,7 @@ def select_task(df, subject):
     stim_trials = []
     stim_trial_counter = 0
 
+    my_subject = df.subject.iloc[0]
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
@@ -293,10 +294,12 @@ def select_task(df, subject):
                         stim_dur_dl = 0
         #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        #trial_criteria = 20
-        #accuracy_criteria = 0.85
         trial_criteria = 20
         accuracy_criteria = 0.85
+
+        if my_subject == 'm2':
+            trial_criteria = 2
+            accuracy_criteria = 0.5
 
         # Identify the last session and second-to-last session
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
@@ -365,20 +368,21 @@ def select_task(df, subject):
         second_last_session_substage_stage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
 
         if 'Probability_Training_Bias' in task:
-            if last_session_stage == 1 and second_last_session_stage == 1:
-                if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.1 to stage 1.2')
-                        stage = 1
-                        substage = 2
-                elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                        valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1.2 to normal task')
-                        task = 'Probability_Training_BB'
-                        stage = 1
-                        substage = 0
+            if last_session_task == second_last_session_task:
+                if last_session_stage == 1 and second_last_session_stage == 1:
+                    if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.1 to stage 1.2')
+                            stage = 1
+                            substage = 2
+                    elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
+                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                            print(f'Advancing from stage 1.2 to normal task')
+                            task = 'Probability_Training_BB'
+                            stage = 1
+                            substage = 0
 
         elif 'Probability_Extra_Training' in task:
             if last_session_task == second_last_session_task:
@@ -469,7 +473,6 @@ def select_task(df, subject):
         task = Water_Filler
         print("rat drank water")
 
-    my_subject = df.subject.iloc[0]
     if my_subject == 'm2':
         wait_seconds = 5
 
