@@ -237,7 +237,8 @@ class StageTraining_RatB_V1_50(Task):
                     #self.pdsc2 = 0.25
                     self.correction_bias = 1  # Repeat prev stim position if punish
                     # from trial 20 start reducing stimulus duration of DS
-                    if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    #if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    if self.current_trial >= 500 and self.current_trial % self.running_window == 0:  #This was changed for ciri, sorrel and luna for trials to be more than 500.
                         if self.accuracy >= self.acc_up and self.stim_dur_ds > 0.05:
                             self.stim_dur_ds -= 0.05
                             print('more difficult!')
@@ -260,7 +261,8 @@ class StageTraining_RatB_V1_50(Task):
                     # self.pdmc1 = 0.225
 
                     # from trial 20 start reducing stimulus duration of DM
-                    if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    #if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    if self.current_trial >= 500 and self.current_trial % self.running_window == 0: #This was changed for ciri, sorrel and luna for trials to be more than 500.
                         if self.dm_accuracy >= self.acc_up - 0.1 and self.stim_dur_dm > 0.05:
                             self.stim_dur_dm -= 0.05
                             print('more difficult!')
@@ -286,7 +288,8 @@ class StageTraining_RatB_V1_50(Task):
                     #self.pdl = 0.3
 
                     # from trial 20 start reducing stimulus duration of DL
-                    if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    #if self.current_trial >= 20 and self.current_trial % self.running_window == 0:
+                    if self.current_trial >= 500 and self.current_trial % self.running_window == 0: #This was changed for ciri, sorrel and luna for trials to be more than 500.
                         if self.dm_accuracy >= self.acc_up - 0.1 and self.stim_dur_dl > 0.05:
                             self.stim_dur_dl -= 0.05
                             print('more difficult!')
