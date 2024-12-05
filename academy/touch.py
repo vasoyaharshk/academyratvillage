@@ -197,12 +197,12 @@ class Touch:
             ypsy = 750  # y is now set to 770
             #ypsy = abs(y)  # y is now set to 770
 
-            print('Touch: ', answer)
+            #print('Touch: ', answer)
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
             ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
             #ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1])) - yz
-            print('X2: ', xtouch, 'Y2: ', ytouch)
-            print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)
+            #print('X2: ', xtouch, 'Y2: ', ytouch)
+            #print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)
 
             # Define boundaries for the correct rectangular area:
             top_boundary = (ypsy + height / 2)
@@ -214,29 +214,29 @@ class Touch:
             left_boundary_incorrect2 = (xpsy_incorrect2 - width / 2)
             right_boundary_incorrect2 = (xpsy_incorrect2 + width / 2)
 
-            print('Correcth: ', correct_th, 'Repoketh: ', repoke_th)
+            #print('Correcth: ', correct_th, 'Repoketh: ', repoke_th)
 
             # Condition 1: Check if touch is in the correct area
             if ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))) < correct_th:
-                print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                #print('Formula Correct: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
                 self.softcode.send(1)
             # Condition 2: Repoke area in incorrect locations (only if correct_th != repoke_th and outside correct area)
             elif correct_th != repoke_th and (
                     (left_boundary_incorrect1 <= xtouch <= right_boundary_incorrect1 and bottom_boundary <= ytouch <= top_boundary) or
                     (left_boundary_incorrect2 <= xtouch <= right_boundary_incorrect2 and bottom_boundary <= ytouch <= top_boundary)
             ):
-                print('Touch is in the repoketh area')
+                #print('Touch is in the repoketh area')
                 self.softcode.send(2)
             # Condition 3: Check if touch is in the incorrect areas (punish area)
             elif correct_th == repoke_th and (
                     (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect1, ypsy))) < correct_th) or
                      (ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy_incorrect2, ypsy))) < correct_th)
             ):
-                print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
+                #print('Formula Punish: ', ln.norm(np.array((xtouch, ytouch)) - np.array((xpsy, ypsy))))
                 self.softcode.send(4)
             # Condition 4: If touch is outside the correct and incorrect areas
             else:
-                print('Formula Outside: ')
+                #print('Formula Outside: ')
                 self.softcode.send(5)
 
 
