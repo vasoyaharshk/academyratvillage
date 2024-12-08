@@ -33,8 +33,8 @@ class Water_Filler(Task):
         self.substage = 0
 
         # Variables for the task:
-        self.duration_max = 3000
-        self.duration_min = 2100
+        self.duration_max = 300
+        self.duration_min = 180
         self.duration_tired = 1800
         self.trials_tired = 5
         self.tired = False
@@ -87,61 +87,11 @@ class Water_Filler(Task):
         self.stim_trial_counter = 0
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
-
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
-        trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
-                trials.append(candidate)
-        return trials
+        self.gui_input = ['duration_max']
 
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-        print('Accuracy: ', self.accuracy)
-
-        ### Randomizing the stimulus positions for both the images:
-        # Choose x positions:
-        self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
-
-        # Stimulus generation logic
-        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
-            # If not the first block, pass the last stimulus of the previous block to avoid repetition
-            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
-            self.stim_trials = self.generate_random_trials(last_trial)
-            print('x positions list: ' + str(self.stim_trials))
-
-        self.stim_trial = self.stim_trials[self.current_trial]
-        print('Stim Trial: ', self.stim_trial)
-
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
 
         ############ STATE MACHINE ################
@@ -152,7 +102,6 @@ class Water_Filler(Task):
                 state_timer=0,
                 state_change_conditions={'Port2In': 'Real_start'},
                 output_actions=[])
-            # show stim inifite time
 
             self.sma.add_state(
                 state_name='Real_start',
@@ -183,7 +132,7 @@ class Water_Filler(Task):
                 state_name='Reward2',
                 state_timer=self.valve_time * 4,
                 state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
-                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                output_actions=[(Bpod.OutputChannels.Valve, 1)])
 
         #Other Trials:
         else:
@@ -203,87 +152,9 @@ class Water_Filler(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
-
-        self.sma.add_state(
-            state_name='Response_window',
-            state_timer=self.response_duration,
-            state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish', Bpod.Events.Tup: 'No_Touch'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
-        # Starts to read the touchscreen with one touch processing
-
-        self.sma.add_state(
-            state_name='Correct',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
-        # Turns on Water port LED and plays correct sound
-
-        self.sma.add_state(
-            state_name='Correct_image_display',
-            state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
-
-        self.sma.add_state(
-            state_name='Correct_reward',
-            state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-        # Delivers Water and stops the reward sound and flips the screen
-
-        self.sma.add_state(
-            state_name='Flip_screen_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
-
-        self.sma.add_state(
-            state_name='Touch_Outside',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[])
-        # Goes back to response window in case of touch outside the two jar areas
-
-        self.sma.add_state(
-            state_name='Punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 39)])
-        # Turns on Global LED and water port LED on
-
-        self.sma.add_state(
-            state_name='Punish_image_display',
-            state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
-        # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
-
-        self.sma.add_state(
-            state_name='After_punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
-        # Flips the screen after water port poked in.
-
-        self.sma.add_state(
-            state_name='Flip_screen_no_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
-
-        self.sma.add_state(
-            state_name='No_Touch',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 37)])
-        # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
+        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
         self.sma.add_state(
             state_name='Exit',
@@ -291,67 +162,7 @@ class Water_Filler(Task):
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
-
     def after_trial(self):
-        ##### COUNT MISSES:
-        if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-            self.accwindow = self.accwindow[1:] + [0]
-            self.trial_result = 'miss'
-
-        ##### COUNT PUNISH
-        elif self.current_trial_states['Punish'][0][0] > 0:
-            self.trial_result = 'incorrect'
-            self.valid_counter += 1
-            self.accwindow = self.accwindow[1:] + [0]
-
-        ##### COUNT CORRECTS FIRST POKE
-        elif self.current_trial_states['Correct'][0][0] > 0:
-            self.trial_result = 'correct'
-            self.valid_counter += 1
-            self.reward_drunk += self.valve_reward * self.valve_factor_c
-            self.accwindow = self.accwindow[1:] + [1]
-            self.correct_count += 1
-            print('Correct_count: ', self.correct_count)
-
-        # ##### COUNT Touches outside the jar areas :
-        # elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-        #     self.touch_outside += 1
-        #     print('Outside_count: ', self.touch_outside)
-
-        # End-trial calculations
-        #self.last_x = self.x
-        self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
-        print('Trial length: ' + str(self.trial_length))
-
-        ### Long trials
-        if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
-            self.tired_counter += 1
-            if self.tired_counter > 2:
-                self.tired = True
-                print('Finishing task: subject tired')
-        else:  # reset the counter
-            self.tired_counter = 0
-
-        # Accuracy for running trials:
-        #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
-
-        # # Stage progression based on conditions:
-        # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 1 to stage 2 with accuracy {self.accuracy}')
-        #     self.stage = 2
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 2 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 3
-        #     self.current_trial = 1
-        #     self.acc_up = 0
-        # elif self.stage == 3 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
-        #     print(f'Advancing from stage 2 to stage 3 with accuracy {self.accuracy}')
-        #     self.stage = 4
-        #     self.current_trial = 1
-        #     self.acc_up = 0
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
