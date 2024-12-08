@@ -262,7 +262,7 @@ class Probability_WebersLaw(Task):
             return None
 
     def configure_gui(self):
-        self.gui_input = ['duration_max']
+        self.gui_input = ['duration_max', 'stage']
 
     def main_loop(self):
         print('')
@@ -368,7 +368,7 @@ class Probability_WebersLaw(Task):
         print('Stimulus Trial Counter',self.stim_trial_counter)
 
         ############ STATE MACHINE ################
-        if stage != 5:
+        if self.stage != 5:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
