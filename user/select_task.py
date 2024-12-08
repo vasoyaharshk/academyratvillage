@@ -261,7 +261,8 @@ def select_task(df, subject):
                                 lower_stage =True # lower substage
                     if acc <acc_down:                               # Low specific accuracy
                         if initial <= max_stim_dur:
-                            stim_dur = initial + change
+                            #stim_dur = initial + change
+                            stim_dur = initial
                     if df_last3.first_correct_bool.mean() <= 0.4:   # Low global accuracy
                         lower_stage = True # lower substage
 
