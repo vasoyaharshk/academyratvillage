@@ -493,109 +493,115 @@ class Probability_WebersLaw(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        self.trial_counter += 1
-        self.stim_trial_counter += 1
+        if self.stage != 5:
+            self.trial_counter += 1
+            self.stim_trial_counter += 1
 
-        ##### COUNT MISSES:
-        if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-            self.accwindow = self.accwindow[1:] + [0]
-            self.trial_result = 'miss'
+            ##### COUNT MISSES:
+            if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
+                self.accwindow = self.accwindow[1:] + [0]
+                self.trial_result = 'miss'
 
-        ##### COUNT PUNISH
-        elif self.current_trial_states['Punish'][0][0] > 0:
-            self.trial_result = 'incorrect'
-            self.valid_counter += 1
-            self.accwindow = self.accwindow[1:] + [0]
+            ##### COUNT PUNISH
+            elif self.current_trial_states['Punish'][0][0] > 0:
+                self.trial_result = 'incorrect'
+                self.valid_counter += 1
+                self.accwindow = self.accwindow[1:] + [0]
 
-        ##### COUNT CORRECTS FIRST POKE
-        elif self.current_trial_states['Correct'][0][0] > 0:
-            self.trial_result = 'correct'
-            self.valid_counter += 1
-            self.reward_drunk += self.valve_reward * self.valve_factor_c
-            self.accwindow = self.accwindow[1:] + [1]
-            self.correct_count += 1
-            print('Correct_count: ', self.correct_count)
+            ##### COUNT CORRECTS FIRST POKE
+            elif self.current_trial_states['Correct'][0][0] > 0:
+                self.trial_result = 'correct'
+                self.valid_counter += 1
+                self.reward_drunk += self.valve_reward * self.valve_factor_c
+                self.accwindow = self.accwindow[1:] + [1]
+                self.correct_count += 1
+                print('Correct_count: ', self.correct_count)
 
-            # # Check if side bias is active and if the current trial was correct
-            # if self.bias_breaking == 1:  # Side bias active
-            #     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-            #     if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
-            #         self.bias_breaking = 0  # End bias breaking
-            #         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+                # # Check if side bias is active and if the current trial was correct
+                # if self.bias_breaking == 1:  # Side bias active
+                #     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                #     if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                #         self.bias_breaking = 0  # End bias breaking
+                #         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
-        # ##### COUNT Touches outside the jar areas :
-        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-            self.status = 'Touch_Outside'
+            # ##### COUNT Touches outside the jar areas :
+            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+                self.status = 'Touch_Outside'
 
-        # End-trial calculations
-        #self.last_x = self.x
-        self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
-        print('Trial length: ' + str(self.trial_length))
+            # End-trial calculations
+            #self.last_x = self.x
+            self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
+            print('Trial length: ' + str(self.trial_length))
 
-        ### Long trials
-        if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
-            self.tired_counter += 1
-            if self.tired_counter > 2:
-                self.tired = True
-                print('Finishing task: subject tired')
-        else:  # reset the counter
-            self.tired_counter = 0
+            ### Long trials
+            if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
+                self.tired_counter += 1
+                if self.tired_counter > 2:
+                    self.tired = True
+                    print('Finishing task: subject tired')
+            else:  # reset the counter
+                self.tired_counter = 0
 
-        # Accuracy for running trials:
-        #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+            # Accuracy for running trials:
+            #self.accuracy = sum(self.accwindow) / len(self.accwindow)
+            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
-        # Measure accuracy for every 12 trials using running_window
-        if self.trial_counter % self.running_window == 0:
-            trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
-            window_accuracy = sum(trials_in_window) / len(trials_in_window)
-            print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
+            # Measure accuracy for every 12 trials using running_window
+            if self.trial_counter % self.running_window == 0:
+                trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
+                window_accuracy = sum(trials_in_window) / len(trials_in_window)
+                print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
 
-        # # Side Bias Breaking formula:
-        # self.last_stim_trial = self.stim_trial
-        #
-        # try:
-        #     # Try converting response_x directly to a float
-        #     self.response_x_bias = float(self.response_x)
-        # except ValueError:
-        #     print(f"No response_x value or response other: {self.response_x}")
-        #
-        #     # Split the string by commas and convert it to a list of floats
-        #     try:
-        #         # First, check if the response_x is a string and split it
-        #         response_x_list = [float(x) for x in self.response_x.split(",")]
-        #
-        #         # Use the last element of the list as response_x_bias
-        #         self.response_x_bias = response_x_list[-1]
-        #         print(f"Using last value from response_x array: {self.response_x_bias}")
-        #     except Exception as e:
-        #         #print(f"Failed to process response_x as array. Error: {e}")
-        #         return  # Handle this case if needed
-        #
-        # # Append the response to the array:
-        # #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-        # self.response_x_array.append(self.response_x_bias)
-        # print(f"Responses so far: {self.response_x_array}")
-        #
-        # #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-        # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-        #     # Check if all responses fall into one of the two defined categories
-        #     all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-        #     all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
-        #
-        #     if all_left_side:
-        #         self.sameside = 'left'
-        #         self.bias_breaking = 1
-        #         print('Bias breaking active, side:', self.sameside)
-        #         self.last_stim_trial = 32               #Ensure last_stim_trial is 32
-        #     elif all_right_side:
-        #         self.sameside = 'right'
-        #         self.bias_breaking = 1
-        #         self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
-        #         print('Bias breaking active, side:', self.sameside)
-        #
-        #     self.response_x_array = []      #Clearing the array
+            # # Side Bias Breaking formula:
+            # self.last_stim_trial = self.stim_trial
+            #
+            # try:
+            #     # Try converting response_x directly to a float
+            #     self.response_x_bias = float(self.response_x)
+            # except ValueError:
+            #     print(f"No response_x value or response other: {self.response_x}")
+            #
+            #     # Split the string by commas and convert it to a list of floats
+            #     try:
+            #         # First, check if the response_x is a string and split it
+            #         response_x_list = [float(x) for x in self.response_x.split(",")]
+            #
+            #         # Use the last element of the list as response_x_bias
+            #         self.response_x_bias = response_x_list[-1]
+            #         print(f"Using last value from response_x array: {self.response_x_bias}")
+            #     except Exception as e:
+            #         #print(f"Failed to process response_x as array. Error: {e}")
+            #         return  # Handle this case if needed
+            #
+            # # Append the response to the array:
+            # #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+            # self.response_x_array.append(self.response_x_bias)
+            # print(f"Responses so far: {self.response_x_array}")
+            #
+            # #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+            #     # Check if all responses fall into one of the two defined categories
+            #     all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+            #     all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+            #
+            #     if all_left_side:
+            #         self.sameside = 'left'
+            #         self.bias_breaking = 1
+            #         print('Bias breaking active, side:', self.sameside)
+            #         self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+            #     elif all_right_side:
+            #         self.sameside = 'right'
+            #         self.bias_breaking = 1
+            #         self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+            #         print('Bias breaking active, side:', self.sameside)
+            #
+            #     self.response_x_array = []      #Clearing the array
+        else:
+            print("Stage is 5. All repetitions completed. Task Ended.")
+            self.trial_length = 0.1
+            self.trial_result = None
+
 
         ############ REGISTER VALUES ################
         #Working Memory:
