@@ -474,10 +474,51 @@ def select_task(df, subject):
 
             if stage == 5:
                 task = 'Water_Filler'
+                # variables by default
+                stage = 5
+                substage = 0
+                choice = 0
+                wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
+                stim_dur_ds = 0
+                stim_dur_dm = 0
+                stim_dur_dl = 0
+                # Weber's Law:
+                block = 0
+                conditions = []  # Takes the conditions from task file after first session.
+                completed_conditions = []  # To store completed conditions
+                current_condition = 0  # To track the current condition in progress
+                repetition = 0
+                current_repetition = 0  # To store how many times the condition has repeated.
+                trial_counter = 0  # Track the number of trials for the current condition.
+                # Image output stims:
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
+
 
     elif task == 'Water_Filler':
         task = Water_Filler
         print("rat drank water")
+        # variables by default
+        stage = 5
+        substage = 0
+        choice = 0
+        wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
+        stim_dur_ds = 0
+        stim_dur_dm = 0
+        stim_dur_dl = 0
+        # Weber's Law:
+        block = 0
+        conditions = []  # Takes the conditions from task file after first session.
+        completed_conditions = []  # To store completed conditions
+        current_condition = 0  # To track the current condition in progress
+        repetition = 0
+        current_repetition = 0  # To store how many times the condition has repeated.
+        trial_counter = 0  # Track the number of trials for the current condition.
+        # Image output stims:
+        stim_trial = 0
+        stim_trials = []
+        stim_trial_counter = 0
 
     if my_subject == 'm2':
         wait_seconds = 5
