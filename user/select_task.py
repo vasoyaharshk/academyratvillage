@@ -218,7 +218,8 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_ds'].median()
                     acc_up = 0.6
                     acc_down = 0.45
-                    change = 0.075
+                    #change = 0.075
+                    change = 0.15
                 elif substage ==2:
                     max_stim_dur = 0.4
                     average, initial = variable_calc('stim_dur_dm', max_stim_dur, max_stim_dur)
@@ -226,7 +227,9 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dm'].median()
                     acc_up = 0.55
                     acc_down = 0.4
-                    change = 0.05
+                    #change = 0.05
+                    change = 0.15
+
                 elif substage ==3:
                     max_stim_dur = 0.35
                     average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
@@ -234,7 +237,8 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dl'].median()
                     acc_up = 0.5
                     acc_down = 0.35
-                    change = 0.025
+                    #change = 0.025
+                    change = 0.15
 
                 # Good accuracy -> shorten stim_dur
                 if acc > acc_up and n_trials>55:            #n_trials were changed from 55 to 35 on 2024-12-02 for Ciri, Luna, Sorrel due to low motivation.
@@ -250,7 +254,8 @@ def select_task(df, subject):
                     stim_dur = initial # maintain last session value unless ...
                     if n_trials <= 25 and n_trials_prev<= 25:       # Hard demotivation
                         if initial <= max_stim_dur:
-                            stim_dur = initial + change
+                            #stim_dur = initial + change
+                            stim_dur = initial
                         else:
                             if last3_stim_dur >= max_stim_dur:
                                 lower_stage =True # lower substage
