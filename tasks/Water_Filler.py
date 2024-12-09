@@ -70,6 +70,7 @@ class Water_Filler(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.x_correcth = 0
+        self.x_incorrecth = 0
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm
         self.height = 190
