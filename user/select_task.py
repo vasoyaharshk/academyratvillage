@@ -224,7 +224,6 @@ def select_task(df, subject):
                     max_stim_dur = 0.35
                     average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
                     acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
-
                     acc_up = 0.5
                     change = 0.15
 
