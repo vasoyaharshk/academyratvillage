@@ -161,10 +161,20 @@ def select_task(df, subject):
             last5_poke_acc = df_last5.last_correct_bool.mean()
 
             # subdataframes
-            vg_df = df.loc[df['trial_type'] == 'VG']
-            ds_df = df.loc[((df['trial_type'] == 'DS') | (df['trial_type'] == 'DSc1') | (df['trial_type'] == 'DSc2'))]
-            dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
-            dl_df = df.loc[((df['trial_type'] == 'DL'))]
+            # vg_df = df.loc[df['trial_type'] == 'VG']
+            # ds_df = df.loc[((df['trial_type'] == 'DS') | (df['trial_type'] == 'DSc1') | (df['trial_type'] == 'DSc2'))]
+            # dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
+            # dl_df = df.loc[((df['trial_type'] == 'DL'))]
+
+            # Calculate subdataframes for the last 55 trials
+            last_trials = 55  # Define the number of trials to consider
+            df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
+
+            # Subdataframes for each trial type
+            vg_df = df_last_trials.loc[df_last_trials['trial_type'] == 'VG']
+            ds_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DS', 'DSc1', 'DSc2'])]
+            dm_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DM', 'DMc1'])]
+            dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
 
             ############ STAGE 1 ############
             #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
@@ -204,7 +214,7 @@ def select_task(df, subject):
                     acc = ds_df['first_correct_bool'].mean()
                     #last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_ds'].median()
                     acc_up = 0.6
-                    acc_down = 0.45
+                    #acc_down = 0.45
                     change = 0.15
                 elif substage ==2:
                     max_stim_dur = 0.4
@@ -212,7 +222,7 @@ def select_task(df, subject):
                     acc = (dm_df['first_correct_bool'].mean() + ds_df['first_correct_bool'].mean())/2
                     #last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dm'].median()
                     acc_up = 0.55
-                    acc_down = 0.4
+                    #acc_down = 0.4
                     change = 0.15
                 elif substage ==3:
                     max_stim_dur = 0.35
@@ -220,7 +230,7 @@ def select_task(df, subject):
                     acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
                     #last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dl'].median()
                     acc_up = 0.5
-                    acc_down = 0.35
+                    #acc_down = 0.35
                     change = 0.15
 
                 # Good accuracy -> shorten stim_dur
