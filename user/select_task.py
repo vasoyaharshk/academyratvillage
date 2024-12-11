@@ -112,7 +112,7 @@ def select_task(df, subject):
 
             #number of trials
             if n_trials < 15:
-                my_subject = df.subject.iloc[0]
+                #my_subject = df.subject.iloc[0]
                 if my_subject not in settings.INACTIVE_SUBJECTS:
                     telegram_bot.alarm_few_trials(n_trials, my_subject)
 
@@ -166,19 +166,6 @@ def select_task(df, subject):
             dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
             dl_df = df.loc[((df['trial_type'] == 'DL'))]
 
-
-            ############################ STAGE & SUBSTAGE SELECTION ############################
-
-            ########## OPTO ############
-            try:
-                df.subject.iloc[0]
-                if df.opto_type.iloc[-1]== 6 or df.opto_type.iloc[-1]== 7:  # 0 off, 6 for inhibition, 7 for activation
-                    choice = 0
-                elif df.opto_type.iloc[-1] == 0:
-                    choice = 6
-            except: # no opto sessions
-                choice = subject.choice
-
             ############ STAGE 1 ############
             #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
             if stage == 1:
@@ -218,7 +205,6 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_ds'].median()
                     acc_up = 0.6
                     acc_down = 0.45
-                    #change = 0.075
                     change = 0.15
                 elif substage ==2:
                     max_stim_dur = 0.4
@@ -227,7 +213,6 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dm'].median()
                     acc_up = 0.55
                     acc_down = 0.4
-                    #change = 0.05
                     change = 0.15
 
                 elif substage ==3:
@@ -237,7 +222,6 @@ def select_task(df, subject):
                     last3_stim_dur = df_last3.loc[df_last3['trial'] == 10]['stim_dur_dl'].median()
                     acc_up = 0.5
                     acc_down = 0.35
-                    #change = 0.025
                     change = 0.15
 
                 # Good accuracy -> shorten stim_dur
@@ -298,7 +282,9 @@ def select_task(df, subject):
                         substage -=1
                         stim_dur_dm = 0.4
                         stim_dur_dl = 0
-        #return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice
+
+
+
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
         accuracy_criteria = 0.85
@@ -328,7 +314,7 @@ def select_task(df, subject):
 
         # number of trials
         if n_trials_last < 15:
-            my_subject = df.subject.iloc[0]
+            #my_subject = df.subject.iloc[0]
             if my_subject not in settings.INACTIVE_SUBJECTS:
                 telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
@@ -441,20 +427,21 @@ def select_task(df, subject):
                 # Stage 3 -> Weber's Law
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
-                        stage = 4
-                        task = 'Probability_WebersLaw'
-                        block = 12  # This is the number of trials one conditions will remain for
-                        conditions = []  # Takes the conditions from select task file.
-                        completed_conditions = []  # To store completed conditions
-                        current_condition = 0  # To track the current condition in progress
-                        repetition = 3  # To store how many times the conditions needs to repeat.
-                        current_repetition = 0  # To store how many times the condition has repeated.
-                        trial_counter = 0  # Track the number of trials for the current condition
-                        # Image output stims:
-                        stim_trial = 0
-                        stim_trials = []
-                        stim_trial_counter = 0
+                        print(f'Should advance from stage 3 to Webers Law with accuracy in both sessions')
+                        # print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
+                        # stage = 4
+                        # task = 'Probability_WebersLaw'
+                        # block = 12  # This is the number of trials one conditions will remain for
+                        # conditions = []  # Takes the conditions from select task file.
+                        # completed_conditions = []  # To store completed conditions
+                        # current_condition = 0  # To track the current condition in progress
+                        # repetition = 3  # To store how many times the conditions needs to repeat.
+                        # current_repetition = 0  # To store how many times the condition has repeated.
+                        # trial_counter = 0  # Track the number of trials for the current condition
+                        # # Image output stims:
+                        # stim_trial = 0
+                        # stim_trials = []
+                        # stim_trial_counter = 0
 
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
