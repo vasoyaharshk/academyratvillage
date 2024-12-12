@@ -286,7 +286,12 @@ def select_task(df, subject):
                     stim_dur_dl = max(stim_dur_dl, 0)
                 else:
                     print("Stimulus duration has already been modified recently. Skipping further adjustment.")
-
+                    # Assign the last row's stim_dur values to skip further adjustment
+                    stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
+                    stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
+                    stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
+                    print(
+                        f"Retaining stimulus durations: stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}.")
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
