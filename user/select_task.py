@@ -168,8 +168,23 @@ def select_task(df, subject):
             # dl_df = df.loc[((df['trial_type'] == 'DL'))]
 
             # Calculate subdataframes for the last 55 trials
+            last_trials = 20  # Define the number of trials to consider
+            df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
+
+            # Calculate subdataframes for the last 55 trials with the same substage
             last_trials = 55  # Define the number of trials to consider
             df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
+
+            # Check if all the trials in the last 55 rows have the same substage
+            if df_last_trials['substage'].nunique() == 1:
+                # Proceed with the last 55 trials
+                print(f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}")
+            else:
+                # Filter to include only trials from the last substage
+                last_substage = df_last_trials['substage'].iloc[-1]  # Identify the last substage
+                df_last_trials = df_last_trials[df_last_trials['substage'] == last_substage]
+                print(
+                    f"The last {last_trials} trials have different substages. Filtering to include only substage {last_substage}.")
 
             # Subdataframes for each trial type
             vg_df = df_last_trials.loc[df_last_trials['trial_type'] == 'VG']
@@ -208,6 +223,13 @@ def select_task(df, subject):
             ############ STAGE 2 ############
             elif stage == 2:
                 next_stage = False
+
+                correct_trials_last = df_last_trials[df_last_trials['trial_result'] == 'correct'].shape[0]
+                valid_trials_last = df_last_trials[df_last_trials['trial_result'] != 'miss'].shape[0]
+                print("Valid trials in session: ", df_last_trials)
+                accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
+                print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
+
 
                 if substage == 1:
                     max_stim_dur = 0.45
