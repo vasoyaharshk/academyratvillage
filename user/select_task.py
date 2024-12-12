@@ -167,10 +167,6 @@ def select_task(df, subject):
             # dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
             # dl_df = df.loc[((df['trial_type'] == 'DL'))]
 
-            # Calculate subdataframes for the last 55 trials
-            last_trials = 20  # Define the number of trials to consider
-            df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
-
             # Calculate subdataframes for the last 55 trials with the same substage
             last_trials = 55  # Define the number of trials to consider
             df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
