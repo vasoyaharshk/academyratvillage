@@ -220,10 +220,12 @@ class StageTraining_RatB_V1_50(Task):
                 self.pvg = 0.4
                 self.pds = 0.6
                 self.response_duration = 20
-                self.stim_dur_ds = (0.6 + self.init_stim_dur_ds) / 2
+                #self.stim_dur_ds = (0.6 + self.init_stim_dur_ds) / 2
+                self.stim_dur_ds = 0
             elif self.current_trial == 9:
                 self.repoke_th = self.correct_th  # no more repoking allowed
-                self.stim_dur_ds = self.init_stim_dur_ds
+                #self.stim_dur_ds = self.init_stim_dur_ds
+                self.stim_dur_ds = 0
 
             ####### STAGE 2: DELAYS LEARNING #######
             elif self.stage == 2 and self.current_trial >= 10:
