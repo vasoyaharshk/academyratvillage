@@ -182,6 +182,11 @@ def select_task(df, subject):
                 print(
                     f"The last {last_trials} trials have different substages. Filtering to include only substage {last_substage}.")
 
+            # Check if stim_dur was modified in the last 55 trials
+            recent_stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[0] == df_last_trials['stim_dur_ds'].iloc[-1]
+            recent_stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[0] == df_last_trials['stim_dur_dm'].iloc[-1]
+            recent_stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[0] == df_last_trials['stim_dur_dl'].iloc[-1]
+
             # Subdataframes for each trial type
             vg_df = df_last_trials.loc[df_last_trials['trial_type'] == 'VG']
             ds_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DS', 'DSc1', 'DSc2'])]
@@ -218,66 +223,69 @@ def select_task(df, subject):
 
             ############ STAGE 2 ############
             elif stage == 2:
-                next_stage = False
+                if not recent_stim_dur_ds or not recent_stim_dur_dm or not recent_stim_dur_dl:
+                    next_stage = False
 
-                if substage == 1:
-                    max_stim_dur = 0.45
-                    average, initial = variable_calc('stim_dur_ds', max_stim_dur, max_stim_dur)
-                    acc = ds_df['first_correct_bool'].mean()
-                    acc_up = 0.6
-                    change = 0.15
-                elif substage ==2:
-                    max_stim_dur = 0.4
-                    average, initial = variable_calc('stim_dur_dm', max_stim_dur, max_stim_dur)
-                    acc = (dm_df['first_correct_bool'].mean() + ds_df['first_correct_bool'].mean())/2
-                    acc_up = 0.55
-                    change = 0.15
-                elif substage ==3:
-                    max_stim_dur = 0.35
-                    average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
-                    acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
-                    acc_up = 0.5
-                    change = 0.15
+                    if substage == 1:
+                        max_stim_dur = 0.45
+                        average, initial = variable_calc('stim_dur_ds', max_stim_dur, max_stim_dur)
+                        acc = ds_df['first_correct_bool'].mean()
+                        acc_up = 0.6
+                        change = 0.15
+                    elif substage ==2:
+                        max_stim_dur = 0.4
+                        average, initial = variable_calc('stim_dur_dm', max_stim_dur, max_stim_dur)
+                        acc = (dm_df['first_correct_bool'].mean() + ds_df['first_correct_bool'].mean())/2
+                        acc_up = 0.55
+                        change = 0.15
+                    elif substage ==3:
+                        max_stim_dur = 0.35
+                        average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
+                        acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
+                        acc_up = 0.5
+                        change = 0.15
 
-                # Check if accuracy is sufficient for advancement
-                if acc > acc_up and len(df_last_trials) == last_trials:
-                    print(f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration.")
-                    if initial >= change:
-                        stim_dur = initial - change
+                    # Check if accuracy is sufficient for advancement
+                    if acc > acc_up and len(df_last_trials) == last_trials:
+                        print(f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration.")
+                        if initial >= change:
+                            stim_dur = initial - change
+                        else:
+                            stim_dur = 0
+                            next_stage = True  # Advance to next substage if duration is already minimal
                     else:
-                        stim_dur = 0
-                        next_stage = True  # Advance to next substage if duration is already minimal
+                        print(f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration.")
+                        stim_dur = initial
+
+                    if substage == 1:  # stage 2 remain now in substage 1 ds 0
+                        stim_dur_ds = stim_dur
+                        if next_stage == True:
+                            print("Advancing to Stage 2.2")
+                            substage += 1
+                            stim_dur_ds = 0
+                            stim_dur_dm = 0.4
+                    elif substage == 2:
+                        stim_dur_dm = stim_dur
+                        if next_stage == True:
+                            print("Advancing to Stage 2.3")
+                            substage += 1
+                            stim_dur_dm = 0
+                            stim_dur_dl = 0.35
+                    elif substage == 3:
+                        stim_dur_dl = stim_dur
+                        if next_stage == True:
+                            print("Advancing to Stage 3.1")
+                            #if len(last14_substages) == 1:
+                            stage += 1
+                            substage = float(1)
+                            stim_dur_dl = 0
+
+                    #Ensure that stim_duration is below 0:
+                    stim_dur_ds = max(stim_dur_ds, 0)
+                    stim_dur_dm = max(stim_dur_dm, 0)
+                    stim_dur_dl = max(stim_dur_dl, 0)
                 else:
-                    print(f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration.")
-                    stim_dur = initial
-
-                if substage == 1:  # stage 2 remain now in substage 1 ds 0
-                    stim_dur_ds = stim_dur
-                    if next_stage == True:
-                        print("Advancing to Stage 2.2")
-                        substage += 1
-                        stim_dur_ds = 0
-                        stim_dur_dm = 0.4
-                elif substage == 2:
-                    stim_dur_dm = stim_dur
-                    if next_stage == True:
-                        print("Advancing to Stage 2.3")
-                        substage += 1
-                        stim_dur_dm = 0
-                        stim_dur_dl = 0.35
-                elif substage == 3:
-                    stim_dur_dl = stim_dur
-                    if next_stage == True:
-                        print("Advancing to Stage 3.1")
-                        #if len(last14_substages) == 1:
-                        stage += 1
-                        substage = float(1)
-                        stim_dur_dl = 0
-
-                #Ensure that stim_duration is below 0:
-                stim_dur_ds = max(stim_dur_ds, 0)
-                stim_dur_dm = max(stim_dur_dm, 0)
-                stim_dur_dl = max(stim_dur_dl, 0)
+                    print("Stimulus duration has already been modified recently. Skipping further adjustment.")
 
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
