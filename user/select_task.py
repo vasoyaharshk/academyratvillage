@@ -44,7 +44,9 @@ def select_task(df, subject):
         df_last5 = df.loc[df['session'] > last_session - 5].copy()  # last five sessions
         df_last3 = df.loc[df['session'] > last_session - 3].copy()  # last three sessions
         df_last2 = df.loc[df['session'] > last_session - 2].copy()  # last two sessions
-        df = df.loc[df['session'] == last_session].copy()           # last session
+        #df = df.loc[df['session'] == last_session].copy()           # last session
+        #VERY IMPORTANT, THE ABOVE LINE IS COMMENTED OUT BECAUSE WE WANT THE DF TO REMAIN THE SUBJECT'S ALL SESSIONS INSTEAD OF JUST LAST AS
+        #WE WANT TO GET LAST 55 TRIALS FOR THE CRITERIA CHANGED.
 
         # number of trials
         n_trials = df.trial.max()  # number of trials in current session
