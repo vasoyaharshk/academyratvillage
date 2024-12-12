@@ -220,13 +220,6 @@ def select_task(df, subject):
             elif stage == 2:
                 next_stage = False
 
-                correct_trials_last = df_last_trials[df_last_trials['trial_result'] == 'correct'].shape[0]
-                valid_trials_last = df_last_trials[df_last_trials['trial_result'] != 'miss'].shape[0]
-                print("Valid trials in session: ", df_last_trials)
-                accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-                print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
-
-
                 if substage == 1:
                     max_stim_dur = 0.45
                     average, initial = variable_calc('stim_dur_ds', max_stim_dur, max_stim_dur)
