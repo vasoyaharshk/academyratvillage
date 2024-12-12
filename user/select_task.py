@@ -114,7 +114,6 @@ def select_task(df, subject):
 
             #number of trials
             if n_trials < 15:
-                #my_subject = df.subject.iloc[0]
                 if my_subject not in settings.INACTIVE_SUBJECTS:
                     telegram_bot.alarm_few_trials(n_trials, my_subject)
 
@@ -299,7 +298,6 @@ def select_task(df, subject):
 
         # number of trials
         if n_trials_last < 15:
-            #my_subject = df.subject.iloc[0]
             if my_subject not in settings.INACTIVE_SUBJECTS:
                 telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
