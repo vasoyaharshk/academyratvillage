@@ -268,7 +268,6 @@ def select_task(df, subject):
                 stim_dur_dl = max(stim_dur_dl, 0)
 
 
-
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
         accuracy_criteria = 0.85
