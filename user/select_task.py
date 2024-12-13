@@ -203,7 +203,6 @@ def select_task(df, subject):
                     #     task = 'TouchTeaching'
                     #     stage -= 1
                     #     substage -= 1
-
                 elif substage == 2:
                     stim_pos_acc = vg_df.groupby('x')['first_correct_bool'].mean() # accuracy by stimulus in VG trials
                     stim_pos_acc.to_list()
@@ -211,7 +210,6 @@ def select_task(df, subject):
                         substage += 1
                     elif first_poke_acc <= 0.33 and len(last3_substages) == 1:  # lower substage
                         substage -= 1
-
                 elif substage == 3:
                     acc_ds = ds_df['first_correct_bool'].mean() # accuracy in delay short
                     if acc_ds >= 0.55 and len(last2_substages) == 1 and n_trials > 60 and first3_poke_acc >0.7:  # next stage
@@ -281,6 +279,7 @@ def select_task(df, subject):
                             stage += 1
                             substage = float(1)
                             stim_dur_dl = 0
+                            telegram_bot.alarm_completed_criteria(task, subject_name)
 
                     #Ensure that stim_duration is below 0:
                     stim_dur_ds = max(stim_dur_ds, 0)
