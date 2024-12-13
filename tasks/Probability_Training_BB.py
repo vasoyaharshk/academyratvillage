@@ -92,9 +92,9 @@ class Probability_Training_BB(Task):
         self.repetition = 0  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
-        self.stim_trial = 0
-        self.stim_trials = []
+        # # Image output stims:
+        # self.stim_trial = 0
+        # self.stim_trials = []
         self.stim_trial_counter = 0
 
     def configure_gui(self):
@@ -119,6 +119,8 @@ class Probability_Training_BB(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+        #print('Stim_Trial: ', self.stim_trial)
+        #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:

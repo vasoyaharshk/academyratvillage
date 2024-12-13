@@ -223,7 +223,9 @@ def select_task(df, subject):
 
             ############ STAGE 2 ############
             elif stage == 2:
-                if not recent_stim_dur_ds or not recent_stim_dur_dm or not recent_stim_dur_dl:
+                if recent_stim_dur_ds == True and recent_stim_dur_dm == True and recent_stim_dur_dl == True:
+                    print(
+                        f"Stimulus duration are same in last 55 trials: stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}.")
                     next_stage = False
 
                     if substage == 1:
