@@ -85,7 +85,7 @@ class Probability_WebersLaw(Task):
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 3  # To store how many times the conditions needs to repeat.
+        self.repetition = 2  # To store how many times the conditions needs to repeat after the first initial run.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
         # Image output stims:
