@@ -167,6 +167,16 @@ def alarm_few_trials(n_trials, subject_name):
     except:
         pass
 
+def alarm_completed_criteria(task, subject_name):
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+        message = 'ALARM: Task criteria reached: ' + str(task) + ', subject: ' + str(subject_name)
+        utils.alarms.add_new_item({'message': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+        request.urlopen(url, data.encode('utf-8'))
+    except:
+        pass
+
 def alarm_touchscreen(subject_name):
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
