@@ -119,8 +119,8 @@ class Probability_Training_BB(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
-        #print('Stim_Trial: ', self.stim_trial)
-        #print('Stim_Trials: ', self.stim_trials)
+        print('Stim_Trial: ', self.stim_trial)
+        print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
