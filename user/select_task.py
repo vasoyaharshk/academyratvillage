@@ -279,7 +279,11 @@ def select_task(df, subject):
                             stage += 1
                             substage = float(1)
                             stim_dur_dl = 0
-                            #telegram_bot.alarm_completed_criteria(task, subject_name)
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
 
                     #Ensure that stim_duration is below 0:
                     stim_dur_ds = max(stim_dur_ds, 0)
@@ -436,7 +440,11 @@ def select_task(df, subject):
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         print(f'Should advance from stage 3 to Webers Law with accuracy in both sessions')
-                        telegram_bot.alarm_completed_criteria(task, subject_name)
+                        try:
+                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
                         # print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         # stage = 4
                         # task = 'Probability_WebersLaw'
