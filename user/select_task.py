@@ -399,7 +399,7 @@ def select_task(df, subject):
         message = f"Valid trials in session: {valid_trials_last}"
         print(f'{message}')
         try:
-            telegram_bot.alarm_completed_criteria(task, my_subject)
+            telegram_bot.alarm_finish_session(message, my_subject)
         except:
             print('Telegram message not sent')
             pass
@@ -407,7 +407,7 @@ def select_task(df, subject):
         message = f"Accuracy in session: {accuracy_last * 100:.2f}%"
         print(f'{message}')
         try:
-            telegram_bot.alarm_completed_criteria(task, my_subject)
+            telegram_bot.alarm_finish_session(message, my_subject)
         except:
             print('Telegram message not sent')
             pass
@@ -429,7 +429,7 @@ def select_task(df, subject):
             message = f"Valid trials in previous session: {valid_trials_second_last}"
             print(f'{message}')
             try:
-                telegram_bot.alarm_completed_criteria(task, my_subject)
+                telegram_bot.alarm_finish_session(message, my_subject)
             except:
                 print('Telegram message not sent')
                 pass
@@ -437,7 +437,7 @@ def select_task(df, subject):
             message = f"Accuracy in previous session: {accuracy_second_last * 100:.2f}%"
             print(f'{message}')
             try:
-                telegram_bot.alarm_completed_criteria(task, my_subject)
+                telegram_bot.alarm_finish_session(message, my_subject)
             except:
                 print('Telegram message not sent')
                 pass
