@@ -185,8 +185,6 @@ def alarm_touchscreen(subject_name):
         data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
 
         request.urlopen(url, data.encode('utf-8'))
-
-
     except:
         pass
 
