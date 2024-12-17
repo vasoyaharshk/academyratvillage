@@ -202,13 +202,29 @@ def select_task(df, subject):
                 # Check if all the trials in the last 55 rows have the same substage
                 if df_last_trials['substage'].nunique() == 1:
                     # Proceed with the last 55 trials
-                    print(f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}")
+                    message = (
+                        f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}"
+                    )
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
                 else:
                     # Filter to include only trials from the last substage
                     last_substage = df_last_trials['substage'].iloc[-1]  # Identify the last substage
                     df_last_trials = df_last_trials[df_last_trials['substage'] == last_substage]
-                    print(
-                        f"The last {last_trials} trials have different substages. Filtering to include only substage {last_substage}.")
+                    message = (
+                        f"The last {last_trials} trials have different substages. "
+                        f"Filtering to include only substage {last_substage}."
+                    )
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
 
                 # Check if stim_dur was modified in the last 55 trials
                 recent_stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[0] == df_last_trials['stim_dur_ds'].iloc[-1]
@@ -222,8 +238,16 @@ def select_task(df, subject):
                 dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
 
                 if recent_stim_dur_ds == True and recent_stim_dur_dm == True and recent_stim_dur_dl == True:
-                    print(
-                        f"Stimulus duration are same in last 55 trials: stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}.")
+                    message = (
+                        f"Stimulus duration are same in last 55 trials: "
+                        f"stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}."
+                    )
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
                     next_stage = False
 
                     if substage == 1:
@@ -247,14 +271,26 @@ def select_task(df, subject):
 
                     # Check if accuracy is sufficient for advancement
                     if acc > acc_up and len(df_last_trials) == last_trials:
-                        print(f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration.")
+                        message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration."
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
                         if initial >= change:
                             stim_dur = initial - change
                         else:
                             stim_dur = 0
                             next_stage = True  # Advance to next substage if duration is already minimal
                     else:
-                        print(f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration.")
+                        message = f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration."
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
                         stim_dur = initial
 
                     if substage == 1:  # stage 2 remain now in substage 1 ds 0
@@ -279,8 +315,10 @@ def select_task(df, subject):
                             stage += 1
                             substage = float(1)
                             stim_dur_dl = 0
+                            message = 'WM: Advancing to Stage 3.1'
                             try:
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
+                                telegram_bot.alarm_finish_session(message, my_subject)
                             except:
                                 print('Telegram message not sent')
                                 pass
@@ -295,8 +333,16 @@ def select_task(df, subject):
                     stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
                     stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
                     stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
-                    print(
-                        f"Retaining stimulus durations: stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}.")
+                    message = (
+                        f"Retaining stimulus durations: "
+                        f"stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}."
+                    )
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
@@ -439,9 +485,11 @@ def select_task(df, subject):
                 # Stage 3 -> Weber's Law
                 elif last_session_stage == 3 and second_last_session_stage == 3:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Should advance from stage 3 to Webers Law with accuracy in both sessions')
+                        message = 'Should advance from stage 3 to Webers Law with accuracy in both sessions'
+                        print(f'{message}')
                         try:
                             telegram_bot.alarm_completed_criteria(task, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
                         except:
                             print('Telegram message not sent')
                             pass
