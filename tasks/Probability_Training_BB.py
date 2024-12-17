@@ -130,7 +130,7 @@ class Probability_Training_BB(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
