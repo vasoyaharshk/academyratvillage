@@ -279,7 +279,7 @@ def select_task(df, subject):
                             stage += 1
                             substage = float(1)
                             stim_dur_dl = 0
-                            telegram_bot.alarm_completed_criteria(task, subject_name)
+                            #telegram_bot.alarm_completed_criteria(task, subject_name)
 
                     #Ensure that stim_duration is below 0:
                     stim_dur_ds = max(stim_dur_ds, 0)
