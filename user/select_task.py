@@ -196,7 +196,8 @@ def select_task(df, subject):
             ############ STAGE 2 ############
             elif stage == 2:
                 # Calculate subdataframes for the last 55 trials with the same substage
-                last_trials = 20  # Define the number of trials to consider
+                #last_trials = 55  # Define the number of trials to consider
+                last_trials = 55  # Define the number of trials to consider
                 df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
 
                 # Check if all the trials in the last 55 rows have the same substage
@@ -236,6 +237,10 @@ def select_task(df, subject):
                 dm_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DM', 'DMc1'])]
                 dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
 
+                stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
+                stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
+                stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
+
                 if recent_stim_dur_ds == True and recent_stim_dur_dm == True and recent_stim_dur_dl == True:
                     message = (
                         f"Stimulus duration are same in last {last_trials} trials: "
@@ -252,49 +257,58 @@ def select_task(df, subject):
                     if substage == 1:
                         max_stim_dur = 0.45
                         #average, initial = variable_calc('stim_dur_ds', max_stim_dur, max_stim_dur)
-                        stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
+                        initial = df_last_trials['stim_dur_ds'].iloc[-1]
                         acc = ds_df['first_correct_bool'].mean()
                         acc_up = 0.6
                         change = 0.15
                     elif substage ==2:
                         max_stim_dur = 0.4
                         #average, initial = variable_calc('stim_dur_dm', max_stim_dur, max_stim_dur)
-                        stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
+                        initial = df_last_trials['stim_dur_dm'].iloc[-1]
                         acc = (dm_df['first_correct_bool'].mean() + ds_df['first_correct_bool'].mean())/2
                         acc_up = 0.55
                         change = 0.15
                     elif substage ==3:
                         max_stim_dur = 0.35
                         #average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
-                        stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
+                        initial = df_last_trials['stim_dur_dl'].iloc[-1]
                         acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
                         acc_up = 0.5
                         change = 0.15
-
                     # Check if accuracy is sufficient for advancement
                     if acc > acc_up and len(df_last_trials) == last_trials:
-                        message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration."
-                        print(message)
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
+                        print("here4")
                         if initial >= change:
                             stim_dur = initial - change
+                            message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration from {initial} to {stim_dur}."
+                            print(message)
+                            try:
+                                telegram_bot.alarm_finish_session(message, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                         else:
+                            print("here5")
                             stim_dur = 0
                             next_stage = True  # Advance to next substage if duration is already minimal
+                            message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration from {initial} to {stim_dur}."
+                            print(message)
+                            try:
+                                telegram_bot.alarm_finish_session(message, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     else:
-                        message = f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration."
+                        print("here6")
+                        stim_dur = initial
+                        message = f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration the same: {stim_dur}."
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
                         except:
                             print('Telegram message not sent')
                             pass
-                        stim_dur = initial
-
+                    print("here7")
                     if substage == 1:  # stage 2 remain now in substage 1 ds 0
                         stim_dur_ds = stim_dur
                         if next_stage == True:
@@ -317,6 +331,7 @@ def select_task(df, subject):
                             stage += 1
                             substage = float(1)
                             stim_dur_dl = 0
+                            print("here10")
                             message = 'WM: Advancing to Stage 3.1'
                             try:
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
@@ -551,7 +566,7 @@ def select_task(df, subject):
 
 
     elif task == 'Water_Filler':
-        task = Water_Filler
+        task = 'Water_Filler'
         print("rat drank water")
         # # variables by default
         # stage = 5
