@@ -161,37 +161,11 @@ def select_task(df, subject):
             first5_poke_acc = df_last5.first_correct_bool.mean()
             last5_poke_acc = df_last5.last_correct_bool.mean()
 
-            # subdataframes
-            # vg_df = df.loc[df['trial_type'] == 'VG']
-            # ds_df = df.loc[((df['trial_type'] == 'DS') | (df['trial_type'] == 'DSc1') | (df['trial_type'] == 'DSc2'))]
-            # dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
-            # dl_df = df.loc[((df['trial_type'] == 'DL'))]
-
-            # Calculate subdataframes for the last 55 trials with the same substage
-            last_trials = 55  # Define the number of trials to consider
-            df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
-
-            # Check if all the trials in the last 55 rows have the same substage
-            if df_last_trials['substage'].nunique() == 1:
-                # Proceed with the last 55 trials
-                print(f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}")
-            else:
-                # Filter to include only trials from the last substage
-                last_substage = df_last_trials['substage'].iloc[-1]  # Identify the last substage
-                df_last_trials = df_last_trials[df_last_trials['substage'] == last_substage]
-                print(
-                    f"The last {last_trials} trials have different substages. Filtering to include only substage {last_substage}.")
-
-            # Check if stim_dur was modified in the last 55 trials
-            recent_stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[0] == df_last_trials['stim_dur_ds'].iloc[-1]
-            recent_stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[0] == df_last_trials['stim_dur_dm'].iloc[-1]
-            recent_stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[0] == df_last_trials['stim_dur_dl'].iloc[-1]
-
-            # Subdataframes for each trial type
-            vg_df = df_last_trials.loc[df_last_trials['trial_type'] == 'VG']
-            ds_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DS', 'DSc1', 'DSc2'])]
-            dm_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DM', 'DMc1'])]
-            dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
+            subdataframes
+            vg_df = df.loc[df['trial_type'] == 'VG']
+            ds_df = df.loc[((df['trial_type'] == 'DS') | (df['trial_type'] == 'DSc1') | (df['trial_type'] == 'DSc2'))]
+            dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
+            dl_df = df.loc[((df['trial_type'] == 'DL'))]
 
             ############ STAGE 1 ############
             #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
@@ -221,6 +195,32 @@ def select_task(df, subject):
 
             ############ STAGE 2 ############
             elif stage == 2:
+                # Calculate subdataframes for the last 55 trials with the same substage
+                last_trials = 55  # Define the number of trials to consider
+                df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
+
+                # Check if all the trials in the last 55 rows have the same substage
+                if df_last_trials['substage'].nunique() == 1:
+                    # Proceed with the last 55 trials
+                    print(f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}")
+                else:
+                    # Filter to include only trials from the last substage
+                    last_substage = df_last_trials['substage'].iloc[-1]  # Identify the last substage
+                    df_last_trials = df_last_trials[df_last_trials['substage'] == last_substage]
+                    print(
+                        f"The last {last_trials} trials have different substages. Filtering to include only substage {last_substage}.")
+
+                # Check if stim_dur was modified in the last 55 trials
+                recent_stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[0] == df_last_trials['stim_dur_ds'].iloc[-1]
+                recent_stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[0] == df_last_trials['stim_dur_dm'].iloc[-1]
+                recent_stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[0] == df_last_trials['stim_dur_dl'].iloc[-1]
+
+                # Subdataframes for each trial type
+                vg_df = df_last_trials.loc[df_last_trials['trial_type'] == 'VG']
+                ds_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DS', 'DSc1', 'DSc2'])]
+                dm_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DM', 'DMc1'])]
+                dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
+
                 if recent_stim_dur_ds == True and recent_stim_dur_dm == True and recent_stim_dur_dl == True:
                     print(
                         f"Stimulus duration are same in last 55 trials: stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}.")
