@@ -362,7 +362,7 @@ def select_task(df, subject):
                         pass
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 5
+        trial_criteria = 20
         accuracy_criteria = 0.85
 
         if my_subject == 'm2':
