@@ -362,7 +362,7 @@ def select_task(df, subject):
                         pass
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 20
+        trial_criteria = 5
         accuracy_criteria = 0.85
 
         if my_subject == 'm2':
@@ -396,9 +396,21 @@ def select_task(df, subject):
         # Calculate accuracy for the last session
         correct_trials_last = df_last_session[df_last_session['trial_result'] == 'correct'].shape[0]
         valid_trials_last = df_last_session[df_last_session['trial_result'] != 'miss'].shape[0]
-        print("Valid trials in session: ", valid_trials_last)
+        message = f"Valid trials in session: {valid_trials_last}"
+        print(f'{message}')
+        try:
+            telegram_bot.alarm_completed_criteria(task, my_subject)
+        except:
+            print('Telegram message not sent')
+            pass
         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-        print(f"Accuracy in session: {accuracy_last * 100:.2f}%")
+        message = f"Accuracy in session: {accuracy_last * 100:.2f}%"
+        print(f'{message}')
+        try:
+            telegram_bot.alarm_completed_criteria(task, my_subject)
+        except:
+            print('Telegram message not sent')
+            pass
 
         # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
         if task == 'Probability_Training_Demotivation':
@@ -414,9 +426,21 @@ def select_task(df, subject):
         if second_last_session is not None:
             correct_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] == 'correct'].shape[0]
             valid_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] != 'miss'].shape[0]
-            print("Valid trials in previous session: ", valid_trials_second_last)
+            message = f"Valid trials in previous session: {valid_trials_second_last}"
+            print(f'{message}')
+            try:
+                telegram_bot.alarm_completed_criteria(task, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
             accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
-            print(f"Accuracy in previous session: {accuracy_second_last * 100:.2f}%")
+            message = f"Accuracy in previous session: {accuracy_second_last * 100:.2f}%"
+            print(f'{message}')
+            try:
+                telegram_bot.alarm_completed_criteria(task, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
         else:
             valid_trials_second_last = 0
             accuracy_second_last = 0
@@ -443,6 +467,13 @@ def select_task(df, subject):
                             print(f'Advancing from stage 1.1 to stage 1.2')
                             stage = 1
                             substage = 2
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
@@ -450,6 +481,13 @@ def select_task(df, subject):
                             task = 'Probability_Training_BB'
                             stage = 1
                             substage = 0
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
 
         elif 'Probability_Extra_Training' in task:
             if last_session_task == second_last_session_task:
@@ -460,31 +498,65 @@ def select_task(df, subject):
                             print(f'Advancing from stage 1.1 to stage 1.2')
                             stage = 1
                             substage = 2
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                             print(f'Advancing from stage 1.2 to 1.3')
                             stage = 1
                             substage = 3
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     elif last_session_substage_stage == 3 and second_last_session_substage_stage == 3:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                             print(f'Advancing from stage 1.3 to 1.4')
                             stage = 1
                             substage = 4
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     elif last_session_substage_stage == 4 and second_last_session_substage_stage == 4:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                             print(f'Advancing from stage 1.4 to 1.5')
                             stage = 1
                             substage = 5
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
                     elif last_session_substage_stage == 5 and second_last_session_substage_stage == 5:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.5 to normal task')
                             task = 'Probability_Training_BB'
                             stage = 1
                             substage = 0
+                            message = 'PI: Advancing from stage 1 to stage 2'
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                            except:
+                                print('Telegram message not sent')
+                                pass
 
         elif 'Probability_Training_BB' in task:
             # Check stage-specific conditions for advancement
@@ -492,21 +564,32 @@ def select_task(df, subject):
                 # Stage 1 -> Stage 2 check
                 if last_session_stage == 1 and second_last_session_stage == 1:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 1 to stage 2 with accuracy in both sessions')
                         stage = 2
-                # Stage 2 -> Stage 3 check
-                elif last_session_stage == 2 and second_last_session_stage == 2:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        print(f'Advancing from stage 2 to stage 3 with accuracy in both sessions')
-                        stage = 3
-                # Stage 3 -> Weber's Law
-                elif last_session_stage == 3 and second_last_session_stage == 3:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        message = 'Should advance from stage 3 to Webers Law with accuracy in both sessions'
+                        message = 'PI: Advancing from stage 1 to stage 2'
                         print(f'{message}')
                         try:
                             telegram_bot.alarm_completed_criteria(task, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
+                # Stage 2 -> Stage 3 check
+                elif last_session_stage == 2 and second_last_session_stage == 2:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        stage = 3
+                        message = 'PI: Advancing from stage 2 to stage 3'
+                        print(f'{message}')
+                        try:
+                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
+                # Stage 3 -> Weber's Law
+                elif last_session_stage == 3 and second_last_session_stage == 3:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        message = 'PI: Advance from stage 3 to Webers Law with accuracy in both sessions'
+                        print(f'{message}')
+                        try:
+                            telegram_bot.alarm_completed_criteria(task, my_subject)
                         except:
                             print('Telegram message not sent')
                             pass
