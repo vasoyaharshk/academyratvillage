@@ -131,6 +131,13 @@ class Probability_Training_BB(Task):
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
             print('x positions list: ' + str(self.stim_trials))
+            while self.stim_trials is None:
+                print("Retrying to generate stimulus trials...")
+                self.stim_trials = self.generate_random_trials(last_trial)
+                if self.stim_trials is None:
+                    print("generate_random_trials returned None. Retrying...")
+                else:
+                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
