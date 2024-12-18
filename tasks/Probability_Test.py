@@ -5,12 +5,12 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Training_BB(Task):
+class Probability_Test(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This task displays the image of the jars which are touchable. This script includes repoketh, the ability to make correct choices.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
@@ -31,6 +31,7 @@ class Probability_Training_BB(Task):
         self.stim_dur_dl = 0
         self.choices = 0
         self.substage = 0
+        self.project = 'PI'
 
         # Variables for the task:
         self.duration_max = 3000
@@ -41,7 +42,6 @@ class Probability_Training_BB(Task):
         self.stage = 1
         self.substage = 0
         self.response_duration = 60
-        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -70,32 +70,8 @@ class Probability_Training_BB(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for jar is 130mm.
-
-        #Bias breaking variables:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        #Required for Weber's law:
-        self.block = 0  # This is the number of trials one conditions will remain for
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0  # To store how many times the conditions needs to repeat.
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
-        self.stim_trial = 0
-        self.stim_trials = []
-        self.stim_trial_counter = 0
+        self.width = 100  # Stimulus width in mm
+        self.height = 190
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -125,18 +101,14 @@ class Probability_Training_BB(Task):
         self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            #print('x positions list: ' + str(self.stim_trials))
+            print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
-
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
-        else:
-            self.stim_trial = self.last_stim_trial
+        print('Stim Trial: ', self.stim_trial)
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
@@ -194,9 +166,9 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port2In: 'Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
+        # Changes the state to response window after photogate near the screen has been crossed.
 
         self.sma.add_state(
             state_name='Response_window',
@@ -207,31 +179,17 @@ class Probability_Training_BB(Task):
 
         self.sma.add_state(
             state_name='Correct',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
-        # Turns on Water port LED and plays correct sound
-
-        self.sma.add_state(
-            state_name='Correct_image_display',
-            state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+            state_timer=2,
+            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
+        # Turns on Water port LED and plays correct sound and displays correct stimuli
 
         self.sma.add_state(
             state_name='Correct_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-        # Delivers Water and stops the reward sound and flips the screen
-
-        self.sma.add_state(
-            state_name='Flip_screen_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+        # Delivers Water and stops the reward sound
 
         self.sma.add_state(
             state_name='Touch_Outside',
@@ -242,36 +200,15 @@ class Probability_Training_BB(Task):
 
         self.sma.add_state(
             state_name='Punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 39)])
-        # Turns on Global LED and water port LED on
-
-        self.sma.add_state(
-            state_name='Punish_image_display',
-            state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Tup: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+            state_timer=1,
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
-        # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
-
-        self.sma.add_state(
-            state_name='After_punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
-        # Flips the screen after water port poked in.
-
-        self.sma.add_state(
-            state_name='Flip_screen_no_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+        # Turns on Global LED and water port LED on, plays punish sound and displays incorrect stimuli
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -304,17 +241,10 @@ class Probability_Training_BB(Task):
             self.correct_count += 1
             print('Correct_count: ', self.correct_count)
 
-            # Check if side bias is active and if the current trial was correct
-            if self.bias_breaking == 1:  # Side bias active
-                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
-                    self.bias_breaking = 0  # End bias breaking
-                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
-
-
         # ##### COUNT Touches outside the jar areas :
-        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-            self.status = 'Touch_Outside'
+        # elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+        #     self.touch_outside += 1
+        #     print('Outside_count: ', self.touch_outside)
 
         # End-trial calculations
         #self.last_x = self.x
@@ -332,7 +262,7 @@ class Probability_Training_BB(Task):
 
         # Accuracy for running trials:
         #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else None
 
         # # Stage progression based on conditions:
         # if self.stage == 1 and self.current_trial >= 40 and self.accuracy >= self.acc_up:
@@ -351,58 +281,11 @@ class Probability_Training_BB(Task):
         #     self.current_trial = 1
         #     self.acc_up = 0
 
-        # Side Bias Breaking formula:
-        self.last_stim_trial = self.stim_trial
-
-        try:
-            # Try converting response_x directly to a float
-            self.response_x_bias = float(self.response_x)
-        except ValueError:
-            print(f"No response_x value or response other: {self.response_x}")
-
-            # Split the string by commas and convert it to a list of floats
-            try:
-                # First, check if the response_x is a string and split it
-                response_x_list = [float(x) for x in self.response_x.split(",")]
-
-                # Use the last element of the list as response_x_bias
-                self.response_x_bias = response_x_list[-1]
-                print(f"Using last value from response_x array: {self.response_x_bias}")
-            except Exception as e:
-                #print(f"Failed to process response_x as array. Error: {e}")
-                return  # Handle this case if needed
-
-        # Append the response to the array:
-        #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-        self.response_x_array.append(self.response_x_bias)
-        print(f"Responses so far: {self.response_x_array}")
-        print(f"Conditions: {self.conditions}")
-
-        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-            # Check if all responses fall into one of the two defined categories
-            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
-
-            if all_left_side:
-                self.sameside = 'left'
-                self.bias_breaking = 1
-                print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
-            elif all_right_side:
-                self.sameside = 'right'
-                self.bias_breaking = 1
-                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
-                print('Bias breaking active, side:', self.sameside)
-
-            self.response_x_array = []      #Clearing the array
-
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
-
         self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
@@ -417,20 +300,3 @@ class Probability_Training_BB(Task):
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
-        self.register_value('bias_breaking', self.bias_breaking)
-        self.register_value('sameside', self.sameside)
-        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
-        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
-        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
-        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
-        #Weber's Law:
-        self.register_value('block', self.block)
-        self.register_value('conditions', self.conditions)
-        self.register_value('completed_conditions', self.completed_conditions)
-        self.register_value('current_condition', self.current_condition)
-        self.register_value('repetition', self.repetition)
-        self.register_value('current_repetition', self.current_repetition)
-        self.register_value('trial_counter', self.trial_counter)
-        self.register_value('stim_trial', self.stim_trial)
-        self.register_value('stim_trials', self.stim_trials)
-        self.register_value('stim_trial_counter', self.stim_trial_counter)
