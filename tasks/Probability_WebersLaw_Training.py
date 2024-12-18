@@ -13,7 +13,11 @@ class Probability_WebersLaw(Task):
         This is the real weber's law file.
         This task displays the image of the jars which are touchable. This script is for Weber's law and the bias breaking is not active.
         ########   TASK INFO   ########
-        Every 12 trials, the condition will change to a new one. 
+        This is the Weber's law training task where: 
+        1. Training starts with RoR 16, then 12, 8, 6 (conditions 16 to 9) consecutively, only progressing to the next RoR when they meet 
+        criteria: ≥70% success on at least 36 trials within 2 consecutive sessions
+        2. Then they get ROR 4 – 1 (conditions 9 to 1) interleaved with easier RoRs (conditions 16 to 9). No more than 2 easy or hard in a row
+        3. End point: Cut-off of 1000 trials per RoR of conditions 16 to 9.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -81,11 +85,11 @@ class Probability_WebersLaw(Task):
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
         # Randomise blocks and trials for Weber's Law:
-        self.block = 12  # This is the number of trials one conditions will remain for
+        self.block = 0  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 3  # To store how many times the conditions needs to repeat.
+        self.repetition = 0  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
         # Image output stims:
@@ -95,102 +99,53 @@ class Probability_WebersLaw(Task):
 
         self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
-    def generate_alternating_conditions(self):
-        # Define easy and hard conditions
-        easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
-        hard_conditions = [1, 2, 3, 4, 5, 6, 7, 8]
-        max_retries = 1000  # Limit retries to prevent excessive computation
+        #Weber's Law Training Variables:
+        self.start_task == 1        #This ensures that the first sessions is the start training task.
 
-        for attempt in range(max_retries):
-            # Shuffle conditions for randomness
-            random.shuffle(easy_conditions)
-            random.shuffle(hard_conditions)
-            total_conditions = len(easy_conditions) + len(hard_conditions)
-            alternating_sequence = []
+    def generate_alternating_conditions():
+        """
+        Generate a sequence with easy and hard conditions following specified rules.
 
-            def is_valid_candidate(sequence, candidate, is_easy):
-                # Rule 1: No more than two hard or two easy in a row
-                if len(sequence) >= 2 and (
+        Easy conditions: [16, 15, 14, 13, 12, 11, 10, 9]
+        Hard conditions: [8, 7, 6, 5, 4, 3, 2, 1]
+
+        Rules:
+        - Rule 1: No more than two hard or two easy in a row.
+        - Rule 2: No more than two conditions in a row with the same parity.
+        """
+        easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
+        hard_conditions = [8, 7, 6, 5, 4, 3]
+        sequence = easy_conditions[:]  # Start with all easy conditions in order
+
+        def is_valid_candidate(sequence, candidate, is_easy):
+            # Rule 1: No more than two hard or two easy in a row
+            if len(sequence) >= 2 and (
                     all(c in hard_conditions for c in sequence[-2:]) and not is_easy or
                     all(c in easy_conditions for c in sequence[-2:]) and is_easy
-                ):
-                    return False
-                # Rule 2: No more than two conditions in a row with same parity
-                if len(sequence) >= 2 and sequence[-1] % 2 == sequence[-2] % 2 == candidate % 2:
-                    return False
-                # Rule 3: Always start with an easy condition
-                if len(sequence) == 0 and not is_easy:
-                    return False
-                # Rule 4: Conditions 1 and 2 must be followed by an easy condition
-                if len(sequence) > 0 and sequence[-1] in {1, 2} and not is_easy:
-                    return False
-                return True
-
-            def backtrack(sequence, easy_idx, hard_idx):
-                # If the sequence is complete, return it
-                if len(sequence) == total_conditions:
-                    return sequence
-                # Try adding an easy condition if possible
-                if easy_idx < len(easy_conditions):
-                    candidate = easy_conditions[easy_idx]
-                    if is_valid_candidate(sequence, candidate, True):
-                        sequence.append(candidate)
-                        result = backtrack(sequence, easy_idx + 1, hard_idx)
-                        if result:
-                            return result
-                        sequence.pop()  # Backtrack
-                # Try adding a hard condition if possible
-                if hard_idx < len(hard_conditions):
-                    candidate = hard_conditions[hard_idx]
-                    if is_valid_candidate(sequence, candidate, False):
-                        sequence.append(candidate)
-                        result = backtrack(sequence, easy_idx, hard_idx + 1)
-                        if result:
-                            return result
-                        sequence.pop()  # Backtrack
-                return None  # No valid sequence found
-
-            # Attempt to generate a sequence
-            result = backtrack([], 0, 0)
-            if result:
-                return result  # Successfully generated a sequence
-
-        # If all retries fail, raise an error
-        raise RuntimeError("Unable to generate a valid sequence after multiple retries.")
-
-    def validate_sequence(self, sequence):
-        # Define easy and hard conditions
-        easy_conditions = set([9, 10, 11, 12, 13, 14, 15, 16])
-        hard_conditions = set([1, 2, 3, 4, 5, 6, 7, 8])
-
-        # Dictionary to track rule violations
-        rule_violations = {
-            "no_more_than_two_hard_or_easy_in_a_row": False,
-            "no_more_than_two_same_parity_in_a_row": False,
-            "always_start_with_easy": False,
-            "condition_1_2_followed_by_easy": False,
-        }
-
-        # Rule 3: Always start with an easy condition
-        if len(sequence) == 0 or sequence[0] not in easy_conditions:
-            rule_violations["always_start_with_easy"] = True
-
-        for i in range(len(sequence)):
-            # Rule 1: No more than two hard or two easy in a row
-            if i >= 2 and (
-                all(c in hard_conditions for c in sequence[i - 2:i + 1]) or
-                all(c in easy_conditions for c in sequence[i - 2:i + 1])
             ):
-                rule_violations["no_more_than_two_hard_or_easy_in_a_row"] = True
-            # Rule 2: No more than two conditions in a row with same parity
-            if i >= 2 and sequence[i] % 2 == sequence[i - 1] % 2 == sequence[i - 2] % 2:
-                rule_violations["no_more_than_two_same_parity_in_a_row"] = True
-            # Rule 4: Conditions 1 and 2 must be followed by an easy condition
-            if sequence[i] in {1, 2} and i < len(sequence) - 1 and sequence[i + 1] not in easy_conditions:
-                rule_violations["condition_1_2_followed_by_easy"] = True
+                return False
+            # Rule 2: No more than two conditions in a row with the same parity
+            if len(sequence) >= 2 and sequence[-1] % 2 == sequence[-2] % 2 == candidate % 2:
+                return False
+            return True
 
-        # Return rule violations
-        return rule_violations
+        hard_idx = 0
+        while hard_idx < len(hard_conditions):
+            hard_candidate = hard_conditions[hard_idx]
+            valid_easy_candidates = [e for e in easy_conditions if is_valid_candidate(sequence, e, True)]
+
+            # Insert a hard condition if valid
+            if is_valid_candidate(sequence, hard_candidate, False):
+                sequence.append(hard_candidate)
+                hard_idx += 1
+            # Insert a random valid easy condition if available
+            elif valid_easy_candidates:
+                sequence.append(random.choice(valid_easy_candidates))
+            else:
+                # If no valid easy candidates, advance hard conditions to avoid a deadlock
+                hard_idx += 1
+
+        return sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -269,7 +224,7 @@ class Probability_WebersLaw(Task):
         print('Trial: ' + str(self.current_trial))
         print('Total Accuracy for session: ', self.accuracy)
 
-        if not self.conditions and self.current_repetition == 0:
+        if not self.conditions and self.start_task == 1:
             while True:  # Retry until a valid sequence is generated
                 self.conditions = self.generate_alternating_conditions()
                 validation_results = self.validate_sequence(self.conditions)
@@ -277,43 +232,7 @@ class Probability_WebersLaw(Task):
                     print("Conditions generated following the rules")
                     break  # Exit the loop if the sequence is valid
             self.current_condition = self.conditions[0]
-
-        # Check if the current block of trials is complete
-        if self.trial_counter >= self.block:
-            # Move the completed condition to completed_conditions
-            self.completed_conditions.append(self.current_condition)
-
-            # Move to the next condition, if any are left
-            if self.conditions:
-                self.conditions.pop(0)  # Remove the completed condition
-                if self.conditions:
-                    self.current_condition = self.conditions[0]  # Set new current condition
-
-            # If all conditions are completed, prepare for repetition
-            if not self.conditions:
-                self.current_repetition += 1
-                if self.current_repetition <= self.repetition:
-                    while True:  # Retry until a valid sequence is generated
-                        self.conditions = self.generate_alternating_conditions()
-                        validation_results = self.validate_sequence(self.conditions)
-                        if not any(validation_results.values()):  # Ensure no rule violations
-                            print("Conditions generated following the rules")
-                            break  # Exit the loop if the sequence is valid
-                    self.completed_conditions = []
-                    self.current_condition = self.conditions[0]
-                else:
-                    self.stage = 5
-                    self.tired = True
-                    print("All repetitions completed. Task ending. Stage = 5")
-                    self.sma.add_state(
-                        state_name='Exit',
-                        state_timer=0,
-                        state_change_conditions={Bpod.Events.Tup: 'exit'},
-                        output_actions=[])
-
-            # Reset trial counter for the new condition or new repetition cycle
-            self.trial_counter = 0
-            self.stim_trial_counter = 0
+            self.start_task == 0
 
         print(f"Block: {self.block}")
         print(f"Conditions: {self.conditions}")
@@ -493,7 +412,7 @@ class Probability_WebersLaw(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        if self.stage != 5:
+        if self.stage != 6:
             self.trial_counter += 1
             self.stim_trial_counter += 1
 
@@ -552,6 +471,22 @@ class Probability_WebersLaw(Task):
                 trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
                 window_accuracy = sum(trials_in_window) / len(trials_in_window)
                 print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
+
+            if self.accuracy>=0.7:
+                # Move the completed condition to completed_conditions
+                self.completed_conditions.append(self.current_condition)
+                # Move to the next condition, if any are left
+                if self.conditions:
+                    self.conditions.pop(0)  # Remove the completed condition
+                    if self.conditions:
+                        self.current_condition = self.conditions[0]  # Set new current condition
+                    # If all conditions are completed, end the task
+                    if not self.conditions:
+                        self.stage == 6
+
+                    # Reset trial counter for the new condition or new repetition cycle
+                    self.trial_counter = 0
+
 
             # # Side Bias Breaking formula:
             # self.last_stim_trial = self.stim_trial
