@@ -137,7 +137,7 @@ class Probability_WL_Training(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_random_trial_conditions(self, current_ror, last_trial=None):
+    def generate_random_trial_conditions_easy(self, current_ror, last_trial=None):
         """
         Generate a list of conditions for a session based on the given ROR.
         """
@@ -157,6 +157,73 @@ class Probability_WL_Training(Task):
                 continue
             # Add the candidate to trials
             trials.append(candidate)
+        return trials
+
+    def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
+        """
+        Generate a list of conditions for a session based on the given ROR.
+        :param current_ror: The ROR value for the current session.
+        :param last_trial: The last condition from the previous session (to avoid repetition).
+        :return: A list of conditions.
+        """
+        if current_ror not in self.ror_to_conditions:
+            raise ValueError("Invalid ROR value provided.")
+
+        hard_conditions = self.ror_to_conditions[current_ror]
+        is_hard = current_ror in self.hard_ror
+        probabilities = {
+            4: [0.7, 0.3],
+            2: [0.6, 0.4],
+            1.5: [0.5, 0.5],
+        }.get(current_ror, [0.5, 0.5])
+        trials = []
+        prev_type = None  # Tracks if the last condition was hard or easy
+        prev_parity = None
+        type_streak = 0
+        parity_streak = 0
+
+        while len(trials) < 20:
+            if is_hard:
+                # Combine hard conditions and easy conditions based on probabilities
+                candidates = hard_conditions + self.easy_conditions
+                candidate = random.choices(
+                    candidates,
+                    weights=[probabilities[0] if c in hard_conditions else probabilities[1] for c in candidates],
+                )[0]
+            else:
+                # For easy RORs, randomly select from its conditions with equal probability
+                candidate = random.choice(hard_conditions)
+
+            # Ensure no more than 2 consecutive same type (hard/easy)
+            candidate_type = "hard" if candidate in hard_conditions else "easy"
+            if prev_type == candidate_type and type_streak >= 2:
+                continue
+
+            # Ensure no more than 2 consecutive same parity
+            parity = "odd" if candidate % 2 != 0 else "even"
+            if prev_parity == parity and parity_streak >= 2:
+                continue
+
+            # Update type and parity streaks
+            if prev_type == candidate_type:
+                type_streak += 1
+            else:
+                type_streak = 1
+            prev_type = candidate_type
+
+            if prev_parity == parity:
+                parity_streak += 1
+            else:
+                parity_streak = 1
+            prev_parity = parity
+
+            # Avoid repetition from the previous session's last trial
+            if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                continue
+
+            # Add the candidate to trials
+            trials.append(candidate)
+
         return trials
 
     def configure_gui(self):
