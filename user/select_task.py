@@ -369,18 +369,18 @@ def select_task(df, subject):
             trial_criteria = 2
             accuracy_criteria = 0.5
 
-        # Identify the last session and second-to-last session
+        # First: Identify the last session and second-to-last session:
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None  # The second most recent session
         third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None  # The third most recent session
 
-        # Filter the DataFrame to include only the last two sessions
+        # Second: Filter the DataFrame to include only the last two sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
         df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
 
-        #Get the number of trials in the last session and second-to-last session (if exists)
+        # Third: Get the number of trials in the last session and second-to-last session (if exists)
         n_trials_last = df_last_session.trial.max()  # Trials in the last session
         if second_last_session is not None:
             df_second_last_session = df_last2[df_last2['session'] == second_last_session].copy()
@@ -388,12 +388,12 @@ def select_task(df, subject):
         else:
             n_trials_second_last = 0
 
-        # number of trials
+        #Telegram message for low number of trials.
         if n_trials_last < 15:
             if my_subject not in settings.INACTIVE_SUBJECTS:
                 telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
-        # Calculate accuracy for the last session
+        # Fourth: Calculate accuracy for the last session and second last session (if exists)
         correct_trials_last = df_last_session[df_last_session['trial_result'] == 'correct'].shape[0]
         valid_trials_last = df_last_session[df_last_session['trial_result'] != 'miss'].shape[0]
         message = f"Valid trials in session: {valid_trials_last}"
@@ -411,16 +411,6 @@ def select_task(df, subject):
         except:
             print('Telegram message not sent')
             pass
-
-        # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
-        if task == 'Probability_Training_Demotivation':
-            # Ensure the last three sessions were all 'Probability_Training_Demotivation'
-            if task == 'Probability_Training_Demotivation':
-                # Ensure the last three sessions were all 'Probability_Training_Demotivation'
-                last_three_sessions_tasks = df_last3['task'].unique()
-                if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_Demotivation':
-                    task = 'Probability_Training_BB'
-                    print("Moved from demotivation task to normal task")
 
         # Calculate accuracy for the second-to-last session (if exists)
         if second_last_session is not None:
@@ -446,19 +436,27 @@ def select_task(df, subject):
             accuracy_second_last = 0
             print("No previous session available.")
 
-        # Check if the last session and second-to-last session are in different stages
+        # Fifth: Check if the last session and second-to-last session are in different tasks
         last_session_task = df_last_session['task'].iloc[0]  # Stage in the last session
         second_last_session_task = df_second_last_session['task'].iloc[0] if second_last_session is not None else None
 
-        # Check if the last session and second-to-last session are in different stages
+        # Sixth: Check if the last session and second-to-last session are in different stages
         last_session_stage = df_last_session['stage'].iloc[0]  # Stage in the last session
         second_last_session_stage = df_second_last_session['stage'].iloc[0] if second_last_session is not None else None
 
-        # Check if the last session and second-to-last session are in different substages
+        # Seventh: Check if the last session and second-to-last session are in different substages
         last_session_substage_stage = df_last_session['substage'].iloc[0]  # Stage in the last session
         second_last_session_substage_stage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
 
-        if 'Probability_Training_Bias' in task:
+        # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
+        if task == 'Probability_Training_Demotivation':
+            # Ensure the last three sessions were all 'Probability_Training_Demotivation'
+            last_three_sessions_tasks = df_last3['task'].unique()
+            if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_Demotivation':
+                task = 'Probability_Training_BB'
+                print("Moved from demotivation task to normal task")
+
+        elif 'Probability_Training_Bias' in task:
             if last_session_task == second_last_session_task:
                 if last_session_stage == 1 and second_last_session_stage == 1:
                     if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
@@ -593,19 +591,21 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                             pass
-                        # stage = 4
-                        # task = 'Probability_WebersLaw'
-                        # block = 12  # This is the number of trials one conditions will remain for
-                        # conditions = []  # Takes the conditions from select task file.
-                        # completed_conditions = []  # To store completed conditions
-                        # current_condition = 0  # To track the current condition in progress
-                        # repetition = 3  # To store how many times the conditions needs to repeat.
-                        # current_repetition = 0  # To store how many times the condition has repeated.
-                        # trial_counter = 0  # Track the number of trials for the current condition
-                        # # Image output stims:
-                        # stim_trial = 0
-                        # stim_trials = []
-                        # stim_trial_counter = 0
+                        '''
+                        stage = 4
+                        task = 'Probability_WebersLaw'
+                        block = 12  # This is the number of trials one conditions will remain for
+                        conditions = []  # Takes the conditions from select task file.
+                        completed_conditions = []  # To store completed conditions
+                        current_condition = 0  # To track the current condition in progress
+                        repetition = 3  # To store how many times the conditions needs to repeat.
+                        current_repetition = 0  # To store how many times the condition has repeated.
+                        trial_counter = 0  # Track the number of trials for the current condition
+                        # Image output stims:
+                        stim_trial = 0
+                        stim_trials = []
+                        stim_trial_counter = 0
+                        '''
 
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
@@ -624,16 +624,9 @@ def select_task(df, subject):
             stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
-                task = 'Water_Filler'
-                # variables by default
-                stage = 5
-                substage = 0
-                choice = 0
-                wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
-                stim_dur_ds = 0
-                stim_dur_dm = 0
-                stim_dur_dl = 0
+                task = 'Probability_WebersLaw_Training'
                 # Weber's Law:
+                stage = 5
                 block = 0
                 conditions = []  # Takes the conditions from task file after first session.
                 completed_conditions = []  # To store completed conditions
@@ -646,13 +639,55 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
-                message = 'PI: Training complete, Moving to Weber's law.
+                ror = [16, 12, 8, 6, 4, 2, 1.5]
+                current_ror = 16
+                completed_ror = []
+
+                message = 'PI: Training complete, Moving to Webers law.'
                 print(f'{message}')
                 try:
                     telegram_bot.alarm_completed_criteria(task, my_subject)
                 except:
                     print('Telegram message not sent')
                     pass
+
+        elif 'Probability_WL_Training' in task:
+            trial_criteria = 72
+            accuracy_criteria = 0.70
+            total_trials = n_trials_last + n_trials_second_last
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
+
+            # Check if the last session and second-to-last session are in different rors:
+            last_session_ror = df_last_session['current_ror'].iloc[0]  # Stage in the last session
+            second_last_session_ror = df_second_last_session['current_ror'].iloc[0] if second_last_session is not None else None
+
+            # Assign each value from the last row to the variables:
+            ror = last_row['ror']
+            completed_ror = last_row['completed_ror']
+            current_ror = last_row['current_ror']
+
+            if last_session_task == second_last_session_task:
+                if last_session_ror == second_last_session_ror:
+                    if total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria):
+                        # Move the completed condition to completed_conditions
+                        completed_ror.append(current_ror)
+                        # Move to the next ror, if any are left
+                        if ror:
+                            ror.pop(0)  # Remove the completed ROR
+                            if ror:
+                                current_ror = ror[0]  # Set new current ROR
+                            else:
+                                print("All RORs are completed. Task ends.")
+                                current_ror = 0
+                                stage = 6
+                                task == 'Water_Filler'
+                                message = 'PI: Webers law Training completed'
+                                print(f'{message}')
+                                try:
+                                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                                except:
+                                    print('Telegram message not sent')
+                                    pass
 
     elif task == 'Water_Filler':
         task = 'Water_Filler'
@@ -681,4 +716,4 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 5
 
-    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter
+    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror
