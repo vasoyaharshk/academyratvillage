@@ -116,13 +116,11 @@ class Probability_Training_BB(Task):
         return trials
 
     def main_loop(self):
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:
-            self.stim_trials = []
-
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
+        print('Bias Breaking: ', self.bias_breaking)
         #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
@@ -134,7 +132,7 @@ class Probability_Training_BB(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
-            print('x positions list: ' + str(self.stim_trials))
+            print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 print("Retrying to generate stimulus trials...")
                 self.stim_trials = self.generate_random_trials(last_trial)
