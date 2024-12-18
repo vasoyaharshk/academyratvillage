@@ -646,7 +646,7 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
-                message = 'PI: Training complete, Moving to Weber's law.
+                message = 'PI: Training complete, Moving to Webers law.'
                 print(f'{message}')
                 try:
                     telegram_bot.alarm_completed_criteria(task, my_subject)
