@@ -647,6 +647,14 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
+                message = 'PI: Training complete, Moving to Weber's law.
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
 
     elif task == 'Water_Filler':
         task = 'Water_Filler'
