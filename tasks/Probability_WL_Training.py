@@ -143,14 +143,9 @@ class Probability_WL_Training(Task):
         """
         if current_ror not in self.ror_to_conditions:
             raise ValueError("Invalid ROR value provided.")
-
         conditions = self.ror_to_conditions[current_ror]
         probabilities = [0.5, 0.5]  # 50% probability for each condition
-        is_easy = current_ror in self.easy_ror
         trials = []
-        prev_parity = None
-        parity_streak = 0
-
         while len(trials) < 500:
             # Randomly select a candidate condition with 50-50 probability
             candidate = random.choices(conditions, probabilities)[0]
