@@ -102,62 +102,31 @@ class Probability_WL_Training(Task):
         #Weber's Law Training Variables:
         # Variables not tracked:
         self.start_task == 1        #This ensures that the first sessions is the start training task.
+        self.ror_to_conditions = {
+            16: [16, 15],
+            12: [14, 13],
+            8: [12, 11],
+            6: [10, 9],
+            4: [8, 7],
+            2: [6, 5],
+            1.5: [4, 3],
+        }
+        self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
+        self.easy_ror = [16, 12, 8, 6]
+        self.hard_ror = [4, 2, 1.5]
+        self.blocks = 20
 
         #Variables tracked:
         self.ror = [16, 12, 8, 6, 4, 2, 1.5]
-        self.current_ror = 0
+        self.current_ror = 16
         self.completed_ror = []
-
-    def generate_alternating_conditions():
-        """
-        Generate a sequence with easy and hard conditions following specified rules.
-
-        Easy conditions: [16, 15, 14, 13, 12, 11, 10, 9]
-        Hard conditions: [8, 7, 6, 5, 4, 3, 2, 1]
-
-        Rules:
-        - Rule 1: No more than two hard or two easy in a row.
-        - Rule 2: No more than two conditions in a row with the same parity.
-        """
-        easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
-        hard_conditions = [8, 7, 6, 5, 4, 3]
-        sequence = easy_conditions[:]  # Start with all easy conditions in order
-
-        def is_valid_candidate(sequence, candidate, is_easy):
-            # Rule 1: No more than two hard or two easy in a row
-            if len(sequence) >= 2 and (
-                    all(c in hard_conditions for c in sequence[-2:]) and not is_easy or
-                    all(c in easy_conditions for c in sequence[-2:]) and is_easy
-            ):
-                return False
-            # Rule 2: No more than two conditions in a row with the same parity
-            if len(sequence) >= 2 and sequence[-1] % 2 == sequence[-2] % 2 == candidate % 2:
-                return False
-            return True
-
-        hard_idx = 0
-        while hard_idx < len(hard_conditions):
-            hard_candidate = hard_conditions[hard_idx]
-            valid_easy_candidates = [e for e in easy_conditions if is_valid_candidate(sequence, e, True)]
-
-            # Insert a hard condition if valid
-            if is_valid_candidate(sequence, hard_candidate, False):
-                sequence.append(hard_candidate)
-                hard_idx += 1
-            # Insert a random valid easy condition if available
-            elif valid_easy_candidates:
-                sequence.append(random.choice(valid_easy_candidates))
-            else:
-                # If no valid easy candidates, advance hard conditions to avoid a deadlock
-                hard_idx += 1
-
-        return sequence
+        self.trial_conditions = []
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < self.block:
+        while len(trials) < 1000:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -168,59 +137,32 @@ class Probability_WL_Training(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_random_trials_ror1(self, last_trial=None):
-        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
-        repetition_count = 3
+    def generate_random_trial_conditions(self, current_ror, last_trial=None):
+        """
+        Generate a list of conditions for a session based on the given ROR.
+        """
+        if current_ror not in self.ror_to_conditions:
+            raise ValueError("Invalid ROR value provided.")
 
-        def generate_trials():
-            all_trials = self.stim * repetition_count
-            random.shuffle(all_trials)
-            trials = []
-            max_attempts = 1000
-            attempts = 0
+        conditions = self.ror_to_conditions[current_ror]
+        probabilities = [0.5, 0.5]  # 50% probability for each condition
+        is_easy = current_ror in self.easy_ror
+        trials = []
+        prev_parity = None
+        parity_streak = 0
 
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                return (
-                        (candidate % 2 != trials[-1] % 2 or candidate % 2 != trials[-2] % 2)
-                        and ((candidate <= 44) != (trials[-1] <= 44) or (candidate <= 44) != (trials[-2] <= 44))
-                )
-
-            while len(trials) < self.block:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * repetition_count
-                    random.shuffle(all_trials)
-
-                candidate = all_trials.pop(0)
-
-                if len(trials) == 0 and last_trial is not None and candidate == last_trial:
-                    continue
-
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
-                else:
-                    all_trials.append(candidate)
-
-            print("Generated trials:", trials)
-            return trials
-
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
-            else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generate_random_trials_ror1: {e}")
-            return None
+        while len(trials) < 500:
+            # Randomly select a candidate condition with 50-50 probability
+            candidate = random.choices(conditions, probabilities)[0]
+            # Ensure no more than 2 consecutive same conditions
+            if len(trials) >= 2 and candidate == trials[-1] == trials[-2]:
+                continue
+            # Ensure the first trial doesn't repeat the last trial from the previous block
+            if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                continue
+            # Add the candidate to trials
+            trials.append(candidate)
+        return trials
 
     def configure_gui(self):
         self.gui_input = ['duration_max', 'stage']
@@ -228,69 +170,67 @@ class Probability_WL_Training(Task):
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-        print('Total Accuracy for session: ', self.accuracy)
-
-        if not self.conditions and self.start_task == 1:
-            while True:  # Retry until a valid sequence is generated
-                self.conditions = self.generate_alternating_conditions()
-                validation_results = self.validate_sequence(self.conditions)
-                if not any(validation_results.values()):  # Ensure no rule violations
-                    print("Conditions generated following the rules")
-                    break  # Exit the loop if the sequence is valid
-            self.current_condition = self.conditions[0]
-            self.start_task == 0
-
-        print(f"Block: {self.block}")
-        print(f"Conditions: {self.conditions}")
-        print(f"Completed Conditions: {self.completed_conditions}")
-        print(f"Current Condition: {self.current_condition}")
-        print(f"Repetition: {self.repetition}")
-        print(f"Current Repetition: {self.current_repetition}")
-        print(f"Trial Counter: {self.trial_counter}")
+        print('Accuracy: ', self.accuracy)
+        print('Stim_Trial: ', self.stim_trial)
+        print('Bias Breaking: ', self.bias_breaking)
+        #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        if self.current_condition in [1, 2]:
-            self.stim = [43, 44, 45, 46]  # These are the functions being called. Odds are for the correct answer is on the left and Evens are when the correct answer is on the right
-        else:
-            self.stim = [41, 42]  # These are the functions being called. 41 is for the correct answer is on the left and 42 is when the correct answer is on the right
+        self.stim = [61, 62]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
-        # Stimulus generation logic: every 12 trials the stimulus location will be regenerated.
-        if self.trial_counter % self.block == 0 and self.bias_breaking == 0:  # Re-randomize every 12 trials
+        # Stimulus generation logic
+        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
-            self.stim_trial_counter = 0
-            last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-
-            if self.current_condition in [1, 2]:
-                print(f"Current condition is {self.current_condition}. Using generate_random_trials_ror1.")
-                self.stim_trials = self.generate_random_trials_ror1(last_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
-                    self.stim_trials = self.generate_random_trials_ror1(last_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials_ror1 returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-            else:
+            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+            self.stim_trials = self.generate_random_trials(last_trial)
+            print(f"Stimulus trials after first attempt: {self.stim_trials}")
+            while self.stim_trials is None:
+                print("Retrying to generate stimulus trials...")
                 self.stim_trials = self.generate_random_trials(last_trial)
-                print('Stimulus List: ', self.stim_trials)
+                if self.stim_trials is None:
+                    print("generate_random_trials returned None. Retrying...")
+                else:
+                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
+
+            last_trial_conditions = self.trial_conditions[self.current_trial - 1] if self.current_trial > 0 else None
+            self.trial_conditions = self.generate_random_trial_conditions(last_trial, self.current_ror)
+            print(f"Trial conditions after first attempt: {self.trial_conditions}")
+            while self.trial_conditions is None:
+                print("Retrying to generate trial conditions...")
+                self.trial_conditions = self.self.generate_random_trial_conditions(last_trial, self.current_ror)
+                if self.trial_conditions is None:
+                    print("generate_random_trial_conditions returned None. Retrying...")
+                else:
+                    print(f"Successfully generated stimulus trials: {self.trial_conditions}")
+
+        self.stim_trial = self.stim_trials[self.current_trial]
+        self.trial_condition = self.trial_conditions[self.current_trial]
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.trial_counter % self.block]
-        # else:
-        #     self.stim_trial = self.last_stim_trial
-        if self.stim_trial in [41, 43, 45]:
-            self.x_correcth = self.x_correcth_pos[0]
-            self.x_incorrecth = self.x_correcth_pos[1]
-            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial in [42, 44, 46]:
-            self.x_correcth = self.x_correcth_pos[1]
-            self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            self.stim_trial = self.stim_trials[self.current_trial]
+        else:
+            self.stim_trial = self.last_stim_trial
 
-        print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter',self.stim_trial_counter)
+        if self.stage == 1:  # We have only one stimuli in stage 1
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
+            if self.stim_trial == 31:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = None  # No incorrect area in stage 1
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+            elif self.stim_trial == 32:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = None  # No incorrect area in stage 1
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+        else:  # We have two stimuli after stage 1 with correct and incorrect areas
+            if self.stim_trial == 31:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 32:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         ############ STATE MACHINE ################
         if self.stage != 5:
