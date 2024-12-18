@@ -593,7 +593,6 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                             pass
-                        # print(f'Advancing from stage 3 to Webers Law with accuracy in both sessions')
                         # stage = 4
                         # task = 'Probability_WebersLaw'
                         # block = 12  # This is the number of trials one conditions will remain for
@@ -654,7 +653,6 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
-
 
     elif task == 'Water_Filler':
         task = 'Water_Filler'
