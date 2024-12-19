@@ -16,7 +16,6 @@ class Softcode:
         self.client_socket.sendto(message, self.address)
         stop_message = b's'
         self.client_socket.sendto(stop_message, self.address)
-        print("BPod Message: ", message)
 
     def kill(self):
         """ Send a code to kill the current session """

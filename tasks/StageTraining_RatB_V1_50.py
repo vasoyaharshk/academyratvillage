@@ -702,4 +702,3 @@ class StageTraining_RatB_V1_50(Task):
         self.register_value('stim_trial', self.stim_trial)
         self.register_value('stim_trials', self.stim_trials)
         self.register_value('stim_trial_counter', self.stim_trial_counter)
-

@@ -71,7 +71,7 @@ class Probability_Training_BB(Task):
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
         self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for jar is 130mm.
+        self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -120,6 +120,11 @@ class Probability_Training_BB(Task):
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
+
+        if self.current_trial == 0:
+            self.bias_breaking == 0
+            self.accuracy = 0
+
         print('Bias Breaking: ', self.bias_breaking)
         #print('Stim_Trials: ', self.stim_trials)
 
@@ -175,7 +180,7 @@ class Probability_Training_BB(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -191,7 +196,7 @@ class Probability_Training_BB(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -204,7 +209,7 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port2In: 'Response_window'},
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -225,7 +230,7 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Correct_image_display',
             state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
@@ -239,7 +244,7 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Flip_screen_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -260,7 +265,7 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Punish_image_display',
             state_timer=self.image_display,
-            state_change_conditions={Bpod.Events.Tup: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
@@ -274,14 +279,14 @@ class Probability_Training_BB(Task):
         self.sma.add_state(
             state_name='Flip_screen_no_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
         self.sma.add_state(
             state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 37)])
         # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -406,6 +411,25 @@ class Probability_Training_BB(Task):
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
+
+        # if 45 < self.response_x < 145:
+        #     self.sameside = 'left'
+        #     self.sameside_counter += 1
+        # elif 231 < self.response_x < 331:
+        #     #self.sameside = 'right'
+        #     self.sameside_counter += 1
+        #
+        # if self.sameside_counter == 5:
+        #     self.bias_breaking = 1
+        #     print('Bias breaking active, side: ', self.sameside)
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        #
+        # # Correction bias extension
+        # if self.bias_breaking == 1:
+        #     if self.trial_result == 'punish':
+        #         self.stim_trial = self.last_stim_trial
+        # print('Stim Trial: ', self.stim_trial)
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
