@@ -45,17 +45,11 @@ class Probability_WL_Training(Task):
         self.substage = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
-        # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
-
-        # accuracy limits for changing something later on:
-        #self.acc_up = 0.85
-        #self.acc_down = 0.4
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
         self.valve_factor_c = 2  # Normal water delivery of 25ul.
-        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
         self.valid_counter = 0
@@ -84,24 +78,23 @@ class Probability_WL_Training(Task):
         self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
-        # Randomise blocks and trials for Weber's Law:
-        self.block = 0  # This is the number of trials one conditions will remain for
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0  # To store how many times the conditions needs to repeat.
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # Image output stims:
+        # # Randomise blocks and trials for Weber's Law:
+        # self.block = 0  # This is the number of trials one conditions will remain for
+        # self.conditions = []  # Takes the conditions from select task file.
+        # self.completed_conditions = []  # To store completed conditions
+        # self.current_condition = 0  # To track the current condition in progress
+        # self.repetition = 0  # To store how many times the conditions needs to repeat.
+        # self.current_repetition = 0  # To store how many times the condition has repeated.
+        # self.trial_counter = 0  # Track the number of trials for the current ror
+        # # Image output stims:
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
 
-        self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
+        #self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
         #Weber's Law Training Variables:
         # Variables not tracked:
-        self.start_task == 1        #This ensures that the first sessions is the start training task.
         self.ror_to_conditions = {
             16: [16, 15],
             12: [14, 13],
@@ -114,45 +107,49 @@ class Probability_WL_Training(Task):
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
         self.easy_ror = [16, 12, 8, 6]
         self.hard_ror = [4, 2, 1.5]
-        self.blocks = 20
+        self.block_wlt = 0
+        self.stim_trial_counter = 0
+        self.condition_trial_counter = 0
 
         #Variables tracked:
         self.ror = [16, 12, 8, 6, 4, 2, 1.5]
         self.current_ror = 16
         self.completed_ror = []
         self.trial_conditions = []
+        self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
+        while len(trials) < self.block_wlt:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
             if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block_wlt
                 if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
+                    continue  # Skip if the first trial of new block_wlt matches last trial of previous block_wlt
                 trials.append(candidate)
         return trials
 
     def generate_random_trial_conditions_easy(self, current_ror, last_trial=None):
         """
-        Generate a list of conditions for a session based on the given ROR.
+        Generate a list of conditions for a session based on the given ROR for easy conditions.
         """
         if current_ror not in self.ror_to_conditions:
             raise ValueError("Invalid ROR value provided.")
+
         conditions = self.ror_to_conditions[current_ror]
         probabilities = [0.5, 0.5]  # 50% probability for each condition
         trials = []
-        while len(trials) < 500:
+        while len(trials) < self.block_wlt:
             # Randomly select a candidate condition with 50-50 probability
             candidate = random.choices(conditions, probabilities)[0]
             # Ensure no more than 2 consecutive same conditions
             if len(trials) >= 2 and candidate == trials[-1] == trials[-2]:
                 continue
-            # Ensure the first trial doesn't repeat the last trial from the previous block
+            # Ensure the first trial doesn't repeat the last trial from the previous block_wlt
             if last_trial is not None and len(trials) == 0 and candidate == last_trial:
                 continue
             # Add the candidate to trials
@@ -182,7 +179,7 @@ class Probability_WL_Training(Task):
         type_streak = 0
         parity_streak = 0
 
-        while len(trials) < 20:
+        while len(trials) < self.block_wlt:
             if is_hard:
                 # Combine hard conditions and easy conditions based on probabilities
                 candidates = hard_conditions + self.easy_conditions
@@ -232,19 +229,25 @@ class Probability_WL_Training(Task):
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-        print('Accuracy: ', self.accuracy)
+        print('Total Accuracy for the session: ', self.accuracy)
+        print('ROR: ', self.current_ror)
         print('Stim_Trial: ', self.stim_trial)
+
+        if self.current_trial == 0:
+            self.bias_breaking == 0
+            self.accuracy = 0
+
         print('Bias Breaking: ', self.bias_breaking)
         #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [61, 62]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
-        # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-            # If not the first block, pass the last stimulus of the previous block to avoid repetition
-            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+        # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
+        if self.stim_trial_counter % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+            # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
+            last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
@@ -254,48 +257,55 @@ class Probability_WL_Training(Task):
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
+            self.stim_trial_counter = 0
 
-            last_trial_conditions = self.trial_conditions[self.current_trial - 1] if self.current_trial > 0 else None
-            self.trial_conditions = self.generate_random_trial_conditions(last_trial, self.current_ror)
-            print(f"Trial conditions after first attempt: {self.trial_conditions}")
-            while self.trial_conditions is None:
-                print("Retrying to generate trial conditions...")
-                self.trial_conditions = self.self.generate_random_trial_conditions(last_trial, self.current_ror)
-                if self.trial_conditions is None:
-                    print("generate_random_trial_conditions returned None. Retrying...")
-                else:
-                    print(f"Successfully generated stimulus trials: {self.trial_conditions}")
+        # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
+        if self.condition_trial_counter % self.block_wlt == 0:
+            last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
+            if self.current_ror in self.easy_ror:
+                self.trial_conditions = self.generate_random_trial_conditions_easy(last_trial_conditions, self.current_ror)
+                print(f"Trial conditions after first attempt: {self.trial_conditions}")
+                while self.trial_conditions is None:
+                    print("Retrying to generate trial conditions...")
+                    self.trial_conditions = self.generate_random_trial_conditions_easy(last_trial, self.current_ror)
+                    if self.trial_conditions is None:
+                        print("generate_random_trial_conditions_easy returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.trial_conditions}")
+            elif self.current_ror in self.hard_ror:
+                self.trial_conditions = self.generate_random_trial_conditions_hard(last_trial_conditions, self.current_ror)
+                print(f"Trial conditions after first attempt: {self.trial_conditions}")
+                while self.trial_conditions is None:
+                    print("Retrying to generate trial conditions...")
+                    self.trial_conditions = self.generate_random_trial_conditions_hard(last_trial, self.current_ror)
+                    if self.trial_conditions is None:
+                        print("generate_random_trial_conditions_hard returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.trial_conditions}")
+            self.condition_trial_counter = 0
 
-        self.stim_trial = self.stim_trials[self.current_trial]
-        self.trial_condition = self.trial_conditions[self.current_trial]
+        self.trial_condition = self.trial_conditions[self.condition_trial_counter]
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
+            self.stim_trial = self.stim_trials[self.stim_trial_counter]
         else:
             self.stim_trial = self.last_stim_trial
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        if self.stim_trial == 61:
+            self.x_correcth = self.x_correcth_pos[0]
+            self.x_incorrecth = self.x_correcth_pos[1]
+            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.stim_trial == 62:
+            self.x_correcth = self.x_correcth_pos[1]
+            self.x_incorrecth = self.x_correcth_pos[0]
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        print('Stimulus trial: ', self.stim_trial)
+        print('Stimulus Trial Counter',self.stim_trial_counter)
+        print('Stimulus Condition Counter', self.condition_trial_counter)
 
         ############ STATE MACHINE ################
-        if self.stage != 5:
+        if self.stage != 6:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
@@ -421,8 +431,9 @@ class Probability_WL_Training(Task):
 
     def after_trial(self):
         if self.stage != 6:
-            self.trial_counter += 1
+            self.trial_counter_ror += 1
             self.stim_trial_counter += 1
+            self.condition_trial_counter += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -475,73 +486,59 @@ class Probability_WL_Training(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Measure accuracy for every 12 trials using running_window
-            if self.trial_counter % self.running_window == 0:
+            if self.trial_counter_ror % self.running_window == 0:
                 trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
                 window_accuracy = sum(trials_in_window) / len(trials_in_window)
-                print(f"Running Accuracy (Last Block: {window_accuracy:.2f}")
+                print(f"Running Accuracy (Last block_wlt: {window_accuracy:.2f}")
 
-            if self.accuracy>=0.7:
-                # Move the completed condition to completed_conditions
-                self.completed_conditions.append(self.current_condition)
-                # Move to the next condition, if any are left
-                if self.conditions:
-                    self.conditions.pop(0)  # Remove the completed condition
-                    if self.conditions:
-                        self.current_condition = self.conditions[0]  # Set new current condition
-                    # If all conditions are completed, end the task
-                    if not self.conditions:
-                        self.stage == 6
+            # Side Bias Breaking formula:
+            self.last_stim_trial = self.stim_trial
 
-                    # Reset trial counter for the new condition or new repetition cycle
-                    self.trial_counter = 0
+            try:
+                # Try converting response_x directly to a float
+                self.response_x_bias = float(self.response_x)
+            except ValueError:
+                print(f"No response_x value or response other: {self.response_x}")
 
+                # Split the string by commas and convert it to a list of floats
+                try:
+                    # First, check if the response_x is a string and split it
+                    response_x_list = [float(x) for x in self.response_x.split(",")]
 
-            # # Side Bias Breaking formula:
-            # self.last_stim_trial = self.stim_trial
-            #
-            # try:
-            #     # Try converting response_x directly to a float
-            #     self.response_x_bias = float(self.response_x)
-            # except ValueError:
-            #     print(f"No response_x value or response other: {self.response_x}")
-            #
-            #     # Split the string by commas and convert it to a list of floats
-            #     try:
-            #         # First, check if the response_x is a string and split it
-            #         response_x_list = [float(x) for x in self.response_x.split(",")]
-            #
-            #         # Use the last element of the list as response_x_bias
-            #         self.response_x_bias = response_x_list[-1]
-            #         print(f"Using last value from response_x array: {self.response_x_bias}")
-            #     except Exception as e:
-            #         #print(f"Failed to process response_x as array. Error: {e}")
-            #         return  # Handle this case if needed
-            #
-            # # Append the response to the array:
-            # #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-            # self.response_x_array.append(self.response_x_bias)
-            # print(f"Responses so far: {self.response_x_array}")
-            #
-            # #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-            #     # Check if all responses fall into one of the two defined categories
-            #     all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-            #     all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
-            #
-            #     if all_left_side:
-            #         self.sameside = 'left'
-            #         self.bias_breaking = 1
-            #         print('Bias breaking active, side:', self.sameside)
-            #         self.last_stim_trial = 32               #Ensure last_stim_trial is 32
-            #     elif all_right_side:
-            #         self.sameside = 'right'
-            #         self.bias_breaking = 1
-            #         self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
-            #         print('Bias breaking active, side:', self.sameside)
-            #
-            #     self.response_x_array = []      #Clearing the array
+                    # Use the last element of the list as response_x_bias
+                    self.response_x_bias = response_x_list[-1]
+                    print(f"Using last value from response_x array: {self.response_x_bias}")
+                except Exception as e:
+                    # print(f"Failed to process response_x as array. Error: {e}")
+                    return  # Handle this case if needed
+
+            # Append the response to the array:
+            # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+            self.response_x_array.append(self.response_x_bias)
+            print(f"Responses so far: {self.response_x_array}")
+
+            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+                # Check if all responses fall into one of the two defined categories
+                all_left_side = all(
+                    45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+                all_right_side = all(
+                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
+
+                if all_left_side:
+                    self.sameside = 'left'
+                    self.bias_breaking = 1
+                    print('Bias breaking active, side:', self.sameside)
+                    self.last_stim_trial = 62  # Ensure last_stim_trial is 62
+                elif all_right_side:
+                    self.sameside = 'right'
+                    self.bias_breaking = 1
+                    self.last_stim_trial = 61  # Ensure last_stim_trial is 61
+                    print('Bias breaking active, side:', self.sameside)
+
+                self.response_x_array = []  # Clearing the array
         else:
-            print("Stage is 5. All repetitions completed. Task Ended.")
+            print("Stage is 6. All RORs completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
 
@@ -574,17 +571,17 @@ class Probability_WL_Training(Task):
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
-        #Weber's Law:
-        self.register_value('block', self.block)
-        self.register_value('conditions', self.conditions)
-        self.register_value('completed_conditions', self.completed_conditions)
-        self.register_value('current_condition', self.current_condition)
-        self.register_value('repetition', self.repetition)
-        self.register_value('current_repetition', self.current_repetition)
-        self.register_value('trial_counter', self.trial_counter)
-        self.register_value('stim_trial', self.stim_trial)
-        self.register_value('stim_trials', self.stim_trials)
-        self.register_value('stim_trial_counter', self.stim_trial_counter)
+        # #Weber's Law:
+        # self.register_value('block', self.block)
+        # self.register_value('conditions', self.conditions)
+        # self.register_value('completed_conditions', self.completed_conditions)
+        # self.register_value('current_condition', self.current_condition)
+        # self.register_value('repetition', self.repetition)
+        # self.register_value('current_repetition', self.current_repetition)
+        # self.register_value('trial_counter', self.trial_counter)
+        # self.register_value('stim_trial', self.stim_trial)
+        # self.register_value('stim_trials', self.stim_trials)
+        # self.register_value('stim_trial_counter', self.stim_trial_counter)
         # Weber's Law Training:
         self.register_value('ror', self.ror)
         self.register_value('current_ror', self.current_ror)

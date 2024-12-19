@@ -654,8 +654,10 @@ def select_task(df, subject):
         elif 'Probability_WL_Training' in task:
             trial_criteria = 72
             accuracy_criteria = 0.70
+            trial_end_criteria = 1000
             total_trials = n_trials_last + n_trials_second_last
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
+
 
             # Check if the last session and second-to-last session are in different rors:
             last_session_ror = df_last_session['current_ror'].iloc[0]  # Stage in the last session
@@ -665,12 +667,15 @@ def select_task(df, subject):
             ror = last_row['ror']
             completed_ror = last_row['completed_ror']
             current_ror = last_row['current_ror']
+            trial_counter_ror = last_row['trial_counter_ror']
 
             if last_session_task == second_last_session_task:
                 if last_session_ror == second_last_session_ror:
-                    if total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria):
+                    if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
+                            or (trial_counter_ror <= trial_end_criteria)):
                         # Move the completed condition to completed_conditions
                         completed_ror.append(current_ror)
+                        trial_counter_ror = 0
                         # Move to the next ror, if any are left
                         if ror:
                             ror.pop(0)  # Remove the completed ROR
@@ -716,4 +721,4 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 5
 
-    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror
+    return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror
