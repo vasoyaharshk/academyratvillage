@@ -122,7 +122,7 @@ class Probability_Training_BB(Task):
         print('Stim_Trial: ', self.stim_trial)
 
         if self.current_trial == 0:
-            self.bias_breaking == 0
+            self.bias_breaking = 0
             self.accuracy = 0
 
         print('Bias Breaking: ', self.bias_breaking)
