@@ -87,9 +87,9 @@ class Probability_WL_Training(Task):
         # self.current_repetition = 0  # To store how many times the condition has repeated.
         # self.trial_counter = 0  # Track the number of trials for the current ror
         # # Image output stims:
-        self.stim_trial = 0
-        self.stim_trials = []
-        self.stim_trial_counter = 0
+        # self.stim_trial = 0
+        # self.stim_trials = []
+        # self.stim_trial_counter = 0
 
         #self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
@@ -107,15 +107,17 @@ class Probability_WL_Training(Task):
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
         self.easy_ror = [16, 12, 8, 6]
         self.hard_ror = [4, 2, 1.5]
-        self.block_wlt = 0
-        self.stim_trial_counter = 0
+        self.block_wlt = 20
+        self.stim_trial_wlt = 0
+        self.stim_trials_wlt = []
+        self.stim_trial_counter_wlt = 0
         self.condition_trial_counter = 0
+        self.trial_conditions = []
 
         #Variables tracked:
         self.ror = [16, 12, 8, 6, 4, 2, 1.5]
-        self.current_ror = 16
         self.completed_ror = []
-        self.trial_conditions = []
+        self.current_ror = 16
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
@@ -353,33 +355,33 @@ class Probability_WL_Training(Task):
         print('Trial: ' + str(self.current_trial))
         print('Total Accuracy for the session: ', self.accuracy)
         print('ROR: ', self.current_ror)
-        print('Stim_Trial: ', self.stim_trial)
+        print('stim_trial_wlt: ', self.stim_trial_wlt)
 
         if self.current_trial == 0:
-            self.bias_breaking == 0
+            self.bias_breaking = 0
             self.accuracy = 0
 
         print('Bias Breaking: ', self.bias_breaking)
-        #print('Stim_Trials: ', self.stim_trials)
+        #print('stim_trials_wlt: ', self.stim_trials_wlt)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
         # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
-        if self.stim_trial_counter % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+        if self.stim_trial_counter_wlt % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
-            last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(last_trial)
-            print(f"Stimulus trials after first attempt: {self.stim_trials}")
-            while self.stim_trials is None:
+            last_trial = self.stim_trials_wlt[self.stim_trial_counter_wlt - 1] if self.stim_trial_counter_wlt > 0 else None
+            self.stim_trials_wlt = self.generate_random_trials(last_trial)
+            print(f"Stimulus trials after first attempt: {self.stim_trials_wlt}")
+            while self.stim_trials_wlt is None:
                 print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials(last_trial)
-                if self.stim_trials is None:
+                self.stim_trials_wlt = self.generate_random_trials(last_trial)
+                if self.stim_trials_wlt is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
-                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
-            self.stim_trial_counter = 0
+                    print(f"Successfully generated stimulus trials: {self.stim_trials_wlt}")
+            self.stim_trial_counter_wlt = 0
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.condition_trial_counter % self.block_wlt == 0:
@@ -409,21 +411,21 @@ class Probability_WL_Training(Task):
         self.trial_condition = self.trial_conditions[self.condition_trial_counter]
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            self.stim_trial_wlt = self.stim_trials_wlt[self.stim_trial_counter_wlt]
         else:
-            self.stim_trial = self.last_stim_trial
+            self.stim_trial_wlt = self.last_stim_trial
 
-        if self.stim_trial == 61:
+        if self.stim_trial_wlt == 61:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
             print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial == 62:
+        elif self.stim_trial_wlt == 62:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-        print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter',self.stim_trial_counter)
+        print('Stimulus trial: ', self.stim_trial_wlt)
+        print('Stimulus Trial Counter',self.stim_trial_counter_wlt)
         print('Stimulus Condition Counter', self.condition_trial_counter)
 
         ############ STATE MACHINE ################
@@ -434,7 +436,7 @@ class Probability_WL_Training(Task):
                     state_name='Start_task',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial_wlt)])
                 # Starts task and displays stimuli instanly
 
                 self.sma.add_state(
@@ -463,7 +465,7 @@ class Probability_WL_Training(Task):
                 state_name='Fixation',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial_wlt)])
             # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
             self.sma.add_state(
@@ -554,7 +556,7 @@ class Probability_WL_Training(Task):
     def after_trial(self):
         if self.stage != 6:
             self.trial_counter_ror += 1
-            self.stim_trial_counter += 1
+            self.stim_trial_counter_wlt += 1
             self.condition_trial_counter += 1
 
             ##### COUNT MISSES:
@@ -607,14 +609,8 @@ class Probability_WL_Training(Task):
             #self.accuracy = sum(self.accwindow) / len(self.accwindow)
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
-            # Measure accuracy for every 12 trials using running_window
-            if self.trial_counter_ror % self.running_window == 0:
-                trials_in_window = self.accwindow[-self.running_window:]  # Last 12 trials
-                window_accuracy = sum(trials_in_window) / len(trials_in_window)
-                print(f"Running Accuracy (Last block_wlt: {window_accuracy:.2f}")
-
             # Side Bias Breaking formula:
-            self.last_stim_trial = self.stim_trial
+            self.last_stim_trial = self.stim_trial_wlt
 
             try:
                 # Try converting response_x directly to a float
@@ -706,5 +702,6 @@ class Probability_WL_Training(Task):
         # self.register_value('stim_trial_counter', self.stim_trial_counter)
         # Weber's Law Training:
         self.register_value('ror', self.ror)
-        self.register_value('current_ror', self.current_ror)
         self.register_value('completed_ror', self.completed_ror)
+        self.register_value('current_ror', self.current_ror)
+        self.register_value('trial_counter_ror', self.trial_counter_ror)

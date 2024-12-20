@@ -640,8 +640,9 @@ def select_task(df, subject):
                 stim_trial_counter = 0
 
                 ror = [16, 12, 8, 6, 4, 2, 1.5]
-                current_ror = 16
                 completed_ror = []
+                current_ror = 16
+                trial_counter_ror = 0
 
                 message = 'PI: Training complete, Moving to Webers law.'
                 print(f'{message}')
@@ -655,9 +656,14 @@ def select_task(df, subject):
             trial_criteria = 72
             accuracy_criteria = 0.70
             trial_end_criteria = 1000
+
+            if my_subject == 'm2':
+                trial_criteria = 2
+                accuracy_criteria = 0.5
+                trial_end_criteria = 10
+
             total_trials = n_trials_last + n_trials_second_last
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
-
 
             # Check if the last session and second-to-last session are in different rors:
             last_session_ror = df_last_session['current_ror'].iloc[0]  # Stage in the last session
