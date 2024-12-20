@@ -157,71 +157,193 @@ class Probability_WL_Training(Task):
         return trials
 
     def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
-        """
-        Generate a list of conditions for a session based on the given ROR.
-        :param current_ror: The ROR value for the current session.
-        :param last_trial: The last condition from the previous session (to avoid repetition).
-        :return: A list of conditions.
-        """
-        if current_ror not in self.ror_to_conditions:
-            raise ValueError("Invalid ROR value provided.")
+        def check_max_consecutive_type(seq, hard_conditions):
+            last_type = None
+            count = 0
+            for t in seq:
+                current_type = "hard" if t in hard_conditions else "easy"
+                if current_type == last_type:
+                    count += 1
+                    if count > 2:
+                        return False
+                else:
+                    last_type = current_type
+                    count = 1
+            return True
 
-        hard_conditions = self.ror_to_conditions[current_ror]
-        is_hard = current_ror in self.hard_ror
-        probabilities = {
-            4: [0.7, 0.3],
-            2: [0.6, 0.4],
-            1.5: [0.5, 0.5],
-        }.get(current_ror, [0.5, 0.5])
-        trials = []
-        prev_type = None  # Tracks if the last condition was hard or easy
-        prev_parity = None
-        type_streak = 0
-        parity_streak = 0
+        def check_max_consecutive_parity(seq):
+            def get_parity(t):
+                return "odd" if t % 2 != 0 else "even"
 
-        while len(trials) < self.block_wlt:
-            if is_hard:
-                # Combine hard conditions and easy conditions based on probabilities
-                candidates = hard_conditions + self.easy_conditions
-                candidate = random.choices(
-                    candidates,
-                    weights=[probabilities[0] if c in hard_conditions else probabilities[1] for c in candidates],
-                )[0]
-            else:
-                # For easy RORs, randomly select from its conditions with equal probability
-                candidate = random.choice(hard_conditions)
+            last_parity = None
+            count = 0
+            for t in seq:
+                current_parity = get_parity(t)
+                if current_parity == last_parity:
+                    count += 1
+                    if count > 2:
+                        return False
+                else:
+                    last_parity = current_parity
+                    count = 1
+            return True
 
-            # Ensure no more than 2 consecutive same type (hard/easy)
-            candidate_type = "hard" if candidate in hard_conditions else "easy"
-            if prev_type == candidate_type and type_streak >= 2:
-                continue
+        # Hard conditions mapping
+        ror_to_hard_conditions = {
+            4: [8, 7],
+            2: [6, 5]
+        }
+        if current_ror not in ror_to_hard_conditions:
+            raise ValueError("Invalid ROR. Must be 4 or 2.")
+        hard_conditions = ror_to_hard_conditions[current_ror]
 
-            # Ensure no more than 2 consecutive same parity
-            parity = "odd" if candidate % 2 != 0 else "even"
-            if prev_parity == parity and parity_streak >= 2:
-                continue
+        # Easy conditions
+        easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
 
-            # Update type and parity streaks
-            if prev_type == candidate_type:
-                type_streak += 1
-            else:
-                type_streak = 1
-            prev_type = candidate_type
+        # ROR proportions
+        ror_to_proportion = {
+            4: 0.7,
+            2: 0.6
+        }
 
-            if prev_parity == parity:
-                parity_streak += 1
-            else:
-                parity_streak = 1
-            prev_parity = parity
+        hard_prop = ror_to_proportion[current_ror]
+        hard_count_total = int(round(self.block_wlt * hard_prop))
+        easy_count_total = self.block_wlt - hard_count_total
 
-            # Avoid repetition from the previous session's last trial
-            if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                continue
+        print(f"Expected proportions -> Hard: {hard_prop * 100:.2f}%, Easy: {(1 - hard_prop) * 100:.2f}%")
+        print(f"Expected counts -> Hard: {hard_count_total}, Easy: {easy_count_total}")
 
-            # Add the candidate to trials
-            trials.append(candidate)
+        # Distribute hard conditions evenly
+        num_hard_conditions = len(hard_conditions)
+        hard_count_per_condition = {c: hard_count_total // num_hard_conditions for c in hard_conditions}
+        remainder = hard_count_total % num_hard_conditions
+        for i in range(remainder):
+            c = hard_conditions[i]
+            hard_count_per_condition[c] += 1
 
-        return trials
+        # Distribute easy conditions evenly
+        num_easy_conditions = len(easy_conditions)
+        easy_count_per_condition = {c: easy_count_total // num_easy_conditions for c in easy_conditions}
+        remainder = easy_count_total % num_easy_conditions
+        for i in range(remainder):
+            c = easy_conditions[i]
+            easy_count_per_condition[c] += 1
+
+        hard_trials = []
+        for c, cnt in hard_count_per_condition.items():
+            hard_trials += [c] * cnt
+
+        easy_trials = []
+        for c, cnt in easy_count_per_condition.items():
+            easy_trials += [c] * cnt
+
+        random.shuffle(hard_trials)
+        random.shuffle(easy_trials)
+
+        def get_parity(t):
+            return "odd" if t % 2 != 0 else "even"
+
+        def is_valid_addition(seq, trial):
+            # Check max consecutive type
+            if len(seq) >= 2:
+                last_two_types = ["hard" if x in hard_conditions else "easy" for x in seq[-2:]]
+                current_type = "hard" if trial in hard_conditions else "easy"
+                if last_two_types[0] == last_two_types[1] == current_type:
+                    return False
+
+            # Check max consecutive parity
+            if len(seq) >= 2:
+                last_two_parities = [get_parity(x) for x in seq[-2:]]
+                current_parity = get_parity(trial)
+                if last_two_parities[0] == last_two_parities[1] == current_parity:
+                    return False
+
+            # Last trial repetition rule (only for first trial)
+            if len(seq) == 0 and last_trial is not None:
+                first_p = get_parity(trial)
+                last_p = get_parity(last_trial)
+                if first_p == last_p:
+                    return False
+
+            return True
+
+        max_attempts = 100000
+        for attempt in range(max_attempts):
+            sequence = []
+            temp_hard = hard_trials.copy()
+            temp_easy = easy_trials.copy()
+
+            while len(sequence) < self.block_wlt:
+                if len(sequence) >= 2:
+                    last_two_types = ["hard" if x in hard_conditions else "easy" for x in sequence[-2:]]
+                    if last_two_types[0] == last_two_types[1] == "hard":
+                        possible_types = ["easy"]
+                    elif last_two_types[0] == last_two_types[1] == "easy":
+                        possible_types = ["hard"]
+                    else:
+                        possible_types = ["hard", "easy"]
+                else:
+                    possible_types = ["hard", "easy"]
+
+                random.shuffle(possible_types)
+                added = False
+                for ttype in possible_types:
+                    if ttype == "hard" and len(temp_hard) > 0:
+                        candidates = temp_hard.copy()
+                        random.shuffle(candidates)
+                        for c in candidates:
+                            if is_valid_addition(sequence, c):
+                                sequence.append(c)
+                                temp_hard.remove(c)
+                                added = True
+                                break
+                        if added:
+                            break
+                    elif ttype == "easy" and len(temp_easy) > 0:
+                        candidates = temp_easy.copy()
+                        random.shuffle(candidates)
+                        for e in candidates:
+                            if is_valid_addition(sequence, e):
+                                sequence.append(e)
+                                temp_easy.remove(e)
+                                added = True
+                                break
+                        if added:
+                            break
+
+                if not added:
+                    # Couldn't add a valid trial now, try another attempt
+                    break
+
+            if len(sequence) == self.block_wlt:
+                # Validate
+                hard_count = sum(1 for x in sequence if x in hard_conditions)
+                easy_count = self.block_wlt - hard_count
+                actual_hard_prop = hard_count / self.block_wlt
+                expected_hard_prop = ror_to_proportion[current_ror]
+
+                print(
+                    f"Generated proportions -> Hard: {actual_hard_prop * 100:.2f}%, Easy: {(1 - actual_hard_prop) * 100:.2f}%")
+                print(f"Generated counts -> Hard: {hard_count}, Easy: {easy_count}")
+
+                # Proportion tolerance ±2%
+                if abs(actual_hard_prop - expected_hard_prop) > 0.02:
+                    continue
+
+                if not check_max_consecutive_type(sequence, hard_conditions):
+                    continue
+                if not check_max_consecutive_parity(sequence):
+                    continue
+
+                if last_trial is not None:
+                    first_p = get_parity(sequence[0])
+                    last_p = get_parity(last_trial)
+                    if first_p == last_p:
+                        continue
+
+                return sequence
+
+        raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
 
     def configure_gui(self):
         self.gui_input = ['duration_max', 'stage']
@@ -262,7 +384,7 @@ class Probability_WL_Training(Task):
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.condition_trial_counter % self.block_wlt == 0:
             last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
-            if self.current_ror in self.easy_ror:
+            if self.current_ror in self.easy_ror or self.current_ror == 1.5:
                 self.trial_conditions = self.generate_random_trial_conditions_easy(last_trial_conditions, self.current_ror)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
