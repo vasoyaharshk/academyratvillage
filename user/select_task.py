@@ -21,7 +21,7 @@ def select_task(df, subject):
     stim_dur_ds= 0
     stim_dur_dm= 0
     stim_dur_dl= 0
-    #Weber's Law:
+    #Weber's Law Test:
     block = 0
     conditions = []  # Takes the conditions from task file after first session.
     completed_conditions = []  # To store completed conditions
@@ -33,6 +33,11 @@ def select_task(df, subject):
     stim_trial = 0
     stim_trials = []
     stim_trial_counter = 0
+    #Weber's Law Training:
+    ror = 0
+    completed_ror = []
+    current_ror = 0
+    trial_counter_ror = 0
 
     my_subject = df.subject.iloc[0]
 
