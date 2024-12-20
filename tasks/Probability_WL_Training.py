@@ -385,21 +385,21 @@ class Probability_WL_Training(Task):
         if self.condition_trial_counter % self.block_wlt == 0:
             last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
             if self.current_ror in self.easy_ror or self.current_ror == 1.5:
-                self.trial_conditions = self.generate_random_trial_conditions_easy(last_trial_conditions, self.current_ror)
+                self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial_conditions)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_easy(last_trial, self.current_ror)
+                    self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_easy returned None. Retrying...")
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
             elif self.current_ror in self.hard_ror:
-                self.trial_conditions = self.generate_random_trial_conditions_hard(last_trial_conditions, self.current_ror)
+                self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, last_trial_conditions)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_hard(last_trial, self.current_ror)
+                    self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, last_trial_conditions)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_hard returned None. Retrying...")
                     else:
