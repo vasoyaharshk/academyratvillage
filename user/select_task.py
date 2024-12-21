@@ -680,13 +680,25 @@ def select_task(df, subject):
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
 
+            # Ensure completed_ror is a list with known elements:
             if isinstance(completed_ror, str):
-                completed_ror = completed_ror.split(",")  # Convert CSV string to list
-                print(f"Converted completed_ror to list: {completed_ror}")
+                # Remove unwanted brackets or artifacts from the string
+                sanitized = completed_ror.strip("[]").replace("'", "").strip()
+                # Convert to list if there are valid elements
+                completed_ror = sanitized.split(",") if sanitized else []
+                print(f"Sanitized and converted completed_ror to list: {completed_ror}")
+            elif not isinstance(completed_ror, list):
+                completed_ror = []  # Default to an empty list
+                print(f"Initialized completed_ror as an empty list.")
 
+            # Ensure ror is a list
             if isinstance(ror, str):
-                ror = ror.split(",")  # Convert CSV string to list
-                print(f"Converted ror to list: {ror}")
+                sanitized = ror.strip("[]").replace("'", "").strip()
+                ror = sanitized.split(",") if sanitized else []
+                print(f"Sanitized and converted ror to list: {ror}")
+            elif not isinstance(ror, list):
+                ror = []  # Default to an empty list
+                print(f"Initialized ror as an empty list.")
 
             print(f"Type of completed_ror: {type(completed_ror)}")
             print(f"Type of ror: {type(ror)}")
