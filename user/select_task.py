@@ -680,6 +680,9 @@ def select_task(df, subject):
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
 
+            print(f"Type of completed_ror: {type(completed_ror)}")
+            print(f"Type of ror: {type(ror)}")
+
             message = (
                 f"Last Session ROR: {last_session_ror}\n"
                 f"Second Last Session ROR: {second_last_session_ror}\n"
