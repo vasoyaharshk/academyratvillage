@@ -599,6 +599,7 @@ def select_task(df, subject):
 
                         stage = 4
                         task = 'Probability_WebersLaw'
+                        #block = 12  # This is the number of trials one conditions will remain for
                         block = 3  # This is the number of trials one conditions will remain for
                         conditions = []  # Takes the conditions from select task file.
                         completed_conditions = []  # To store completed conditions
@@ -629,7 +630,7 @@ def select_task(df, subject):
             stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
-                task = 'Probability_WebersLaw_Training'
+                task = 'Probability_WL_Training'
                 # Weber's Law:
                 stage = 5
                 block = 0
@@ -649,7 +650,7 @@ def select_task(df, subject):
                 current_ror = 16
                 trial_counter_ror = 0
 
-                message = 'PI: Training complete, Moving to Webers law.'
+                message = 'PI: Probability_WebersLaw completes, Moving to Webers law Training.'
                 print(f'{message}')
                 try:
                     telegram_bot.alarm_completed_criteria(task, my_subject)
@@ -663,7 +664,7 @@ def select_task(df, subject):
             trial_end_criteria = 1000
 
             if my_subject == 'm2':
-                trial_criteria = 2
+                trial_criteria = 3
                 accuracy_criteria = 0.5
                 trial_end_criteria = 10
 
@@ -728,7 +729,7 @@ def select_task(df, subject):
                                 print("All RORs are completed. Task ends.")
                                 current_ror = 0
                                 stage = 6
-                                task == 'Water_Filler'
+                                task = 'Water_Filler'
                                 message = 'PI: Webers law Training completed'
                                 print(f'{message}')
                                 try:
@@ -751,7 +752,6 @@ def select_task(df, subject):
                                 pass
 
     elif task == 'Water_Filler':
-        task = 'Water_Filler'
         print("rat drank water")
         # # variables by default
         # stage = 5
