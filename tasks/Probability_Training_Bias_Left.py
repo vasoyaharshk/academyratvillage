@@ -154,15 +154,15 @@ class Probability_Training_Bias_Left(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        # else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            # if self.stim_trial == 31:
-            #     self.x_correcth = self.x_correcth_pos[0]
-            #     self.x_incorrecth = self.x_correcth_pos[1]
-            #     print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            # elif self.stim_trial == 32:
-            #     self.x_correcth = self.x_correcth_pos[1]
-            #     self.x_incorrecth = self.x_correcth_pos[0]
-            #     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        else:  # We have two stimuli after stage 1 with correct and incorrect areas
+            if self.stim_trial == 31:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 32:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
 
         ############ STATE MACHINE ################
