@@ -74,8 +74,8 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 45                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 60                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_CAGE1 = 40                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 50                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR1 = 85                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 110                                               # <-- TO CHANGE Harsh-Done
 
