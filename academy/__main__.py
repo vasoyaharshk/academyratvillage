@@ -637,11 +637,11 @@ def go_to_state(num):
         utils.subject.stim_trial_counter = int(utils.subject.stim_trial_counter)  # Cast to int
         if isinstance(utils.subject.ror, str):
             utils.subject.ror = ast.literal_eval(utils.subject.ror)
-        utils.subject.ror = list(map(int, utils.subject.ror))
+        utils.subject.ror = list(map(float, utils.subject.ror))
         if isinstance(utils.subject.completed_ror, str):
             utils.subject.completed_ror = ast.literal_eval(utils.subject.completed_ror)
-        utils.subject.completed_ror = list(map(int, utils.subject.completed_ror))
-        utils.subject.current_ror = int(utils.subject.current_ror)  # Cast to int
+        utils.subject.completed_ror = list(map(float, utils.subject.completed_ror))
+        utils.subject.current_ror = float(utils.subject.current_ror)  # Cast to int
         utils.subject.trial_counter_ror = int(utils.subject.trial_counter_ror)  # Cast to int
 
 
