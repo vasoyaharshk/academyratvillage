@@ -596,7 +596,7 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                             pass
-
+                        '''
                         stage = 4
                         task = 'Probability_WebersLaw'
                         block = 12  # This is the number of trials one conditions will remain for
@@ -610,6 +610,7 @@ def select_task(df, subject):
                         stim_trial = 0
                         stim_trials = []
                         stim_trial_counter = 0
+                        '''
 
 
         elif 'Probability_WebersLaw' in task:
