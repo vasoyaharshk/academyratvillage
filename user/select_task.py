@@ -680,6 +680,14 @@ def select_task(df, subject):
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
 
+            if isinstance(completed_ror, str):
+                completed_ror = completed_ror.split(",")  # Convert CSV string to list
+                print(f"Converted completed_ror to list: {completed_ror}")
+
+            if isinstance(ror, str):
+                ror = ror.split(",")  # Convert CSV string to list
+                print(f"Converted ror to list: {ror}")
+
             print(f"Type of completed_ror: {type(completed_ror)}")
             print(f"Type of ror: {type(ror)}")
 
