@@ -635,6 +635,14 @@ def go_to_state(num):
             utils.subject.stim_trials = ast.literal_eval(utils.subject.stim_trials)
         utils.subject.stim_trials = list(map(int, utils.subject.stim_trials))
         utils.subject.stim_trial_counter = int(utils.subject.stim_trial_counter)  # Cast to int
+        if isinstance(utils.subject.ror, str):
+            utils.subject.ror = ast.literal_eval(utils.subject.ror)
+        utils.subject.ror = list(map(int, utils.subject.ror))
+        if isinstance(utils.subject.completed_ror, str):
+            utils.subject.completed_ror = ast.literal_eval(utils.subject.completed_ror)
+        utils.subject.completed_ror = list(map(int, utils.subject.completed_ror))
+        utils.subject.current_ror = int(utils.subject.current_ror)  # Cast to int
+        utils.subject.trial_counter_ror = int(utils.subject.trial_counter_ror)  # Cast to int
 
 
         utils.task.stage = utils.subject.stage
@@ -654,6 +662,10 @@ def go_to_state(num):
         utils.task.stim_trial = utils.subject.stim_trial
         utils.task.stim_trials = utils.subject.stim_trials
         utils.task.stim_trial_counter = utils.subject.stim_trial_counter
+        utils.task.ror = utils.subject.ror
+        utils.task.completed_ror = utils.subject.completed_ror
+        utils.task.current_ror = utils.subject.current_ror
+        utils.task.trial_counter_ror = utils.subject.trial_counter_ror
 
 
         utils.task_manager = TaskManager(utils.subject)

@@ -51,6 +51,10 @@ class Task(object):
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
+        self.ror = []
+        self.completed_ror = []
+        self.current_ror = 0
+        self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
         self.checksum = None
         self.subject_class = None
