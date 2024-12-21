@@ -611,10 +611,10 @@ def loop36(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called in [31, 41, 51]:
+        if last_function_called in [31, 41, 43, 45, 51, 61]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called in [32, 42, 52]:
+        elif last_function_called in [32, 42, 44, 46, 52, 62]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
