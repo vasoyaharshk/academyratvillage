@@ -599,8 +599,7 @@ def select_task(df, subject):
 
                         stage = 4
                         task = 'Probability_WebersLaw'
-                        #block = 12  # This is the number of trials one conditions will remain for
-                        block = 3  # This is the number of trials one conditions will remain for
+                        block = 12  # This is the number of trials one conditions will remain for
                         conditions = []  # Takes the conditions from select task file.
                         completed_conditions = []  # To store completed conditions
                         current_condition = 0  # To track the current condition in progress
