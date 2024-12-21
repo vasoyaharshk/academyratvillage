@@ -83,6 +83,8 @@ class Probability_Training_Bias_Left(Task):
         self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
         self.status = None              #Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
         #Required for Weber's law:
         self.block = 0  # This is the number of trials one conditions will remain for

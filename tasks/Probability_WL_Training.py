@@ -193,7 +193,8 @@ class Probability_WL_Training(Task):
         # Hard conditions mapping
         ror_to_hard_conditions = {
             4: [8, 7],
-            2: [6, 5]
+            2: [6, 5],
+            1.5: [4, 3]
         }
         if current_ror not in ror_to_hard_conditions:
             raise ValueError("Invalid ROR. Must be 4 or 2.")
@@ -205,7 +206,8 @@ class Probability_WL_Training(Task):
         # ROR proportions
         ror_to_proportion = {
             4: 0.7,
-            2: 0.6
+            2: 0.6,
+            1.5: 0.5
         }
 
         hard_prop = ror_to_proportion[current_ror]
