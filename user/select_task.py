@@ -551,9 +551,9 @@ def select_task(df, subject):
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                             task = 'Probability_Training_BB'
-                            stage = 1
+                            stage = 2
                             substage = 0
-                            message = 'PI: Advancing from stage 1 to stage 2'
+                            message = 'PI: Advancing to Probability_Training_BB to stage 2'
                             print(f'{message}')
                             try:
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
@@ -596,21 +596,21 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                             pass
-                        '''
+
                         stage = 4
                         task = 'Probability_WebersLaw'
-                        block = 12  # This is the number of trials one conditions will remain for
+                        block = 3  # This is the number of trials one conditions will remain for
                         conditions = []  # Takes the conditions from select task file.
                         completed_conditions = []  # To store completed conditions
                         current_condition = 0  # To track the current condition in progress
-                        repetition = 3  # To store how many times the conditions needs to repeat.
+                        repetition = 2  # To store how many times the conditions needs to repeat.
                         current_repetition = 0  # To store how many times the condition has repeated.
                         trial_counter = 0  # Track the number of trials for the current condition
                         # Image output stims:
                         stim_trial = 0
                         stim_trials = []
                         stim_trial_counter = 0
-                        '''
+
 
         elif 'Probability_WebersLaw' in task:
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
@@ -680,18 +680,50 @@ def select_task(df, subject):
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
 
+            message = (
+                f"Last Session ROR: {last_session_ror}\n"
+                f"Second Last Session ROR: {second_last_session_ror}\n"
+                f"Total Trials in last two sessions: {total_trials}\n"
+                f"Total trials in current ROR: {trial_counter_ror}"
+            )
+            print(message)
+            try:
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except Exception as e:
+                print('Telegram message not sent:', e)
+                pass
+
             if last_session_task == second_last_session_task:
+                print('here 1')
                 if last_session_ror == second_last_session_ror:
+                    print('here 2')
                     if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
                             or (trial_counter_ror <= trial_end_criteria)):
+                        print('here 3')
                         # Move the completed condition to completed_conditions
                         completed_ror.append(current_ror)
+                        print('here 4')
                         trial_counter_ror = 0
+                        print('here 5')
                         # Move to the next ror, if any are left
                         if ror:
                             ror.pop(0)  # Remove the completed ROR
+                            print('here 6')
                             if ror:
                                 current_ror = ror[0]  # Set new current ROR
+                                # Create a message indicating the change in current_ror
+                                print('here 7')
+                                message = (
+                                    f"Current ROR has been updated.\n"
+                                    f"New Current ROR: {current_ror}\n"
+                                    f"Completed RORs: {completed_ror}"
+                                )
+                                print(message)
+                                try:
+                                    telegram_bot.alarm_finish_session(message, my_subject)
+                                except Exception as e:
+                                    print('Telegram message not sent:', e)
+                                    pass
                             else:
                                 print("All RORs are completed. Task ends.")
                                 current_ror = 0
@@ -704,6 +736,19 @@ def select_task(df, subject):
                                 except:
                                     print('Telegram message not sent')
                                     pass
+                        else:
+                            message = (
+                                f"Criteria not met.\n"
+                                f"Current ROR not updated.\n"
+                                f"Current ROR: {current_ror}\n"
+                                f"Completed RORs: {completed_ror}"
+                            )
+                            print(message)
+                            try:
+                                telegram_bot.alarm_finish_session(message, my_subject)
+                            except Exception as e:
+                                print('Telegram message not sent:', e)
+                                pass
 
     elif task == 'Water_Filler':
         task = 'Water_Filler'
