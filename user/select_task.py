@@ -34,7 +34,7 @@ def select_task(df, subject):
     stim_trials = []
     stim_trial_counter = 0
     #Weber's Law Training:
-    ror = 0
+    ror = []
     completed_ror = []
     current_ror = 0
     trial_counter_ror = 0
