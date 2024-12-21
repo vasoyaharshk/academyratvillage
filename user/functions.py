@@ -1077,6 +1077,9 @@ def function61():  # When the correct answer is on left
     stage = utils.task.stage
     trial_condition = utils.task.trial_condition
     left_images = []
+
+    print('Trial Condition: ', trial_condition)
+
     try:
         image_folder = f'/home/ratvillage01/academy/jars/5_webers_law_training/{trial_condition}'
         left_images = [f for f in os.listdir(image_folder) if
@@ -1112,6 +1115,8 @@ def function62():  # When the correct answer is on right
     stage = utils.task.stage
     right_images = []
     trial_condition = utils.task.trial_condition
+
+    print('Trial Condition: ', trial_condition)
 
     try:
         # Get all the images based on the stages
