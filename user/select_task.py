@@ -692,14 +692,14 @@ def select_task(df, subject):
                 completed_ror = []  # Default to an empty list
                 print(f"Initialized completed_ror as an empty list.")
 
-            # Ensure ror is a list
-            if isinstance(ror, str):
-                sanitized = ror.strip("[]").replace("'", "").strip()
-                ror = sanitized.split(",") if sanitized else []
-                print(f"Sanitized and converted ror to list: {ror}")
-            elif not isinstance(ror, list):
-                ror = []  # Default to an empty list
-                print(f"Initialized ror as an empty list.")
+            # # Ensure ror is a list
+            # if isinstance(ror, str):
+            #     sanitized = ror.strip("[]").replace("'", "").strip()
+            #     ror = sanitized.split(",") if sanitized else []
+            #     print(f"Sanitized and converted ror to list: {ror}")
+            # elif not isinstance(ror, list):
+            #     ror = []  # Default to an empty list
+            #     print(f"Initialized ror as an empty list.")
 
             print(f"Type of completed_ror: {type(completed_ror)}")
             print(f"Type of ror: {type(ror)}")
@@ -725,16 +725,18 @@ def select_task(df, subject):
                             or (trial_counter_ror <= trial_end_criteria)):
                         print('here 3')
                         # Move the completed condition to completed_conditions
-                        completed_ror.append(current_ror)
+                        #completed_ror.append(current_ror)
+                        # Move the completed condition to completed_conditions
+                        completed_ror = str_append(completed_ror, str(current_ror))  # Use str_append
                         print('here 4')
                         trial_counter_ror = 0
                         print('here 5')
                         # Move to the next ror, if any are left
-                        if ror:
-                            ror.pop(0)  # Remove the completed ROR
+                        if ror != "[]" and ror:  # Check if ror is not empty
+                            ror, _ = str_pop(ror)  # Use str_pop to remove the first ROR
                             print('here 6')
-                            if ror:
-                                current_ror = ror[0]  # Set new current ROR
+                            if ror != "[]" and ror:
+                                current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
                                 # Create a message indicating the change in current_ror
                                 print('here 7')
                                 message = (
@@ -774,6 +776,12 @@ def select_task(df, subject):
                                 print('Telegram message not sent:', e)
                                 pass
 
+            # Ensure current_ror is an integer after processing
+            if isinstance(current_ror, str):
+                current_ror = int(current_ror)  # Convert to int if it's a string
+                print(f"current_ror converted to int: {current_ror}")
+
+
     elif task == 'Water_Filler':
         print("rat drank water")
         # # variables by default
@@ -801,3 +809,24 @@ def select_task(df, subject):
         wait_seconds = 5
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror
+
+
+def str_append(my_str: str, value: str) -> str:
+    """Simulate appending a value to a string representation of a list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:  # If empty list, add value directly
+        return f"[{value}]"
+    return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
+
+
+def str_pop(my_str: str) -> tuple[str, str]:
+    """Simulate popping the last value from a string representation of a list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:  # Handle empty list
+        raise ValueError("Cannot pop from an empty list")
+
+    # Remove the brackets and split by commas
+    parts = my_str[1:-1].split(", ")
+    popped_value = parts.pop()  # Remove the last element
+    new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
+    return new_str, popped_value
