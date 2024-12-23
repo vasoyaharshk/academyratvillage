@@ -644,9 +644,9 @@ def select_task(df, subject):
                 stim_trial_counter = 0
 
                 #Weber's Law Training Variables:
-                ror = [16, 12, 8, 6, 4, 2, 1.5]
+                ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0]
                 completed_ror = []
-                current_ror = 16
+                current_ror = 16.0
                 trial_counter_ror = 0
 
                 message = 'PI: Probability_WebersLaw completes, Moving to Webers law Training.'
@@ -680,16 +680,16 @@ def select_task(df, subject):
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
 
-            # Ensure completed_ror is a list with known elements:
-            if isinstance(completed_ror, str):
-                # Remove unwanted brackets or artifacts from the string
-                sanitized = completed_ror.strip("[]").replace("'", "").strip()
-                # Convert to list if there are valid elements
-                completed_ror = sanitized.split(",") if sanitized else []
-                print(f"Sanitized and converted completed_ror to list: {completed_ror}")
-            elif not isinstance(completed_ror, list):
-                completed_ror = []  # Default to an empty list
-                print(f"Initialized completed_ror as an empty list.")
+            # # Ensure completed_ror is a list with known elements:
+            # if isinstance(completed_ror, str):
+            #     # Remove unwanted brackets or artifacts from the string
+            #     sanitized = completed_ror.strip("[]").replace("'", "").strip()
+            #     # Convert to list if there are valid elements
+            #     completed_ror = sanitized.split(",") if sanitized else []
+            #     print(f"Sanitized and converted completed_ror to list: {completed_ror}")
+            # elif not isinstance(completed_ror, list):
+            #     completed_ror = []  # Default to an empty list
+            #     print(f"Initialized completed_ror as an empty list.")
 
             # # Ensure ror is a list
             # if isinstance(ror, str):
@@ -725,14 +725,14 @@ def select_task(df, subject):
                         print('here 3')
                         # Move the completed condition to completed_conditions
                         #completed_ror.append(current_ror)
-                        # Move the completed condition to completed_conditions
-                        completed_ror = str_append(completed_ror, str(current_ror))  # Use str_append
+                        # Move the current_ror to completed_ror
+                        completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
                         print('here 4')
                         trial_counter_ror = 0
                         print('here 5')
                         # Move to the next ror, if any are left
                         if ror != "[]" and ror:  # Check if ror is not empty
-                            ror, _ = str_pop(ror)  # Use str_pop to remove the first ROR
+                            ror, current_ror = str_pop(ror)  # Use str_pop to remove the first ROR
                             print('here 6')
                             if ror != "[]" and ror:
                                 current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
@@ -740,6 +740,7 @@ def select_task(df, subject):
                                 print('here 7')
                                 message = (
                                     f"Current ROR has been updated.\n"
+                                    f"Remaining ROR: {ror}\n"
                                     f"New Current ROR: {current_ror}\n"
                                     f"Completed RORs: {completed_ror}"
                                 )
@@ -777,9 +778,22 @@ def select_task(df, subject):
 
             # Ensure current_ror is an integer after processing
             if isinstance(current_ror, str):
-                current_ror = int(current_ror)  # Convert to int if it's a string
+                print('here 8')
+                current_ror = float(current_ror)  # Convert to int if it's a string
                 print(f"current_ror converted to int: {current_ror}")
 
+            # Convert ror and completed_ror to lists using isinstance
+            if isinstance(ror, str):
+                print('here 9')
+                ror = str_to_list(ror)
+                print(f"Converted ror to list: {ror}")
+
+            if isinstance(completed_ror, str):
+                print('here 10')
+                completed_ror = str_to_list(completed_ror)
+                print(f"Converted completed_ror to list: {completed_ror}")
+
+            print('here 11')
 
     elif task == 'Water_Filler':
         print("rat drank water")
@@ -805,7 +819,7 @@ def select_task(df, subject):
         # stim_trial_counter = 0
 
     if my_subject == 'm2':
-        wait_seconds = 5
+        wait_seconds = 1
 
     return task, stage, substage, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror
 
@@ -819,13 +833,21 @@ def str_append(my_str: str, value: str) -> str:
 
 
 def str_pop(my_str: str) -> tuple[str, str]:
-    """Simulate popping the last value from a string representation of a list."""
+    """Simulate popping the first value from a string representation of a list."""
     my_str = my_str.strip()  # Ensure no leading/trailing spaces
     if my_str == "[]" or not my_str:  # Handle empty list
         raise ValueError("Cannot pop from an empty list")
 
     # Remove the brackets and split by commas
     parts = my_str[1:-1].split(", ")
-    popped_value = parts.pop()  # Remove the last element
+    popped_value = parts.pop(0)  # Remove the first element
     new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
     return new_str, popped_value
+
+# Convert ror and completed_ror back to lists
+def str_to_list(my_str: str) -> list:
+    """Convert a string representation of a list back to a Python list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:
+        return []  # Return an empty list if the string is empty or '[]'
+    return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
