@@ -96,17 +96,17 @@ class Probability_WL_Training(Task):
         #Weber's Law Training Variables:
         # Variables not tracked:
         self.ror_to_conditions = {
-            16: [16, 15],
-            12: [14, 13],
-            8: [12, 11],
-            6: [10, 9],
-            4: [8, 7],
-            2: [6, 5],
+            16.0: [16, 15],
+            12.0: [14, 13],
+            8.0: [12, 11],
+            6.0: [10, 9],
+            4.0: [8, 7],
+            2.0: [6, 5],
             1.5: [4, 3],
         }
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
-        self.easy_ror = [16, 12, 8, 6]
-        self.hard_ror = [4, 2, 1.5]
+        self.easy_ror = [16.0, 12.0, 8.0, 6.0]
+        self.hard_ror = [4.0, 2.0, 1.5]
         self.block_wlt = 20
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
@@ -115,9 +115,9 @@ class Probability_WL_Training(Task):
         self.trial_conditions = []
 
         #Variables tracked:
-        self.ror = [16, 12, 8, 6, 4, 2, 1.5]
+        self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
         self.completed_ror = []
-        self.current_ror = 16
+        self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
@@ -358,10 +358,16 @@ class Probability_WL_Training(Task):
         print('Total Accuracy for the session: ', self.accuracy)
         print('ROR: ', self.current_ror)
         print('stim_trial_wlt: ', self.stim_trial_wlt)
+        print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
+
 
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
+            self.stim_trial_counter_wlt = 0
+            self.trial_conditions = []
+            self.condition_trial_counter = 0
+
 
         print('Bias Breaking: ', self.bias_breaking)
         #print('stim_trials_wlt: ', self.stim_trials_wlt)
@@ -582,12 +588,12 @@ class Probability_WL_Training(Task):
                 self.correct_count += 1
                 print('Correct_count: ', self.correct_count)
 
-                # # Check if side bias is active and if the current trial was correct
-                # if self.bias_breaking == 1:  # Side bias active
-                #     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                #     if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
-                #         self.bias_breaking = 0  # End bias breaking
-                #         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+                # Check if side bias is active and if the current trial was correct
+                if self.bias_breaking == 1:  # Side bias active
+                    self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                        self.bias_breaking = 0  # End bias breaking
+                        self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
             # ##### COUNT Touches outside the jar areas :
@@ -703,8 +709,18 @@ class Probability_WL_Training(Task):
         # self.register_value('stim_trial', self.stim_trial)
         # self.register_value('stim_trials', self.stim_trials)
         # self.register_value('stim_trial_counter', self.stim_trial_counter)
-        # Weber's Law Training:
+        # Weber's Law Training Tracked:
         self.register_value('ror', self.ror)
         self.register_value('completed_ror', self.completed_ror)
         self.register_value('current_ror', self.current_ror)
         self.register_value('trial_counter_ror', self.trial_counter_ror)
+        # Weber's Law Training unTracked:
+        self.register_value('easy_conditions', self.easy_conditions)
+        self.register_value('easy_ror', self.easy_ror)
+        self.register_value('hard_ror', self.hard_ror)
+        self.register_value('block_wlt', self.block_wlt)
+        self.register_value('stim_trial_wlt', self.stim_trial_wlt)
+        self.register_value('stim_trials_wlt', self.stim_trials_wlt)
+        self.register_value('stim_trial_counter_wlt', self.stim_trial_counter_wlt)
+        self.register_value('condition_trial_counter', self.condition_trial_counter)
+        self.register_value('trial_conditions', self.trial_conditions)
