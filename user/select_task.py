@@ -395,6 +395,9 @@ def select_task(df, subject):
         else:
             n_trials_second_last = 0
 
+        if third_last_session is not None:
+            df_third_last_session = df_last3[df_last3['session'] == third_last_session].copy()
+
         #Telegram message for low number of trials.
         if n_trials_last < 15:
             if my_subject not in settings.INACTIVE_SUBJECTS:
@@ -446,14 +449,17 @@ def select_task(df, subject):
         # Fifth: Check if the last session and second-to-last session are in different tasks
         last_session_task = df_last_session['task'].iloc[0]  # Stage in the last session
         second_last_session_task = df_second_last_session['task'].iloc[0] if second_last_session is not None else None
+        third_last_session_task = df_third_last_session['task'].iloc[0] if third_last_session is not None else None
 
         # Sixth: Check if the last session and second-to-last session are in different stages
         last_session_stage = df_last_session['stage'].iloc[0]  # Stage in the last session
         second_last_session_stage = df_second_last_session['stage'].iloc[0] if second_last_session is not None else None
+        third_last_session_stage = df_third_last_session['stage'].iloc[0] if third_last_session is not None else None
 
         # Seventh: Check if the last session and second-to-last session are in different substages
         last_session_substage_stage = df_last_session['substage'].iloc[0]  # Stage in the last session
         second_last_session_substage_stage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
+        third_last_session_substage_stage = df_third_last_session['substage'].iloc[0] if third_last_session is not None else None
 
         # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
         if task == 'Probability_Training_Demotivation':
@@ -493,23 +499,28 @@ def select_task(df, subject):
                             except:
                                 print('Telegram message not sent')
                                 pass
+
             # Check for move-back criteria using the function
             if len(unique_sessions) >= 3:
-                sessions = [last_session, second_last_session, third_last_session]
-                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
-                )
+                if last_session_task == second_last_session_task == third_last_session_task:
+                    if last_session_stage == second_last_session_stage == third_last_session_stage:
+                        if last_session_stage == second_last_session_stage == third_last_session_stage:
+                            if last_session_substage_stage == second_last_session_substage_stage == third_last_session_substage_stage:
+                                sessions = [last_session, second_last_session, third_last_session]
+                                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
+                                )
 
-                # Apply move-back logic if all three sessions fail the criteria
-                if low_trial_count == 3 or low_accuracy_count == 3:
-                    print("Move-back criteria met. Moving back one substage.")
-                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
-                    message = f"PI: Subject moved back one stage due to low performance. Stage: {substage}"
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print(f"Telegram message not sent: {e}")
+                                # Apply move-back logic if all three sessions fail the criteria
+                                if low_trial_count == 3 or low_accuracy_count == 3:
+                                    print("Move-back criteria met. Moving back one substage.")
+                                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
+                                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
+                                    print(f'{message}')
+                                    try:
+                                        telegram_bot.alarm_finish_session(message, my_subject)
+                                    except Exception as e:
+                                        print(f"Telegram message not sent: {e}")
 
         elif 'Probability_Extra_Training' in task:
             if last_session_task == second_last_session_task:
@@ -629,24 +640,25 @@ def select_task(df, subject):
                         stim_trials = []
                         stim_trial_counter = 0
 
-
             # Check for move-back criteria using the function
             if len(unique_sessions) >= 3:
-                sessions = [last_session, second_last_session, third_last_session]
-                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
-                )
+                if last_session_task == second_last_session_task == third_last_session_task:
+                    if last_session_stage == second_last_session_stage == third_last_session_stage:
+                        sessions = [last_session, second_last_session, third_last_session]
+                        low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                            df_last3, sessions, trial_criteria, accuracy_moveback_criteria
+                        )
 
-                # Apply move-back logic if all three sessions fail the criteria
-                if low_trial_count == 3 or low_accuracy_count == 3:
-                    print("Move-back criteria met. Moving back one stage.")
-                    stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
-                    message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print(f"Telegram message not sent: {e}")
+                        # Apply move-back logic if all three sessions fail the criteria
+                        if low_trial_count == 3 or low_accuracy_count == 3:
+                            print("Move-back criteria met. Moving back one stage.")
+                            stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
+                            message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
+                            print(f'{message}')
+                            try:
+                                telegram_bot.alarm_finish_session(message, my_subject)
+                            except Exception as e:
+                                print(f"Telegram message not sent: {e}")
 
 
         elif 'Probability_WebersLaw' in task:
