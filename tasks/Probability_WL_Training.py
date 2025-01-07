@@ -394,7 +394,7 @@ class Probability_WL_Training(Task):
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.condition_trial_counter % self.block_wlt == 0:
             last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
-            if self.current_ror in self.easy_ror or self.current_ror == 1.5:
+            if self.current_ror in self.easy_ror:
                 self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial_conditions)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
