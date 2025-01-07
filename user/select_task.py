@@ -369,10 +369,12 @@ def select_task(df, subject):
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
         accuracy_criteria = 0.85
+        accuracy_moveback_criteria = 0.4
 
         if my_subject == 'm2':
             trial_criteria = 2
-            accuracy_criteria = 0.5
+            accuracy_criteria = 0.85
+            accuracy_moveback_criteria = 0.4
 
         # First: Identify the last session and second-to-last session:
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
@@ -380,7 +382,7 @@ def select_task(df, subject):
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None  # The second most recent session
         third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None  # The third most recent session
 
-        # Second: Filter the DataFrame to include only the last two sessions
+        # Second: Filter the DataFrame to include only the last two sessions/three sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
         df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
@@ -491,6 +493,23 @@ def select_task(df, subject):
                             except:
                                 print('Telegram message not sent')
                                 pass
+            # Check for move-back criteria using the function
+            if len(unique_sessions) >= 3:
+                sessions = [last_session, second_last_session, third_last_session]
+                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
+                )
+
+                # Apply move-back logic if all three sessions fail the criteria
+                if low_trial_count == 3 or low_accuracy_count == 3:
+                    print("Move-back criteria met. Moving back one substage.")
+                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
+                    message = f"PI: Subject moved back one stage due to low performance. Stage: {substage}"
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except Exception as e:
+                        print(f"Telegram message not sent: {e}")
 
         elif 'Probability_Extra_Training' in task:
             if last_session_task == second_last_session_task:
@@ -609,6 +628,25 @@ def select_task(df, subject):
                         stim_trial = 0
                         stim_trials = []
                         stim_trial_counter = 0
+
+
+            # Check for move-back criteria using the function
+            if len(unique_sessions) >= 3:
+                sessions = [last_session, second_last_session, third_last_session]
+                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
+                )
+
+                # Apply move-back logic if all three sessions fail the criteria
+                if low_trial_count == 3 or low_accuracy_count == 3:
+                    print("Move-back criteria met. Moving back one stage.")
+                    stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
+                    message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except Exception as e:
+                        print(f"Telegram message not sent: {e}")
 
 
         elif 'Probability_WebersLaw' in task:
@@ -851,3 +889,35 @@ def str_to_list(my_str: str) -> list:
     if my_str == "[]" or not my_str:
         return []  # Return an empty list if the string is empty or '[]'
     return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+
+
+def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
+    """
+    Calculate low trial count and low accuracy count for given sessions.
+
+    Args:
+        df_last3 (pd.DataFrame): DataFrame containing data for the last three sessions.
+        sessions (list): List of session identifiers to evaluate.
+        trial_criteria (int): Minimum required trials per session.
+        accuracy_moveback_criteria (float): Minimum required accuracy per session.
+
+    Returns:
+        tuple: (low_trial_count, low_accuracy_count)
+            - low_trial_count (int): Number of sessions below the trial criteria.
+            - low_accuracy_count (int): Number of sessions below the accuracy criteria.
+    """
+    low_trial_count = 0
+    low_accuracy_count = 0
+    for session in sessions:
+        session_data = df_last3[df_last3['session'] == session]
+        # Calculate trial count and accuracy
+        trial_count = session_data['trial'].max()
+        correct_trials = session_data[session_data['trial_result'] == 'correct'].shape[0]
+        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+        # Check criteria
+        if trial_count < trial_criteria:
+            low_trial_count += 1
+        if accuracy < accuracy_moveback_criteria:
+            low_accuracy_count += 1
+    return low_trial_count, low_accuracy_count
