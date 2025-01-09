@@ -714,8 +714,8 @@ def select_task(df, subject):
 
             if my_subject == 'm2':
                 trial_criteria = 3
-                accuracy_criteria = 0.5
-                trial_end_criteria = 10
+                accuracy_criteria = 0.7
+                trial_end_criteria = 15
 
             total_trials = n_trials_last + n_trials_second_last
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
