@@ -14,8 +14,8 @@ class Probability_Training_Bias_Right(Task):
         This task displays the image of the jars which are touchable.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination 1: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination 2: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each)
+        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
