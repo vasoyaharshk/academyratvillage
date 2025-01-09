@@ -725,3 +725,4 @@ class Probability_WL_Training(Task):
         self.register_value('stim_trial_counter_wlt', self.stim_trial_counter_wlt)
         self.register_value('condition_trial_counter', self.condition_trial_counter)
         self.register_value('trial_conditions', self.trial_conditions)
+        self.register_value('trial_condition', self.trial_condition)
