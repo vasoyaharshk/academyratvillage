@@ -737,27 +737,6 @@ def select_task(df, subject):
             accuracy_current_ror = correct_ror_trials / valid_ror_trials if valid_ror_trials > 0 else 0
 
             print(f"Accuracy for current ROR ({current_ror}): {accuracy_current_ror:.2f}")
-
-            # # Ensure completed_ror is a list with known elements:
-            # if isinstance(completed_ror, str):
-            #     # Remove unwanted brackets or artifacts from the string
-            #     sanitized = completed_ror.strip("[]").replace("'", "").strip()
-            #     # Convert to list if there are valid elements
-            #     completed_ror = sanitized.split(",") if sanitized else []
-            #     print(f"Sanitized and converted completed_ror to list: {completed_ror}")
-            # elif not isinstance(completed_ror, list):
-            #     completed_ror = []  # Default to an empty list
-            #     print(f"Initialized completed_ror as an empty list.")
-
-            # # Ensure ror is a list
-            # if isinstance(ror, str):
-            #     sanitized = ror.strip("[]").replace("'", "").strip()
-            #     ror = sanitized.split(",") if sanitized else []
-            #     print(f"Sanitized and converted ror to list: {ror}")
-            # elif not isinstance(ror, list):
-            #     ror = []  # Default to an empty list
-            #     print(f"Initialized ror as an empty list.")
-
             print(f"Type of completed_ror: {type(completed_ror)}")
             print(f"Type of ror: {type(ror)}")
 
@@ -777,12 +756,31 @@ def select_task(df, subject):
             if last_session_task == second_last_session_task:
                 print('here 1')
                 if last_session_ror == second_last_session_ror:
+                    # Filter for the specific ROR in the last session
+                    last_ror_trials = df_last_session[df_last_session['current_ror'] == last_session_ror]
+                    correct_trials_last = last_ror_trials[last_ror_trials['trial_result'] == 'correct'].shape[0]
+                    valid_trials_last = last_ror_trials[last_ror_trials['trial_result'] != 'miss'].shape[0]
+                    accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
+                    print(f"Accuracy for last session in ROR {last_session_ror}: {accuracy_last:.2f}")
+                    # Filter for the specific ROR in the second last session
+                    if second_last_session is not None:
+                        second_last_ror_trials = df_second_last_session[
+                            df_second_last_session['current_ror'] == second_last_session_ror]
+                        correct_trials_second_last = \
+                        second_last_ror_trials[second_last_ror_trials['trial_result'] == 'correct'].shape[0]
+                        valid_trials_second_last = \
+                        second_last_ror_trials[second_last_ror_trials['trial_result'] != 'miss'].shape[0]
+                        accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
+                        print(
+                            f"Accuracy for second last session in ROR {second_last_session_ror}: {accuracy_second_last:.2f}")
+                    else:
+                        accuracy_second_last = 0
+                        print("No second last session available.")
                     print('here 2')
+
                     if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
                             or (trial_counter_ror <= trial_end_criteria)):
                         print('here 3')
-                        # Move the completed condition to completed_conditions
-                        #completed_ror.append(current_ror)
                         # Move the current_ror to completed_ror
                         completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
                         print('here 4')
@@ -942,83 +940,3 @@ def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_mo
             low_accuracy_count += 1
     return low_trial_count, low_accuracy_count
 
-
-
-'''
-if last_session_task == second_last_session_task:
-    print('here 1')
-    if last_session_ror == second_last_session_ror:
-        print('here 2')
-
-        # Filter for the specific ROR in the last session
-        last_ror_trials = df_last_session[df_last_session['current_ror'] == last_session_ror]
-        correct_trials_last = last_ror_trials[last_ror_trials['trial_result'] == 'correct'].shape[0]
-        valid_trials_last = last_ror_trials[last_ror_trials['trial_result'] != 'miss'].shape[0]
-        accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-        print(f"Accuracy for last session in ROR {last_session_ror}: {accuracy_last:.2f}")
-
-        # Filter for the specific ROR in the second last session
-        if second_last_session is not None:
-            second_last_ror_trials = df_second_last_session[df_second_last_session['current_ror'] == second_last_session_ror]
-            correct_trials_second_last = second_last_ror_trials[second_last_ror_trials['trial_result'] == 'correct'].shape[0]
-            valid_trials_second_last = second_last_ror_trials[second_last_ror_trials['trial_result'] != 'miss'].shape[0]
-            accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
-            print(f"Accuracy for second last session in ROR {second_last_session_ror}: {accuracy_second_last:.2f}")
-        else:
-            accuracy_second_last = 0
-            print("No second last session available.")
-
-        # Check criteria
-        if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
-                or (trial_counter_ror <= trial_end_criteria)):
-            print('here 3')
-            # Move the completed condition to completed_conditions
-            completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
-            print('here 4')
-            trial_counter_ror = 0
-            print('here 5')
-            # Move to the next ROR, if any are left
-            if ror != "[]" and ror:  # Check if ROR is not empty
-                ror, current_ror = str_pop(ror)  # Use str_pop to remove the first ROR
-                print('here 6')
-                if ror != "[]" and ror:
-                    current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
-                    # Create a message indicating the change in current ROR
-                    print('here 7')
-                    message = (
-                        f"Current ROR has been updated.\n"
-                        f"Remaining ROR: {ror}\n"
-                        f"New Current ROR: {current_ror}\n"
-                        f"Completed RORs: {completed_ror}"
-                    )
-                    print(message)
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print('Telegram message not sent:', e)
-                        pass
-                else:
-                    print("All RORs are completed. Task ends.")
-                    current_ror = 0
-                    stage = 6
-                    message = 'PI: Webers law Training completed'
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
-            else:
-                message = (
-                    f"Criteria not met.\n"
-                    f"Current ROR not updated.\n"
-                    f"Current ROR: {current_ror}\n"
-                    f"Completed RORs: {completed_ror}"
-                )
-                print(message)
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                except Exception as e:
-                    print('Telegram message not sent:', e)
-                    pass
-'''
