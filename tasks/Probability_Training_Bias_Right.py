@@ -124,6 +124,14 @@ class Probability_Training_Bias_Right(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+        print('Stim_Trial: ', self.stim_trial)
+
+        if self.current_trial == 0:
+            self.bias_breaking = 0
+            self.accuracy = 0
+
+        print('Bias Breaking: ', self.bias_breaking)
+        #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
@@ -134,8 +142,15 @@ class Probability_Training_Bias_Right(Task):
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
+            print(f"Stimulus trials after first attempt: {self.stim_trials}")
+            while self.stim_trials is None:
+                print("Retrying to generate stimulus trials...")
+                self.stim_trials = self.generate_random_trials(last_trial)
+                if self.stim_trials is None:
+                    print("generate_random_trials returned None. Retrying...")
+                else:
+                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
             print('Substage: ', self.substage, 'Probs: ', self.probabilities)
-            print('x positions list: ' + str(self.stim_trials))
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
