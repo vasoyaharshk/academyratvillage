@@ -736,7 +736,7 @@ def select_task(df, subject):
             valid_ror_trials = ror_trials[ror_trials['trial_result'] != 'miss'].shape[0]
             accuracy_current_ror = correct_ror_trials / valid_ror_trials if valid_ror_trials > 0 else 0
 
-            print(f"Accuracy for current ROR ({current_ror}): {accuracy_current_ror:.2f}")
+            print(f"Accuracy for current ROR ({current_ror}): {accuracy_current_ror * 100:.2f}%")
             print(f"Type of completed_ror: {type(completed_ror)}")
             print(f"Type of ror: {type(ror)}")
 
@@ -760,19 +760,16 @@ def select_task(df, subject):
                     last_ror_trials = df_last_session[df_last_session['current_ror'] == last_session_ror]
                     correct_trials_last = last_ror_trials[last_ror_trials['trial_result'] == 'correct'].shape[0]
                     valid_trials_last = last_ror_trials[last_ror_trials['trial_result'] != 'miss'].shape[0]
-                    accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-                    print(f"Accuracy for last session in ROR {last_session_ror}: {accuracy_last:.2f}")
+                    accuracy_last = correct_trials_last/valid_trials_last if valid_trials_last > 0 else 0
+                    print(f"Accuracy for last session in ROR {last_session_ror}: {accuracy_last* 100:.2f}%")
                     # Filter for the specific ROR in the second last session
                     if second_last_session is not None:
-                        second_last_ror_trials = df_second_last_session[
-                            df_second_last_session['current_ror'] == second_last_session_ror]
-                        correct_trials_second_last = \
-                        second_last_ror_trials[second_last_ror_trials['trial_result'] == 'correct'].shape[0]
-                        valid_trials_second_last = \
-                        second_last_ror_trials[second_last_ror_trials['trial_result'] != 'miss'].shape[0]
-                        accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
+                        second_last_ror_trials = df_second_last_session[df_second_last_session['current_ror'] == second_last_session_ror]
+                        correct_trials_second_last = second_last_ror_trials[second_last_ror_trials['trial_result'] == 'correct'].shape[0]
+                        valid_trials_second_last = second_last_ror_trials[second_last_ror_trials['trial_result'] != 'miss'].shape[0]
+                        accuracy_second_last = correct_trials_second_last/valid_trials_second_last if valid_trials_second_last > 0 else 0
                         print(
-                            f"Accuracy for second last session in ROR {second_last_session_ror}: {accuracy_second_last:.2f}")
+                            f"Accuracy for second last session in ROR {second_last_session_ror}: {accuracy_second_last* 100:.2f}%")
                     else:
                         accuracy_second_last = 0
                         print("No second last session available.")

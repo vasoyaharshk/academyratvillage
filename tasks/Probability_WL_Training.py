@@ -433,6 +433,7 @@ class Probability_WL_Training(Task):
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         print('Stimulus Condition', self.trial_conditions)
+        print('Stimulus Condition', self.trial_condition)
         print('Stimulus trial: ', self.stim_trial_wlt)
         print('Stimulus Trial Counter',self.stim_trial_counter_wlt)
         print('Stimulus Condition Counter', self.condition_trial_counter)
