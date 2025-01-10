@@ -6,6 +6,7 @@ from user.psychopy_elements import window ,square, square2, square3, border1, bo
 from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
 import random
 import os
+import re
 
 import traceback
 
@@ -583,7 +584,7 @@ def loop35(timing):
         window.flip()
 
 
-# Display camera correct, play punish sound and display incorrect stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW AND WEBER'S LAW TRAINING.
+# Display camera Punish, play punish sound and display incorrect stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW AND WEBER'S LAW TRAINING.
 def function36():
     soundStream.play(soundVec3)
 
@@ -1146,3 +1147,89 @@ def function62():  # When the correct answer is on right
 def loop62(timing):
     image_jar_right.draw()
     window.flip()
+
+
+#Display camera correct, play correct sound and display correct stimuli FOR WEBER'S LAW TRAINING.
+def function63():
+    #soundStream.play(soundVec1)
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    #print("Correct, Reward Sound played")
+
+    stage = utils.task.stage
+    if stage != 1:
+        # Replace "both" with "correct" in the image path
+        if image_path and "both" in image_path:
+            # Remove the last underscore and number/s from the filename
+            directory, filename = re.split(r'\\(?=[^\\]*$)', image_path)  # Separate directory and filename
+            filename = re.sub(r'_(\d+)(\.\w+)$', r'\2', filename)  # Remove last underscore and numbers afterwards
+            image_path = f"{directory}\\{filename}"
+            # Replace "both" with "correct":
+            image_path_replaced = image_path.replace("both", "correct")
+            # Update the image path for drawing
+            if last_function_called in [61]:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            elif last_function_called in [62]:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+        print(f"Correct image path: {image_path_replaced}")
+
+def loop63(timing):
+    # Check which function (31 or 32) was last called and display the corresponding image:
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in [61]:
+            #print("Last function called: ", last_function_called)
+            image_jar_left.draw()
+        elif last_function_called in [62]:
+            #print("Last function called: ", last_function_called)
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
+
+
+# Display camera Punish, play punish sound and display incorrect stimuli FOR WEBER'S LAW TRAINING.
+def function664():
+    soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+    stage = utils.task.stage
+    if stage != 1:
+        # Replace "both" with "correct" in the image path
+        if image_path and "both" in image_path:
+            # Remove the last underscore and number/s from the filename
+            directory, filename = re.split(r'\\(?=[^\\]*$)', image_path)  # Separate directory and filename
+            filename = re.sub(r'_(\d+)(\.\w+)$', r'\2', filename)  # Remove last underscore and numbers afterwards
+            image_path = f"{directory}\\{filename}"
+            # Replace "both" with "incorrect":
+            image_path_replaced = image_path.replace("both", "incorrect")
+            # Update the image path for drawing
+            if last_function_called in [61]:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            elif last_function_called in [62]:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+        print(f"Incorrect image path: {image_path_replaced}")
+    else:
+        pass
+
+def loop64(timing):
+    # Check which function (31 or 32) was last called and display the corresponding image:
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in [61]:
+            #print("Last function called: ", last_function_called)
+            image_jar_left.draw()
+        elif last_function_called in [62]:
+            #print("Last function called: ", last_function_called)
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
