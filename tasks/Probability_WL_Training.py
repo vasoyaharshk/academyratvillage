@@ -120,19 +120,48 @@ class Probability_WL_Training(Task):
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials_ror1(self, last_trial=None):
+        """
+        Generates a series of randomized trials with constraints:
+        1. No more than two consecutive trials with the same side (Left/Right).
+        2. No more than two consecutive trials with the same size (Small/Big).
+        3. Equal distribution of all stimuli (25% each).
+        """
         trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        probabilities = [0.25, 0.25, 0.25, 0.25]  # Equal probability for each stimulus
+
+        def is_valid_candidate(candidate, trials):
+            if len(trials) < 2:
+                return True  # If there are fewer than 2 trials, any candidate is valid
+
+            # Extract the side and size of the candidate
+            candidate_side = candidate % 2  # 61/63 (Left) -> 1, 62/64 (Right) -> 0
+            candidate_size = 1 if candidate > 62 else 0  # 61/62 (Small) -> 0, 63/64 (Big) -> 1
+
+            # Extract the side and size of the last two trials
+            last_side = trials[-1] % 2
+            second_last_side = trials[-2] % 2
+            last_size = 1 if trials[-1] > 62 else 0
+            second_last_size = 1 if trials[-2] > 62 else 0
+
+            # Check constraints: no more than 2 consecutive same side or size
+            side_constraint = candidate_side != last_side or candidate_side != second_last_side
+            size_constraint = candidate_size != last_size or candidate_size != second_last_size
+
+            return side_constraint and size_constraint
+
         while len(trials) < self.block_wlt:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
+            # Randomly choose a candidate based on probabilities
             candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block_wlt
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block_wlt matches last trial of previous block_wlt
+
+            # Ensure the first trial does not repeat the last trial
+            if len(trials) == 0 and last_trial is not None and candidate == last_trial:
+                continue
+
+            # Validate the candidate
+            if is_valid_candidate(candidate, trials):
                 trials.append(candidate)
+
         return trials
 
     def generate_random_trial_conditions_easy(self, current_ror, last_trial=None):
@@ -374,19 +403,19 @@ class Probability_WL_Training(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
+        self.stim = [61, 62, 63, 64]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
         # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
         if self.stim_trial_counter_wlt % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
             last_trial = self.stim_trials_wlt[self.stim_trial_counter_wlt - 1] if self.stim_trial_counter_wlt > 0 else None
-            self.stim_trials_wlt = self.generate_random_trials(last_trial)
+            self.stim_trials_wlt = self.generate_random_trials_ror1(last_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials_wlt}")
             while self.stim_trials_wlt is None:
                 print("Retrying to generate stimulus trials...")
-                self.stim_trials_wlt = self.generate_random_trials(last_trial)
+                self.stim_trials_wlt = self.generate_random_trials_ror1(last_trial)
                 if self.stim_trials_wlt is None:
-                    print("generate_random_trials returned None. Retrying...")
+                    print("generate_random_trials_ror1 returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials_wlt}")
             self.stim_trial_counter_wlt = 0
@@ -423,11 +452,11 @@ class Probability_WL_Training(Task):
         else:
             self.stim_trial_wlt = self.last_stim_trial
 
-        if self.stim_trial_wlt == 61:
+        if self.stim_trial_wlt in [61, 63]:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
             print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial_wlt == 62:
+        elif self.stim_trial_wlt in [62, 64]:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
