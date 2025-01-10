@@ -1161,12 +1161,14 @@ def function63():
     if stage != 1:
         # Replace "both" with "correct" in the image path
         if image_path and "both" in image_path:
-            # Remove the last underscore and number/s from the filename
-            directory, filename = re.split(r'\\(?=[^\\]*$)', image_path)  # Separate directory and filename
-            filename = re.sub(r'_(\d+)(\.\w+)$', r'\2', filename)  # Remove last underscore and numbers afterwards
-            image_path = f"{directory}\\{filename}"
-            # Replace "both" with "correct":
-            image_path_replaced = image_path.replace("both", "correct")
+            # Split into directory and filename
+            directory, filename = os.path.split(image_path)
+            # Remove everything after the last underscore
+            filename = re.sub(r'_[^_]+\.png$', '.png', filename)
+            # Replace "both" with "correct"
+            filename = filename.replace("both", "correct")
+            # Recombine the directory and modified filename
+            image_path_replaced = os.path.join(directory, filename)
             # Update the image path for drawing
             if last_function_called in [61]:
                 image_jar_left.image = image_path_replaced
