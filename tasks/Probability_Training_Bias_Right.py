@@ -10,7 +10,7 @@ class Probability_Training_Bias_Right(Task):
         super().__init__()
 
         self.info = """
-        This script is IF THE BIAS IS TOWARDS THE RIGHT SIDE.
+        This script is IF THE BIAS IS TOWARDS THE RIGHT SIDE.  So the stim will be displayed on the LEFT more than the RIGHT.
         This task displays the image of the jars which are touchable.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
@@ -105,9 +105,9 @@ class Probability_Training_Bias_Right(Task):
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         if self.substage == 1:
-            self.probabilities = [0.1, 0.9]
+            self.probabilities = [0.9, 0.1]
         elif self.substage == 2:
-            self.probabilities = [0.25, 0.75]
+            self.probabilities = [0.75, 0.25]
           # Adjust this if you have more than two stimuli
         while len(trials) < 1000:
             # Use random.choices to select a candidate with 50% probability for each stimulus
