@@ -1159,7 +1159,6 @@ def function63():
 
     stage = utils.task.stage
     if stage != 1:
-        # Print debugging information for the current stage
         # Replace "both" with "correct" in the image path
         if image_path and "both" in image_path:
             print(f"Original image path: {image_path}")
@@ -1205,33 +1204,25 @@ def function64():
 
     stage = utils.task.stage
     if stage != 1:
-        # Print debugging information for the current stage
-        print(f"Debug: Current stage is {stage}")
         # Replace "both" with "correct" in the image path
         if image_path and "both" in image_path:
-            print(f"Debug: Original image path is {image_path}")
+            print(f"Original image path: {image_path}")
             # Split into directory and filename
             directory, filename = os.path.split(image_path)
-            print(f"Debug: Directory is {directory}, Filename is {filename}")
             # Remove all "[digit]c_" patterns
             filename = re.sub(r'\d+c_', '', filename)
-            print(f"Debug: Filename after removing '[digit]c_' patterns is {filename}")
             # Replace "both" with "incorrect"
             filename = filename.replace("both", "incorrect")
-            print(f"Debug: Filename after replacing 'both' with 'incorrect' is {filename}")
             # Remove the final "_digits" before ".png"
             filename = re.sub(r'_\d+(?=\.png)', '', filename)
-            print(f"Debug: Filename after removing '_digits' before '.png' is {filename}")
             # Recombine the directory and modified filename
             image_path_replaced = os.path.join(directory, filename)
-            print(f"Debug: Recombined image path is {image_path_replaced}")
+            print(f"Modified image path is {image_path_replaced}")
             # Update the image path for drawing
             if last_function_called in [61]:
-                print("Debug: Updating image_jar_left")
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
             elif last_function_called in [62]:
-                print("Debug: Updating image_jar_right")
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
             print(f"Incorrect image path: {image_path_replaced}")
