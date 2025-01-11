@@ -763,7 +763,6 @@ def select_task(df, subject):
 
             if last_session_task == second_last_session_task:
                 # Update the logic to use trial_condition
-                print('here 1')
                 if last_session_ror == second_last_session_ror:
                     # Allowed trial_conditions for the current ROR
                     allowed_conditions_last = ror_to_conditions.get(last_session_ror, [])
@@ -803,24 +802,18 @@ def select_task(df, subject):
                     except Exception as e:
                         print('Telegram message not sent:', e)
                         pass
-                    print('here 2')
 
                     if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
                             or (trial_counter_ror <= trial_end_criteria)):
-                        print('here 3')
                         # Move the current_ror to completed_ror
                         completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
-                        print('here 4')
                         trial_counter_ror = 0
-                        print('here 5')
                         # Move to the next ror, if any are left
                         if ror != "[]" and ror:  # Check if ror is not empty
                             ror, current_ror = str_pop(ror)  # Use str_pop to remove the first ROR
-                            print('here 6')
                             if ror != "[]" and ror:
                                 current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
                                 # Create a message indicating the change in current_ror
-                                print('here 7')
                                 message = (
                                     f"Current ROR has been updated.\n"
                                     f"Remaining ROR: {ror}\n"
@@ -846,7 +839,6 @@ def select_task(df, subject):
                                     print('Telegram message not sent')
                                     pass
                         else:
-                            print('here 7')
                             message = (
                                 f"Criteria not met.\n"
                                 f"Current ROR not updated.\n"
@@ -874,7 +866,6 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
-            print('here 11')
 
     elif task == 'Water_Filler':
         print("rat drank water")
