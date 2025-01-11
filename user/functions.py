@@ -1159,16 +1159,19 @@ def function63():
 
     stage = utils.task.stage
     if stage != 1:
+        # Print debugging information for the current stage
         # Replace "both" with "correct" in the image path
         if image_path and "both" in image_path:
+            print(f"Original image path: {image_path}")
             # Split into directory and filename
             directory, filename = os.path.split(image_path)
             # Remove everything after the last underscore
-            filename = re.sub(r'_[^_]+\.png$', '.png', filename)
+            filename = re.sub(r'_[^_]+_[^_]+\.png$', '.png', filename)
             # Replace "both" with "correct"
             filename = filename.replace("both", "correct")
             # Recombine the directory and modified filename
             image_path_replaced = os.path.join(directory, filename)
+            print(f"Modified image path is {image_path_replaced}")
             # Update the image path for drawing
             if last_function_called in [61]:
                 image_jar_left.image = image_path_replaced
@@ -1176,7 +1179,6 @@ def function63():
             elif last_function_called in [62]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        print(f"Correct image path: {image_path_replaced}")
 
 def loop63(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
@@ -1194,7 +1196,7 @@ def loop63(timing):
 
 
 # Display camera Punish, play punish sound and display incorrect stimuli FOR WEBER'S LAW TRAINING.
-def function664():
+def function64():
     soundStream.play(soundVec3)
 
     cam2.put_state("Punish")
@@ -1203,25 +1205,37 @@ def function664():
 
     stage = utils.task.stage
     if stage != 1:
+        # Print debugging information for the current stage
+        print(f"Debug: Current stage is {stage}")
         # Replace "both" with "correct" in the image path
         if image_path and "both" in image_path:
+            print(f"Debug: Original image path is {image_path}")
             # Split into directory and filename
             directory, filename = os.path.split(image_path)
-            filename = re.sub(r'(\d+c_)', '', filename)  # Remove all "[digit]c_" patterns
-            filename = filename.replace("both", "incorrect")  # Replace "both" with "correct"
-            filename = re.sub(r'_\d+(?=\.png)', '', filename)  # Remove the final "_digits" before ".png"
-            # Recombine directory and modified filename
+            print(f"Debug: Directory is {directory}, Filename is {filename}")
+            # Remove all "[digit]c_" patterns
+            filename = re.sub(r'\d+c_', '', filename)
+            print(f"Debug: Filename after removing '[digit]c_' patterns is {filename}")
+            # Replace "both" with "incorrect"
+            filename = filename.replace("both", "incorrect")
+            print(f"Debug: Filename after replacing 'both' with 'incorrect' is {filename}")
+            # Remove the final "_digits" before ".png"
+            filename = re.sub(r'_\d+(?=\.png)', '', filename)
+            print(f"Debug: Filename after removing '_digits' before '.png' is {filename}")
+            # Recombine the directory and modified filename
             image_path_replaced = os.path.join(directory, filename)
+            print(f"Debug: Recombined image path is {image_path_replaced}")
             # Update the image path for drawing
             if last_function_called in [61]:
+                print("Debug: Updating image_jar_left")
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
             elif last_function_called in [62]:
+                print("Debug: Updating image_jar_right")
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        print(f"Incorrect image path: {image_path_replaced}")
-    else:
-        pass
+            print(f"Incorrect image path: {image_path_replaced}")
+
 
 def loop64(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
