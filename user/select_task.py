@@ -678,7 +678,7 @@ def select_task(df, subject):
             stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
-                #task = 'Probability_WL_Training'
+                task = 'Probability_WL_Training'
                 # Weber's Law:
                 stage = 5
                 block = 0
