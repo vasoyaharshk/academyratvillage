@@ -497,7 +497,7 @@ class Probability_WL_Training(Task):
                 state_timer=self.image_display,
                 state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
-            # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
+            # Turns on Water port LED and displays correct stimuli for image_display (3 seconds)
 
             self.sma.add_state(
                 state_name='Correct_reward',
