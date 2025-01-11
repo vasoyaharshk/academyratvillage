@@ -678,7 +678,7 @@ def select_task(df, subject):
             stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
-                task = 'Probability_WL_Training'
+                #task = 'Probability_WL_Training'
                 # Weber's Law:
                 stage = 5
                 block = 0
@@ -750,16 +750,6 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
-
-            # # Calculate accuracy for the current ROR
-            # ror_trials = df[df['current_ror'] == current_ror]  # Filter rows for current ROR
-            # correct_ror_trials = ror_trials[ror_trials['trial_result'] == 'correct'].shape[0]
-            # valid_ror_trials = ror_trials[ror_trials['trial_result'] != 'miss'].shape[0]
-            # accuracy_current_ror = correct_ror_trials / valid_ror_trials if valid_ror_trials > 0 else 0
-            # print(f"Accuracy for current ROR ({current_ror}): {accuracy_current_ror * 100:.2f}%")
-
-            #print(f"Type of completed_ror: {type(completed_ror)}")
-            #print(f"Type of ror: {type(ror)}")
 
             if last_session_task == second_last_session_task:
                 # Update the logic to use trial_condition
