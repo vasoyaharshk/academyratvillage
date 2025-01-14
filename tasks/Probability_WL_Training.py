@@ -159,6 +159,23 @@ class Probability_WL_Training(Task):
         return trials
 
     def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
+        # 1. Trial Type Constraints:
+        #    - No more than two consecutive trials of the same type (hard or easy).
+        #
+        # 2. Parity Constraints:
+        #    - No more than two consecutive trials with the same parity (odd or even).
+        #
+        # 3. Initial Trial Rule:
+        #    - If a previous trial (`last_trial`) is provided, the parity of the first trial in the new sequence
+        #      must not match the parity of `last_trial`.
+        #
+        # 4. ROR Proportion Rule:
+        #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
+        #    - The proportions and counts must fall within ±2% of the expected values.
+        #
+        # 5. Randomization:
+        #    - Hard and easy trials are shuffled to ensure randomized distribution within the constraints.
+        #
         def check_max_consecutive_type(seq, hard_conditions):
             last_type = None
             count = 0
@@ -405,6 +422,7 @@ class Probability_WL_Training(Task):
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
             elif self.current_ror in self.hard_ror:
+
                 self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, last_trial_conditions)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
