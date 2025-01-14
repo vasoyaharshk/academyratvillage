@@ -159,6 +159,7 @@ class Probability_WL_Training(Task):
         return trials
 
     def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
+        # Rules enforced by this script:
         # 1. Trial Type Constraints:
         #    - No more than two consecutive trials of the same type (hard or easy).
         #
@@ -171,11 +172,25 @@ class Probability_WL_Training(Task):
         #
         # 4. ROR Proportion Rule:
         #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
-        #    - The proportions and counts must fall within ±2% of the expected values.
+        #    - Example proportions:
+        #      ROR = 4   -> Hard: 70%, Easy: 30%
+        #      ROR = 2   -> Hard: 60%, Easy: 40%
+        #      ROR = 1.5 -> Hard: 50%, Easy: 50%
+        #    - Proportions and counts must fall within ±2% of the expected values.
         #
-        # 5. Randomization:
-        #    - Hard and easy trials are shuffled to ensure randomized distribution within the constraints.
+        # 5. Hard Condition Distribution Rule:
+        #    - Hard conditions are evenly distributed among their respective values.
+        #      Example: For ROR=4, "8" and "7" split the hard trials equally (50% each).
+        #    - Edge cases (e.g., uneven splits due to rounding) are handled by assigning
+        #      remaining trials to the first conditions in the list.
         #
+        # 6. Randomization within Constraints:
+        #    - Hard and easy trials are shuffled to ensure no fixed ordering.
+        #    - Randomization respects all constraints (e.g., type, parity, proportion).
+        #
+        # 7. Failure Handling:
+        #    - If a valid sequence cannot be generated within the maximum attempts, an exception is raised.
+
         def check_max_consecutive_type(seq, hard_conditions):
             last_type = None
             count = 0
