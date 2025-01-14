@@ -712,10 +712,10 @@ def select_task(df, subject):
             accuracy_criteria = 0.70
             trial_end_criteria = 1000
 
-            if my_subject == 'm2':
-                trial_criteria = 3
-                accuracy_criteria = 0.7
-                trial_end_criteria = 200
+            # if my_subject == 'm2':
+            #     trial_criteria = 3
+            #     accuracy_criteria = 0.7
+            #     trial_end_criteria = 200
 
             ror_to_conditions = {
                 16.0: [16, 15],
@@ -765,8 +765,8 @@ def select_task(df, subject):
                     correct_trials_last = last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
                     valid_trials_last = last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
                     accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-
                     print(f"Accuracy for last session in trial_condition: {accuracy_last * 100:.2f}%")
+
                     # Filter for the specific trial_condition in the second last session
                     if second_last_session is not None:
                         second_last_condition_trials = df_second_last_session[df_second_last_session['trial_condition'].isin(allowed_conditions_second_last)]
@@ -794,7 +794,7 @@ def select_task(df, subject):
                         pass
 
                     if ((total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
-                            or (trial_counter_ror <= trial_end_criteria)):
+                            or (trial_counter_ror >= trial_end_criteria)):
                         # Move the current_ror to completed_ror
                         completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
                         trial_counter_ror = 0
