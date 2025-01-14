@@ -172,7 +172,7 @@ class Probability_WL_Training(Task):
         #
         # 4. ROR Proportion Rule:
         #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
-        #    - Example proportions:
+        #    - Proportions:
         #      ROR = 4   -> Hard: 70%, Easy: 30%
         #      ROR = 2   -> Hard: 60%, Easy: 40%
         #      ROR = 1.5 -> Hard: 50%, Easy: 50%
