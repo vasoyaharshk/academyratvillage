@@ -462,16 +462,16 @@ def select_task(df, subject):
         third_last_session_substage_stage = df_third_last_session['substage'].iloc[0] if third_last_session is not None else None
 
         # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
-        if task == 'Probability_Training_Demotivation':
+        if task == 'Probability_Training_BB_Demotivation':
             # Ensure the last three sessions were all 'Probability_Training_Demotivation'
             last_three_sessions_tasks = df_last3['task'].unique()
-            if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_Demotivation':
+            if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_BB_Demotivation':
                 task = 'Probability_Training_BB'
                 print("Moved from demotivation task to normal task")
 
         elif 'Probability_Training_Bias' in task:
             if last_session_task == second_last_session_task:
-                if last_session_stage == 1 and second_last_session_stage == 1:
+                if last_session_stage ==  second_last_session_stage:
                     if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
