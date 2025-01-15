@@ -41,6 +41,7 @@ class Probability_WL_Training(Task):
         self.duration_tired = 1800
         self.trials_tired = 5
         self.tired = False
+        self.task_number = 3
         self.stage = 5
         self.substage = 0
         self.response_duration = 60
@@ -719,6 +720,7 @@ class Probability_WL_Training(Task):
         self.register_value('response_y', self.response_y)
         self.register_value('response_duration', self.response_duration)
         self.register_value('trial_length', self.trial_length)
+        self.register_value('task_number', self.task_number)
         self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
         self.register_value('trial_result', self.trial_result)
