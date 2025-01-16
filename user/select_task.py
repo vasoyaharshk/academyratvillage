@@ -475,10 +475,9 @@ def select_task(df, subject):
                     if last_session_substage_stage == 1 and second_last_session_substage_stage == 1:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.1 to stage 1.2')
-                            stage = 1
+                            print(f'Advancing from substage 1 to substage 2')
                             substage = 2
-                            message = 'PI: Advancing from stage 1 to stage 2'
+                            message = 'PI: Advancing from substage 1 to substage 2'
                             print(f'{message}')
                             try:
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
@@ -488,11 +487,10 @@ def select_task(df, subject):
                     elif last_session_substage_stage == 2 and second_last_session_substage_stage == 2:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.2 to normal task')
+                            print(f'Advancing from substage 2 to normal task')
                             task = 'Probability_Training_BB'
-                            stage = 1
                             substage = 0
-                            message = 'PI: Advancing from stage 1 to stage 2'
+                            message = 'PI: Advancing from substage 2 to normal task'
                             print(f'{message}')
                             try:
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
