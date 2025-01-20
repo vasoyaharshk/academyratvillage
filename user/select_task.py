@@ -491,7 +491,7 @@ def select_task(df, subject):
                                     print('Telegram message not sent')
                                     pass
                         elif last_session_substage_bias == 2 and last_session_substage_bias == 2:
-                                    print("here6")
+                                print("here6")
                                 if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                                     valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                                     print("here7")
