@@ -53,6 +53,7 @@ class StageTraining_RatB_V1_50(Task):
         self.prob = 0.33   # random by default
         self.stage = 1
         self.substage = 1
+        self.substage_bias = 0
 
         # task variables: by default easy parameters
         self.response_duration = 60
