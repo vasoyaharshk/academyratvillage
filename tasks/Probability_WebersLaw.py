@@ -30,6 +30,7 @@ class Probability_WebersLaw(Task):
         self.stim_dur_dl = 0
         self.choices = 0
         self.substage = 0
+        self.substage_bias = 0
 
         # Variables for the task:
         self.duration_max = 3000
@@ -623,6 +624,7 @@ class Probability_WebersLaw(Task):
         self.register_value('task_number', self.task_number)
         self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
+        self.register_value('substage_bias', self.substage_bias)
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)

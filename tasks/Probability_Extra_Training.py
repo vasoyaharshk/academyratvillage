@@ -44,6 +44,7 @@ class Probability_Extra_Training(Task):
         self.task_number = 2
         self.stage = 1
         self.substage = 1
+        self.substage_bias = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -395,8 +396,8 @@ class Probability_Extra_Training(Task):
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
-
         self.register_value('substage', self.substage)
+        self.register_value('substage_bias', self.substage_bias)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)

@@ -36,6 +36,7 @@ class Probability_Training_Bias_Left(Task):
         self.stim_dur_dl = 0
         self.choices = 0
         self.substage = 0
+        self.substage_bias = 0
 
         # Variables for the task:
         self.duration_max = 3000
@@ -440,8 +441,8 @@ class Probability_Training_Bias_Left(Task):
         self.register_value('stim_dur_dm', self.stim_dur_dm)
         self.register_value('stim_dur_dl', self.stim_dur_dl)
         self.register_value('choices', self.choices)
-
         self.register_value('substage', self.substage)
+        self.register_value('substage_bias', self.substage_bias)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
