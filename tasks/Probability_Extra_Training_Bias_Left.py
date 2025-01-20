@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Extra_Training(Task):
+class Probability_Extra_Training_Bias_Left(Task):
     def __init__(self):
         super().__init__()
 
