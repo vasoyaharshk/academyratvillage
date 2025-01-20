@@ -615,6 +615,7 @@ def go_to_state(num):
 
         utils.subject.stage = float(utils.subject.stage)
         utils.subject.substage = float(utils.subject.substage)
+        utils.subject.substage_bias = float(utils.subject.substage_bias)
         utils.subject.stim_dur_ds = float(utils.subject.stim_dur_ds)
         utils.subject.stim_dur_dm = float(utils.subject.stim_dur_dm)
         utils.subject.stim_dur_dl = float(utils.subject.stim_dur_dl)
@@ -647,6 +648,7 @@ def go_to_state(num):
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
+        utils.task.substage_bias = utils.subject.substage_bias
         utils.task.stim_dur_ds = utils.subject.stim_dur_ds
         utils.task.stim_dur_dm = utils.subject.stim_dur_dm
         utils.task.stim_dur_dl = utils.subject.stim_dur_dl

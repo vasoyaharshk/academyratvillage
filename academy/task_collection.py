@@ -35,7 +35,7 @@ class Task(object):
         self.p = None
         self.stage = 1
         self.substage = 1
-
+        self.substage_bias = 0
         self.stim_dur_ds = 0  # by default
         self.stim_dur_dm = 0  # by default
         self.stim_dur_dl = 0.1  # by default
