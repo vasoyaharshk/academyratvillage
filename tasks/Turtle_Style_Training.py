@@ -101,7 +101,7 @@ class Turtle_Style_Training(Task):
         self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 40 == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
@@ -116,10 +116,8 @@ class Turtle_Style_Training(Task):
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
-        else:
-            self.stim_trial = self.last_stim_trial
+
+        self.stim_trial = self.stim_trials[self.current_trial]
 
         #Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
         if self.stim_trial == 71:
@@ -298,10 +296,6 @@ class Turtle_Style_Training(Task):
 
         # Accuracy for running trials:
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-
-        # Side Bias Breaking formula:
-        self.last_stim_trial = self.stim_trial
-
 
         ############ REGISTER VALUES ################
         self.register_value('substage', self.substage)
