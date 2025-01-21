@@ -106,7 +106,7 @@ class StageTraining_RatB_V1_50(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water # 25ul per trial normal conditions
-        self.valve_factor_c = 1 * 2                 #Increased to 2 from 1 on 2024-06-27 due to low motivation by rats. Decreased back to 1 on 28/06/24.
+        self.valve_factor_c = 1.8  # Normal water delivery of 25ul multiplied by this
         self.valve_factor_i = 0.45 * 2
 
         # counters
