@@ -297,7 +297,6 @@ def function20():
 
 
 #No mask testing functions from 21 to 25:
-
 # start reading touchscreen:
 def function21():
     width = (utils.task.width + 25) * settings.PIXELS_PER_MM      #+25 because we need 1cm more than the stim
@@ -1241,3 +1240,151 @@ def loop64(timing):
         window.flip()
     else:
         window.flip()
+
+
+## FUNCTIONS FROM 70 TO 80 ARE FOR TURTLE STYLE EXPERIMENT:
+def function71():  # When the correct stimuli is on left
+    global last_function_called, image_path
+    last_function_called = 71  # Track that function31 was called
+
+    stage = utils.task.stage
+    left_images = []
+    try:
+        # Get all the images based on the stages
+        if stage == 0:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/0_pre_training'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif stage == 1:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/1_training'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif stage == 2:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/2_training'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+        elif stage == 3:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/3_training'
+            left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and
+                           ('left' in f.lower() and 'both' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left: ', random_image_path_left)
+
+        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop71(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+def function72():  # When the correct stimuli is on right
+    global last_function_called, image_path
+    last_function_called = 72  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    try:
+        # Get all the images based on the stages
+        if stage == 0:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/0_pre_training'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif stage == 1:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/1_training'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif stage == 2:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/2_training'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+        elif stage == 3:
+            image_folder = '/home/harsh/academy/jars/6_turtle_style/3_training'
+            right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and
+                           ('right' in f.lower() and 'both' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right:', random_image_path_right)
+
+        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop72(timing):
+    image_jar_right.draw()
+    window.flip()
+
+
+# start reading touchscreen:
+def function73():
+    width = utils.task.width * settings.PIXELS_PER_MM
+    height = utils.task.height * settings.PIXELS_PER_MM
+    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+    x_incorrect = utils.task.x_incorrecth
+    y = utils.task.y_correcth * settings.PIXELS_PER_MM
+
+    if x_incorrect is None:
+        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, None, y, width, height)
+    else:
+        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win 1')
+    #print('x_correct in functions: ', x_correct)
+    #print('x_incorrect in functions: ', x_incorrect)
+
+#Resume Reading
+def function74():
+    width = utils.task.width * settings.PIXELS_PER_MM
+    height = utils.task.height * settings.PIXELS_PER_MM
+    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+    x_incorrect = utils.task.x_incorrecth
+    y = utils.task.y_correcth * settings.PIXELS_PER_MM
+
+    if x_incorrect is None:
+        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, None, y, width, height)
+    else:
+        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win 1')
+    #print('x_correct in functions: ', x_correct)
+    #print('x_incorrect in functions: ', x_incorrect)
+
+

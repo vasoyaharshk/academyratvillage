@@ -5,17 +5,20 @@ from user import settings
 import random
 import numpy as np
 
-class Turtle_Style(Task):
+class Turtle_Style_Training(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This task is the Relative Quantity Discrimination task based on the Turtle experiment by Sun et al. 2023. The discrimination is between blue and yellow colours.
         ########   TASK INFO   ########
-        Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Stage 0: Pre training: 5Y0B VS 0Y5B (100%Y VS 0%Y)
+        Stage 1: Training 1: 4Y1B VS 1Y4B (80%Y VS 20%Y)
+        Stage 2: Training 2: 4Y1B VS 2Y3B (80%Y VS 40%Y)
+        Stage 3: Training 3: 2Y3B VS 1Y4B (40%Y VS 20%Y)
 
+        Substages do not mean anything.
+        
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -25,24 +28,26 @@ class Turtle_Style(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-        #Non-used variables so that stage training works:
-        self.stim_dur_ds = 0
-        self.stim_dur_dm = 0
-        self.stim_dur_dl = 0
-        self.choices = 0
-        self.substage = 0
+        # #Non-used variables so that stage training works:
+        # self.stim_dur_ds = 0
+        # self.stim_dur_dm = 0
+        # self.stim_dur_dl = 0
+        # self.choices = 0
+        # self.substage = 0
 
         # Variables for the task:
-        self.duration_max = 3000
-        self.duration_min = 2100
-        self.duration_tired = 1800
+        self.duration_max = 3000                    #50 mins
+        self.duration_min = 2100                    #35 mins
+        self.duration_tired = 1800                  #30 mins
         self.trials_tired = 5
         self.tired = False
-        self.stage = 1
+        self.task = 4                               #Task 4 is for Turtle Style.
+        self.stage = 0
         self.substage = 0
         self.response_duration = 60
+        self.repoking = 0               #This means that repoking is allowed where animals can correct their choices.
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
-        # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
+        self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
         #self.acc_up = 0.85
@@ -51,7 +56,7 @@ class Turtle_Style(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 2  # Normal water delivery of 25ul.
+        self.valve_factor_c = 1.8  # Normal water delivery of 25ul multiplied by this
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
@@ -65,7 +70,7 @@ class Turtle_Style(Task):
         self.accuracy = 0
 
         # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.stim = [0]
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
@@ -73,16 +78,16 @@ class Turtle_Style(Task):
         self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
         self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
 
-        #Bias breaking variables:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+        # #Bias breaking variables:
+        # self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        # self.response_x_array = []      #Stores responses for x till 3 values
+        # self.sameside_counter = 0       #Counts number of times on same side
+        # self.sameside = None             # To track which side is being triggered
+        # self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        # self.side_bias_trigger_acc = 0.8
+        # self.status = None              #Stores the Touch_outside condition
+        # self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        # self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
         #Required for Weber's law:
         self.block = 0  # This is the number of trials one conditions will remain for
@@ -92,13 +97,14 @@ class Turtle_Style(Task):
         self.repetition = 0  # To store how many times the conditions needs to repeat.
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
-        # # Image output stims:
-        # self.stim_trial = 0
-        # self.stim_trials = []
-        self.stim_trial_counter = 0
+
+        # # # Image output stims:
+        self.stim_trial = 0
+        self.stim_trials = []
+        # self.stim_trial_counter = 0
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'duration_max']
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -120,20 +126,20 @@ class Turtle_Style(Task):
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
-
-        if self.current_trial == 0:
-            self.bias_breaking = 0
-            self.accuracy = 0
-
-        print('Bias Breaking: ', self.bias_breaking)
-        #print('Stim_Trials: ', self.stim_trials)
+        #
+        # if self.current_trial == 0:
+        #     self.bias_breaking = 0
+        #     self.accuracy = 0
+        #
+        # print('Bias Breaking: ', self.bias_breaking)
+        # #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+        if self.current_trial % 10 == 0: #and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
@@ -153,30 +159,19 @@ class Turtle_Style(Task):
         else:
             self.stim_trial = self.last_stim_trial
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-
+        #Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
+        if self.stim_trial == 71:
+            self.x_correcth = self.x_correcth_pos[0]
+            self.x_incorrecth = self.x_correcth_pos[1]
+            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.stim_trial == 72:
+            self.x_correcth = self.x_correcth_pos[1]
+            self.x_incorrecth = self.x_correcth_pos[0]
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         ############ STATE MACHINE ################
         #First trial:
-        if self.current_trial == 0:
+        if self.current_trial == 0 and self.repoking = 0:
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
