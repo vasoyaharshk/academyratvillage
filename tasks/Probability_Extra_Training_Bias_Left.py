@@ -117,6 +117,8 @@ class Probability_Extra_Training_Bias_Left(Task):
             self.probabilities = [0.1, 0.9]
         elif self.substage_bias == 2:
             self.probabilities = [0.25, 0.75]
+        elif self.substage_bias == 3:
+            self.probabilities = [0.5, 0.5]
           # Adjust this if you have more than two stimuli
         while len(trials) < 1000:
             # Use random.choices to select a candidate with 50% probability for each stimulus
