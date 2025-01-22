@@ -269,7 +269,7 @@ class Turtle_Style_Training_NoP(Task):
             print('Correct_count: ', self.correct_count)
 
         ##### COUNT CORRECTIONS:
-            elif self.current_trial_states['Correct_other'][0][0] > 0:
+        elif self.current_trial_states['Correct_other'][0][0] > 0:
             self.trial_result = 'correction'
             self.valid_counter += 1
             self.reward_drunk += self.valve_reward * self.valve_factor_i

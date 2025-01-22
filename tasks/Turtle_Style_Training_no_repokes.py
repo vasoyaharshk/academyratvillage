@@ -171,7 +171,7 @@ class Turtle_Style_Training(Task):
 
         ############ STATE MACHINE ################
         #First trial:
-        if self.current_trial == 0 and self.repoking = 0:
+        if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
