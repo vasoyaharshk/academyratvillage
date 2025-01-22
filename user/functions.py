@@ -1247,26 +1247,26 @@ def function71():  # When the correct stimuli is on left
     global last_function_called, image_path
     last_function_called = 71  # Track that function31 was called
 
-    stage = utils.task.stage
+    substage = utils.task.substage
     left_images = []
     try:
         # Get all the images based on the stages
-        if stage == 0:
+        if substage == 0:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/0_pre_training'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 1:
+        elif substage == 1:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/1_training'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 2:
+        elif substage == 2:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/2_training'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
+        elif substage == 3:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/3_training'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
@@ -1299,26 +1299,26 @@ def function72():  # When the correct stimuli is on right
     global last_function_called, image_path
     last_function_called = 72  # Track that function31 was called
 
-    stage = utils.task.stage
+    substage = utils.task.substage
     right_images = []
     try:
         # Get all the images based on the stages
-        if stage == 0:
+        if substage == 0:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/0_pre_training'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 1:
+        elif substage == 1:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/1_training'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 2:
+        elif substage == 2:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/2_training'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and
                            ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
+        elif substage == 3:
             image_folder = '/home/harsh/academy/jars/6_turtle_style/3_training'
             right_images = [f for f in os.listdir(image_folder) if
                             os.path.isfile(os.path.join(image_folder, f)) and

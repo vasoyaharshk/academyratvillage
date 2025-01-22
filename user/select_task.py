@@ -562,7 +562,7 @@ def select_task(df, subject):
                                         print(f"Telegram message not sent: {e}")
 
 
-        elif 'Probability_Extra_Training' in task:
+        elif task == 'Probability_Extra_Training':
             if last_session_task == second_last_session_task:
                 if last_session_stage == 1 and second_last_session_stage == 1:
                     if last_session_substage == 1 and second_last_session_substage == 1:
@@ -745,6 +745,7 @@ def select_task(df, subject):
                 message = 'PI: Probability_WebersLaw completes, Moving to Webers law Training.'
                 print(f'{message}')
                 try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
                     telegram_bot.alarm_completed_criteria(task, my_subject)
                 except:
                     print('Telegram message not sent')
@@ -901,6 +902,56 @@ def select_task(df, subject):
             if isinstance(completed_ror, str):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
+
+        elif 'Turtle_Training' in task:
+            trial_criteria = 30
+            accuracy_criteria = 0.80
+            trial_end_criteria = 1000
+
+            trial_counter = last_row['trial_counter']
+
+            if trial_counter >= trial_end_criteria:
+                stage = 7
+                message = f"{trial_end_criteria} trials completed in substage {substage}. Task ended."
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria):
+                # Move to the next stage up to stage 3
+                if substage < 3:
+                    substage += 1
+                    trial_counter = 0
+                    message = (f"Moving to stage {substage} due to 80% accuracy in a session of {valid_trials_last} trials.")
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+                else:
+                    #task = 'Probability_Turtle_Test'
+                    message = (f"Last substage {substage} completed, Training complete")
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+            else:
+                message = ("Criteria for moving to the next stage not met.")
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
 
 
     elif task == 'Water_Filler':
