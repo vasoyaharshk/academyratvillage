@@ -202,7 +202,7 @@ class Turtle_Style_Training_NoP(Task):
             state_name='Response_window2',
             state_timer=self.response_duration,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                     'SoftCode3': 'Miss', 'SoftCode4': 'Punish', 'SoftCode5': 'Touch_Outside2',
+                                     'SoftCode3': 'Miss', 'SoftCode5': 'Touch_Outside2',
                                      Bpod.Events.Tup: 'Miss'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 74)])
 

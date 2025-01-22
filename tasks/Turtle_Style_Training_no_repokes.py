@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Turtle_Style_Training(Task):
+class Turtle_Style_Training_no_repokes(Task):
     def __init__(self):
         super().__init__()
 
