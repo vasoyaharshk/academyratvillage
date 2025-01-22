@@ -5,6 +5,7 @@ from user import settings
 import random
 import numpy as np
 
+
 class Turtle_Style_Training_NoP(Task):
     def __init__(self):
         super().__init__()
@@ -19,7 +20,7 @@ class Turtle_Style_Training_NoP(Task):
         Stage 3: Training 3: 2Y3B VS 1Y4B (40%Y VS 20%Y)
 
         Substages do not mean anything right now.
-        
+
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -30,17 +31,18 @@ class Turtle_Style_Training_NoP(Task):
         """
 
         # Variables for the task:
-        self.duration_max = 3000                    #50 mins
-        self.duration_min = 2100                    #35 mins
-        self.duration_tired = 1800                  #30 mins
+        self.duration_max = 3000  # 50 mins
+        self.duration_min = 2100  # 35 mins
+        self.duration_tired = 1800  # 30 mins
         self.trials_tired = 5
         self.tired = False
-        self.task = 4                               #Task 4 is for Turtle Style.
+        self.task = 4  # Task 4 is for Turtle Style.
         self.stage = 0
         self.substage = 0
         self.response_duration = 60
-        self.repoking = 1               #This means that repoking is allowed where animals can correct their choices.
-        self.repoke_th = settings.WIN_SIZE[0] * 2           #This is only to keep the repoke_th different from the correcth_area. Dont change this.
+        self.repoking = 1  # This means that repoking is allowed where animals can correct their choices.
+        self.repoke_th = settings.WIN_SIZE[
+                             0] * 2  # This is only to keep the repoke_th different from the correcth_area. Dont change this.
 
         # pump:
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -64,8 +66,8 @@ class Turtle_Style_Training_NoP(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 110    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 110   # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 110  # Stimulus width in mm. Original size for jar is 70mm.
+        self.height = 110  # Stimulus height in mm. Original size for jar is 110mm.
 
         # Image output stims:
         self.stim_trial = 0
@@ -75,7 +77,8 @@ class Turtle_Style_Training_NoP(Task):
     def configure_gui(self):
         self.gui_input = ['stage', 'duration_max']
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials(self,
+                               last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
@@ -98,7 +101,8 @@ class Turtle_Style_Training_NoP(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [71,
+                     72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
         if self.current_trial % 40 == 0:  # Re-randomize every 10 trials
@@ -116,10 +120,9 @@ class Turtle_Style_Training_NoP(Task):
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
-
         self.stim_trial = self.stim_trials[self.current_trial]
 
-        #Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
+        # Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
         if self.stim_trial == 71:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
@@ -127,10 +130,11 @@ class Turtle_Style_Training_NoP(Task):
         elif self.stim_trial == 72:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                  self.x_incorrecth)
 
         ############ STATE MACHINE ################
-        #First trial:
+        # First trial:
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
@@ -146,7 +150,7 @@ class Turtle_Style_Training_NoP(Task):
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
             # Closes corridor door 2 and delivers initial 50ul water.
 
-        #Other Trials:
+        # Other Trials:
         else:
             self.sma.add_state(
                 state_name='Start_task',
@@ -171,8 +175,8 @@ class Turtle_Style_Training_NoP(Task):
         self.sma.add_state(
             state_name='Response_window',
             state_timer=self.response_duration,
-            state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss'
-                , 'SoftCode5': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
+            state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect',
+                                     'SoftCode3': 'Touch_Outside', Bpod.Events.Tup: 'No_Touch'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 73)])
         # wait for subject response
 
@@ -184,16 +188,16 @@ class Turtle_Style_Training_NoP(Task):
         # waterLED and correct sound remain ON until poke and flips the screen
 
         self.sma.add_state(
-            state_name='Miss',
+            state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 12)])
+                            (Bpod.OutputChannels.SoftCode, 37)])
         # waterLED ON, global LEDs ON and flips the screen
 
         self.sma.add_state(
             state_name='Incorrect',
-            state_timer=1,          #After incorrect, the state remians for 1 second.
+            state_timer=1,  # After incorrect, the state remains for 1 second.
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
         # Incorrect sound and global LED.
@@ -202,8 +206,7 @@ class Turtle_Style_Training_NoP(Task):
             state_name='Response_window2',
             state_timer=self.response_duration,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                     'SoftCode3': 'Miss', 'SoftCode5': 'Touch_Outside2',
-                                     Bpod.Events.Tup: 'Miss'},
+                                     'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 74)])
 
         self.sma.add_state(
@@ -226,13 +229,6 @@ class Turtle_Style_Training_NoP(Task):
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
 
         self.sma.add_state(
-            state_name='Miss_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
-        #Resets the stimuli and camera.
-
-        self.sma.add_state(
             state_name='Touch_Outside',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},
@@ -252,7 +248,6 @@ class Turtle_Style_Training_NoP(Task):
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
-
     def after_trial(self):
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -261,7 +256,7 @@ class Turtle_Style_Training_NoP(Task):
 
         ##### COUNT CORRECTS:
         elif self.current_trial_states['Correct_first'][0][0] > 0:
-            self.trial_result = 'correct'
+            self.trial_result = 'correct_first'
             self.valid_counter += 1
             self.reward_drunk += self.valve_reward * self.valve_factor_c
             self.accwindow = self.accwindow[1:] + [1]
@@ -298,7 +293,6 @@ class Turtle_Style_Training_NoP(Task):
         self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
         ############ REGISTER VALUES ################
-        self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
@@ -309,6 +303,7 @@ class Turtle_Style_Training_NoP(Task):
         self.register_value('response_y', self.response_y)
         self.register_value('response_duration', self.response_duration)
         self.register_value('trial_length', self.trial_length)
+        self.register_value('stage', self.stage)
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
