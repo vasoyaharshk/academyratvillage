@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class Probability_Turtle_Training(Task):
+class Probability_Turtle_Training_NoP(Task):
     def __init__(self):
         super().__init__()
 
@@ -66,7 +66,7 @@ class Probability_Turtle_Training(Task):
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
         self.width = 110  # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 110  # Stimulus height in mm. Original size for jar is 110mm.
+        self.height = 150  # Stimulus height in mm. Original size for jar is 110mm.
 
         # Image output stims:
         self.stim_trial = 0
@@ -141,7 +141,7 @@ class Probability_Turtle_Training(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                    state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Starts task and displays stimuli instanly
 
@@ -157,7 +157,7 @@ class Probability_Turtle_Training(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                     output_actions=[])
 
             self.sma.add_state(
@@ -170,7 +170,7 @@ class Probability_Turtle_Training(Task):
             self.sma.add_state(
                 state_name='Fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -185,14 +185,14 @@ class Probability_Turtle_Training(Task):
             self.sma.add_state(
                 state_name='Correct_first',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
+                state_change_conditions={Bpod.Events.Tup: 'Correct_first_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke and flips the screen
 
             self.sma.add_state(
                 state_name='No_Touch',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                                 (Bpod.OutputChannels.SoftCode, 37)])
             # waterLED ON, global LEDs ON and flips the screen
@@ -214,7 +214,7 @@ class Probability_Turtle_Training(Task):
             self.sma.add_state(
                 state_name='Correct_other',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
+                state_change_conditions={Bpod.Events.Tup: 'Correct_other_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
             # waterLED and correct sound remain ON until poke
 

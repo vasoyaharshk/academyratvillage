@@ -398,13 +398,13 @@ class Touch:
         if answer is None:
             self.softcode.send(3)
             response = []
-            print('No touch found')  # Debugging incorrect area touch
+            #print('No touch found')  # Debugging incorrect area touch
         else:
-            print('x_correct in touch.py 2: ', x_correct)
-            print('x_incorrect in touch.py 2: ', x_incorrect)
-            print('y in touch.py2: ', y)
-            print('width in touch.py2: ', width)
-            print('height in touch.py2: ', height)
+            #print('x_correct in touch.py 2: ', x_correct)
+            #print('x_incorrect in touch.py 2: ', x_incorrect)
+            #print('y in touch.py2: ', y)
+            #print('width in touch.py2: ', width)
+            #print('height in touch.py2: ', height)
 
             xpsy_correct = abs(x_correct)
             ypsy = 750  # y set to 750
