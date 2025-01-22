@@ -472,46 +472,39 @@ def select_task(df, subject):
 
         elif 'Probability_Extra_Training_Bias' in task:
             if last_session_task == second_last_session_task:
-                print("here1")
                 if last_session_stage == second_last_session_stage:
-                    print("here2")
                     if last_session_substage == second_last_session_substage:
-                        print("here3")
                         if last_session_substage_bias == 1 and second_last_session_substage_bias == 1:
-                            print("here4")
                             if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                                 valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                print("here5")
                                 substage_bias = 2
                                 message = f'Advancing from substage_bias 1 to substage_bias 2'
                                 print(f'{message}')
                                 try:
-                                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                                    telegram_bot.alarm_finish_session(message, my_subject)
                                 except:
                                     print('Telegram message not sent')
                                     pass
                         elif last_session_substage_bias == 2 and second_last_session_substage_bias == 2:
-                            print("here4")
-                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                print("here5")
+                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                                valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                                 substage_bias = 3
                                 message = f'Advancing from substage_bias 2 to substage_bias 3'
                                 print(f'{message}')
                                 try:
-                                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                                    telegram_bot.alarm_finish_session(message, my_subject)
                                 except:
                                     print('Telegram message not sent')
                                     pass
-                        elif last_session_substage_bias == 3 and last_session_substage_bias == 3:
-                                print("here6")
+                        elif last_session_substage_bias == 3 and second_last_session_substage_bias == 3:
                                 if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                                     valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                    print("here7")
                                     substage, task = (substage + 1, "Probability_Extra_Training") if (substage := substage + 1) == 2 else (substage + 1, task)
                                     substage_bias = 1
                                     message = f'Advancing from substage_bias 3 substage 2 to normal task'
                                     print(f'{message}')
                                     try:
+                                        telegram_bot.alarm_finish_session(message, my_subject)
                                         telegram_bot.alarm_completed_criteria(task, my_subject)
                                     except:
                                         print('Telegram message not sent')
@@ -528,7 +521,7 @@ def select_task(df, subject):
                                 message = 'PI: Advancing from substage 1 to substage 2'
                                 print(f'{message}')
                                 try:
-                                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                                    ttelegram_bot.alarm_finish_session(message, my_subject)
                                 except:
                                     print('Telegram message not sent')
                                     pass
@@ -540,6 +533,7 @@ def select_task(df, subject):
                                 message = 'PI: Advancing from substage 2 to normal task'
                                 print(f'{message}')
                                 try:
+                                    telegram_bot.alarm_finish_session(message, my_subject)
                                     telegram_bot.alarm_completed_criteria(task, my_subject)
                                 except:
                                     print('Telegram message not sent')
@@ -580,7 +574,7 @@ def select_task(df, subject):
                             message = 'PI: Advancing from stage 1 to stage 2'
                             print(f'{message}')
                             try:
-                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                telegram_bot.alarm_finish_session(message, my_subject)
                             except:
                                 print('Telegram message not sent')
                                 pass
@@ -593,7 +587,7 @@ def select_task(df, subject):
                             message = 'PI: Advancing from stage 1 to stage 2'
                             print(f'{message}')
                             try:
-                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                telegram_bot.alarm_finish_session(message, my_subject)
                             except:
                                 print('Telegram message not sent')
                                 pass
@@ -606,7 +600,7 @@ def select_task(df, subject):
                             message = 'PI: Advancing from stage 1 to stage 2'
                             print(f'{message}')
                             try:
-                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                telegram_bot.alarm_finish_session(message, my_subject)
                             except:
                                 print('Telegram message not sent')
                                 pass
@@ -619,7 +613,7 @@ def select_task(df, subject):
                             message = 'PI: Advancing from stage 1 to stage 2'
                             print(f'{message}')
                             try:
-                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                telegram_bot.alarm_finish_session(message, my_subject)
                             except:
                                 print('Telegram message not sent')
                                 pass
@@ -632,6 +626,7 @@ def select_task(df, subject):
                             message = 'PI: Advancing to Probability_Training_BB to stage 2'
                             print(f'{message}')
                             try:
+                                telegram_bot.alarm_finish_session(message, my_subject)
                                 telegram_bot.alarm_completed_criteria(task, my_subject)
                             except:
                                 print('Telegram message not sent')
@@ -648,7 +643,7 @@ def select_task(df, subject):
                         message = 'PI: Advancing from stage 1 to stage 2'
                         print(f'{message}')
                         try:
-                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
                         except:
                             print('Telegram message not sent')
                             pass
@@ -659,7 +654,7 @@ def select_task(df, subject):
                         message = 'PI: Advancing from stage 2 to stage 3'
                         print(f'{message}')
                         try:
-                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
                         except:
                             print('Telegram message not sent')
                             pass
@@ -669,6 +664,7 @@ def select_task(df, subject):
                         message = 'PI: Advance from stage 3 to Webers Law with accuracy in both sessions'
                         print(f'{message}')
                         try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
                             telegram_bot.alarm_completed_criteria(task, my_subject)
                         except:
                             print('Telegram message not sent')
@@ -794,6 +790,7 @@ def select_task(df, subject):
                 message = f"{trial_end_criteria} trials completed in ROR {current_ror}. Task ended."
                 print(f'{message}')
                 try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
                     telegram_bot.alarm_completed_criteria(task, my_subject)
                 except:
                     print('Telegram message not sent')
@@ -872,6 +869,7 @@ def select_task(df, subject):
                                 message = 'PI: Webers law Training completed'
                                 print(f'{message}')
                                 try:
+                                    telegram_bot.alarm_finish_session(message, my_subject)
                                     telegram_bot.alarm_completed_criteria(task, my_subject)
                                 except:
                                     print('Telegram message not sent')
