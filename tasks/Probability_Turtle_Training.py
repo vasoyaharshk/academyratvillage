@@ -40,7 +40,6 @@ class Probability_Turtle_Training(Task):
         self.substage = 0
         self.response_duration = 60
         self.repoking = 1               #This means that repoking is allowed where animals can correct their choices.
-        self.repoke_th = settings.WIN_SIZE[0] * 2           #This is only to keep the repoke_th different from the correcth_area. Dont change this.
 
         # pump:
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -277,8 +276,9 @@ class Probability_Turtle_Training(Task):
                 print('Correction_count: ', self.correction_count)
 
             # ##### COUNT Touches outside the jar areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+            elif self.current_trial_states['Touch_Outside'][0][0] > 0 or self.current_trial_states['Touch_Outside2'][0][0] > 0:
                 self.status = 'Touch_Outside'
+                self.touch_outside += 1
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
@@ -316,3 +316,7 @@ class Probability_Turtle_Training(Task):
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
         self.register_value('trial_counter', self.trial_counter)
+        self.register_value('correct_count', self.correct_count)
+        self.register_value('touch_outside', self.touch_outside)
+        self.register_value('correction_count', self.correction_count)
+        self.register_value('repoking', self.repoking)

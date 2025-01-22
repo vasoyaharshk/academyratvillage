@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class Probability_Turtle_Training_NoP(Task):
+class Probability_Turtle_Training(Task):
     def __init__(self):
         super().__init__()
 
@@ -278,8 +278,10 @@ class Probability_Turtle_Training_NoP(Task):
                 print('Correction_count: ', self.correction_count)
 
             # ##### COUNT Touches outside the jar areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+            elif self.current_trial_states['Touch_Outside'][0][0] > 0 or self.current_trial_states['Touch_Outside2'][0][
+                0] > 0:
                 self.status = 'Touch_Outside'
+                self.touch_outside += 1
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
@@ -317,3 +319,7 @@ class Probability_Turtle_Training_NoP(Task):
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
         self.register_value('trial_counter', self.trial_counter)
+        self.register_value('correct_count', self.correct_count)
+        self.register_value('touch_outside', self.touch_outside)
+        self.register_value('correction_count', self.correction_count)
+        self.register_value('repoking', self.repoking)
