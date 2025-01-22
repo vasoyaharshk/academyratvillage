@@ -335,7 +335,7 @@ class Touch:
                 #print(f'Incorrect Area (x_incorrect): {xpsy_incorrect}')  # Debugging incorrect area
                 #print(f'Incorrect Boundaries (left, right): {left_boundary_incorrect}, {right_boundary_incorrect}')  # Debugging incorrect area boundaries
 
-                # Check if the touch is in the incorrect area
+                # Check if the touch is in the incorrect area:
                 if left_boundary_incorrect <= xtouch <= right_boundary_incorrect and bottom_boundary <= ytouch <= top_boundary:
                     #print('Touch is in the incorrect area.')  # Debugging incorrect area touch
                     self.softcode.send(4)
@@ -400,11 +400,11 @@ class Touch:
             response = []
             print('No touch found')  # Debugging incorrect area touch
         else:
-            #print('x_correct in touch.py 2: ', x_correct)
-            #print('x_incorrect in touch.py 2: ', x_incorrect)
-            #print('y in touch.py2: ', y)
-            #print('width in touch.py2: ', width)
-            #print('height in touch.py2: ', height)
+            print('x_correct in touch.py 2: ', x_correct)
+            print('x_incorrect in touch.py 2: ', x_incorrect)
+            print('y in touch.py2: ', y)
+            print('width in touch.py2: ', width)
+            print('height in touch.py2: ', height)
 
             xpsy_correct = abs(x_correct)
             ypsy = 750  # y set to 750

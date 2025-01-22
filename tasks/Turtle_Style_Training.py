@@ -171,8 +171,8 @@ class Turtle_Style_Training(Task):
         self.sma.add_state(
             state_name='Response_window',
             state_timer=self.response_duration,
-            state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect', 'SoftCode3': 'Miss'
-                , 'SoftCode5': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
+            state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode2': 'Incorrect',
+                                     'SoftCode3': 'Touch_Outside', Bpod.Events.Tup: 'No_Touch'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 73)])
         # wait for subject response
 
@@ -184,16 +184,16 @@ class Turtle_Style_Training(Task):
         # waterLED and correct sound remain ON until poke and flips the screen
 
         self.sma.add_state(
-            state_name='Miss',
+            state_name='No_Touch',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward', Bpod.Events.Port2In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 12)])
+                            (Bpod.OutputChannels.SoftCode, 37)])
         # waterLED ON, global LEDs ON and flips the screen
 
         self.sma.add_state(
             state_name='Incorrect',
-            state_timer=1,          #After incorrect, the state remians for 1 second.
+            state_timer=1,          #After incorrect, the state remains for 1 second.
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
         # Incorrect sound and global LED.
@@ -202,8 +202,7 @@ class Turtle_Style_Training(Task):
             state_name='Response_window2',
             state_timer=self.response_duration,
             state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                     'SoftCode3': 'Miss', 'SoftCode5': 'Touch_Outside2',
-                                     Bpod.Events.Tup: 'Miss'},
+                                     'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 74)])
 
         self.sma.add_state(
@@ -224,13 +223,6 @@ class Turtle_Style_Training(Task):
             state_timer=self.valve_time * self.valve_factor_i,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-
-        self.sma.add_state(
-            state_name='Miss_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 17)])
-        #Resets the stimuli and camera.
 
         self.sma.add_state(
             state_name='Touch_Outside',
