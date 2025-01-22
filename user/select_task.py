@@ -562,7 +562,7 @@ def select_task(df, subject):
                                         print(f"Telegram message not sent: {e}")
 
 
-        elif 'Probability_Extra_Training' in task:
+        elif task == 'Probability_Extra_Training':
             if last_session_task == second_last_session_task:
                 if last_session_stage == 1 and second_last_session_stage == 1:
                     if last_session_substage == 1 and second_last_session_substage == 1:
