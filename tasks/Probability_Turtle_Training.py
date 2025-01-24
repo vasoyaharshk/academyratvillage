@@ -64,8 +64,8 @@ class Probability_Turtle_Training(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 110    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 110   # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 110  # Stimulus width in mm. Original size for jar is 70mm.
+        self.height = 160  # Stimulus height in mm. Original size for jar is 110mm.
 
         # Image output stims:
         self.stim_trial = 0
@@ -119,7 +119,7 @@ class Probability_Turtle_Training(Task):
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
-        #Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
+        # Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
         if self.stim_trial == 71:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
@@ -127,10 +127,11 @@ class Probability_Turtle_Training(Task):
         elif self.stim_trial == 72:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                  self.x_incorrecth)
 
         ############ STATE MACHINE ################
-        #First trial:
+        # First trial:
         if self.stage != 7:
             self.trial_counter += 1
 
@@ -149,7 +150,7 @@ class Probability_Turtle_Training(Task):
                     output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # Closes corridor door 2 and delivers initial 50ul water.
 
-            #Other Trials:
+            # Other Trials:
             else:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -195,8 +196,16 @@ class Probability_Turtle_Training(Task):
             # waterLED ON, global LEDs ON and flips the screen
 
             self.sma.add_state(
+                state_name='No_Touch2',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 37)])
+            # waterLED ON, global LEDs ON and flips the screen
+
+            self.sma.add_state(
                 state_name='Incorrect',
-                state_timer=1,          #After incorrect, the state remains for 1 second.
+                state_timer=1,  # After incorrect, the state remains for 1 second.
                 state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
                 output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
             # Incorrect sound and global LED.
@@ -205,7 +214,7 @@ class Probability_Turtle_Training(Task):
                 state_name='Response_window2',
                 state_timer=self.response_duration,
                 state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                         'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch'},
+                                         'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch2'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 74)])
 
             self.sma.add_state(
@@ -257,6 +266,10 @@ class Probability_Turtle_Training(Task):
                 self.accwindow = self.accwindow[1:] + [0]
                 self.trial_result = 'miss'
 
+            if self.current_trial_states['No_Touch2'][0][0] > 0:  # misses modify the acc
+                self.accwindow = self.accwindow[1:] + [0]
+                self.trial_result = 'incorrect'
+
             ##### COUNT CORRECTS:
             elif self.current_trial_states['Correct_first'][0][0] > 0:
                 self.trial_result = 'correct_first'
@@ -276,7 +289,8 @@ class Probability_Turtle_Training(Task):
                 print('Correction_count: ', self.correction_count)
 
             # ##### COUNT Touches outside the jar areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0 or self.current_trial_states['Touch_Outside2'][0][0] > 0:
+            elif self.current_trial_states['Touch_Outside'][0][0] > 0 or self.current_trial_states['Touch_Outside2'][0][
+                0] > 0:
                 self.status = 'Touch_Outside'
                 self.touch_outside += 1
 

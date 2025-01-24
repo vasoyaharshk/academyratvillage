@@ -20,7 +20,7 @@ class Probability_Turtle_Training_NoP(Task):
         Substage 3: Training 3: 2Y3B VS 1Y4B (40%Y VS 20%Y)
 
         Stage = 6
-
+        
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -31,16 +31,16 @@ class Probability_Turtle_Training_NoP(Task):
         """
 
         # Variables for the task:
-        self.duration_max = 3000  # 50 mins
-        self.duration_min = 2100  # 35 mins
-        self.duration_tired = 1800  # 30 mins
+        self.duration_max = 3000                    #50 mins
+        self.duration_min = 2100                    #35 mins
+        self.duration_tired = 1800                  #30 mins
         self.trials_tired = 5
         self.tired = False
-        self.task = 4  # Task 4 is for Turtle Style.
+        self.task = 4                               #Task 4 is for Turtle Style.
         self.stage = 0
         self.substage = 0
         self.response_duration = 60
-        self.repoking = 1  # This means that repoking is allowed where animals can correct their choices.
+        self.repoking = 1               #This means that repoking is allowed where animals can correct their choices.
 
         # pump:
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -66,7 +66,7 @@ class Probability_Turtle_Training_NoP(Task):
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
         self.width = 110  # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 150  # Stimulus height in mm. Original size for jar is 110mm.
+        self.height = 160  # Stimulus height in mm. Original size for jar is 110mm.
 
         # Image output stims:
         self.stim_trial = 0
@@ -76,8 +76,7 @@ class Probability_Turtle_Training_NoP(Task):
     def configure_gui(self):
         self.gui_input = ['substage', 'duration_max']
 
-    def generate_random_trials(self,
-                               last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
@@ -100,8 +99,7 @@ class Probability_Turtle_Training_NoP(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [71,
-                     72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
         if self.current_trial % 40 == 0:  # Re-randomize every 10 trials
@@ -118,6 +116,7 @@ class Probability_Turtle_Training_NoP(Task):
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
 
         self.stim_trial = self.stim_trials[self.current_trial]
+
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
@@ -198,6 +197,14 @@ class Probability_Turtle_Training_NoP(Task):
             # waterLED ON, global LEDs ON and flips the screen
 
             self.sma.add_state(
+                state_name='No_Touch2',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 37)])
+            # waterLED ON, global LEDs ON and flips the screen
+
+            self.sma.add_state(
                 state_name='Incorrect',
                 state_timer=1,  # After incorrect, the state remains for 1 second.
                 state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
@@ -208,7 +215,7 @@ class Probability_Turtle_Training_NoP(Task):
                 state_name='Response_window2',
                 state_timer=self.response_duration,
                 state_change_conditions={'SoftCode1': 'Correct_other', 'SoftCode2': 'Incorrect',
-                                         'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch'},
+                                         'SoftCode3': 'Touch_Outside2', Bpod.Events.Tup: 'No_Touch2'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 74)])
 
             self.sma.add_state(
@@ -252,12 +259,17 @@ class Probability_Turtle_Training_NoP(Task):
         else:
             print("Stage is 7. Task Ended.")
 
+
     def after_trial(self):
         if self.stage != 7:
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
                 self.accwindow = self.accwindow[1:] + [0]
                 self.trial_result = 'miss'
+
+            if self.current_trial_states['No_Touch2'][0][0] > 0:  # misses modify the acc
+                self.accwindow = self.accwindow[1:] + [0]
+                self.trial_result = 'incorrect'
 
             ##### COUNT CORRECTS:
             elif self.current_trial_states['Correct_first'][0][0] > 0:

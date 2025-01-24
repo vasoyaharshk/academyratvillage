@@ -407,7 +407,7 @@ class Touch:
             #print('height in touch.py2: ', height)
 
             xpsy_correct = abs(x_correct)
-            ypsy = 750  # y set to 750
+            ypsy = 720  # y set to 750
 
             # Convert touch coordinates to the window coordinates
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
