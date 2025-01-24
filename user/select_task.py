@@ -499,16 +499,30 @@ def select_task(df, subject):
                         elif last_session_substage_bias == 3 and second_last_session_substage_bias == 3:
                                 if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                                     valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                    substage, task = (substage + 1, "Probability_Extra_Training") if (substage := substage + 1) == 2 else (substage + 1, task)
-                                    substage_bias = 1
-                                    message = f'Advancing from substage_bias 3 substage 2 to normal task'
-                                    print(f'{message}')
-                                    try:
-                                        telegram_bot.alarm_finish_session(message, my_subject)
-                                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                                    except:
-                                        print('Telegram message not sent')
-                                        pass
+                                    # Increment substage until it reaches 2
+                                    while substage < 2:
+                                        substage += 1
+                                        message = f'Advancing to substage {substage}'
+                                        print(f'{message}')
+                                        try:
+                                            telegram_bot.alarm_finish_session(message, my_subject)
+                                        except:
+                                            print('Telegram message not sent')
+                                            pass
+
+                                    # When substage reaches 2, update task, substage_bias, and substage
+                                    if substage == 2:
+                                        task = "Probability_Extra_Training"
+                                        substage_bias = 0
+                                        substage = 3
+                                        message = f'Substage is now 3, task changed to {task}, substage_bias reset to 0'
+                                        print(f'{message}')
+                                        try:
+                                            telegram_bot.alarm_finish_session(message, my_subject)
+                                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                                        except:
+                                            print('Telegram message not sent')
+                                            pass
 
 
         elif 'Probability_Training_Bias' in task:
