@@ -1,7 +1,7 @@
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
-class Test_Sound(Task):
+class zTest_Sound(Task):
     def __init__(self):
         super().__init__()
 

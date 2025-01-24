@@ -3,7 +3,7 @@ from pybpodapi.protocol import Bpod
 
 from user import settings
 
-class Test_Screen(Task):
+class zTest_Screen(Task):
 
     def __init__(self):
         super().__init__()
