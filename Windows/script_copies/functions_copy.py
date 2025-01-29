@@ -150,34 +150,6 @@ def function5():
     cam3.put_state("Resp Win")
     print('Resp Win')
 
-# def function6():  #For Stage 1 where the probabilities are 100% blue vs nothing:
-#     jar1.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     jar1.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-# def loop6(timing):
-#     jar1.draw()
-#     window.flip()
-# def function7(): #For Stage 2 where the probabilities are 100% blue vs 100% yellow:
-#     jar1.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     jar1.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     jar2.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     jar2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-# def loop7(timing):
-#     jar1.draw()
-#     jar2.draw()
-#     window.flip()
-# def function8(): #For Stage 3 where the probabilities are 100% yellow vs 50% blue and 50% yellow:
-#     jar2.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     jar2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     jar3.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     jar3.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-# def loop8(timing):
-#     jar2.draw()
-#     jar3.draw()
-#     window.flip()
-
 
 def function9():
     soundStream.stop(soundVec1)  #14Khz sound played
@@ -261,12 +233,6 @@ def loop15(timing):
     border2.draw()
     border3.draw()
     window.flip()
-
-
-# # communication is ok
-# def function16():
-#     #print('softcode 16 received')
-#     utils.control_softcodes += 1
 
 
 # camera empty and delete screen
@@ -659,7 +625,7 @@ def function40():
 def loop40(timing):
     window.flip()
 
-## FUNCTIONS FROM 40 TO 46 ARE FOR WEBER'S LAW.
+## FUNCTIONS FROM 41 TO 46 ARE FOR WEBER'S LAW.
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
 def function41():  # When the correct answer is on left
     global last_function_called, image_path
