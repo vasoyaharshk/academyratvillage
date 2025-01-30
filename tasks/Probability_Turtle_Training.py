@@ -205,7 +205,7 @@ class Probability_Turtle_Training(Task):
 
             self.sma.add_state(
                 state_name='Incorrect',
-                state_timer=1,  # After incorrect, the state remains for 1 second.
+                state_timer=0.25,  # After incorrect, the state remains for 1 second.
                 state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
                 output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
             # Incorrect sound and global LED.
@@ -333,4 +333,4 @@ class Probability_Turtle_Training(Task):
         self.register_value('correct_count', self.correct_count)
         self.register_value('touch_outside', self.touch_outside)
         self.register_value('correction_count', self.correction_count)
-        self.register_value('repoking', self.repoking)
+
