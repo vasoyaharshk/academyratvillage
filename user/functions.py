@@ -1350,7 +1350,7 @@ def function74():
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
-    print('Resp Win 1')
+    print('Resp Win 2')
     #print('x_correct in functions: ', x_correct)
     #print('x_incorrect in functions: ', x_incorrect)
 

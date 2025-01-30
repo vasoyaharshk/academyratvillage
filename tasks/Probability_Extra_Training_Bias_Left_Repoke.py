@@ -64,7 +64,7 @@ class Probability_Extra_Training_Bias_Left_Repoke(Task):
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
         self.valve_factor_c = 1.8  # Normal water delivery of 25ul multiplied by this
-        # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
+        self.valve_factor_i = 0.9  # Water delivery for corrections
 
         # counters for trials:
         self.valid_counter = 0
@@ -74,6 +74,7 @@ class Probability_Extra_Training_Bias_Left_Repoke(Task):
         # self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
         self.accwindow = [0]
         self.correct_count = 0
+        self.correction_count = 0
         self.accuracy = 0
 
         # Image output stims:
@@ -254,7 +255,7 @@ class Probability_Extra_Training_Bias_Left_Repoke(Task):
 
         self.sma.add_state(
             state_name='Incorrect',
-            state_timer=1,  # After incorrect, the state remains for 1 second.
+            state_timer=0.25,  # After incorrect, the state remains for 1 second.
             state_change_conditions={Bpod.Events.Tup: 'Response_window2'},
             output_actions=[(Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 13)])
         # Incorrect sound and global LED.
