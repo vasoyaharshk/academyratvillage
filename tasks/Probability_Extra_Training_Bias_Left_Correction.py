@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 
-class Probability_Extra_Training_Bias_Left_Repoke(Task):
+class Probability_Extra_Training_Bias_Left_Correction(Task):
     def __init__(self):
         super().__init__()
 
@@ -432,6 +432,9 @@ class Probability_Extra_Training_Bias_Left_Repoke(Task):
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        self.register_value('correct_count', self.correct_count)
+        self.register_value('touch_outside', self.touch_outside)
+        self.register_value('correction_count', self.correction_count)
         # Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)

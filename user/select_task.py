@@ -369,8 +369,9 @@ def select_task(df, subject):
 
         if my_subject == 'm2':
             trial_criteria = 2
-            accuracy_criteria = 0.85
+            accuracy_criteria = 0.7
             accuracy_moveback_criteria = 0.4
+
 
         # First: Identify the last session and second-to-last session:
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
@@ -400,7 +401,8 @@ def select_task(df, subject):
                 telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
         # Fourth: Calculate accuracy for the last session and second last session (if exists)
-        correct_trials_last = df_last_session[df_last_session['trial_result'] == 'correct'].shape[0]
+        correct_trials_last = df_last_session[df_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[
+            0]
         valid_trials_last = df_last_session[df_last_session['trial_result'] != 'miss'].shape[0]
         message = f"Valid trials in session: {valid_trials_last}"
         print(f'{message}')
@@ -420,7 +422,8 @@ def select_task(df, subject):
 
         # Calculate accuracy for the second-to-last session (if exists)
         if second_last_session is not None:
-            correct_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] == 'correct'].shape[0]
+            correct_trials_second_last = df_second_last_session[df_second_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[
+            0]
             valid_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] != 'miss'].shape[0]
             message = f"Valid trials in previous session: {valid_trials_second_last}"
             print(f'{message}')
@@ -512,17 +515,30 @@ def select_task(df, subject):
 
                                     # When substage reaches 2, update task, substage_bias, and substage
                                     if substage == 2:
-                                        task = "Probability_Extra_Training"
-                                        substage_bias = 0
-                                        substage = 3
-                                        message = f'Substage is now 3, task changed to {task}, substage_bias reset to 0'
-                                        print(f'{message}')
-                                        try:
-                                            telegram_bot.alarm_finish_session(message, my_subject)
-                                            telegram_bot.alarm_completed_criteria(task, my_subject)
-                                        except:
-                                            print('Telegram message not sent')
-                                            pass
+                                        if 'Probability_Extra_Training_Bias_Left_Correction' in task:
+                                            task = "Probability_Extra_Training_Bias_Left"
+                                            substage_bias = 3
+                                            substage = 2
+                                            message = f'Substage is now 2, task changed to {task}, substage_bias reset to 3'
+                                            print(f'{message}')
+                                            try:
+                                                telegram_bot.alarm_finish_session(message, my_subject)
+                                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                            except:
+                                                print('Telegram message not sent')
+                                                pass
+                                        else:
+                                            task = "Probability_Extra_Training"
+                                            substage_bias = 0
+                                            substage = 3
+                                            message = f'Substage is now 3, task changed to {task}, substage_bias reset to 0'
+                                            print(f'{message}')
+                                            try:
+                                                telegram_bot.alarm_finish_session(message, my_subject)
+                                                telegram_bot.alarm_completed_criteria(task, my_subject)
+                                            except:
+                                                print('Telegram message not sent')
+                                                pass
 
 
         elif 'Probability_Training_Bias' in task:
@@ -920,7 +936,11 @@ def select_task(df, subject):
         elif 'Probability_Turtle_Training' in task:
             trial_criteria = 30
             accuracy_criteria = 0.80
-            trial_end_criteria = 1000
+            trial_end_criteria = 3000
+
+            if my_subject == 'm2':
+                trial_criteria = 2
+                accuracy_criteria = 0.7
 
             trial_counter = last_row['trial_counter']
 
@@ -1047,7 +1067,8 @@ def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_mo
         session_data = df_last3[df_last3['session'] == session]
         # Calculate trial count and accuracy
         trial_count = session_data['trial'].max()
-        correct_trials = session_data[session_data['trial_result'] == 'correct'].shape[0]
+        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
+            0]
         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
         # Check criteria
