@@ -1048,7 +1048,7 @@ def function61():  # When the correct answer is on left
     print('Trial Condition: ', trial_condition)
 
     try:
-        image_folder = f'/home/ratvillage01/academy/stimuli/5_webers_law_training/{trial_condition}'
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{trial_condition}'
         left_images = [f for f in os.listdir(image_folder) if
                        os.path.isfile(os.path.join(image_folder, f)) and
                        ('left' in f.lower() and 'both' in f.lower())]
@@ -1087,7 +1087,7 @@ def function62():  # When the correct answer is on right
 
     try:
         # Get all the images based on the stages
-        image_folder = f'/home/ratvillage01/academy/stimuli/5_webers_law_training/{trial_condition}'
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{trial_condition}'
         right_images = [f for f in os.listdir(image_folder) if
                         os.path.isfile(os.path.join(image_folder, f)) and
                         ('right' in f.lower() and 'both' in f.lower())]
