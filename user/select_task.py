@@ -815,9 +815,14 @@ def select_task(df, subject):
             trial_counter_ror = last_row['trial_counter_ror']
 
             if trial_counter_ror >= trial_end_criteria:
+                ror = []
+                completed_ror = []
                 current_ror = 0
+                trial_counter_ror = 0
+                #task = 'Probability_Turtle_Training'
                 stage = 6
-                # task = 'Water_Filler'
+                substage = 0
+                trial_counter = 0
                 message = f"{trial_end_criteria} trials completed in ROR {current_ror}. Task ended."
                 print(f'{message}')
                 try:
@@ -827,7 +832,7 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-            if last_session_task == second_last_session_task:
+            elif last_session_task == second_last_session_task:
                 # Update the logic to use trial_condition
                 if last_session_ror == second_last_session_ror:
                     # Allowed trial_conditions for the current ROR
@@ -895,8 +900,10 @@ def select_task(df, subject):
                             else:
                                 print("All RORs are completed. Task ends.")
                                 current_ror = 0
-                                stage = 6
                                 #task = 'Probability_Turtle_Training'
+                                stage = 6
+                                substage = 0
+                                trial_counter = 0
                                 message = 'PI: Webers law Training completed'
                                 print(f'{message}')
                                 try:
