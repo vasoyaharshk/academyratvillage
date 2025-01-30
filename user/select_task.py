@@ -896,7 +896,7 @@ def select_task(df, subject):
                                 print("All RORs are completed. Task ends.")
                                 current_ror = 0
                                 stage = 6
-                                #task = 'Water_Filler'
+                                #task = 'Probability_Turtle_Training'
                                 message = 'PI: Webers law Training completed'
                                 print(f'{message}')
                                 try:
