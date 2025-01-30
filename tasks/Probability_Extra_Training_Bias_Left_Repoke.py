@@ -311,7 +311,7 @@ class Probability_Extra_Training_Bias_Left_Repoke(Task):
             self.accwindow = self.accwindow[1:] + [0]
             self.trial_result = 'miss'
 
-        if self.current_trial_states['No_Touch2'][0][0] > 0:  # misses modify the acc
+        if self.current_trial_states['No_Touch2'][0][0] > 0:  # miss after a touch is considered as an incorrect
             self.accwindow = self.accwindow[1:] + [0]
             self.trial_result = 'incorrect'
 
