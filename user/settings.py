@@ -154,13 +154,9 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002317343440"  # <-- TO CHANGE
-TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
-}
+TELEGRAM_TOKEN = ""  # <-- TO CHANGE
+TELEGRAM_CHAT = ""  # <-- TO CHANGE
+TELEGRAM_USERS = {""}
 
 #AWS
 OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
@@ -186,6 +182,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
