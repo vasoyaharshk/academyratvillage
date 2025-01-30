@@ -1323,10 +1323,10 @@ def function73():
     y = utils.task.y_correcth * settings.PIXELS_PER_MM
 
     if x_incorrect is None:
-        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, None, y, width, height)
+        touch.start_reading_probability_correction(utils.task.response_duration, x_correct, None, y, width, height)
     else:
         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+        touch.start_reading_probability_correction(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -1343,10 +1343,10 @@ def function74():
     y = utils.task.y_correcth * settings.PIXELS_PER_MM
 
     if x_incorrect is None:
-        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, None, y, width, height)
+        touch.start_reading_probability_correction(utils.task.response_duration, x_correct, None, y, width, height)
     else:
         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability_turtle(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+        touch.start_reading_probability_correction(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
