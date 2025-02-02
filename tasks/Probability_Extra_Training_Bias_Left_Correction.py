@@ -141,11 +141,9 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+        print('Stim_Trial: ', self.stim_trial)
 
-        ### Randomizing the stimulus positions for both the images:
-        # Choose x positions:
-        self.stim = [51,
-                     52]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [51, 52]
 
         # Stimulus generation logic
         if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials

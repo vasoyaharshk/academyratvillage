@@ -76,7 +76,7 @@ THRESHOLD_DAY_DOOR2 = 60                                                 # <-- T
 
 THRESHOLD_NIGHT_CAGE1 = 40                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
 THRESHOLD_NIGHT_CAGE2 = 45                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR1 = 85                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR1 = 75                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 85                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
