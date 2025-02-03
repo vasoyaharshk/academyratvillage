@@ -158,11 +158,6 @@ class Probability_Training_Bias_Left(Task):
 
         self.stim_trial = self.stim_trials[self.current_trial]
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
-        else:
-            self.stim_trial = self.last_stim_trial
-
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
             if self.stim_trial == 31:
