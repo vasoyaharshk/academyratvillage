@@ -127,6 +127,12 @@ class Probability_Extra_Training_Demotivation(Task):
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
 
+        if self.current_trial == 0:
+            self.bias_breaking = 0
+            self.accuracy = 0
+
+        print('Bias Breaking: ', self.bias_breaking)
+
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [51, 52]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right

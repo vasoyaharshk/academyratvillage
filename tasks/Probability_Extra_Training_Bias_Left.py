@@ -137,6 +137,7 @@ class Probability_Extra_Training_Bias_Left(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
+        print('Bias_Breaking: ', self.bias_breaking)
 
         self.bias_breaking = 0
 
