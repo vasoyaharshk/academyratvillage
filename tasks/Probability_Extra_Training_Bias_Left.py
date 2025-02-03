@@ -162,6 +162,8 @@ class Probability_Extra_Training_Bias_Left(Task):
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
+
+            print(f"Successfully generated stimulus trials: {self.stim_trials}")
             print('Substage_bias: ', self.substage_bias, 'Probs: ', self.probabilities)
 
         self.stim_trial = self.stim_trials[self.current_trial]

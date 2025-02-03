@@ -163,6 +163,8 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
             # print('x positions list: ' + str(self.stim_trials))
+
+            print(f"Successfully generated stimulus trials: {self.stim_trials}")
             print('Substage_bias: ', self.substage_bias, 'Probs: ', self.probabilities)
 
         self.stim_trial = self.stim_trials[self.current_trial]
