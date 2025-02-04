@@ -49,6 +49,7 @@ class SoundR:
 
 def pureToneGen(amp, freq, toneDuration, FsOut=44800):
     """Generates a given parameters pure tone vector. Generates a sine wave (pure tone) as a NumPy array.
+    FsOut is the sound quality (sampling rate), 44800 Hz is the CD quality.
     pureToneGen(amp, freq, toneDuration, FsOut=192000):
     """
     if type(amp) is float and type(freq) is int:
