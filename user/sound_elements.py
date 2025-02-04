@@ -48,11 +48,13 @@ class SoundR:
 
 
 def pureToneGen(amp, freq, toneDuration, FsOut=44800):
-    """generates a given parameters pure tone vector. Gen counterpart using np.empty(s1.shape[?])
+    """Generates a given parameters pure tone vector. Generates a sine wave (pure tone) as a NumPy array.
     pureToneGen(amp, freq, toneDuration, FsOut=192000):
     """
     if type(amp) is float and type(freq) is int:
+        # Create a time vector from 0 to duration, sampled at FsOut
         tvec = np.linspace(0, toneDuration, toneDuration * FsOut)
+        # Generate a sine wave with the given amplitude and frequency
         s1 = amp * np.sin(2 * np.pi * freq * tvec)
         return s1
     else:
