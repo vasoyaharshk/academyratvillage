@@ -161,7 +161,7 @@ class Probability_WL_Training(Task):
         return trials
 
     def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
-        # Rules enforced by this script:
+        # Rules enforced by this function:
         # 1. Trial Type Constraints:
         #    - No more than two consecutive trials of the same type (hard or easy).
         #
