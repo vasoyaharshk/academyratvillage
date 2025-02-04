@@ -69,7 +69,7 @@ ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- T
 SEVERALMICE = 14000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
-THRESHOLD_DAY_CAGE1 = 40                                                  # <-- TO CHANGE
+THRESHOLD_DAY_CAGE1 = 25                                                  # <-- TO CHANGE
 THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
