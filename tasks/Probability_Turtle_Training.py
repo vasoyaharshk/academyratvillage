@@ -72,6 +72,7 @@ class Probability_Turtle_Training(Task):
         self.stim_trial = 0
         self.stim_trials = []
         self.image_path_function = None
+        self.image_displayed = None
         # self.stim_trial_counter = 0
 
     def configure_gui(self):
@@ -181,6 +182,9 @@ class Probability_Turtle_Training(Task):
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         self.image_path_function = self.get_stim_image_path(self.stim_trial, self.substage)
+
+        directory, filename = os.path.split(self.image_path_function)
+        self.image_displayed = filename
 
         ############ STATE MACHINE ################
         # First trial:
@@ -387,4 +391,6 @@ class Probability_Turtle_Training(Task):
         self.register_value('correct_count', self.correct_count)
         self.register_value('touch_outside', self.touch_outside)
         self.register_value('correction_count', self.correction_count)
+        self.register_value('image_displayed', self.image_displayed)
+
 

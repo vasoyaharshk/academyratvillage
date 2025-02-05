@@ -69,6 +69,7 @@ class Probability_WL_Training(Task):
         self.height = 225   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
         self.stim = [0]  # Calls functions to display Blue 1.png and function 26 to display Blue 2.png respectively.
         self.image_path_function = None
+        self.image_displayed = None
 
         #Bias breaking variables, not used in Weber's Law:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -489,6 +490,9 @@ class Probability_WL_Training(Task):
 
         self.image_path_function = self.get_stim_image_path(self.stim_trial, self.substage)
 
+        directory, filename = os.path.split(self.image_path_function)
+        self.image_displayed = filename
+
         print('Stimulus Condition', self.trial_conditions)
         print('Stimulus Condition', self.trial_condition)
         print('Stimulus trial: ', self.stim_trial_wlt)
@@ -785,3 +789,4 @@ class Probability_WL_Training(Task):
         self.register_value('condition_trial_counter', self.condition_trial_counter)
         self.register_value('trial_conditions', self.trial_conditions)
         self.register_value('trial_condition', self.trial_condition)
+        self.register_value('image_displayed', self.image_displayed)
