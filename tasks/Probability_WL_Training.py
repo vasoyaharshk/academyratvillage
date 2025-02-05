@@ -68,6 +68,7 @@ class Probability_WL_Training(Task):
         self.width = 110  # Stimulus width in mm. Original size for big jar is 80mm and small jar is 70mm.
         self.height = 225   # Stimulus height in mm. Original size for big jar is 125mm and small jar is 110mm.
         self.stim = [0]  # Calls functions to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.image_path_function = None
 
         #Bias breaking variables, not used in Weber's Law:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -79,21 +80,6 @@ class Probability_WL_Training(Task):
         self.status = None              #Stores the Touch_outside condition
         self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        # # Randomise blocks and trials for Weber's Law:
-        # self.block = 0  # This is the number of trials one conditions will remain for
-        # self.conditions = []  # Takes the conditions from select task file.
-        # self.completed_conditions = []  # To store completed conditions
-        # self.current_condition = 0  # To track the current condition in progress
-        # self.repetition = 0  # To store how many times the conditions needs to repeat.
-        # self.current_repetition = 0  # To store how many times the condition has repeated.
-        # self.trial_counter = 0  # Track the number of trials for the current ror
-        # # Image output stims:
-        # self.stim_trial = 0
-        # self.stim_trials = []
-        # self.stim_trial_counter = 0
-
-        #self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
         #Weber's Law Training Variables:
         # Variables not tracked:
@@ -121,6 +107,41 @@ class Probability_WL_Training(Task):
         self.completed_ror = []
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
+
+    def get_stim_image_path(self, stim_trial, trial_condition):
+        """
+        Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
+        """
+        image_path = None
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{condition}'
+
+        try:
+            if stim_trial == 61:
+                position = 'left'
+            elif stim_trial == 62:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
+
+                # Get relevant images
+            images = [f for f in os.listdir(image_folder) if
+                      os.path.isfile(os.path.join(image_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+
+            if not images:
+                raise ValueError(
+                    f"No images found in {image_folder} for condition {condition} and position {position}.")
+
+            # Choose a random image
+            image_path = os.path.join(image_folder, random.choice(images))
+
+            print(f'Trial Condition: {condition}')
+            print(f'Correct answer on {position}: {image_path}')
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+        return image_path
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -465,6 +486,8 @@ class Probability_WL_Training(Task):
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.substage)
 
         print('Stimulus Condition', self.trial_conditions)
         print('Stimulus Condition', self.trial_condition)

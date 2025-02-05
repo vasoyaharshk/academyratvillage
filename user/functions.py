@@ -1039,36 +1039,12 @@ def loop56(timing):
 ## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
 def function61():  # When the correct answer is on left
     global last_function_called, image_path
-    last_function_called = 61  # Track that function41 was called
+    last_function_called = 61  # Track that function31 was called
 
-    stage = utils.task.stage
-    trial_condition = utils.task.trial_condition
-    left_images = []
+    image_path = utils.task.image_path_function
 
-    print('Trial Condition: ', trial_condition)
-
-    try:
-        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{trial_condition}'
-        left_images = [f for f in os.listdir(image_folder) if
-                       os.path.isfile(os.path.join(image_folder, f)) and
-                       ('left' in f.lower() and 'both' in f.lower())]
-
-        if not left_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the left_images list
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
-
-        image_jar_left.image = random_image_path_left
-        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage: ', utils.task.stage)
-        print('Correct answer on left: ', random_image_path_left)
-
-        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop61(timing):
     image_jar_left.draw()
