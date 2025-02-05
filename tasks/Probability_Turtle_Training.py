@@ -57,6 +57,7 @@ class Probability_Turtle_Training(Task):
         self.correction_count = 0
         self.accuracy = 0
         self.trial_counter = 0
+        self.random_counter = 0
 
         # Image output stims:
         self.stim = [0]
@@ -70,6 +71,7 @@ class Probability_Turtle_Training(Task):
         # Image output stims:
         self.stim_trial = 0
         self.stim_trials = []
+        self.image_path = None
         # self.stim_trial_counter = 0
 
     def configure_gui(self):
@@ -90,20 +92,71 @@ class Probability_Turtle_Training(Task):
                 trials.append(candidate)
         return trials
 
+    def get_stim_image_path(self, stim_trial, substage):
+        """
+        Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
+        """
+        image_path = None
+        image_folder = None
+
+        try:
+            if stim_trial == 71:
+                position = 'left'
+            elif stim_trial == 72:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
+
+            # Define image folder based on substage
+            if substage == 0:
+                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
+            elif substage == 1:
+                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
+            elif substage == 2:
+                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
+            elif substage == 3:
+                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
+            else:
+                raise ValueError(f"Invalid substage value: {substage}.")
+
+            # Get relevant images
+            images = [f for f in os.listdir(image_folder) if
+                      os.path.isfile(os.path.join(image_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+
+            if not images:
+                raise ValueError(f"No images found in {image_folder} for substage {substage} and position {position}.")
+
+            # Choose a random image
+            image_path = os.path.join(image_folder, random.choice(images))
+
+            print(f'Stage: {utils.task.stage}')
+            print(f'Correct answer on {position}: {image_path}')
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+        return image_path
+
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
+        print('Random Counter: ' + str(self.random_counter))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
+
+        if self.current_trial == 0:
+            self.accuracy = 0
+            self.random_counter = 0
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.current_trial % 40 == 0:  # Re-randomize every 10 trials
+        if self.random_counter % 40 == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
-            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
+            last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
@@ -114,10 +167,8 @@ class Probability_Turtle_Training(Task):
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
 
-        self.stim_trial = self.stim_trials[self.current_trial]
+        self.stim_trial = self.stim_trials[self.random_counter]
 
-
-        self.stim_trial = self.stim_trials[self.current_trial]
 
         # Decide where the correct position is depending on the function generated randomly, 71 for left and 72 for right:
         if self.stim_trial == 71:
@@ -127,8 +178,9 @@ class Probability_Turtle_Training(Task):
         elif self.stim_trial == 72:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                  self.x_incorrecth)
+            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        self.image_path_function = get_stim_image_path(self.stim_trial, self.substage)
 
         ############ STATE MACHINE ################
         # First trial:
@@ -261,6 +313,8 @@ class Probability_Turtle_Training(Task):
 
     def after_trial(self):
         if self.stage != 7:
+            self.random_counter += 1
+
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
                 self.accwindow = self.accwindow[1:] + [0]

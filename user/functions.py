@@ -1210,104 +1210,133 @@ def loop64(timing):
 
 
 ## FUNCTIONS FROM 70 TO 80 ARE FOR TURTLE STYLE EXPERIMENT:
+# def function71():  # When the correct stimuli is on left
+#     global last_function_called, image_path
+#     last_function_called = 71  # Track that function31 was called
+#
+#     substage = utils.task.substage
+#     left_images = []
+#     try:
+#         # Get all the images based on the stages
+#         if substage == 0:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
+#             left_images = [f for f in os.listdir(image_folder) if
+#                            os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('left' in f.lower() and 'both' in f.lower())]
+#         elif substage == 1:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
+#             left_images = [f for f in os.listdir(image_folder) if
+#                            os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('left' in f.lower() and 'both' in f.lower())]
+#         elif substage == 2:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
+#             left_images = [f for f in os.listdir(image_folder) if
+#                            os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('left' in f.lower() and 'both' in f.lower())]
+#         elif substage == 3:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
+#             left_images = [f for f in os.listdir(image_folder) if
+#                            os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('left' in f.lower() and 'both' in f.lower())]
+#
+#         if not left_images:
+#             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+#
+#         # Choose a random image from the left_images list
+#         random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+#
+#         image_jar_left.image = random_image_path_left
+#         image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+#
+#         print('Stage: ', utils.task.stage)
+#         print('Correct answer on left: ', random_image_path_left)
+#
+#         image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+#
+#     except Exception as e:
+#         print(f"Error occurred: {e}")
+#
+# def loop71(timing):
+#     image_jar_left.draw()
+#     window.flip()
+#
+#
+# # Functions for Probability Inference Tasks for different stages where the correct answer is right:
+# def function72():  # When the correct stimuli is on right
+#     global last_function_called, image_path
+#     last_function_called = 72  # Track that function31 was called
+#
+#     substage = utils.task.substage
+#     right_images = []
+#     try:
+#         # Get all the images based on the stages
+#         if substage == 0:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
+#             right_images = [f for f in os.listdir(image_folder) if
+#                             os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('right' in f.lower() and 'both' in f.lower())]
+#         elif substage == 1:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
+#             right_images = [f for f in os.listdir(image_folder) if
+#                             os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('right' in f.lower() and 'both' in f.lower())]
+#         elif substage == 2:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
+#             right_images = [f for f in os.listdir(image_folder) if
+#                             os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('right' in f.lower() and 'both' in f.lower())]
+#         elif substage == 3:
+#             image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
+#             right_images = [f for f in os.listdir(image_folder) if
+#                             os.path.isfile(os.path.join(image_folder, f)) and
+#                            ('right' in f.lower() and 'both' in f.lower())]
+#
+#         if not right_images:
+#             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+#
+#         # Choose a random image from the right_images list
+#         random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+#
+#         image_jar_right.image = random_image_path_right
+#         image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+#
+#         print('Stage:', utils.task.stage)
+#         print('Correct answer on right:', random_image_path_right)
+#
+#         image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+#
+#     except Exception as e:
+#         print(f"Error occurred: {e}")
+#
+#
+# def loop72(timing):
+#     image_jar_right.draw()
+#     window.flip()
+
+
 def function71():  # When the correct stimuli is on left
     global last_function_called, image_path
     last_function_called = 71  # Track that function31 was called
 
-    substage = utils.task.substage
-    left_images = []
-    try:
-        # Get all the images based on the stages
-        if substage == 0:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif substage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif substage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif substage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
+    image_path = utils.task.image_path_function
 
-        if not left_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the left_images list
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
-
-        image_jar_left.image = random_image_path_left
-        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage: ', utils.task.stage)
-        print('Correct answer on left: ', random_image_path_left)
-
-        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop71(timing):
     image_jar_left.draw()
     window.flip()
 
 
-# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+# Functions where the correct answer is right:
 def function72():  # When the correct stimuli is on right
     global last_function_called, image_path
     last_function_called = 72  # Track that function31 was called
 
-    substage = utils.task.substage
-    right_images = []
-    try:
-        # Get all the images based on the stages
-        if substage == 0:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif substage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif substage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif substage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
+    image_path = utils.task.image_path_function
 
-        if not right_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the right_images list
-        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
-
-        image_jar_right.image = random_image_path_right
-        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage:', utils.task.stage)
-        print('Correct answer on right:', random_image_path_right)
-
-        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop72(timing):
     image_jar_right.draw()
