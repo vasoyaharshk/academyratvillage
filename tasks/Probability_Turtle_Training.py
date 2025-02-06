@@ -60,6 +60,7 @@ class Probability_Turtle_Training(Task):
         self.accuracy = 0
         self.trial_counter = 0
         self.random_counter = 0
+        self.random_block = 4
 
         # Image output stims:
         self.stim = [0]
@@ -157,7 +158,7 @@ class Probability_Turtle_Training(Task):
         self.stim = [71, 72]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
 
         # Stimulus generation logic
-        if self.random_counter % 40 == 0:  # Re-randomize every 10 trials
+        if self.random_counter % self.random_block == 0:  # Re-randomize every 10 trials
             # If not the first block, pass the last stimulus of the previous block to avoid repetition
             last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
             self.stim_trials = self.generate_random_trials(last_trial)
