@@ -950,6 +950,7 @@ def select_task(df, subject):
                 accuracy_criteria = 0.7
                 trial_end_criteria = 20
 
+            last_row = df.iloc[-1]  # Get the last row of the DataFrame
             trial_counter = last_row['trial_counter']
 
             if trial_counter >= trial_end_criteria:
@@ -993,8 +994,6 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
-
-
 
     elif task == 'Water_Filler':
         print("rat drank water")
