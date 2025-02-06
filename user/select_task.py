@@ -977,6 +977,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 else:
+                    stage = 7
                     #task = 'Probability_Turtle_Test'
                     message = (f"Last substage {substage} completed, Training complete")
                     print(f'{message}')
