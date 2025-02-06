@@ -785,7 +785,7 @@ def select_task(df, subject):
         elif 'Probability_WL_Training' in task:
             trial_criteria = 72
             accuracy_criteria = 0.70
-            trial_end_criteria = 3000
+            trial_end_criteria = 1500
 
             if my_subject == 'm2':
                 trial_criteria = 10
