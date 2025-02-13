@@ -589,6 +589,7 @@ class StageTraining_RatB_V1_50(Task):
 
     def after_trial(self):
         ############ TRIAL COUNTER ################
+        self.trial_counter += 1
 
         ##### COUNT MISSES
         if self.current_trial_states['Miss'][0][0] > 0:  # misses & incorrects modify the acc

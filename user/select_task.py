@@ -361,22 +361,6 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-            # elif stage == 3:
-            #     # Count the total number of trials where stage == 3
-            #     trial_counter = last_row['trial_counter']
-            #
-            #     # Check if the total trials exceed or equal 4000
-            #     if trial_counter >= 4000:
-            #         task = "Probability_Training_BB"
-            #         stage = 1
-            #         substage = 0
-            #         message = (f"Total trials in Stage 3 reached {trial_counter}. Moving to Probability task.")
-            #         print(message)
-            #         try:
-            #             telegram_bot.alarm_finish_session(message, my_subject)
-            #             telegram_bot.alarm_completed_criteria(task, my_subject)
-            #         except:
-            #             print("Telegram message not sent")
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
         trial_criteria = 20
