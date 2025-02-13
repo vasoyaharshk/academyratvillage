@@ -175,7 +175,28 @@ def select_task(df, subject):
 
             ############ STAGE 1 ############
             #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
-            if stage == 1:
+            if stage == 3:
+                # Count the total number of trials where stage == 3
+                print("here1")
+                last_row = df.iloc[-1]  # Get the last row of the DataFrame
+                trial_counter = last_row['trial_counter']
+                print("trial_counter", trial_counter)
+                # Check if the total trials exceed or equal 4000
+                if trial_counter >= 4000:
+                    print("here2")
+                    task = "Probability_Training_BB"
+                    stage = 1
+                    substage = 0
+                    message = (f"Total trials in Stage 3 reached {trial_counter}. Moving to Probability task.")
+                    trial_counter = 0
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print("Telegram message not sent")
+                        pass
+            elif stage == 1:
                 if substage == 1:
                     if last3_poke_acc >= 0.8 and len(last2_substages) == 1 and n_trials > 60:  # next substage
                         substage += 1
@@ -361,23 +382,6 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-
-            elif stage == 3:
-            # Count the total number of trials where stage == 3
-            trial_counter = last_row['trial_counter']
-
-            # Check if the total trials exceed or equal 4000
-            if trial_counter >= 4000:
-                task = "Probability_Training_BB"
-                stage = 1
-                substage = 0
-                message = (f"Total trials in Stage 3 reached {trial_counter}. Moving to Probability task.")
-                print(message)
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                    telegram_bot.alarm_completed_criteria(task, my_subject)
-                except:
-                    print("Telegram message not sent")
 
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
