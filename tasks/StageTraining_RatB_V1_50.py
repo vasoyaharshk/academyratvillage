@@ -164,7 +164,6 @@ class StageTraining_RatB_V1_50(Task):
 
         ####### STAGE 1: STIMULUS CATEGORIZATION ######
         if self.stage == 1:
-
             if self.blocks == True:  # Repeat more un side if blocks allowed
                 if self.substage==1:
                     self.prob = 0.75
