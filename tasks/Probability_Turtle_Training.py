@@ -194,8 +194,6 @@ class Probability_Turtle_Training(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.stage != 7:
-            self.trial_counter += 1
-
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -322,6 +320,7 @@ class Probability_Turtle_Training(Task):
 
     def after_trial(self):
         if self.stage != 7:
+            self.trial_counter += 1
             self.random_counter += 1
 
             ##### COUNT MISSES:
