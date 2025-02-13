@@ -177,13 +177,10 @@ def select_task(df, subject):
             #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
             if stage == 3:
                 # Count the total number of trials where stage == 3
-                print("here1")
                 last_row = df.iloc[-1]  # Get the last row of the DataFrame
                 trial_counter = last_row['trial_counter']
-                print("trial_counter", trial_counter)
                 # Check if the total trials exceed or equal 4000
                 if trial_counter >= 4000:
-                    print("here2")
                     task = "Probability_Training_BB"
                     stage = 1
                     substage = 0
