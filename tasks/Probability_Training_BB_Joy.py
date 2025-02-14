@@ -5,18 +5,18 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_Training_BB_Joy(Task):
+class Probability_Training_BB(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
-        This script is only for Joy.
+        This script is only for Joy where stage 2 and stage 3 are big jars only
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). All big
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). All Big
-        Stage 4: Discrimination c: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
+        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
+        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Both are big jars.
+        Stage 4: Discrimination c: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%) but big jars randomised.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -76,6 +76,9 @@ class Probability_Training_BB_Joy(Task):
         self.y_correcth = 110
         self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
         self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -118,6 +121,53 @@ class Probability_Training_BB_Joy(Task):
                     continue  # Skip if the first trial of new block matches last trial of previous block
                 trials.append(candidate)
         return trials
+
+    def get_stim_image_path(self, stim_trial, stage):
+        """
+        Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
+        """
+        image_path = None
+        image_folder = None
+
+        try:
+            if stim_trial == 31:
+                position = 'left'
+            elif stim_trial == 32:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 31 or 32.")
+
+            # Define image folder based on substage
+            if stage == 1:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/1_indication'
+            elif stage == 2:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/2_discrimination_1'
+            elif stage == 3:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/3_discrimination_2'
+            elif stage == 4:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/4_discrimination_3'
+            else:
+                raise ValueError(f"Invalid substage value: {substage}.")
+
+            # Get relevant images
+            images = [f for f in os.listdir(image_folder) if
+                      os.path.isfile(os.path.join(image_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+
+            if not images:
+                raise ValueError(f"No images found in {image_folder} for substage {substage} and position {position}.")
+
+            # Choose a random image
+            image_path = os.path.join(image_folder, random.choice(images))
+
+            print(f'Stage: {utils.task.stage}')
+            print(f'Correct answer on {position}: {image_path}')
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+        return image_path
+
 
     def main_loop(self):
         print('')
@@ -176,6 +226,12 @@ class Probability_Training_BB_Joy(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+
+        directory, filename = os.path.split(self.image_path_function)
+        self.image_displayed = filename
+        self.image_directory = directory
 
 
         ############ STATE MACHINE ################
@@ -473,3 +529,5 @@ class Probability_Training_BB_Joy(Task):
         self.register_value('stim_trial', self.stim_trial)
         self.register_value('stim_trials', self.stim_trials)
         self.register_value('stim_trial_counter', self.stim_trial_counter)
+        self.register_value('image_displayed', self.image_displayed)
+        self.register_value('image_directory', self.image_directory)

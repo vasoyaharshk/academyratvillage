@@ -379,96 +379,35 @@ image_path = None  # Global variable to store the image path
 #random_image_path_right = None
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
-def function31():  # When the blue jar is on left
+
+def function31():  # When the correct stimuli is on left
     global last_function_called, image_path
     last_function_called = 31  # Track that function31 was called
 
-    stage = utils.task.stage
-    left_images = []
-    try:
-        # Get all the images based on the stages
-        if stage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
-        elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_1'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_2'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
+    image_path = utils.task.image_path_function
 
-        if not left_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the left_images list
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
-
-        image_jar_left.image = random_image_path_left
-        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage: ', utils.task.stage)
-        print('Correct answer on left: ', random_image_path_left)
-
-        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop31(timing):
     image_jar_left.draw()
     window.flip()
 
 
-# Functions for Probability Inference Tasks for different stages where the correct answer is right:
-def function32():  # When the blue jar is on right
+# Functions where the correct answer is right:
+def function32():  # When the correct stimuli is on right
     global last_function_called, image_path
     last_function_called = 32  # Track that function31 was called
 
-    stage = utils.task.stage
-    right_images = []
-    try:
-        # Get all the images based on the stages
-        if stage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
-        elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_1'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_2'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
+    image_path = utils.task.image_path_function
 
-        if not right_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the right_images list
-        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
-
-        image_jar_right.image = random_image_path_right
-        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage:', utils.task.stage)
-        print('Correct answer on right:', random_image_path_right)
-
-        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop32(timing):
     image_jar_right.draw()
     window.flip()
+
 
 #
 # # Start reading touchscreen for Probabilistic inference tasks with all touches processed:
