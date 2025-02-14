@@ -1349,7 +1349,6 @@ def function82():  # When the correct answer is on right
 def loop82(timing):
     image_jar_right.draw()
     window.flip()
-s
 
 
 #Function 83 to 86 are for conditions 1 and 2 for ror 1 in weber's law post 83 is for Left-Small, 84 for for Right-Small, 85 is for Left-Big, 86 for for Right-Big:
