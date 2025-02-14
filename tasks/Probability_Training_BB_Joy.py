@@ -4,8 +4,10 @@ from academy.utils import utils
 from user import settings
 import random
 import numpy as np
+import os
+import re
 
-class Probability_Training_BB(Task):
+class Probability_Training_BB_Joy(Task):
     def __init__(self):
         super().__init__()
 
