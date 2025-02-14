@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
 
-class Test_PurgeValve(Task):
+class A_Test_PurgeValve(Task):
 
     def __init__(self):
         super().__init__()

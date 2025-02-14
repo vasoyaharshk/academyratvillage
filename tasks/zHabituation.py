@@ -3,7 +3,7 @@ from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
 
-class Habituation(Task):
+class zHabituation(Task):
 
     def __init__(self):
         super().__init__()

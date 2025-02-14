@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
-class LickTeaching_Demotivation(Task):
+class zLickTeaching(Task):
 
     def __init__(self):
         super().__init__()
@@ -36,20 +36,19 @@ class LickTeaching_Demotivation(Task):
 
     def init_variables(self):
         # general
-        self.duration_min = 600  # 10 mins
-        self.duration_max = 660 #11 mins
+        self.duration_min = 1200  # 20 mins
+        self.duration_max = 1260 #21 mins
         self.stage = 0
         self.substage = 0
-        self.trials_max = 4
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1 * 4
 
         # counters
         self.miss_acc_counter = 0
         self.reward_drunk = 0
+
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -98,7 +97,7 @@ class LickTeaching_Demotivation(Task):
 
         self.sma.add_state(
             state_name='Automatic_reward',
-            state_timer=self.valve_time * self.valve_factor_c,
+            state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
                             (Bpod.OutputChannels.SoftCode, 11)])
