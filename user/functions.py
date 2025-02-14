@@ -466,7 +466,7 @@ def function35():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "correct")
             # Update the image path for drawing
-            if last_function_called in [31, 41, 43, 45, 51, 61]:
+            if last_function_called in [31, 41, 43, 45, 51, 61, 81]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
             elif last_function_called in [32, 42, 44, 46, 52, 62]:
@@ -1273,3 +1273,225 @@ def function74():
     #print('x_correct in functions: ', x_correct)
     #print('x_incorrect in functions: ', x_incorrect)
 
+
+
+## FUNCTIONS FROM 81 TO 86 ARE FOR WEBER'S LAW POST.
+# Functions for Probability Inference Tasks for different stages where the correct answer is left:
+def function81():  # When the correct answer is on left
+    global last_function_called, image_path
+    last_function_called = 81  # Track that function41 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left: ', random_image_path_left)
+
+        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop81(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+def function82():  # When the correct answer is on right
+    global last_function_called, image_path
+    last_function_called = 82  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right:', random_image_path_right)
+
+        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop82(timing):
+    image_jar_right.draw()
+    window.flip()
+s
+
+
+#Function 83 to 86 are for conditions 1 and 2 for ror 1 in weber's law post 83 is for Left-Small, 84 for for Right-Small, 85 is for Left-Big, 86 for for Right-Big:
+def function83():
+    global last_function_called, image_path
+    last_function_called = 83  # Track that function41 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left, small jar: ', random_image_path_left)
+
+        image_path = random_image_path_left  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop83(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+def function84():
+    global last_function_called, image_path
+    last_function_called = 84  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower() and 'small' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right, small jar:', random_image_path_right)
+
+        image_path = random_image_path_right  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop84(timing):
+    image_jar_right.draw()
+    window.flip()
+
+
+def function85():
+    global last_function_called, image_path
+    last_function_called = 85  # Track that function41 was called
+
+    stage = utils.task.stage
+    current_condition = utils.task.current_condition
+    left_images = []
+    try:
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        left_images = [f for f in os.listdir(image_folder) if
+                       os.path.isfile(os.path.join(image_folder, f)) and
+                       ('left' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left, big jar: ', random_image_path_left)
+
+        image_path = random_image_path_left  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop85(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+def function86():
+    global last_function_called, image_path
+    last_function_called = 86  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    current_condition = utils.task.current_condition
+
+    try:
+        # Get all the images based on the stages
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/4_webers_law_post/{current_condition}'
+        right_images = [f for f in os.listdir(image_folder) if
+                        os.path.isfile(os.path.join(image_folder, f)) and
+                        ('right' in f.lower() and 'both' in f.lower() and 'big' in f.lower())]
+
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right, big jar:', random_image_path_right)
+
+        image_path = random_image_path_right  # Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop86(timing):
+    image_jar_right.draw()
+    window.flip()

@@ -707,8 +707,19 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                             pass
-                # Stage 3 -> Weber's Law
                 elif last_session_stage == 3 and second_last_session_stage == 3:
+                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
+                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
+                        stage = 4
+                        message = 'PI: Advancing from stage 3 to stage 4'
+                        print(f'{message}')
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except:
+                            print('Telegram message not sent')
+                            pass
+                # Stage 3 -> Weber's Law
+                elif last_session_stage == 4 and second_last_session_stage == 4:
                     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
                         message = 'PI: Advance from stage 3 to Webers Law with accuracy in both sessions'
                         print(f'{message}')
