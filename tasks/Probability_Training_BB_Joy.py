@@ -152,12 +152,17 @@ class Probability_Training_BB_Joy(Task):
                 raise ValueError(f"Invalid stage value: {stage}.")
 
             # Get relevant images
-            images = [f for f in os.listdir(image_folder) if
-                      os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower())]
+            if stage != 1:
+                images = [f for f in os.listdir(image_folder) if
+                          os.path.isfile(os.path.join(image_folder, f)) and
+                          (position in f.lower() and 'both' in f.lower())]
+            else:
+                images = [f for f in os.listdir(image_folder) if
+                          os.path.isfile(os.path.join(image_folder, f)) and
+                          (position in f.lower())]
 
             if not images:
-                raise ValueError(f"No images found in {image_folder} for substage {substage} and position {position}.")
+                raise ValueError(f"No images found in {image_folder} for stage {stage} and position {position}.")
 
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
