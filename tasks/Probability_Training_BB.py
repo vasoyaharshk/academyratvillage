@@ -121,34 +121,45 @@ class Probability_Training_BB(Task):
                 trials.append(candidate)
         return trials
 
-    def get_stim_image_path(self, stim_trial, condition):
+    def get_stim_image_path(self, stim_trial, stage):
         """
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
         """
         image_path = None
-        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{condition}'
+        image_folder = None
 
         try:
-            if stim_trial == 61:
+            if stim_trial == 31:
                 position = 'left'
-            elif stim_trial == 62:
+            elif stim_trial == 32:
                 position = 'right'
             else:
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
 
-                # Get relevant images
+            # Define image folder based on substage
+            if stage == 1:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
+            elif stage == 2:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_1'
+            elif stage == 3:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_2'
+            elif stage == 4:
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_3'
+            else:
+                raise ValueError(f"Invalid substage value: {substage}.")
+
+            # Get relevant images
             images = [f for f in os.listdir(image_folder) if
                       os.path.isfile(os.path.join(image_folder, f)) and
                       (position in f.lower() and 'both' in f.lower())]
 
             if not images:
-                raise ValueError(
-                    f"No images found in {image_folder} for condition {condition} and position {position}.")
+                raise ValueError(f"No images found in {image_folder} for substage {substage} and position {position}.")
 
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
 
-            print(f'Trial Condition: {condition}')
+            print(f'Stage: {utils.task.stage}')
             print(f'Correct answer on {position}: {image_path}')
 
         except Exception as e:
@@ -214,6 +225,12 @@ class Probability_Training_BB(Task):
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+
+        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+
+        directory, filename = os.path.split(self.image_path_function)
+        self.image_displayed = filename
+        self.image_directory = directory
 
 
         ############ STATE MACHINE ################
