@@ -137,17 +137,17 @@ class Probability_Training_BB(Task):
             else:
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 31 or 32.")
 
-            # Define image folder based on substage
+            # Define image folder based on stage
             if stage == 1:
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/1_indication'
             elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/2_discrimination_1'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/2_discrimination_a'
             elif stage == 3:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/3_discrimination_2'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/3_discrimination_b'
             elif stage == 4:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/4_discrimination_3'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/4_discrimination_c'
             else:
-                raise ValueError(f"Invalid substage value: {substage}.")
+                raise ValueError(f"Invalid stage value: {stage}.")
 
             # Get relevant images
             images = [f for f in os.listdir(image_folder) if
