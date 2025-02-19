@@ -357,11 +357,11 @@ class Probability_WebersLaw_Post(Task):
             self.stim_trial = self.stim_trials[self.trial_counter % self.block]
         # else:
         #     self.stim_trial = self.last_stim_trial
-        if self.stim_trial in [41, 43, 45]:
+        if self.stim_trial in [81, 83, 85]:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
             print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial in [42, 44, 46]:
+        elif self.stim_trial in [82, 84, 86]:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
             print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
