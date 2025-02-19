@@ -274,7 +274,7 @@ class Probability_Training_BB_Joy(Task):
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-                elif self.stim_trial in [102, 104]:
+            elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)

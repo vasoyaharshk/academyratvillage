@@ -111,66 +111,20 @@ class Probability_Training_SB_Joy(Task):
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
 
-    def generate_random_trials_position_size(self, last_trial=None):
-        """
-        This function generates a sequence of trials ensuring the following constraints:
-        1. No more than two consecutive trials should have the same size ('small' or 'big').
-        2. No more than two consecutive trials should have the same position ('left' or 'right').
-        3. The first trial of the new block must also follow these constraints relative to the last trial of the previous block.
-        """
-        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
-        def generate_trials():
-            all_trials = self.stim * 100  # Ensure enough trials to randomize from
-            random.shuffle(all_trials)
-            trials = []
-            max_attempts = 10000
-            attempts = 0
-            def get_size(trial):
-                return 'small' if trial in [101, 102] else 'big'
-            def get_position(trial):
-                return 'left' if trial in [101, 103] else 'right'
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                return (
-                        get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])
-                ) and (
-                        get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-                    trials[-2])
-                )
-            first_trial_selected = False
-            while len(trials) < self.random_block:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * 100
-                    random.shuffle(all_trials)
-                candidate = all_trials.pop(0)
-                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
-                            last_trial):
-                        continue
-                    first_trial_selected = True
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
-                else:
-                    all_trials.append(candidate)
-            print("Generated trials:", trials)
-            return trials
-
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
-            else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generate_random_trials_ror1: {e}")
-            return None
+    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+        trials = []
+        # Define a 50% probability for each stimulus (two stimuli)
+        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        while len(trials) < 1000:
+            # Use random.choices to select a candidate with 50% probability for each stimulus
+            candidate = random.choices(self.stim, probabilities)[0]
+            # Ensure no repetition more than twice in sequence
+            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                    continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
+        return trials
 
     def get_stim_image_path(self, stim_trial, stage):
         """
@@ -234,11 +188,11 @@ class Probability_Training_SB_Joy(Task):
         if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
             # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
             last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
-            self.stim_trials = self.generate_random_trials_position_size(last_trial)
+            self.stim_trials = self.generate_random_trials(last_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials_position_size(last_trial)
+                self.stim_trials = self.generate_random_trials(last_trial)
                 if self.stim_trials is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
@@ -266,7 +220,7 @@ class Probability_Training_SB_Joy(Task):
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-                elif self.stim_trial in [102, 104]:
+            elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
