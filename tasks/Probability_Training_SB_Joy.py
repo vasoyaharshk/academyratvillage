@@ -7,7 +7,7 @@ import numpy as np
 import os
 import re
 
-class Probability_Training_BB_Joy(Task):
+class Probability_Training_SB_Joy(Task):
     def __init__(self):
         super().__init__()
 
@@ -179,13 +179,7 @@ class Probability_Training_BB_Joy(Task):
         image_path = None
         image_folder = None
         try:
-            if stim_trial == 101:
-                position = 'left'
-                size = 'small'
-            elif stim_trial == 102:
-                position = 'right'
-                size = 'small'
-            elif stim_trial == 103:
+            if stim_trial == 103:
                 position = 'left'
                 size = 'big'
             elif stim_trial == 104:
@@ -200,8 +194,6 @@ class Probability_Training_BB_Joy(Task):
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/2_discrimination_a'
             elif stage == 3:
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/3_discrimination_b'
-            elif stage == 4:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/4_discrimination_c'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
             # Get relevant images based on position and size
@@ -236,7 +228,7 @@ class Probability_Training_BB_Joy(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [101, 102, 103, 104]  # These are the functions being called. 101 is for the correct answer is on the left and 102 is when the correct answer is on the right. 103 left big and 104 right big.
+        self.stim = [103, 104]  # These are the functions being called. 101 is for the correct answer is on the left and 102 is when the correct answer is on the right. 103 left big and 104 right big.
 
         # Stimulus generation logic
         if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
