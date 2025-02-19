@@ -7,17 +7,17 @@ import numpy as np
 import os
 import re
 
-class Probability_Training_BB(Task):
+class Probability_Training_BB_Joy(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
+        This script is only for Joy where stage 2 and stage 3 are big jars only
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each)
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%)
-        Stage 4: Discrimination c: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%) but big jars randomised.
+        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
+        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Both are big jars.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -80,6 +80,9 @@ class Probability_Training_BB(Task):
         self.image_path_function = None
         self.image_displayed = None
         self.image_directory = None
+        self.random_block = 40
+        self.random_counter = 0
+
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -93,7 +96,7 @@ class Probability_Training_BB(Task):
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
         #Required for Weber's law:
-        self.block = 0  # This is the number of trials one conditions will remain for
+        self.block = 0  # This is the number of trials at which randomisation will be given again.
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
@@ -108,36 +111,88 @@ class Probability_Training_BB(Task):
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
-        trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
-                trials.append(candidate)
-        return trials
+    def generate_random_trials_position_size(self, last_trial=None):
+        """
+        This function generates a sequence of trials ensuring the following constraints:
+        1. No more than two consecutive trials should have the same size ('small' or 'big').
+        2. No more than two consecutive trials should have the same position ('left' or 'right').
+        3. The first trial of the new block must also follow these constraints relative to the last trial of the previous block.
+        """
+        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
+        def generate_trials():
+            all_trials = self.stim * 100  # Ensure enough trials to randomize from
+            random.shuffle(all_trials)
+            trials = []
+            max_attempts = 10000
+            attempts = 0
+            def get_size(trial):
+                return 'small' if trial in [101, 102] else 'big'
+            def get_position(trial):
+                return 'left' if trial in [101, 103] else 'right'
+            def is_valid_candidate(candidate, trials):
+                if len(trials) < 2:
+                    return True
+                return (
+                        get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])
+                ) and (
+                        get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
+                    trials[-2])
+                )
+            first_trial_selected = False
+            while len(trials) < self.random_block:
+                attempts += 1
+                if attempts >= max_attempts:
+                    print("Reached max_attempts in generate_trials.")
+                    return None
+                if not all_trials:
+                    print("No candidates left in all_trials. Reinitializing.")
+                    all_trials = self.stim * 100
+                    random.shuffle(all_trials)
+                candidate = all_trials.pop(0)
+                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
+                    if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
+                            last_trial):
+                        continue
+                    first_trial_selected = True
+                if is_valid_candidate(candidate, trials):
+                    trials.append(candidate)
+                else:
+                    all_trials.append(candidate)
+            print("Generated trials:", trials)
+            return trials
+
+        try:
+            result = generate_trials()
+            if result is None:
+                print("generate_trials returned None.")
+            else:
+                print(f"Generated trials successfully: {result}")
+            return result
+        except Exception as e:
+            print(f"Error in generate_random_trials_ror1: {e}")
+            return None
 
     def get_stim_image_path(self, stim_trial, stage):
         """
-        Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
+        Determines whether stim_trial is 101, 102, 103, or 104, retrieves the corresponding image path, and returns it.
         """
         image_path = None
         image_folder = None
-
         try:
-            if stim_trial == 31:
+            if stim_trial == 101:
                 position = 'left'
-            elif stim_trial == 32:
+                size = 'small'
+            elif stim_trial == 102:
                 position = 'right'
+                size = 'small'
+            elif stim_trial == 103:
+                position = 'left'
+                size = 'big'
+            elif stim_trial == 104:
+                position = 'right'
+                size = 'big'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
-
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 101, 102, 103, or 104.")
             # Define image folder based on stage
             if stage == 1:
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
@@ -149,29 +204,19 @@ class Probability_Training_BB(Task):
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
-
-            # Get relevant images
-            if stage != 1:
-                images = [f for f in os.listdir(image_folder) if
-                          os.path.isfile(os.path.join(image_folder, f)) and
-                          (position in f.lower() and 'both' in f.lower())]
-            else:
-                images = [f for f in os.listdir(image_folder) if
-                          os.path.isfile(os.path.join(image_folder, f)) and
-                          (position in f.lower())]
-
+            # Get relevant images based on position and size
+            images = [f for f in os.listdir(image_folder) if
+                      os.path.isfile(os.path.join(image_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower() and size in f.lower())]
             if not images:
-                raise ValueError(f"No images found in {image_folder} for stage {stage} and position {position}.")
-
+                raise ValueError(
+                    f"No images found in {image_folder} for stage {stage}, position {position}, and size {size}.")
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
-
             print(f'Stage: {utils.task.stage}')
-            print(f'Correct answer on {position}: {image_path}')
-
+            print(f'Correct answer on {position}, {size} jar: {image_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
-
         return image_path
 
 
@@ -180,55 +225,56 @@ class Probability_Training_BB(Task):
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
+        print('Random Counter: ', self.random_counter)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
+            self.random_counter = 0
 
         print('Bias Breaking: ', self.bias_breaking)
-        #print('Stim_Trials: ', self.stim_trials)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [31, 32]  # These are the functions being called. 31 is for the correct answer is on the left and 32 is when the correct answer is on the right
+        self.stim = [101, 102, 103, 104]  # These are the functions being called. 101 is for the correct answer is on the left and 102 is when the correct answer is on the right. 103 left big and 104 right big.
 
         # Stimulus generation logic
-        if self.current_trial % 10 == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-            # If not the first block, pass the last stimulus of the previous block to avoid repetition
-            last_trial = self.stim_trials[self.current_trial - 1] if self.current_trial > 0 else None
-            self.stim_trials = self.generate_random_trials(last_trial)
+        if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+            # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
+            last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
+            self.stim_trials = self.generate_random_trials_position_size(last_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials(last_trial)
+                self.stim_trials = self.generate_random_trials_position_size(last_trial)
                 if self.stim_trials is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
 
-        self.stim_trial = self.stim_trials[self.current_trial]
+        self.stim_trial = self.stim_trials[self.random_counter]
 
         if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.current_trial]
+            self.stim_trial = self.stim_trials[self.random_counter]
         else:
             self.stim_trial = self.last_stim_trial
 
         if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 31:
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
+            if self.stim_trial == 101:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 32:
+            elif self.stim_trial == 102:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
         else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 31:
+            if self.stim_trial == 101:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 32:
+            elif self.stim_trial == 102:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
@@ -297,7 +343,7 @@ class Probability_Training_BB(Task):
             state_name='Correct_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
         self.sma.add_state(
@@ -332,7 +378,7 @@ class Probability_Training_BB(Task):
             state_name='Punish_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 64)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
@@ -365,6 +411,8 @@ class Probability_Training_BB(Task):
 
 
     def after_trial(self):
+        self.random_counter += 1
+
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
             self.accwindow = self.accwindow[1:] + [0]
@@ -469,11 +517,11 @@ class Probability_Training_BB(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 32               #Ensure last_stim_trial is 32
+                self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
-                self.last_stim_trial = 31                  #Ensure last_stim_trial is 31
+                self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
@@ -524,6 +572,8 @@ class Probability_Training_BB(Task):
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        self.register_value('random_counter', self.random_counter)
+        self.register_value('random_block', self.random_block)
         #Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)

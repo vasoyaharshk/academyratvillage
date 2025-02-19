@@ -18,7 +18,6 @@ class Probability_Training_BB_Joy(Task):
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
         Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Both are big jars.
-        Stage 4: Discrimination c: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%) but big jars randomised.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -344,7 +343,7 @@ class Probability_Training_BB_Joy(Task):
             state_name='Correct_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 35)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
         self.sma.add_state(
@@ -379,7 +378,7 @@ class Probability_Training_BB_Joy(Task):
             state_name='Punish_image_display',
             state_timer=self.image_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 36)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 64)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
@@ -518,11 +517,11 @@ class Probability_Training_BB_Joy(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = 102               #Ensure last_stim_trial is 102
+                self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
-                self.last_stim_trial = 101                  #Ensure last_stim_trial is 101
+                self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
@@ -572,7 +571,6 @@ class Probability_Training_BB_Joy(Task):
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
-        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('random_counter', self.random_counter)
         self.register_value('random_block', self.random_block)
