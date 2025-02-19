@@ -225,7 +225,7 @@ class Probability_WebersLaw_Post(Task):
                     return True
                 return (
                         (candidate % 2 != trials[-1] % 2 or candidate % 2 != trials[-2] % 2)
-                        and ((candidate <= 44) != (trials[-1] <= 44) or (candidate <= 44) != (trials[-2] <= 44))
+                        and ((candidate <= 84) != (trials[-1] <= 84) or (candidate <= 84) != (trials[-2] <= 84))
                 )
 
             while len(trials) < self.block:
