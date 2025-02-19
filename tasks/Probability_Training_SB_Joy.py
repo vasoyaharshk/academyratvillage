@@ -253,20 +253,20 @@ class Probability_Training_SB_Joy(Task):
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial == 101:
+            if self.stim_trial in [101, 103]:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 102:
+            elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
         else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial == 101:
+            if self.stim_trial in [101, 103]:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 102:
+                elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
