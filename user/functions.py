@@ -379,7 +379,6 @@ image_path = None  # Global variable to store the image path
 #random_image_path_right = None
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
-
 def function31():  # When the correct stimuli is on left
     global last_function_called, image_path
     last_function_called = 31  # Track that function31 was called
@@ -407,28 +406,6 @@ def function32():  # When the correct stimuli is on right
 def loop32(timing):
     image_jar_right.draw()
     window.flip()
-
-
-#
-# # Start reading touchscreen for Probabilistic inference tasks with all touches processed:
-# def function33():
-#     width = utils.task.width * settings.PIXELS_PER_MM
-#     height = utils.task.height * settings.PIXELS_PER_MM
-#     x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
-#     x_incorrect = utils.task.x_incorrecth
-#     y = utils.task.y_correcth * settings.PIXELS_PER_MM
-#
-#     if x_incorrect is None:
-#         touch.start_reading_probability(utils.task.response_duration, x_correct, None, y, width, height)
-#     else:
-#         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-#         touch.start_reading_probability(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
-#
-#     cam2.put_state("Resp Win")
-#     cam3.put_state("Resp Win")
-#     print('Resp Win 1')
-#     #print('x_correct in functions: ', x_correct)
-#     #print('x_incorrect in functions: ', x_incorrect)
 
 
 # Start reading touchscreen for Probabilistic inference tasks with only one touch processing:
@@ -466,10 +443,10 @@ def function35():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "correct")
             # Update the image path for drawing
-            if last_function_called in [31, 41, 43, 45, 51, 61, 81]:
+            if last_function_called in [31, 41, 43, 45, 51, 61, 81, 101, 103]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called in [32, 42, 44, 46, 52, 62]:
+            elif last_function_called in [32, 42, 44, 46, 52, 62, 82, 102, 104]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
         print(f"Correct image path: {image_path_replaced}")
@@ -478,10 +455,10 @@ def loop35(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called in [31, 41, 43, 45, 51, 61]:
+        if last_function_called in [31, 41, 43, 45, 51, 61, 81, 101, 103]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called in [32, 42, 44, 46, 52, 62]:
+        elif last_function_called in [32, 42, 44, 46, 52, 62, 82, 102, 104]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -503,10 +480,10 @@ def function36():
         if image_path and "both" in image_path:
             image_path_replaced = image_path.replace("both", "incorrect")
             # Update the image path for drawing
-            if last_function_called in [31, 41, 43, 45, 51, 61]:
+            if last_function_called in [31, 41, 43, 45, 51, 61, 81, 101, 103]:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-            elif last_function_called in [32, 42, 44, 46, 52, 62]:
+            elif last_function_called in [32, 42, 44, 46, 52, 62, 82, 102, 104]:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
         print(f"Incorrect image path: {image_path_replaced}")
@@ -517,10 +494,10 @@ def loop36(timing):
     # Check which function (31 or 32) was last called and display the corresponding image:
     stage = utils.task.stage
     if stage != 1:
-        if last_function_called in [31, 41, 43, 45, 51, 61]:
+        if last_function_called in [31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103]:
             #print("Last function called: ", last_function_called)
             image_jar_left.draw()
-        elif last_function_called in [32, 42, 44, 46, 52, 62]:
+        elif last_function_called in [32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104]:
             #print("Last function called: ", last_function_called)
             image_jar_right.draw()
         window.flip()
@@ -1313,6 +1290,7 @@ def loop81(timing):
 
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is right:
+# Weber's law Post:
 def function82():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 82  # Track that function31 was called
@@ -1494,3 +1472,63 @@ def function86():
 def loop86(timing):
     image_jar_right.draw()
     window.flip()
+
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is left, for new discrimination
+def function101():  # When the correct stimuli is on left and small
+    global last_function_called, image_path
+    last_function_called = 101  # Track that function101 was called
+
+    image_path = utils.task.image_path_function
+
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop101(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions where the correct answer is right:
+def function102():  # When the correct stimuli is on right and small
+    global last_function_called, image_path
+    last_function_called = 102  # Track that function102 was called
+
+    image_path = utils.task.image_path_function
+
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop102(timing):
+    image_jar_right.draw()
+    window.flip()
+
+def function103():  # When the correct stimuli is on left and big
+    global last_function_called, image_path
+    last_function_called = 103  # Track that function103 was called
+
+    image_path = utils.task.image_path_function
+
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop103(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions where the correct answer is right:
+def function104():  # When the correct stimuli is on right adn big
+    global last_function_called, image_path
+    last_function_called = 104  # Track that function104 was called
+
+    image_path = utils.task.image_path_function
+
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop104(timing):
+    image_jar_right.draw()
+    window.flip()
+
