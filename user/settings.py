@@ -45,7 +45,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-2-1'   # <-- TO CHANGE
 WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
@@ -156,8 +156,7 @@ CAM3_TRACKING_POSITION = True
 # telegram
 TELEGRAM_TOKEN = ""  # <-- TO CHANGE
 TELEGRAM_CHAT = ""  # <-- TO CHANGE
-TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-}
+TELEGRAM_USERS = {""}
 
 #AWS
 OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
@@ -183,6 +182,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
