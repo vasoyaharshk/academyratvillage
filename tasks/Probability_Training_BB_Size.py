@@ -80,7 +80,7 @@ class Probability_Training_BB_Size(Task):
         self.image_path_function = None
         self.image_displayed = None
         self.image_directory = None
-        self.random_block = 4
+        self.random_block = 40
         self.random_counter = 0
 
 
