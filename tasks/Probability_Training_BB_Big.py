@@ -7,7 +7,7 @@ import numpy as np
 import os
 import re
 
-class Probability_Training_Big(Task):
+class Probability_Training_BB_Big(Task):
     def __init__(self):
         super().__init__()
 
