@@ -412,7 +412,7 @@ def animate_thread():
     filename = os.path.join(settings.DATA_DIRECTORY, 'plots.jpg')
     set_alarm = True
     # last_alarm = 0
-    aws.send_timing()
+    #aws.send_timing()
 
     while True:
 
@@ -447,7 +447,7 @@ def animate_thread():
         if minute == 55:
             if set_alarm:
                 set_alarm = False
-                aws.send_timing()
+                #aws.send_timing()
                 if hour == 7 or hour == 17:
                     try:
                         data, error_mice_list = telegram_data(hours=24)
