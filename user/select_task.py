@@ -682,7 +682,7 @@ def select_task(df, subject):
                                 pass
 
 
-        elif 'Joy' in task:
+        elif 'Big' in task:
             # Check stage-specific conditions for advancement
             if last_session_task == second_last_session_task:
                 # Stage 1 -> Stage 2 check
