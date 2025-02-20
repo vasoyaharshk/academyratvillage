@@ -25,14 +25,17 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
         Substage_bias regulates the probabilities on both sides:
         Substage_bias 1: 10% on left and 90% on right.
         Substage_bias 2: 25% on left and 75% on right.
-
+        Substage_bias 3: 50% on left and 50% on right.
+        
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
         Port 3 - PHOTOGATES 3: Photogates 
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
+        
+        Note side bias breaking activate for substage_bias = 3
         """
 
         # Non-used variables so that stage training works:
@@ -369,48 +372,49 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
         # Side Bias Breaking formula:
         self.last_stim_trial = self.stim_trial
 
-        # try:
-        #     # Try converting response_x directly to a float
-        #     self.response_x_bias = float(self.response_x)
-        # except ValueError:
-        #     print(f"No response_x value or response other: {self.response_x}")
-        #
-        #     # Split the string by commas and convert it to a list of floats
-        #     try:
-        #         # First, check if the response_x is a string and split it
-        #         response_x_list = [float(x) for x in self.response_x.split(",")]
-        #
-        #         # Use the last element of the list as response_x_bias
-        #         self.response_x_bias = response_x_list[-1]
-        #         print(f"Using last value from response_x array: {self.response_x_bias}")
-        #     except Exception as e:
-        #         # print(f"Failed to process response_x as array. Error: {e}")
-        #         return  # Handle this case if needed
-        #
-        # # Append the response to the array:
-        # # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-        # self.response_x_array.append(self.response_x_bias)
-        # print(f"Responses so far: {self.response_x_array}")
-        #
-        # # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-        # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-        #     # Check if all responses fall into one of the two defined categories
-        #     all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
-        #     all_right_side = all(
-        #         231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
-        #
-        #     if all_left_side:
-        #         self.sameside = 'left'
-        #         self.bias_breaking = 1
-        #         print('Bias breaking active, side:', self.sameside)
-        #         self.last_stim_trial = 52  # Ensure last_stim_trial is 52
-        #     elif all_right_side:
-        #         self.sameside = 'right'
-        #         self.bias_breaking = 1
-        #         self.last_stim_trial = 51  # Ensure last_stim_trial is 51
-        #         print('Bias breaking active, side:', self.sameside)
-        #
-        #     self.response_x_array = []  # Clearing the array
+        if self.substage_bias == 3:
+            try:
+                # Try converting response_x directly to a float
+                self.response_x_bias = float(self.response_x)
+            except ValueError:
+                print(f"No response_x value or response other: {self.response_x}")
+
+                # Split the string by commas and convert it to a list of floats
+                try:
+                    # First, check if the response_x is a string and split it
+                    response_x_list = [float(x) for x in self.response_x.split(",")]
+
+                    # Use the last element of the list as response_x_bias
+                    self.response_x_bias = response_x_list[-1]
+                    print(f"Using last value from response_x array: {self.response_x_bias}")
+                except Exception as e:
+                    # print(f"Failed to process response_x as array. Error: {e}")
+                    return  # Handle this case if needed
+
+            # Append the response to the array:
+            # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+            self.response_x_array.append(self.response_x_bias)
+            print(f"Responses so far: {self.response_x_array}")
+
+            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+                # Check if all responses fall into one of the two defined categories
+                all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+                all_right_side = all(
+                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
+
+                if all_left_side:
+                    self.sameside = 'left'
+                    self.bias_breaking = 1
+                    print('Bias breaking active, side:', self.sameside)
+                    self.last_stim_trial = 52  # Ensure last_stim_trial is 52
+                elif all_right_side:
+                    self.sameside = 'right'
+                    self.bias_breaking = 1
+                    self.last_stim_trial = 51  # Ensure last_stim_trial is 51
+                    print('Bias breaking active, side:', self.sameside)
+
+                self.response_x_array = []  # Clearing the array
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
