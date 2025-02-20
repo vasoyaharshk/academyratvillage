@@ -140,7 +140,7 @@ class Probability_Training_Big(Task):
                 position = 'right'
                 size = 'big'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 101, 102, 103, or 104.")
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 103, or 104.")
             # Define image folder based on stage
             if stage == 1:
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/1_indication'
@@ -463,11 +463,11 @@ class Probability_Training_Big(Task):
                 self.sameside = 'left'
                 self.bias_breaking = 1
                 print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
+                self.last_stim_trial = 104  # Ensure the new stim is on the right
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
-                self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
+                self.last_stim_trial = 103  # Ensure the new stim is on the left
                 print('Bias breaking active, side:', self.sameside)
 
             self.response_x_array = []      #Clearing the array
