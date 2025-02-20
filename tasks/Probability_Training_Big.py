@@ -7,7 +7,7 @@ import numpy as np
 import os
 import re
 
-class Probability_Training_SB_Joy(Task):
+class Probability_Training_Big(Task):
     def __init__(self):
         super().__init__()
 
@@ -43,7 +43,7 @@ class Probability_Training_SB_Joy(Task):
         self.trials_tired = 5
         self.tired = False
         self.task_number = 2
-        self.stage = 1
+        self.stage = 2
         self.substage = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
