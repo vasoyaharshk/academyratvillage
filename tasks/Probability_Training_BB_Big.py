@@ -171,7 +171,7 @@ class Probability_Training_BB_Big(Task):
         print('Trial: ' + str(self.current_trial))
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
-        print('Random Counter: ', self.random_counter)
+        print('random_counter: ', self.random_counter)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -197,8 +197,7 @@ class Probability_Training_BB_Big(Task):
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
-
-        self.stim_trial = self.stim_trials[self.random_counter]
+            self.random_counter = 0
 
         if self.bias_breaking == 0:
             self.stim_trial = self.stim_trials[self.random_counter]
@@ -231,6 +230,7 @@ class Probability_Training_BB_Big(Task):
         self.image_displayed = filename
         self.image_directory = directory
 
+        print('random counter',self.random_counter)
 
         ############ STATE MACHINE ################
         #First trial:
