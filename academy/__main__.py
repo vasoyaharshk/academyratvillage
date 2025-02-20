@@ -405,7 +405,7 @@ def stop_and_save_task():
         + str(int(float(utils.task.substage)))
     )
     utils.log_cam(name, name_task, "END")
-    aws.send_timing2()
+    #aws.send_timing2()
 
 
 def button_actions(tag):
