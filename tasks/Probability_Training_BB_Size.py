@@ -507,43 +507,64 @@ class Probability_Training_BB_Size(Task):
         print(f"Responses so far: {self.response_x_array}")
         print(f"Conditions: {self.conditions}")
 
-        #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+        # Side-Size Bias Detection
         if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-            # Check if all responses fall into one of the two defined categories
-            all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-            all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+            # Side Bias Detection:
+            all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all responses fall on left
+            all_right_side = all(231 < x < 331 for x in self.response_x_array)  # Check if all responses fall on right
 
             if all_left_side:
                 self.sameside = 'left'
                 self.bias_breaking = 1
-                print('Bias breaking active, side:', self.sameside)
                 self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
+                print('Bias breaking active (side):', self.sameside)
             elif all_right_side:
                 self.sameside = 'right'
                 self.bias_breaking = 1
                 self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
-                print('Bias breaking active, side:', self.sameside)
+                print('Bias breaking active (side):', self.sameside)
 
-            self.response_x_array = []      #Clearing the array
+            # Size Bias Detection:
+            # Track the last 5 trials using random_counter
+            last_five_trials = [self.stim_trials[self.random_counter - i] for i in range(1, 6) if
+                                (self.random_counter - i) >= 0]
 
-        # if 45 < self.response_x < 145:
-        #     self.sameside = 'left'
-        #     self.sameside_counter += 1
-        # elif 231 < self.response_x < 331:
-        #     #self.sameside = 'right'
-        #     self.sameside_counter += 1
-        #
-        # if self.sameside_counter == 5:
-        #     self.bias_breaking = 1
-        #     print('Bias breaking active, side: ', self.sameside)
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        #
-        # # Correction bias extension
-        # if self.bias_breaking == 1:
-        #     if self.trial_result == 'punish':
-        #         self.stim_trial = self.last_stim_trial
-        # print('Stim Trial: ', self.stim_trial)
+            # Determine where small and big jars were in the last 5 trials
+            small_jar_positions = []
+            big_jar_positions = []
+            small_jar_areas = []
+            big_jar_areas = []
+            area = 50
+
+            for trial in last_five_trials:
+                if trial in [101, 102]:  # Small jar is on x_correcth, Big jar on x_incorrecth
+                    small_jar_positions.append(self.x_correcth)
+                    big_jar_positions.append(self.x_incorrecth)
+                    small_jar_areas.append((self.x_correcth - area, self.x_correcth + area))
+                    big_jar_areas.append((self.x_incorrecth - area, self.x_incorrecth + area))
+                elif trial in [103, 104]:  # Small jar is on x_incorrecth, Big jar on x_correcth
+                    small_jar_positions.append(self.x_incorrecth)
+                    big_jar_positions.append(self.x_correcth)
+                    small_jar_areas.append((self.x_incorrecth - area, self.x_incorrecth + area))
+                    big_jar_areas.append((self.x_correcth - area, self.x_correcth + area))
+
+            # Adjusted size bias detection using jar areas
+            all_small = all(any(lower <= response <= upper for lower, upper in small_jar_areas) for response in self.response_x_array)
+            all_big = all(any(lower <= response <= upper for lower, upper in big_jar_areas) for response in self.response_x_array)
+
+            if all_small:
+                self.samesize = 'small'
+                self.bias_breaking_size = 1
+                self.last_stim_trial = random.choice([103, 104])  # Ensure the new stim is on the big
+                print('Bias breaking active (size):', self.samesize)
+            elif all_big:
+                self.samesize = 'big'
+                self.bias_breaking_size = 1
+                self.last_stim_trial = random.choice([101, 102])  # Ensure the new stim is on the small
+                print('Bias breaking active (size):', self.samesize)
+
+            # Clear response array after triggering bias
+            self.response_x_array = []
 
         ############ REGISTER VALUES ################
         self.register_value('stim_dur_ds', self.stim_dur_ds)
