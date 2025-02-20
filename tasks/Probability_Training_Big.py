@@ -13,7 +13,7 @@ class Probability_Training_Big(Task):
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
-        This script is only for Joy where stage 2 and stage 3 are big jars only
+        This script is only for Joy where stage 2 and stage 3 are big jars only.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
