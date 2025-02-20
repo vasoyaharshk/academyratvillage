@@ -1048,6 +1048,7 @@ def select_task(df, subject):
                 trial_counter_ror = last_row['trial_counter_ror']
 
                 trial_message_criteria = 216
+                trial_urgent_message_criteria = 1300
 
                 if trial_counter_ror % trial_message_criteria == 0 and trial_counter_ror > 0:
                     message = f"{trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
@@ -1058,6 +1059,17 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
+
+                if trial_counter_ror == trial_urgent_message_criteria:
+                    message = f"URGENT: {trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+
 
                 if trial_counter_ror >= trial_end_criteria:
                     current_ror = 0
