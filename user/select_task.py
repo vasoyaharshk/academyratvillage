@@ -181,7 +181,7 @@ def select_task(df, subject):
                 trial_counter = last_row['trial_counter']
                 # Check if the total trials exceed or equal 4000
                 if trial_counter >= 4000:
-                    task = "Probability_Training_SB"
+                    task = "Probability_Training_BB_Size"
                     stage = 1
                     substage = 0
                     message = (f"Total trials in Stage 3 reached {trial_counter}. Moving to Probability task.")
@@ -489,7 +489,7 @@ def select_task(df, subject):
             # Ensure the last three sessions were all 'Probability_Training_Demotivation'
             last_three_sessions_tasks = df_last3['task'].unique()
             if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_BB_Demotivation':
-                task = 'Probability_Training_SB'
+                task = 'Probability_Training_BB_Size'
                 print("Moved from demotivation task to normal task")
 
         elif 'Probability_Extra_Training_Bias' in task:
@@ -577,7 +577,7 @@ def select_task(df, subject):
                     elif last_session_substage == 2 and second_last_session_substage == 2:
                             if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                                 valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                task = 'Probability_Training_SB'
+                                task = 'Probability_Training_BB_Size'
                                 substage = 0
                                 message = 'PI: Advancing from substage 2 to normal task'
                                 print(f'{message}')
@@ -669,10 +669,10 @@ def select_task(df, subject):
                     elif last_session_substage == 5 and second_last_session_substage == 5:
                         if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
                             valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            task = 'Probability_Training_SB'
+                            task = 'Probability_Training_BB_Size'
                             stage = 2
                             substage = 0
-                            message = 'PI: Advancing to Probability_Training_SB to stage 2'
+                            message = 'PI: Advancing to Probability_Training_BB_Size to stage 2'
                             print(f'{message}')
                             try:
                                 telegram_bot.alarm_finish_session(message, my_subject)
@@ -719,10 +719,10 @@ def select_task(df, subject):
                             pass
                         # Stage 3 -> Normal Script
                         stage = 1
-                        task = 'Probability_Training_SB'
+                        task = 'Probability_Training_BB_Size'
 
 
-        elif 'Probability_Training_SB' in task:
+        elif 'Probability_Training_BB_Size' in task:
             # Check stage-specific conditions for advancement
             if last_session_task == second_last_session_task:
                 # Stage 1 -> Stage 2 check
