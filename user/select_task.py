@@ -1049,8 +1049,8 @@ def select_task(df, subject):
 
                 trial_message_criteria = 216
 
-                if trial_counter_ror >= trial_message_criteria:
-                    message = f"{trial_message_criteria} trials completed in ROR {current_ror}. Check Data."
+                if trial_counter_ror % trial_message_criteria == 0 and trial_counter_ror > 0:
+                    message = f"{trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -1060,15 +1060,22 @@ def select_task(df, subject):
                         pass
 
                 if trial_counter_ror >= trial_end_criteria:
-                    ror = []
-                    completed_ror = []
                     current_ror = 0
-                    trial_counter_ror = 0
-                    # task = 'Probability_Turtle_Training'
-                    stage = 6
+                    task = 'Probability_WebersLaw_Post'
+                    stage = 4
+                    block = 12  # This is the number of trials one conditions will remain for
+                    conditions = []  # Takes the conditions from select task file.
+                    completed_conditions = []  # To store completed conditions
+                    current_condition = 0  # To track the current condition in progress
+                    repetition = 2  # To store how many times the conditions needs to repeat.
+                    current_repetition = 0  # To store how many times the condition has repeated.
+                    trial_counter = 0  # Track the number of trials for the current condition
+                    # Image output stims:
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
                     substage = 0
-                    trial_counter = 0
-                    message = f"{trial_end_criteria} trials completed in ROR {current_ror}. Task ended."
+                    message = f"{trial_end_criteria} trials completed in ROR {current_ror}. Task ended. Moved to Weber's Law Post test"
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
