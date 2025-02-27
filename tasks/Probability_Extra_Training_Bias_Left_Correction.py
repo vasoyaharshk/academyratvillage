@@ -351,6 +351,13 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
             self.status = 'Touch_Outside'
             self.touch_outside += 1
 
+        # Check if side bias is active and if the current trial was correct
+        if self.bias_breaking == 1:  # Side bias active
+            self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+            if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
+                self.bias_breaking = 0  # End bias breaking
+                self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+
         # End-trial calculations
         # self.last_x = self.x
         self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
