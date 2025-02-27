@@ -795,13 +795,24 @@ def select_task(df, subject):
                         # Apply move-back logic if all three sessions fail the criteria
                         if low_trial_count == 3 or low_accuracy_count == 3:
                             print("Move-back criteria met. Moving back one stage.")
-                            stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
-                            message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
+                            task = 'Probability_Extra_Training'
+                            stage = 1
+                            substage = 1
+                            substage_bias = 0
+                            message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}. Task: {task}."
                             print(f'{message}')
                             try:
                                 telegram_bot.alarm_finish_session(message, my_subject)
                             except Exception as e:
                                 print(f"Telegram message not sent: {e}")
+
+                            # stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
+                            # message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
+                            # print(f'{message}')
+                            # try:
+                            #     telegram_bot.alarm_finish_session(message, my_subject)
+                            # except Exception as e:
+                            #     print(f"Telegram message not sent: {e}")
 
 
         elif 'Probability_WebersLaw' in task:
