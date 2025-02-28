@@ -127,15 +127,26 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
         elif self.substage_bias == 3:
             self.probabilities = [0.5, 0.5]
         # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, self.probabilities)[0]
-            # # Ensure no repetition more than twice in sequence
-            # if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-            #     # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-            #     if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-            #         continue  # Skip if the first trial of new block matches last trial of previous block
-            trials.append(candidate)
+        if self.substage_bias == 3:
+            while len(trials) < 1000:
+                # Use random.choices to select a candidate with 50% probability for each stimulus
+                candidate = random.choices(self.stim, self.probabilities)[0]
+                # Ensure no repetition more than twice in sequence
+                if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                    # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                    if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                        continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
+        else:
+            while len(trials) < 1000:
+                # Use random.choices to select a candidate with 50% probability for each stimulus
+                candidate = random.choices(self.stim, self.probabilities)[0]
+                # # Ensure no repetition more than twice in sequence
+                # if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                #     # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                #     if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                #         continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
         return trials
 
     def main_loop(self):
