@@ -115,7 +115,7 @@ class Probability_Extra_Training_Bias_Left_Correction(Task):
         self.stim_trial_counter = 0
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'substage', 'duration_max', 'substage_bias']
 
     def generate_random_trials(self,
                                last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
