@@ -40,6 +40,7 @@ class Task(object):
         self.stim_dur_dm = 0  # by default
         self.stim_dur_dl = 0.1  # by default
         #PI Variables:
+        self.moved_back_counter = 0  # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
         self.block = 0  # This is the number of trials one conditions will remain for
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
