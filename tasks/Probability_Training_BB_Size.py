@@ -83,6 +83,8 @@ class Probability_Training_BB_Size(Task):
         self.random_block = 40
         self.random_counter = 0
 
+        self.moved_back_counter = 0 # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
+
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -100,7 +102,7 @@ class Probability_Training_BB_Size(Task):
         self.conditions = []  # Takes the conditions from select task file.
         self.completed_conditions = []  # To store completed conditions
         self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0  # To store how many times the conditions needs to repeat.
+        self.repetition = 0
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
         # # Image output stims:
@@ -574,6 +576,7 @@ class Probability_Training_BB_Size(Task):
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('random_counter', self.random_counter)
         self.register_value('random_block', self.random_block)
+        self.register_value('moved_back_counter', self.moved_back_counter)
         #Weber's Law:
         self.register_value('block', self.block)
         self.register_value('conditions', self.conditions)

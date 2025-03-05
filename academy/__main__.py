@@ -620,6 +620,7 @@ def go_to_state(num):
         utils.subject.stim_dur_dm = float(utils.subject.stim_dur_dm)
         utils.subject.stim_dur_dl = float(utils.subject.stim_dur_dl)
         #PI variables:
+        utils.subject.moved_back_counter = float(utils.subject.moved_back_counter)
         utils.subject.block = int(utils.subject.block)  # Cast to int
         if isinstance(utils.subject.conditions, str):
             utils.subject.conditions = ast.literal_eval(utils.subject.conditions)
@@ -654,6 +655,7 @@ def go_to_state(num):
         utils.task.stim_dur_dl = utils.subject.stim_dur_dl
         utils.task.choice = utils.subject.choice
         #PI variables:
+        utils.task.moved_back_counter = utils.subject.moved_back_counter
         utils.task.block = utils.subject.block
         utils.task.conditions = utils.subject.conditions
         utils.task.completed_conditions = utils.subject.completed_conditions
