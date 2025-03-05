@@ -13,9 +13,9 @@ import traceback
 # when softcode n is called, function n runs once
 # then loop n runs until another softcode is called
 
-# Global sets for function call groups
-LEFT_FUNCTIONS = {31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103}
-RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104}
+# Global sets for function call groups. All odd numbers are for left and even numbers for right
+LEFT_FUNCTIONS = {31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103, 105, 107}
+RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104, 106, 108}
 
 last_function_called = None  # Global variable to track the last function called
 image_path = None  # Global variable to store the image path
@@ -1481,12 +1481,11 @@ def loop86(timing):
 
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is left, for new discrimination
+#101 to 104 without spacers:
 def function101():  # When the correct stimuli is on left and small
     global last_function_called, image_path
     last_function_called = 101  # Track that function101 was called
-
     image_path = utils.task.image_path_function
-
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1494,14 +1493,10 @@ def loop101(timing):
     image_jar_left.draw()
     window.flip()
 
-
-# Functions where the correct answer is right:
 def function102():  # When the correct stimuli is on right and small
     global last_function_called, image_path
     last_function_called = 102  # Track that function102 was called
-
     image_path = utils.task.image_path_function
-
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1512,9 +1507,7 @@ def loop102(timing):
 def function103():  # When the correct stimuli is on left and big
     global last_function_called, image_path
     last_function_called = 103  # Track that function103 was called
-
     image_path = utils.task.image_path_function
-
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1522,14 +1515,10 @@ def loop103(timing):
     image_jar_left.draw()
     window.flip()
 
-
-# Functions where the correct answer is right:
-def function104():  # When the correct stimuli is on right adn big
+def function104():  # When the correct stimuli is on right and big
     global last_function_called, image_path
     last_function_called = 104  # Track that function104 was called
-
     image_path = utils.task.image_path_function
-
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1537,3 +1526,47 @@ def loop104(timing):
     image_jar_right.draw()
     window.flip()
 
+#105 to 108 are for
+def function105():  # When the correct stimuli is on left, small, with spacer
+    global last_function_called, image_path
+    last_function_called = 105
+    image_path = utils.task.image_path_function
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop105(timing):
+    image_jar_left.draw()
+    window.flip()
+
+def function106():  # When the correct stimuli is on right, small, with spacer
+    global last_function_called, image_path
+    last_function_called = 106
+    image_path = utils.task.image_path_function
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop106(timing):
+    image_jar_right.draw()
+    window.flip()
+
+def function107():  # When the correct stimuli is on left, big, with spacer
+    global last_function_called, image_path
+    last_function_called = 107
+    image_path = utils.task.image_path_function
+    image_jar_left.image = image_path
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop107(timing):
+    image_jar_left.draw()
+    window.flip()
+
+def function108():  # When the correct stimuli is on right, big, with spacer
+    global last_function_called, image_path
+    last_function_called = 108
+    image_path = utils.task.image_path_function
+    image_jar_right.image = image_path
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop108(timing):
+    image_jar_right.draw()
+    window.flip()
