@@ -16,9 +16,10 @@ class Probability_Training_BB_Size(Task):
         This script is where the jars are a mix of small and big.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Both are big jars.
-
+        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Combination of small and big jars.
+        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars.
+        Stage 4: Discrimination c: Spacers: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars with spacers.        
+                
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 

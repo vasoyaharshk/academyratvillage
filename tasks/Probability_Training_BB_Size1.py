@@ -16,9 +16,10 @@ class Probability_Training_BB_Size1(Task):
         This script is where the jars are a mix of small and big.
         ########   TASK INFO   ########
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Both are big jars.
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Both are big jars.
-
+        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Combination of small and big jars.
+        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars.
+        Stage 4: Discrimination c: Spacers: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars with spacers.        
+                
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -44,7 +45,6 @@ class Probability_Training_BB_Size1(Task):
         self.tired = False
         self.task_number = 2
         self.stage = 1
-        self.substage = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -84,7 +84,6 @@ class Probability_Training_BB_Size1(Task):
         self.random_counter = 0
 
         self.moved_back_counter = 0 # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
-
 
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
@@ -237,6 +236,7 @@ class Probability_Training_BB_Size1(Task):
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
+        print('Stage:', self.stage)
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
         print('random_counter: ', self.random_counter)
@@ -250,7 +250,10 @@ class Probability_Training_BB_Size1(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [101, 102, 103, 104, 105, 106, 107, 108]  # Correct Answer 101-102: small (left/right), 103-104: big (left/right) without spacer; 105-106: small (left/right), 107-108: big (left/right) with spacer. All odd numbers are for left and even numbers for right
+        if self.stage == 4:
+            self.stim = [101, 102, 103, 104, 105, 106, 107, 108]  # Correct Answer 101-102: small (left/right), 103-104: big (left/right) without spacer; 105-106: small (left/right), 107-108: big (left/right) with spacer. All odd numbers are for left and even numbers for right
+        else:
+            self.stim = [101, 102, 103, 104]
 
         # Stimulus generation logic
         if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
