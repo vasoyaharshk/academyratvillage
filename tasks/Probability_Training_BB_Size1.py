@@ -18,7 +18,6 @@ class Probability_Training_BB_Size1(Task):
         Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
         Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Combination of small and big jars.
         Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars.
-        Stage 4: Discrimination c: Spacers: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars with spacers.        
                 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -45,6 +44,7 @@ class Probability_Training_BB_Size1(Task):
         self.tired = False
         self.task_number = 2
         self.stage = 1
+        self.substage = 0
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -85,6 +85,7 @@ class Probability_Training_BB_Size1(Task):
 
         self.moved_back_counter = 0 # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
 
+
         #Bias breaking variables:
         self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
         self.response_x_array = []      #Stores responses for x till 3 values
@@ -117,38 +118,28 @@ class Probability_Training_BB_Size1(Task):
         This function generates a sequence of trials ensuring the following constraints:
         1. No more than two consecutive trials should have the same size ('small' or 'big').
         2. No more than two consecutive trials should have the same position ('left' or 'right').
-        3. No more than two consecutive trials should have the spacer.
-        4. The first trial of the new block must also follow these three constraints relative to the last trial of the previous block.
+        3. The first trial of the new block must also follow these constraints relative to the last trial of the previous block.
         """
-        print(f"Starting generate_random_trials_position_size with last_trial: {last_trial}")
-
+        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
         def generate_trials():
-            all_trials = self.stim * 100
+            all_trials = self.stim * 100  # Ensure enough trials to randomize from
             random.shuffle(all_trials)
             trials = []
             max_attempts = 10000
             attempts = 0
-
             def get_size(trial):
-                return 'small' if trial in [101, 102, 105, 106] else 'big'
-
+                return 'small' if trial in [101, 102] else 'big'
             def get_position(trial):
-                return 'left' if trial in [101, 103, 105, 107] else 'right'
-
-            def get_spacer(trial):
-                return 'spacer' if trial in [105, 106, 107, 108] else 'no spacer'
-
+                return 'left' if trial in [101, 103] else 'right'
             def is_valid_candidate(candidate, trials):
                 if len(trials) < 2:
                     return True
                 return (
-                        (get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])) and
-                        (get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-                            trials[-2])) and
-                        (get_spacer(candidate) != get_spacer(trials[-1]) or get_spacer(candidate) != get_spacer(
-                            trials[-2]))
+                        get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])
+                ) and (
+                        get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
+                    trials[-2])
                 )
-
             first_trial_selected = False
             while len(trials) < self.random_block:
                 attempts += 1
@@ -161,11 +152,8 @@ class Probability_Training_BB_Size1(Task):
                     random.shuffle(all_trials)
                 candidate = all_trials.pop(0)
                 if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if (
-                            get_size(candidate) == get_size(last_trial) or
-                            get_position(candidate) == get_position(last_trial) or
-                            get_spacer(candidate) == get_spacer(last_trial)
-                    ):
+                    if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
+                            last_trial):
                         continue
                     first_trial_selected = True
                 if is_valid_candidate(candidate, trials):
@@ -183,30 +171,31 @@ class Probability_Training_BB_Size1(Task):
                 print(f"Generated trials successfully: {result}")
             return result
         except Exception as e:
-            print(f"Error in generate_random_trials_position_size: {e}")
+            print(f"Error in generate_random_trials_ror1: {e}")
             return None
 
     def get_stim_image_path(self, stim_trial, stage):
+        """
+        Determines whether stim_trial is 101, 102, 103, or 104, retrieves the corresponding image path, and returns it.
+        """
         image_path = None
         image_folder = None
         try:
-            if stim_trial in [101, 105]:
+            if stim_trial == 101:
                 position = 'left'
                 size = 'small'
-            elif stim_trial in [102, 106]:
+            elif stim_trial == 102:
                 position = 'right'
                 size = 'small'
-            elif stim_trial in [103, 107]:
+            elif stim_trial == 103:
                 position = 'left'
                 size = 'big'
-            elif stim_trial in [104, 108]:
+            elif stim_trial == 104:
                 position = 'right'
                 size = 'big'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
-
-            spacer = 'spacer' if stim_trial in [105, 106, 107, 108] else ''
-
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 101, 102, 103, or 104.")
+            # Define image folder based on stage
             if stage == 1:
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
             elif stage == 2:
@@ -217,26 +206,25 @@ class Probability_Training_BB_Size1(Task):
                 image_folder = '/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
-
+            # Get relevant images based on position and size
             images = [f for f in os.listdir(image_folder) if
                       os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower() and size in f.lower() and (
-                          spacer in f.lower() if spacer else True))]
+                      (position in f.lower() and 'both' in f.lower() and size in f.lower())]
             if not images:
                 raise ValueError(
-                    f"No images found in {image_folder} for stage {stage}, position {position}, size {size}, and spacer {spacer}.")
-
+                    f"No images found in {image_folder} for stage {stage}, position {position}, and size {size}.")
+            # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
-            print(f'Stage: {stage}')
-            print(f'Correct answer on {position}, {size}, {spacer} jar: {image_path}')
+            print(f'Stage: {utils.task.stage}')
+            print(f'Correct answer on {position}, {size} jar: {image_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
         return image_path
 
+
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-        print('Stage:', self.stage)
         print('Accuracy: ', self.accuracy)
         print('Stim_Trial: ', self.stim_trial)
         print('random_counter: ', self.random_counter)
@@ -250,10 +238,7 @@ class Probability_Training_BB_Size1(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        if self.stage == 4:
-            self.stim = [101, 102, 103, 104, 105, 106, 107, 108]  # Correct Answer 101-102: small (left/right), 103-104: big (left/right) without spacer; 105-106: small (left/right), 107-108: big (left/right) with spacer. All odd numbers are for left and even numbers for right
-        else:
-            self.stim = [101, 102, 103, 104]
+        self.stim = [101, 102, 103, 104]  # These are the functions being called. 101 is for the correct answer is on the left and 102 is when the correct answer is on the right. 103 left big and 104 right big.
 
         # Stimulus generation logic
         if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
@@ -277,20 +262,20 @@ class Probability_Training_BB_Size1(Task):
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial in [101, 103, 105, 107]:
+            if self.stim_trial in [101, 103]:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial in [102, 104, 106, 108]:
+            elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
         else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial in [101, 103, 105, 107]:
+            if self.stim_trial in [101, 103]:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial in [102, 104, 106, 108]:
+            elif self.stim_trial in [102, 104]:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
