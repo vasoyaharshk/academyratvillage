@@ -274,6 +274,7 @@ class Probability_Training_BB_Size(Task):
             self.stim_trial = self.stim_trials[self.random_counter]
         else:
             self.stim_trial = self.last_stim_trial
+            print('last_stim_trial', self.last_stim_trial)
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
@@ -302,6 +303,7 @@ class Probability_Training_BB_Size(Task):
         self.image_directory = directory
 
         print('random counter',self.random_counter)
+
 
         ############ STATE MACHINE ################
         #First trial:
@@ -428,7 +430,8 @@ class Probability_Training_BB_Size(Task):
 
 
     def after_trial(self):
-        self.random_counter += 1
+        if self.bias_breaking == 0:
+            self.random_counter += 1
 
         ##### COUNT MISSES:
         if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
