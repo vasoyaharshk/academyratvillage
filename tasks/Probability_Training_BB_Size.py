@@ -322,7 +322,7 @@ class Probability_Training_BB_Size(Task):
             self.stim = [101, 102, 103, 104]
 
         # Stimulus generation logic
-        if stage == 4:
+        if self.stage == 4:
             if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
                 last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
