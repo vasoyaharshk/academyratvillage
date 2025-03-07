@@ -45,7 +45,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-2-1'   # <-- TO CHANGE
 WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
@@ -74,10 +74,10 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 20                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR1 = 40                                              # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR2 = 40                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 40                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 40                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR1 = 65                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR2 = 85                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
@@ -103,7 +103,7 @@ CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [60, 135, 92, 195]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [60, 225, 195, 300]     # <-- TO CHANGE left, right, top, down
 CAM1_DOORS1_ZONE = [225, 463, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [463, 575, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS2_ZONE = [463, 582, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
@@ -154,13 +154,9 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002317343440"  # <-- TO CHANGE
-TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
-}
+TELEGRAM_TOKEN = ""  # <-- TO CHANGE
+TELEGRAM_CHAT = ""  # <-- TO CHANGE
+TELEGRAM_USERS = {""}
 
 #AWS
 OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
@@ -186,6 +182,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
