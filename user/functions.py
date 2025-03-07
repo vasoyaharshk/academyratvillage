@@ -1570,3 +1570,6 @@ def function108():  # When the correct stimuli is on right, big, with spacer
 def loop108(timing):
     image_jar_right.draw()
     window.flip()
+
+
+#Functions from 110 onwards are for Bastos and Taylor:
