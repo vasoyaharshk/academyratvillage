@@ -1062,21 +1062,31 @@ def select_task(df, subject):
                 trial_counter_ror = last_row['trial_counter_ror']
 
                 # Define the trial message criteria as a list
-                trial_message_criteria = [216, 432, 648, 864, 1080, 1296]
+                trial_message_criteria = {
+                    "ciri": [216, 432, 648, 864, 1080, 1296],
+                    "gal": [648, 864, 1080, 1296],
+                    "joy": [216, 432, 648, 864, 1080, 1296],
+                    "luna": [216, 432, 648, 864, 1080, 1296],
+                    "sorrel": [216, 432, 648, 864, 1080, 1296],
+                    "sparky": [864, 1080, 1296]
+                }
                 trial_urgent_message_criteria = 1300
 
-                # Check if there are criteria left
-                if trial_message_criteria and trial_counter_ror >= trial_message_criteria[0]:
-                    # Remove the first value from the list
-                    trial_message_criteria.pop(0)
-                    message = f"{trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
+                # Check for the current subject only
+                if my_subject in trial_message_criteria and trial_message_criteria[my_subject]:
+                    next_threshold = trial_message_criteria[my_subject][
+                        0]  # Get the next trial threshold for this subject
+                    if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
+                        message = f"{trial_counter_ror} trials completed for {my_subject} in ROR {current_ror}. Check Data."
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                        except:
+                            print(f'Telegram message not sent for {my_subject}')
+
+                        # Remove the sent threshold
+                        trial_message_criteria[my_subject].pop(0)
 
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
