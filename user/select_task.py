@@ -1061,23 +1061,66 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
-                # Define the trial message criteria as a list
+                # Define criteria for each subject and ROR
                 trial_message_criteria = {
-                    "ciri": [216, 432, 648, 864, 1080, 1296],
-                    "gal": [648, 864, 1080, 1296],
-                    "joy": [216, 432, 648, 864, 1080, 1296],
-                    "luna": [216, 432, 648, 864, 1080, 1296],
-                    "sorrel": [216, 432, 648, 864, 1080, 1296],
-                    "sparky": [864, 1080, 1296]
+                    "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
+                             12.0: [216, 432, 648, 864, 1080, 1296],
+                             8.0: [216, 432, 648, 864, 1080, 1296],
+                             6.0: [216, 432, 648, 864, 1080, 1296],
+                             4.0: [216, 432, 648, 864, 1080, 1296],
+                             2.0: [216, 432, 648, 864, 1080, 1296],
+                             1.5: [216, 432, 648, 864, 1080, 1296]},
+
+                    "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
+                            12.0: [216, 432, 648, 864, 1080, 1296],
+                            8.0: [648, 864, 1080, 1296],
+                            6.0: [216, 432, 648, 864, 1080, 1296],
+                            4.0: [216, 432, 648, 864, 1080, 1296],
+                            2.0: [216, 432, 648, 864, 1080, 1296],
+                            1.5: [216, 432, 648, 864, 1080, 1296]},
+
+                    "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
+                            12.0: [216, 432, 648, 864, 1080, 1296],
+                            8.0: [216, 432, 648, 864, 1080, 1296],
+                            6.0: [216, 432, 648, 864, 1080, 1296],
+                            4.0: [216, 432, 648, 864, 1080, 1296],
+                            2.0: [216, 432, 648, 864, 1080, 1296],
+                            1.5: [216, 432, 648, 864, 1080, 1296]},
+
+                    "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
+                             12.0: [216, 432, 648, 864, 1080, 1296],
+                             8.0: [216, 432, 648, 864, 1080, 1296],
+                             6.0: [216, 432, 648, 864, 1080, 1296],
+                             4.0: [216, 432, 648, 864, 1080, 1296],
+                             2.0: [216, 432, 648, 864, 1080, 1296],
+                             1.5: [216, 432, 648, 864, 1080, 1296]},
+
+                    "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
+                               12.0: [216, 432, 648, 864, 1080, 1296],
+                               8.0: [216, 432, 648, 864, 1080, 1296],
+                               6.0: [216, 432, 648, 864, 1080, 1296],
+                               4.0: [216, 432, 648, 864, 1080, 1296],
+                               2.0: [216, 432, 648, 864, 1080, 1296],
+                               1.5: [216, 432, 648, 864, 1080, 1296]},
+
+                    "sparky": {16.0: [864, 1080, 1296],
+                               12.0: [216, 432, 648, 864, 1080, 1296],
+                               8.0: [216, 432, 648, 864, 1080, 1296],
+                               6.0: [216, 432, 648, 864, 1080, 1296],
+                               4.0: [216, 432, 648, 864, 1080, 1296],
+                               2.0: [216, 432, 648, 864, 1080, 1296],
+                               1.5: [216, 432, 648, 864, 1080, 1296]}
                 }
                 trial_urgent_message_criteria = 1300
 
-                # Check for the current subject only
-                if my_subject in trial_message_criteria and trial_message_criteria[my_subject]:
-                    next_threshold = trial_message_criteria[my_subject][
-                        0]  # Get the next trial threshold for this subject
+                # Check for the current subject and ROR
+                if (my_subject in trial_message_criteria
+                        and current_ror in trial_message_criteria[my_subject]
+                        and trial_message_criteria[my_subject][current_ror]):
+
+                    next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
                     if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
-                        message = f"{trial_counter_ror} trials completed for {my_subject} in ROR {current_ror}. Check Data."
+                        message = f"{trial_counter_ror} trials completed for {my_subject} at ROR {current_ror}. Check Data."
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
@@ -1086,7 +1129,7 @@ def select_task(df, subject):
                             print(f'Telegram message not sent for {my_subject}')
 
                         # Remove the sent threshold
-                        trial_message_criteria[my_subject].pop(0)
+                        trial_message_criteria[my_subject][current_ror].pop(0)
 
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
