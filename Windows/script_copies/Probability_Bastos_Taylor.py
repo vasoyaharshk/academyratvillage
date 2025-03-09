@@ -45,7 +45,7 @@ class Probability_Bastos_Taylor(Task):
         self.task_number = 5
         self.stage = 1
         self.response_duration = 60
-        self.image_display = 3  # Number of seconds the image will display after correct and incorrect
+        self.video_display = 0  # Number of seconds the video will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -68,7 +68,7 @@ class Probability_Bastos_Taylor(Task):
         self.correct_count = 0
         self.accuracy = 0
 
-        # Image output stims:
+        # video output stims:
         self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
 
         # Correcth location and size:
@@ -76,9 +76,9 @@ class Probability_Bastos_Taylor(Task):
         self.y_correcth = 110
         self.width = 100  # Stimulus width in mm. Original size for jar is 70mm.
         self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
-        self.image_path_function = None
-        self.image_displayed = None
-        self.image_directory = None
+        self.video_path_function = None
+        self.video_displayed = None
+        self.video_directory = None
         self.random_block = 40
         self.random_counter = 0
 
@@ -103,7 +103,7 @@ class Probability_Bastos_Taylor(Task):
         self.repetition = 0
         self.current_repetition = 0  # To store how many times the condition has repeated.
         self.trial_counter = 0  # Track the number of trials for the current condition
-        # # Image output stims:
+        # # video output stims:
         # self.stim_trial = 0
         # self.stim_trials = []
         self.stim_trial_counter = 0
@@ -126,6 +126,44 @@ class Probability_Bastos_Taylor(Task):
                 trials.append(candidate)
         return trials
 
+    def get_stim_video_path(self, stim_trial, stage):
+        """
+        Determines whether stim_trial is 111, 112, retrieves the corresponding video path, and returns it.
+        """
+        video_path = None
+        video_folder = None
+        try:
+            if stim_trial == 111:
+                position = 'left'
+            elif stim_trial == 112:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 111, or 112.")
+            # Define video folder based on stage
+            if stage == 1:
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking'
+            elif stage == 2:
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
+            elif stage == 3:
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
+            else:
+                raise ValueError(f"Invalid stage value: {stage}.")
+            # Get relevant videos based on position and size
+            videos = [f for f in os.listdir(video_folder) if
+                      os.path.isfile(os.path.join(video_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+            if not videos:
+                raise ValueError(
+                    f"No videos found in {video_folder} for stage {stage}, position {position}.")
+            # Choose a random video
+            video_path = os.path.join(video_folder, random.choice(videos))
+            print(f'Stage: {utils.task.stage}')
+            print(f'Correct answer on {position}, {size} jar: {video_path}')
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+        return video_path
+
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
@@ -141,7 +179,7 @@ class Probability_Bastos_Taylor(Task):
 
         print('Bias Breaking: ', self.bias_breaking)
 
-        ### Randomizing the stimulus positions for both the images:
+        ### Randomizing the stimulus positions for both the videos:
         # Choose x positions:
         self.stim = [111, 112]
 
@@ -188,11 +226,11 @@ class Probability_Bastos_Taylor(Task):
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                       self.x_incorrecth)
 
-        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+        self.video_path_function = self.get_stim_video_path(self.stim_trial, self.stage)
 
-        directory, filename = os.path.split(self.image_path_function)
-        self.image_displayed = filename
-        self.image_directory = directory
+        directory, filename = os.path.split(self.video_path_function)
+        self.video_displayed = filename
+        self.video_directory = directory
 
         print('random counter', self.random_counter)
 
@@ -246,16 +284,16 @@ class Probability_Bastos_Taylor(Task):
         self.sma.add_state(
             state_name='Correct',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_video_display'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
         # Turns on Water port LED and plays correct sound
 
         self.sma.add_state(
-            state_name='Correct_image_display',
-            state_timer=self.image_display,
+            state_name='Correct_video_display',
+            state_timer=self.video_display,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
+        # Turns on Water port LED and plays correct sound and displays correct stimuli for video_display (3 seconds)
 
         self.sma.add_state(
             state_name='Correct_reward',
@@ -281,18 +319,18 @@ class Probability_Bastos_Taylor(Task):
         self.sma.add_state(
             state_name='Punish',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+            state_change_conditions={Bpod.Events.Tup: 'Punish_video_display'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 39)])
         # Turns on Global LED and water port LED on
 
         self.sma.add_state(
-            state_name='Punish_image_display',
-            state_timer=self.image_display,
+            state_name='Punish_video_display',
+            state_timer=self.video_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 64)])
-        # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
+        # Turns on Global LED and water port LED on, and displays incorrect stimuli for video_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
             state_name='After_punish',
@@ -467,5 +505,5 @@ class Probability_Bastos_Taylor(Task):
         self.register_value('stim_trial', self.stim_trial)
         self.register_value('stim_trials', self.stim_trials)
         self.register_value('stim_trial_counter', self.stim_trial_counter)
-        self.register_value('image_displayed', self.image_displayed)
-        self.register_value('image_directory', self.image_directory)
+        self.register_value('video_displayed', self.video_displayed)
+        self.register_value('video_directory', self.video_directory)
