@@ -46,7 +46,7 @@ class Probability_Turtle_Training(Task):
         # pump:
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1.8  # Normal water delivery of 25ul multiplied by this
+        self.valve_factor_c = 2.0  # Normal water delivery of 25ul multiplied by this
         self.valve_factor_i = 0.9  # Water delivery for corrections
 
         # counters for trials:
