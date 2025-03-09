@@ -1061,10 +1061,14 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
-                trial_message_criteria = 216
+                # Define the trial message criteria as a list
+                trial_message_criteria = [216, 432, 648, 864, 1080, 1296]
                 trial_urgent_message_criteria = 1300
 
-                if trial_counter_ror % trial_message_criteria == 0 and trial_counter_ror > 0:
+                # Check if there are criteria left
+                if trial_message_criteria and trial_counter_ror >= trial_message_criteria[0]:
+                    # Remove the first value from the list
+                    trial_message_criteria.pop(0)
                     message = f"{trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
                     print(f'{message}')
                     try:
@@ -1074,7 +1078,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
-                if trial_counter_ror == trial_urgent_message_criteria:
+                if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
                     print(f'{message}')
                     try:
