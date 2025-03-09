@@ -1682,7 +1682,7 @@ def function115():
     global last_function_called
     last_function_called = 115
 
-    start_time = 0.0  # Start video from 5 seconds
+    start_time = 0.0  # Start video from 0 seconds
     video_left.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing left video from {start_time:.2f} seconds...")
 
@@ -1702,7 +1702,7 @@ def function116():
     global last_function_called
     last_function_called = 116
 
-    start_time = 0.0  # Start video from 6.5 seconds
+    start_time = 0.0  # Start video from 0 seconds
     video_right.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing right video from {start_time:.2f} seconds...")
 
