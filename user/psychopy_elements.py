@@ -99,3 +99,7 @@ image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set d
 image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
 
 circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
+
+video_left = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 111)
+
+video_right = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 112)
