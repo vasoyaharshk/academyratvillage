@@ -395,15 +395,22 @@ def select_task(df, subject):
 
 
         # First: Identify the last session and second-to-last session:
-        unique_sessions = sorted(df['session'].unique(), reverse=True)  # Sort sessions in descending order
         last_session = unique_sessions[0]  # The most recent session
-        second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None  # The second most recent session
-        third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None  # The third most recent session
+        second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None
+        third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None
+        fourth_last_session = unique_sessions[3] if len(unique_sessions) > 3 else None
+        fifth_last_session = unique_sessions[4] if len(unique_sessions) > 4 else None
+        sixth_last_session = unique_sessions[5] if len(unique_sessions) > 5 else None
+        seventh_last_session = unique_sessions[6] if len(unique_sessions) > 6 else None
 
         # Second: Filter the DataFrame to include only the last two sessions/three sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
         df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
+        df_last7 = df[df['session'].isin([last_session, second_last_session, third_last_session, fourth_last_session,
+                                          fifth_last_session, sixth_last_session,
+                                          seventh_last_session])].copy() if seventh_last_session else df_last3
+
 
         # Third: Get the number of trials in the last session and second-to-last session (if exists)
         n_trials_last = df_last_session.trial.max()  # Trials in the last session
@@ -1110,6 +1117,14 @@ def select_task(df, subject):
                                4.0: [216, 432, 648, 864, 1080, 1296],
                                2.0: [216, 432, 648, 864, 1080, 1296],
                                1.5: [216, 432, 648, 864, 1080, 1296]}
+
+                    "m2": {16.0: [3, 864, 1080, 1296],
+                               12.0: [216, 432, 648, 864, 1080, 1296],
+                               8.0: [216, 432, 648, 864, 1080, 1296],
+                               6.0: [216, 432, 648, 864, 1080, 1296],
+                               4.0: [216, 432, 648, 864, 1080, 1296],
+                               2.0: [216, 432, 648, 864, 1080, 1296],
+                               1.5: [216, 432, 648, 864, 1080, 1296]}
                 }
                 trial_urgent_message_criteria = 1300
 
@@ -1409,12 +1424,44 @@ def str_to_list(my_str: str) -> list:
     return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
 
 
-def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
+# def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
+#     """
+#     Calculate low trial count and low accuracy count for given sessions.
+#
+#     Args:
+#         df_last3 (pd.DataFrame): DataFrame containing data for the last three sessions.
+#         sessions (list): List of session identifiers to evaluate.
+#         trial_criteria (int): Minimum required trials per session.
+#         accuracy_moveback_criteria (float): Minimum required accuracy per session.
+#
+#     Returns:
+#         tuple: (low_trial_count, low_accuracy_count)
+#             - low_trial_count (int): Number of sessions below the trial criteria.
+#             - low_accuracy_count (int): Number of sessions below the accuracy criteria.
+#     """
+#     low_trial_count = 0
+#     low_accuracy_count = 0
+#     for session in sessions:
+#         session_data = df_last3[df_last3['session'] == session]
+#         # Calculate trial count and accuracy
+#         trial_count = session_data['trial'].max()
+#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
+#             0]
+#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+#         # Check criteria
+#         if trial_count < trial_criteria:
+#             low_trial_count += 1
+#         if accuracy < accuracy_moveback_criteria:
+#             low_accuracy_count += 1
+#     return low_trial_count, low_accuracy_count
+
+def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_moveback_criteria):
     """
     Calculate low trial count and low accuracy count for given sessions.
 
     Args:
-        df_last3 (pd.DataFrame): DataFrame containing data for the last three sessions.
+        df_last7 (pd.DataFrame): DataFrame containing data for the last three sessions.
         sessions (list): List of session identifiers to evaluate.
         trial_criteria (int): Minimum required trials per session.
         accuracy_moveback_criteria (float): Minimum required accuracy per session.
@@ -1427,7 +1474,7 @@ def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_mo
     low_trial_count = 0
     low_accuracy_count = 0
     for session in sessions:
-        session_data = df_last3[df_last3['session'] == session]
+        session_data = df_last7[df_last7['session'] == session]
         # Calculate trial count and accuracy
         trial_count = session_data['trial'].max()
         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
@@ -1440,4 +1487,3 @@ def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_mo
         if accuracy < accuracy_moveback_criteria:
             low_accuracy_count += 1
     return low_trial_count, low_accuracy_count
-
