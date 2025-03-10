@@ -2,7 +2,8 @@ import os
 from psychopy import visual, logging
 from psychopy.visual import Circle
 from user import settings
-
+from psychopy import prefs
+prefs.hardware['audioLib'] = ['no sound']
 
 # to avoid the recurrent psychopy monitor warning
 logging.console.setLevel(logging.CRITICAL)
@@ -103,7 +104,6 @@ circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], 
 # Use a placeholder video to avoid NoneType error. This is a dummy video
 video_placeholder = "/home/ratvillage01/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
-video_left = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)  #filename taken from functions.py (function 111)
-
+# Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
+video_left = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)
 video_right = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)
-  #filename taken from functions.py (function 112)
