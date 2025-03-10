@@ -117,7 +117,7 @@ class Probability_Bastos_Taylor(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < random_block:
+        while len(trials) < self.random_block:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
