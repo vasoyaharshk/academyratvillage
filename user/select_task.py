@@ -394,22 +394,20 @@ def select_task(df, subject):
             accuracy_moveback_criteria = 0.4
 
 
-        # First: Identify the last session and second-to-last session:
+        # First: Identify the last session and second-to-last session and seven sessions:
+        unique_sessions = sorted(unique_sessions, reverse=True)  # Newest first
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None
         third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None
-        fourth_last_session = unique_sessions[3] if len(unique_sessions) > 3 else None
-        fifth_last_session = unique_sessions[4] if len(unique_sessions) > 4 else None
-        sixth_last_session = unique_sessions[5] if len(unique_sessions) > 5 else None
-        seventh_last_session = unique_sessions[6] if len(unique_sessions) > 6 else None
+        last_7_sessions = unique_sessions[:7] if len(unique_sessions) >= 7 else None  # Select most recent 7
 
-        # Second: Filter the DataFrame to include only the last two sessions/three sessions
+        # Second: Filter the DataFrame to include only the last two sessions/three sessions/seven sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
         df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
         df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
-        df_last7 = df[df['session'].isin([last_session, second_last_session, third_last_session, fourth_last_session,
-                                          fifth_last_session, sixth_last_session,
-                                          seventh_last_session])].copy() if seventh_last_session else df_last3
+        # df_last7 = df[df['session'].isin([last_session, second_last_session, third_last_session, fourth_last_session,
+        #                                   fifth_last_session, sixth_last_session,seventh_last_session])].copy()     #Last seven sessions
+        df_last7 = df[df['session'].isin(last_7_sessions)].copy()
 
 
         # Third: Get the number of trials in the last session and second-to-last session (if exists)
@@ -604,20 +602,20 @@ def select_task(df, subject):
                         if last_session_stage == second_last_session_stage == third_last_session_stage:
                             if last_session_substage == second_last_session_substage == third_last_session_substage:
                                 sessions = [last_session, second_last_session, third_last_session]
-                                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
                                     df_last3, sessions, trial_criteria, accuracy_moveback_criteria
-                                )
+                )
 
                                 # Apply move-back logic if all three sessions fail the criteria
                                 if low_trial_count == 3 or low_accuracy_count == 3:
-                                    print("Move-back criteria met. Moving back one substage.")
+                    print("Move-back criteria met. Moving back one substage.")
                                     substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
-                                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
-                                    print(f'{message}')
-                                    try:
-                                        telegram_bot.alarm_finish_session(message, my_subject)
-                                    except Exception as e:
-                                        print(f"Telegram message not sent: {e}")
+                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except Exception as e:
+                        print(f"Telegram message not sent: {e}")
 
 
         elif task == 'Probability_Extra_Training':
@@ -1118,13 +1116,13 @@ def select_task(df, subject):
                                2.0: [216, 432, 648, 864, 1080, 1296],
                                1.5: [216, 432, 648, 864, 1080, 1296]},
 
-                    "m2": {16.0: [4, 8, 12, 16, 20, 24],
-                           12.0: [4, 8, 12, 16, 20, 24],
-                           8.0: [4, 8, 12, 16, 20, 24],
-                           6.0: [4, 8, 12, 16, 20, 24],
-                           4.0: [4, 8, 12, 16, 20, 24],
-                           2.0: [4, 8, 12, 16, 20, 24],
-                           1.5: [4, 8, 12, 16, 20, 24]}
+                    "m2": {16.0: [648, 864, 1080, 1296],
+                               12.0: [216, 432, 648, 864, 1080, 1296],
+                               8.0: [216, 432, 648, 864, 1080, 1296],
+                               6.0: [216, 432, 648, 864, 1080, 1296],
+                               4.0: [216, 432, 648, 864, 1080, 1296],
+                               2.0: [216, 432, 648, 864, 1080, 1296],
+                               1.5: [216, 432, 648, 864, 1080, 1296]},
                 }
                 trial_urgent_message_criteria = 1300
 
