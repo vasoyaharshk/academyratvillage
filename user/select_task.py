@@ -4,6 +4,7 @@ from wx.lib.pubsub.py2and3 import print_
 from academy import telegram_bot
 from user import settings
 import random
+import json
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
@@ -1104,65 +1105,108 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
-                # Define criteria for each subject and ROR
+                # # Define criteria for each subject and ROR
+                # trial_message_criteria = {
+                #     "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #              12.0: [216, 432, 648, 864, 1080, 1296],
+                #              8.0: [216, 432, 648, 864, 1080, 1296],
+                #              6.0: [216, 432, 648, 864, 1080, 1296],
+                #              4.0: [216, 432, 648, 864, 1080, 1296],
+                #              2.0: [216, 432, 648, 864, 1080, 1296],
+                #              1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [216, 432, 648, 864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #              12.0: [216, 432, 648, 864, 1080, 1296],
+                #              8.0: [216, 432, 648, 864, 1080, 1296],
+                #              6.0: [216, 432, 648, 864, 1080, 1296],
+                #              4.0: [216, 432, 648, 864, 1080, 1296],
+                #              2.0: [216, 432, 648, 864, 1080, 1296],
+                #              1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #                12.0: [216, 432, 648, 864, 1080, 1296],
+                #                8.0: [216, 432, 648, 864, 1080, 1296],
+                #                6.0: [216, 432, 648, 864, 1080, 1296],
+                #                4.0: [216, 432, 648, 864, 1080, 1296],
+                #                2.0: [216, 432, 648, 864, 1080, 1296],
+                #                1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "sparky": {16.0: [648, 864, 1080, 1296],
+                #                12.0: [216, 432, 648, 864, 1080, 1296],
+                #                8.0: [216, 432, 648, 864, 1080, 1296],
+                #                6.0: [216, 432, 648, 864, 1080, 1296],
+                #                4.0: [216, 432, 648, 864, 1080, 1296],
+                #                2.0: [216, 432, 648, 864, 1080, 1296],
+                #                1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "m2": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [216, 432, 648, 864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                # }
+
+
+                # Load dictionary from a file at the beginning
+                file_path = "/home/ratvillage01/academy/user/trial_criteria.json"  # Update this with the actual path
+                try:
+                    with open(file_path, "r") as file:
+                        trial_message_criteria = json.load(file)
+                    print("✅ JSON file loaded successfully!")
+                except FileNotFoundError:
+                    print(f"❌ Error: JSON file not found at {file_path}")
+                except json.JSONDecodeError:
+                    print("❌ Error: JSON file is not properly formatted.")
+
+                print(trial_message_criteria)
+
+                if str(current_ror) in trial_message_criteria.get(my_subject, {}):
+                    print(f"✅ ROR {current_ror} found for subject {my_subject} (after conversion)")
+                else:
+                    print(f"❌ ROR {current_ror} NOT found for subject {my_subject}")
+
+                print(f"Available RORs for {my_subject}: {list(trial_message_criteria[my_subject].keys())}")
+                print(f"Type of current_ror: {type(current_ror)}")
+
+                # Convert dictionary keys from strings to floats after loading from JSON
                 trial_message_criteria = {
-                    "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
-                             12.0: [216, 432, 648, 864, 1080, 1296],
-                             8.0: [216, 432, 648, 864, 1080, 1296],
-                             6.0: [216, 432, 648, 864, 1080, 1296],
-                             4.0: [216, 432, 648, 864, 1080, 1296],
-                             2.0: [216, 432, 648, 864, 1080, 1296],
-                             1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [216, 432, 648, 864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
-                             12.0: [216, 432, 648, 864, 1080, 1296],
-                             8.0: [216, 432, 648, 864, 1080, 1296],
-                             6.0: [216, 432, 648, 864, 1080, 1296],
-                             4.0: [216, 432, 648, 864, 1080, 1296],
-                             2.0: [216, 432, 648, 864, 1080, 1296],
-                             1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "sparky": {16.0: [648, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "m2": {16.0: [648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [216, 432, 648, 864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
+                    subject: {float(ror): values for ror, values in ror_dict.items()}
+                    for subject, ror_dict in trial_message_criteria.items()
                 }
-                trial_urgent_message_criteria = 1300
+
+                # Check for the current subject and ROR
+                if my_subject in trial_message_criteria:
+                    print(f"✅ {my_subject} found in trial_message_criteria")
+                else:
+                    print(f"❌ {my_subject} NOT found in trial_message_criteria")
+
+                if current_ror in trial_message_criteria.get(my_subject, {}):
+                    print(f"✅ ROR {current_ror} found for subject {my_subject}")
+                else:
+                    print(f"❌ ROR {current_ror} NOT found for subject {my_subject}")
+
+                if trial_message_criteria.get(my_subject, {}).get(current_ror):
+                    print(f"✅ Threshold list exists for {my_subject} in ROR {current_ror}")
+                else:
+                    print(f"❌ No thresholds found for {my_subject} in ROR {current_ror}")
 
                 # Check for the current subject and ROR
                 if (
@@ -1182,6 +1226,10 @@ def select_task(df, subject):
 
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
 
                             # Debugging: Check list before removing
                             print(
@@ -1195,16 +1243,22 @@ def select_task(df, subject):
                             print(f"After pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
 
                             # Debugging: Verify full dictionary structure after pop
-                            import json
                             print("Full trial_message_criteria after pop:",
                                   json.dumps(trial_message_criteria, indent=4))
 
                             # Debugging: Check object ID to ensure it's the same dictionary
                             print(f"Dictionary ID before and after pop: {id(trial_message_criteria)}")
 
+                            # Save updated dictionary back to file
+                            with open(file_path, "w") as file:
+                                json.dump(trial_message_criteria, file, indent=4)
+                            print("✅ JSON file updated successfully!")
+
                         except Exception as e:
                             print(f"Telegram message not sent for {my_subject}. Error: {e}")
 
+
+                trial_urgent_message_criteria = 1300
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                     print(f'{message}')

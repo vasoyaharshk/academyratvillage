@@ -71,11 +71,11 @@ class Probability_Bastos_Taylor(Task):
         # video output stims:
         self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
 
-        # Correcth location and size:
+        # Correcth location:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 100  # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 100  # Stimulus width in mm. Original jar is 70mm.
+        self.height = 190  # Stimulus height in mm. Original jar is 110mm.
         self.video_path_function = None
         self.video_displayed = None
         self.video_directory = None
@@ -148,7 +148,7 @@ class Probability_Bastos_Taylor(Task):
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
-            # Get relevant videos based on position and size
+            # Get relevant videos based on position
             videos = [f for f in os.listdir(video_folder) if
                       os.path.isfile(os.path.join(video_folder, f)) and
                       (position in f.lower() and 'both' in f.lower())]
@@ -158,7 +158,7 @@ class Probability_Bastos_Taylor(Task):
             # Choose a random video
             video_path = os.path.join(video_folder, random.choice(videos))
             print(f'Stage: {utils.task.stage}')
-            print(f'Correct answer on {position}, {size} jar: {video_path}')
+            print(f'Correct answer on {position} {video_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
 
