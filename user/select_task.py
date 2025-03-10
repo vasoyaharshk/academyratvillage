@@ -1103,7 +1103,7 @@ def select_task(df, subject):
                                2.0: [216, 432, 648, 864, 1080, 1296],
                                1.5: [216, 432, 648, 864, 1080, 1296]},
 
-                    "sparky": {16.0: [864, 1080, 1296],
+                    "sparky": {16.0: [648, 864, 1080, 1296],
                                12.0: [216, 432, 648, 864, 1080, 1296],
                                8.0: [216, 432, 648, 864, 1080, 1296],
                                6.0: [216, 432, 648, 864, 1080, 1296],
@@ -1120,7 +1120,7 @@ def select_task(df, subject):
 
                     next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
                     if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
-                        message = f"{trial_counter_ror} trials completed for {my_subject} at ROR {current_ror}. Check Data."
+                        message = f"URGENT: {trial_counter_ror} trials completed for {my_subject} at ROR {current_ror}. Check Data."
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
