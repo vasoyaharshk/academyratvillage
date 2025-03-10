@@ -143,9 +143,9 @@ class Probability_Bastos_Taylor(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 111, or 112.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video'
             elif stage == 3:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
             # Get relevant videos based on position and size
