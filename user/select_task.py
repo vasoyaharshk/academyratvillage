@@ -40,7 +40,7 @@ def select_task(df, subject):
     current_ror = 0
     trial_counter_ror = 0
 
-    moved_back_counter = 0
+    moved_back_counter = df.moved_back_counter.iloc[0]
 
     my_subject = df.subject.iloc[0]
 
@@ -566,6 +566,27 @@ def select_task(df, subject):
                                                 print('Telegram message not sent')
                                                 pass
 
+            # Check for move-back criteria using the function
+            if len(unique_sessions) >= 7:
+                # Check if all 7 sessions have the same task, stage, and substage
+                if (df_last7['task'].nunique() == 1 and
+                        df_last7['stage'].nunique() == 1 and
+                        df_last7['substage'].nunique() == 1):
+                    # Evaluate move-back criteria
+                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
+                    )
+                # Apply move-back logic if all seven sessions fail the criteria:
+                if low_trial_count == 7 or low_accuracy_count == 7:
+                    print("Move-back criteria met. Moving back one substage.")
+                    substage_bias = max(substage_bias - 1, 1)  # Ensure stage doesn't go below 1
+                    message = f"PI: Subject moved back one stage due to low performance. substage_bias: {substage_bias}"
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except Exception as e:
+                        print(f"Telegram message not sent: {e}")
+
 
         elif 'Probability_Training_Bias' in task:
             if last_session_task == second_last_session_task:
@@ -596,20 +617,19 @@ def select_task(df, subject):
                                     pass
 
             # Check for move-back criteria using the function
-            if len(unique_sessions) >= 3:
-                if last_session_task == second_last_session_task == third_last_session_task:
-                    if last_session_stage == second_last_session_stage == third_last_session_stage:
-                        if last_session_stage == second_last_session_stage == third_last_session_stage:
-                            if last_session_substage == second_last_session_substage == third_last_session_substage:
-                                sessions = [last_session, second_last_session, third_last_session]
-                low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                                    df_last3, sessions, trial_criteria, accuracy_moveback_criteria
-                )
-
-                                # Apply move-back logic if all three sessions fail the criteria
-                                if low_trial_count == 3 or low_accuracy_count == 3:
+            if len(unique_sessions) >= 7:
+                # Check if all 7 sessions have the same task, stage, and substage
+                if (df_last7['task'].nunique() == 1 and
+                        df_last7['stage'].nunique() == 1 and
+                        df_last7['substage'].nunique() == 1):
+                    # Evaluate move-back criteria
+                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
+                    )
+                # Apply move-back logic if all seven sessions fail the criteria:
+                if low_trial_count == 7 or low_accuracy_count == 7:
                     print("Move-back criteria met. Moving back one substage.")
-                                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
+                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
                     message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
                     print(f'{message}')
                     try:
@@ -688,6 +708,25 @@ def select_task(df, subject):
                                 print('Telegram message not sent')
                                 pass
 
+            if len(unique_sessions) >= 7:
+                # Check if all 7 sessions have the same task, stage, and substage
+                if (df_last7['task'].nunique() == 1 and
+                        df_last7['stage'].nunique() == 1 and
+                        df_last7['substage'].nunique() == 1):
+                    # Evaluate move-back criteria
+                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
+                    )
+                # Apply move-back logic if all seven sessions fail the criteria:
+                if low_trial_count == 7 or low_accuracy_count == 7:
+                    print("Move-back criteria met. Moving back one substage.")
+                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
+                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                    except Exception as e:
+                        print(f"Telegram message not sent: {e}")
 
         elif 'Big' in task:
             # Check stage-specific conditions for advancement
@@ -791,36 +830,35 @@ def select_task(df, subject):
                         stim_trial_counter = 0
 
             # Check for move-back criteria using the function
-            if len(unique_sessions) >= 3:
-                if last_session_task == second_last_session_task == third_last_session_task:
-                    if last_session_stage == second_last_session_stage == third_last_session_stage:
-                        sessions = [last_session, second_last_session, third_last_session]
-                        low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                            df_last3, sessions, trial_criteria, accuracy_moveback_criteria
-                        )
+            if len(unique_sessions) >= 7:
+                # Check if all 7 sessions have the same task, stage, and substage
+                if (df_last7['task'].nunique() == 1 and
+                        df_last7['stage'].nunique() == 1 and
+                        df_last7['substage'].nunique() == 1):
+                    # Evaluate move-back criteria
+                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
+                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
+                    )
+                # Apply move-back logic if all seven sessions fail the criteria:
+                if low_trial_count == 7 or low_accuracy_count == 7:
+                    # Apply move-back logic if all three sessions fail the criteria but track if the discrimination a doesnt go back to indication after 2 times.
+                        if stage == 2:
+                            moved_back_counter += 1
+                        if stage == 2 and moved_back_counter >= 2:
+                            task = 'Probability_Extra_Training'
+                            stage = 1
+                            substage = 1
+                            substage_bias = 0
+                            message = f"PI: Subject moved to extra training due to repeated move-backs. Stage: {stage}. Task: {task}."
+                        else:
+                            stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
+                            message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
 
-                        # Apply move-back logic if all three sessions fail the criteria
-                        if low_trial_count == 3 or low_accuracy_count == 3:
-                            # Apply move-back logic if all three sessions fail the criteria but track if the discrimination a doesnt go back to indication after 2 times.
-                            if low_trial_count == 3 or low_accuracy_count == 3:
-                                if stage == 2:
-                                    moved_back_counter += 1
-
-                                if stage == 2 and moved_back_counter >= 2:
-                                    task = 'Probability_Extra_Training'
-                                    stage = 1
-                                    substage = 1
-                                    substage_bias = 0
-                                    message = f"PI: Subject moved to extra training due to repeated move-backs. Stage: {stage}. Task: {task}."
-                                else:
-                                    stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
-                                    message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
-
-                                print(f'{message}')
-                                try:
-                                    telegram_bot.alarm_finish_session(message, my_subject)
-                                except Exception as e:
-                                    print(f"Telegram message not sent: {e}")
+                        print(f'{message}')
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except Exception as e:
+                            print(f"Telegram message not sent: {e}")
 
 
         elif 'Probability_WebersLaw' in task:
@@ -1117,12 +1155,12 @@ def select_task(df, subject):
                                1.5: [216, 432, 648, 864, 1080, 1296]},
 
                     "m2": {16.0: [648, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]},
+                            12.0: [216, 432, 648, 864, 1080, 1296],
+                            8.0: [216, 432, 648, 864, 1080, 1296],
+                            6.0: [216, 432, 648, 864, 1080, 1296],
+                            4.0: [216, 432, 648, 864, 1080, 1296],
+                            2.0: [216, 432, 648, 864, 1080, 1296],
+                            1.5: [216, 432, 648, 864, 1080, 1296]},
                 }
                 trial_urgent_message_criteria = 1300
 
@@ -1459,7 +1497,7 @@ def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_mo
     Calculate low trial count and low accuracy count for given sessions.
 
     Args:
-        df_last7 (pd.DataFrame): DataFrame containing data for the last three sessions.
+        df_last7 (pd.DataFrame): DataFrame containing data for the last seven sessions.
         sessions (list): List of session identifiers to evaluate.
         trial_criteria (int): Minimum required trials per session.
         accuracy_moveback_criteria (float): Minimum required accuracy per session.
@@ -1485,3 +1523,29 @@ def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_mo
         if accuracy < accuracy_moveback_criteria:
             low_accuracy_count += 1
     return low_trial_count, low_accuracy_count
+
+
+def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_criteria, accuracy_forward_criteria):
+    """
+    Calculate high trial count and high accuracy count for given sessions.
+
+    Args:
+        df_last2 (pd.DataFrame): DataFrame containing data for the last two sessions.
+        sessions (list): List of session identifiers to evaluate.
+        trial_count (int): Trial count for the sessions.
+        trial_criteria (int): Minimum required trials per session.
+        accuracy_forward_criteria (float): Minimum required accuracy per session.
+
+    Returns:
+        bool: True if the subject meets the move forward criteria, False otherwise.
+    """
+    for session in sessions:
+        session_data = df_last2[df_last2['session'] == session]
+        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+        # Check criteria
+        if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
+            return False  # If either condition is not met in any session, do not move forward
+    return True  # Move forward if all sessions meet the criteria
+

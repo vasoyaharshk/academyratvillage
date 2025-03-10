@@ -15,8 +15,8 @@ class Probability_Bastos_Taylor(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test.
         Stages:
-        Stage 1 -
-        Stage 2 -
+        Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
+        Stage 2 - Starts from open hands and then closes as rat approaches.
         Stage 3 -
 
                 ########   PORTS INFO   ########
@@ -43,7 +43,7 @@ class Probability_Bastos_Taylor(Task):
         self.trials_tired = 5
         self.tired = False
         self.task_number = 5
-        self.stage = 1
+        self.stage = 2
         self.response_duration = 60
         self.video_display = 0  # Number of seconds the video will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
@@ -55,7 +55,7 @@ class Probability_Bastos_Taylor(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1.8  # Normal water delivery of 25ul multiplied by this
+        self.valve_factor_c = 2  # Normal water delivery of 25ul multiplied by this
         # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
@@ -82,6 +82,7 @@ class Probability_Bastos_Taylor(Task):
         self.random_block = 40
         self.random_counter = 0
         self.video_stim_play = 0
+        self.video_length = 0
 
         self.moved_back_counter = 0  # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
 
@@ -141,9 +142,7 @@ class Probability_Bastos_Taylor(Task):
             else:
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 111, or 112.")
             # Define video folder based on stage
-            if stage == 1:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking'
-            elif stage == 2:
+            if stage == 2:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
             elif stage == 3:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/'
@@ -165,6 +164,41 @@ class Probability_Bastos_Taylor(Task):
 
         return video_path
 
+    def get_stim_image_path(self, stim_trial, condition):
+        """
+        Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
+        """
+        image_path = None
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{condition}'
+
+        try:
+            if stim_trial == 61:
+                position = 'left'
+            elif stim_trial == 62:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
+
+                # Get relevant images
+            images = [f for f in os.listdir(image_folder) if
+                      os.path.isfile(os.path.join(image_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+
+            if not images:
+                raise ValueError(
+                    f"No images found in {image_folder} for condition {condition} and position {position}.")
+
+            # Choose a random image
+            image_path = os.path.join(image_folder, random.choice(images))
+
+            print(f'Trial Condition: {condition}')
+            print(f'Correct answer on {position}: {image_path}')
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+        return image_path
+
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
@@ -184,52 +218,55 @@ class Probability_Bastos_Taylor(Task):
         # Choose x positions:
         self.stim = [111, 112]
 
-        # Stimulus generation logic
-        if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-            # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
-            last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(last_trial)
-            print(f"Stimulus trials after first attempt: {self.stim_trials}")
-            while self.stim_trials is None:
-                print("Retrying to generate stimulus trials...")
+        if self.stage == 1:
+            pass #Program for images here
+        else:
+            # Stimulus generation logic
+            if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+                # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
+                last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
                 self.stim_trials = self.generate_random_trials(last_trial)
-                if self.stim_trials is None:
-                    print("generate_random_trials returned None. Retrying...")
-                else:
-                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
-            self.random_counter = 0
+                print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                while self.stim_trials is None:
+                    print("Retrying to generate stimulus trials...")
+                    self.stim_trials = self.generate_random_trials(last_trial)
+                    if self.stim_trials is None:
+                        print("generate_random_trials returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                self.random_counter = 0
 
-    if self.bias_breaking == 0:
-        self.stim_trial = self.stim_trials[self.random_counter]
-    else:
-        self.stim_trial = self.last_stim_trial
-        print('last_stim_trial', self.last_stim_trial)
+        if self.bias_breaking == 0:
+            self.stim_trial = self.stim_trials[self.random_counter]
+        else:
+            self.stim_trial = self.last_stim_trial
+            print('last_stim_trial', self.last_stim_trial)
 
-    if self.stage == 1:  # We have only one stimuli in stage 1
-        # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-        if self.stim_trial in [111]:
-            self.video_stim_play = 115
-            self.x_correcth = self.x_correcth_pos[0]
-            self.x_incorrecth = None  # No incorrect area in stage 1
-            print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-        elif self.stim_trial in [112]:
-            self.video_stim_play = 116
-            self.x_correcth = self.x_correcth_pos[1]
-            self.x_incorrecth = None  # No incorrect area in stage 1
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-    else:  # We have two stimuli after stage 1 with correct and incorrect areas
-        if self.stim_trial in [111]:
-            self.video_stim_play = 115
-            self.x_correcth = self.x_correcth_pos[0]
-            self.x_incorrecth = self.x_correcth_pos[1]
-            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                  self.x_incorrecth)
-        elif self.stim_trial in [112]:
-            self.video_stim_play = 116
-            self.x_correcth = self.x_correcth_pos[1]
-            self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                  self.x_incorrecth)
+        if self.stage == 2:  # We have only one stimuli in stage 1
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
+            if self.stim_trial in [111]:
+                self.video_stim_play = 115
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = None  # No incorrect area in stage 1
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+            elif self.stim_trial in [112]:
+                self.video_stim_play = 116
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = None  # No incorrect area in stage 1
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+        else:  # We have two stimuli after stage 1 with correct and incorrect areas
+            if self.stim_trial in [111]:
+                self.video_stim_play = 115
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
+            elif self.stim_trial in [112]:
+                self.video_stim_play = 116
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                      self.x_incorrecth)
 
         self.video_path_function = self.get_stim_video_path(self.stim_trial, self.stage)
 
@@ -273,16 +310,15 @@ class Probability_Bastos_Taylor(Task):
 
         self.sma.add_state(
             state_name='Fixation',
-
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Start_Video'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)]))
+            state_change_conditions={Bpod.Events.Port3In: 'Start_Video'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
         self.sma.add_state(
             state_name='Start_Video',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+            state_timer=self.video_length,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.video_stim_play)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
