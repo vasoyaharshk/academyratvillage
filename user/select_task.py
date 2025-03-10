@@ -1116,15 +1116,15 @@ def select_task(df, subject):
                                6.0: [216, 432, 648, 864, 1080, 1296],
                                4.0: [216, 432, 648, 864, 1080, 1296],
                                2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]}
+                               1.5: [216, 432, 648, 864, 1080, 1296]},
 
-                    "m2": {16.0: [3, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]}
+                    "m2": {16.0: [4, 8, 12, 16, 20, 24],
+                           12.0: [4, 8, 12, 16, 20, 24],
+                           8.0: [4, 8, 12, 16, 20, 24],
+                           6.0: [4, 8, 12, 16, 20, 24],
+                           4.0: [4, 8, 12, 16, 20, 24],
+                           2.0: [4, 8, 12, 16, 20, 24],
+                           1.5: [4, 8, 12, 16, 20, 24]}
                 }
                 trial_urgent_message_criteria = 1300
 
@@ -1135,7 +1135,7 @@ def select_task(df, subject):
 
                     next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
                     if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
-                        message = f"URGENT: {trial_counter_ror} trials completed for {my_subject} at ROR {current_ror}. Check Data."
+                        message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
@@ -1147,7 +1147,7 @@ def select_task(df, subject):
                         trial_message_criteria[my_subject][current_ror].pop(0)
 
                 if trial_counter_ror >= trial_urgent_message_criteria:
-                    message = f"URGENT: {trial_counter_ror} trials completed in ROR {current_ror}. Check Data."
+                    message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
