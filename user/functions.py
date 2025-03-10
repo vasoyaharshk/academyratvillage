@@ -2,7 +2,8 @@ from user import settings
 from academy.utils import utils
 from academy.camera import cam2, cam3
 from academy.touch import touch
-from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth
+from user.psychopy_elements import *
+#from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
 from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
 import random
 import os
@@ -1573,3 +1574,146 @@ def loop108(timing):
 
 
 #Functions from 110 onwards are for Bastos and Taylor:
+# Function 111: Correct answer on left:
+# Function 111: Display the first frame of Left Video (without playing)
+def function111():
+    global last_function_called
+    last_function_called = 111
+
+    video_left.setMovie(utils.task.video_path_function)
+    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_left.seek(0)  # Show the first frame only
+    print(f"Assigned left video: {utils.task.video_path_function}")
+
+def loop111(timing):
+    video_left.draw()  # Show the first frame
+    window.flip()
+
+
+# Function 112: Display the first frame of Right Video (without playing)
+def function112():
+    global last_function_called
+    last_function_called = 112
+
+    video_right.setMovie(utils.task.video_path_function)
+    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_right.seek(0)  # Show the first frame only
+    print(f"Assigned right video: {utils.task.video_path_function}")
+
+def loop112(timing):
+    video_right.draw()  # Show the first frame
+    window.flip()
+
+#Correct:
+def function113():
+    global last_function_called
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+
+    stage = utils.task.stage
+    # if stage != 1:
+    #     image_path_replaced = update_image_path_size_position(correct=True)
+    #     if image_path_replaced:
+    #         if last_function_called in LEFT_FUNCTIONS:
+    #             image_jar_left.image = image_path_replaced
+    #             image_jar_left.pos = settings.CENTRE_SCREEN
+    #         elif last_function_called in RIGHT_FUNCTIONS:
+    #             image_jar_right.image = image_path_replaced
+    #             image_jar_right.pos = settings.CENTRE_SCREEN
+    #         print(f"Correct image path: {image_path_replaced}")
+    #     else:
+    #         print("Warning: image_path is None or could not be processed. No image will be updated.")
+
+
+def loop113(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    # if stage != 1:
+    #     if last_function_called in LEFT_FUNCTIONS:
+    #         image_jar_left.draw()
+    #     elif last_function_called in RIGHT_FUNCTIONS:
+    #         image_jar_right.draw()
+    #     window.flip()
+    # else:
+    #     window.flip()
+
+#Punish:
+def function114():
+    global last_function_called
+
+    soundStream.play(soundVec3)
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+    stage = utils.task.stage
+    # if stage != 1:
+    #     image_path_replaced = update_image_path_size_position(correct=False)
+    #     if image_path_replaced:
+    #         if last_function_called in LEFT_FUNCTIONS:
+    #             image_jar_left.image = image_path_replaced
+    #             image_jar_left.pos = settings.CENTRE_SCREEN
+    #         elif last_function_called in RIGHT_FUNCTIONS:
+    #             image_jar_right.image = image_path_replaced
+    #             image_jar_right.pos = settings.CENTRE_SCREEN
+    #         print(f"Incorrect image path: {image_path_replaced}")
+    #     else:
+    #         print("Warning: image_path is None or could not be processed. No image will be updated.")
+
+
+def loop114(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    # if stage != 1:
+    #     if last_function_called in LEFT_FUNCTIONS:
+    #         image_jar_left.draw()
+    #     elif last_function_called in RIGHT_FUNCTIONS:
+    #         image_jar_right.draw()
+    #     window.flip()
+    # else:
+    #     window.flip()
+
+
+# Function 115: Play the Left Video from 5 Seconds
+def function115():
+    global last_function_called
+    last_function_called = 115
+
+    video_left.setMovie(utils.task.video_path_function)
+    start_time = 0.0  # Start video from 0 seconds
+    video_left.seek(start_time)  # Seek to the specific time before playing
+    print(f"Playing left video from {start_time:.2f} seconds...")
+
+    while video_left.status != visual.FINISHED:
+        video_left.draw()
+        window.flip()
+
+
+def loop115(timing):
+    if video_left.status != visual.FINISHED:
+        video_left.draw()
+    window.flip()
+
+
+# Function 116: Play the Right Video from 6.5 Seconds
+def function116():
+    global last_function_called
+    last_function_called = 116
+
+    start_time = 0.0  # Start video from 0 seconds
+    video_right.setMovie(utils.task.video_path_function)
+    video_right.seek(start_time)  # Seek to the specific time before playing
+    print(f"Playing right video from {start_time:.2f} seconds...")
+
+    while video_right.status != visual.FINISHED:
+        video_right.draw()
+        window.flip()
+
+
+def loop116(timing):
+    if video_right.status != visual.FINISHED:
+        video_right.draw()
+    window.flip()

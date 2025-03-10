@@ -7,8 +7,6 @@ from user import settings
 # to avoid the recurrent psychopy monitor warning
 logging.console.setLevel(logging.CRITICAL)
 
-
-
 # create the window
 window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR, units='pix', fullscr=False, viewPos=settings.VIEW_POSITION)
 
@@ -99,3 +97,7 @@ image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set d
 image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
 
 circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
+
+video_left = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 111)
+
+video_right = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 112)
