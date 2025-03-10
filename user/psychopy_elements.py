@@ -100,6 +100,10 @@ image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set 
 
 circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
 
-video_left = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 111)
+# Use a placeholder video to avoid NoneType error. This is a dummy video
+video_placeholder = "/home/ratvillage01/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
-video_right = visual.MovieStim3(win=window, loop=False)  #filename taken from functions.py (function 112)
+video_left = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)  #filename taken from functions.py (function 111)
+
+video_right = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)
+  #filename taken from functions.py (function 112)
