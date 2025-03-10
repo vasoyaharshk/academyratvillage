@@ -270,6 +270,8 @@ class Probability_Bastos_Taylor(Task):
 
         self.video_path_function = self.get_stim_video_path(self.stim_trial, self.stage)
 
+        print("video_path_function", self.video_path_function)
+
         directory, filename = os.path.split(self.video_path_function)
         self.video_displayed = filename
         self.video_directory = directory

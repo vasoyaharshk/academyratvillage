@@ -1170,6 +1170,10 @@ def select_task(df, subject):
                         and current_ror in trial_message_criteria[my_subject]
                         and trial_message_criteria[my_subject][current_ror]
                 ):
+                    # Debugging: Log current ROR before popping
+                    print(f"Current Subject: {my_subject}, Current ROR: {current_ror}")
+                    print(f"Thresholds before pop: {trial_message_criteria[my_subject]}")
+
                     next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
 
                     if trial_counter_ror >= next_threshold:
@@ -1178,24 +1182,28 @@ def select_task(df, subject):
 
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
 
                             # Debugging: Check list before removing
-                            print(f"Before pop: {trial_message_criteria[my_subject][current_ror]}")
+                            print(
+                                f"Before pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
 
                             # Remove the sent threshold, if possible
                             if trial_message_criteria[my_subject][current_ror]:
                                 trial_message_criteria[my_subject][current_ror].pop(0)
 
                             # Debugging: Check list after removing
-                            print(f"After pop: {trial_message_criteria[my_subject][current_ror]}")
+                            print(f"After pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
+
+                            # Debugging: Verify full dictionary structure after pop
+                            import json
+                            print("Full trial_message_criteria after pop:",
+                                  json.dumps(trial_message_criteria, indent=4))
+
+                            # Debugging: Check object ID to ensure it's the same dictionary
+                            print(f"Dictionary ID before and after pop: {id(trial_message_criteria)}")
 
                         except Exception as e:
                             print(f"Telegram message not sent for {my_subject}. Error: {e}")
-
 
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
