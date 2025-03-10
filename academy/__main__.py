@@ -389,8 +389,8 @@ def stop_and_save_task():
     if utils.task_manager is not None:
         try:
             utils.task_manager.save_csvs(weight=utils.task.subject_weight)
-        except:
-            print("no data to save session stopped")
+        except Exception as e:
+            print(f"No data to save, session stopped. Error: {e}")
 
     if utils.subject is None:
         name = "None"

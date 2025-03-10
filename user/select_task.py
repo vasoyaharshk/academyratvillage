@@ -395,7 +395,7 @@ def select_task(df, subject):
 
 
         # First: Identify the last session and second-to-last session and seven sessions:
-        unique_sessions = sorted(unique_sessions, reverse=True)  # Newest first
+        unique_sessions = sorted(df['session'].unique(), reverse=True)  # Get unique sessions, sorted newest first
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None
         third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None
@@ -1079,7 +1079,7 @@ def select_task(df, subject):
                 if my_subject == 'm2':
                     trial_criteria = 3
                     accuracy_criteria = 0.5
-                    trial_end_criteria = 100
+                    trial_end_criteria = 1500
 
                 ror_to_conditions = {
                     16.0: [16, 15],
@@ -1104,90 +1104,123 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
-                # Define criteria for each subject and ROR
-                trial_message_criteria = {
-                    "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
-                             12.0: [216, 432, 648, 864, 1080, 1296],
-                             8.0: [216, 432, 648, 864, 1080, 1296],
-                             6.0: [216, 432, 648, 864, 1080, 1296],
-                             4.0: [216, 432, 648, 864, 1080, 1296],
-                             2.0: [216, 432, 648, 864, 1080, 1296],
-                             1.5: [216, 432, 648, 864, 1080, 1296]},
+                # # Define criteria for each subject and ROR
+                # trial_message_criteria = {
+                #     "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #              12.0: [216, 432, 648, 864, 1080, 1296],
+                #              8.0: [216, 432, 648, 864, 1080, 1296],
+                #              6.0: [216, 432, 648, 864, 1080, 1296],
+                #              4.0: [216, 432, 648, 864, 1080, 1296],
+                #              2.0: [216, 432, 648, 864, 1080, 1296],
+                #              1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [216, 432, 648, 864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #              12.0: [216, 432, 648, 864, 1080, 1296],
+                #              8.0: [216, 432, 648, 864, 1080, 1296],
+                #              6.0: [216, 432, 648, 864, 1080, 1296],
+                #              4.0: [216, 432, 648, 864, 1080, 1296],
+                #              2.0: [216, 432, 648, 864, 1080, 1296],
+                #              1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
+                #                12.0: [216, 432, 648, 864, 1080, 1296],
+                #                8.0: [216, 432, 648, 864, 1080, 1296],
+                #                6.0: [216, 432, 648, 864, 1080, 1296],
+                #                4.0: [216, 432, 648, 864, 1080, 1296],
+                #                2.0: [216, 432, 648, 864, 1080, 1296],
+                #                1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "sparky": {16.0: [648, 864, 1080, 1296],
+                #                12.0: [216, 432, 648, 864, 1080, 1296],
+                #                8.0: [216, 432, 648, 864, 1080, 1296],
+                #                6.0: [216, 432, 648, 864, 1080, 1296],
+                #                4.0: [216, 432, 648, 864, 1080, 1296],
+                #                2.0: [216, 432, 648, 864, 1080, 1296],
+                #                1.5: [216, 432, 648, 864, 1080, 1296]},
+                #
+                #     "m2": {16.0: [648, 864, 1080, 1296],
+                #             12.0: [216, 432, 648, 864, 1080, 1296],
+                #             8.0: [216, 432, 648, 864, 1080, 1296],
+                #             6.0: [216, 432, 648, 864, 1080, 1296],
+                #             4.0: [216, 432, 648, 864, 1080, 1296],
+                #             2.0: [216, 432, 648, 864, 1080, 1296],
+                #             1.5: [216, 432, 648, 864, 1080, 1296]},
+                # }
+                # trial_urgent_message_criteria = 1300
+                #
+                # # Check for the current subject and ROR
+                # if (my_subject in trial_message_criteria
+                #         and current_ror in trial_message_criteria[my_subject]
+                #         and trial_message_criteria[my_subject][current_ror]):
+                #
+                #     next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
+                #     if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
+                #         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                #         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                #         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                #         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                #         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                #         print(message)
+                #         try:
+                #             telegram_bot.alarm_finish_session(message, my_subject)
+                #             telegram_bot.alarm_completed_criteria(task, my_subject)
+                #         except:
+                #             print(f'Telegram message not sent for {my_subject}')
+                #
+                #         # Remove the sent threshold
+                #         trial_message_criteria[my_subject][current_ror].pop(0)
 
-                    "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [216, 432, 648, 864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
-                             12.0: [216, 432, 648, 864, 1080, 1296],
-                             8.0: [216, 432, 648, 864, 1080, 1296],
-                             6.0: [216, 432, 648, 864, 1080, 1296],
-                             4.0: [216, 432, 648, 864, 1080, 1296],
-                             2.0: [216, 432, 648, 864, 1080, 1296],
-                             1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "sparky": {16.0: [648, 864, 1080, 1296],
-                               12.0: [216, 432, 648, 864, 1080, 1296],
-                               8.0: [216, 432, 648, 864, 1080, 1296],
-                               6.0: [216, 432, 648, 864, 1080, 1296],
-                               4.0: [216, 432, 648, 864, 1080, 1296],
-                               2.0: [216, 432, 648, 864, 1080, 1296],
-                               1.5: [216, 432, 648, 864, 1080, 1296]},
-
-                    "m2": {16.0: [648, 864, 1080, 1296],
-                            12.0: [216, 432, 648, 864, 1080, 1296],
-                            8.0: [216, 432, 648, 864, 1080, 1296],
-                            6.0: [216, 432, 648, 864, 1080, 1296],
-                            4.0: [216, 432, 648, 864, 1080, 1296],
-                            2.0: [216, 432, 648, 864, 1080, 1296],
-                            1.5: [216, 432, 648, 864, 1080, 1296]},
-                }
+                trial_message_criteria = 216
                 trial_urgent_message_criteria = 1300
 
-                # Check for the current subject and ROR
-                if (my_subject in trial_message_criteria
-                        and current_ror in trial_message_criteria[my_subject]
-                        and trial_message_criteria[my_subject][current_ror]):
+                # Subjects to track
+                subjects = ["ciri", "gal", "joy", "luna", "sorrel", "sparky", "m2"]
 
-                    next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
-                    if trial_counter_ror >= next_threshold:  # Use trial_counter_ror directly
+                # Keep track of last notified multiple for each subject
+                last_notified_multiple = {subject: 0 for subject in subjects}
+
+                # Get the current subject
+                my_subject = df.subject.iloc[0]
+
+                # Check for the current subject only
+                if my_subject in subjects and trial_counter_ror[my_subject] >= last_notified_multiple[
+                    my_subject] + trial_message_criteria:
+                    multiple = (trial_counter_ror[my_subject] // trial_message_criteria) * trial_message_criteria
+                    if multiple > last_notified_multiple[my_subject]:
+                        last_notified_multiple[my_subject] = multiple  # Update the last notified multiple
                         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_completed_criteria(task, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_finish_session(message, my_subject)
                         except:
                             print(f'Telegram message not sent for {my_subject}')
-
-                        # Remove the sent threshold
-                        trial_message_criteria[my_subject][current_ror].pop(0)
 
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                        telegram_bot.alarm_finish_session(message, my_subject)
                     except:
                         print('Telegram message not sent')
                         pass
