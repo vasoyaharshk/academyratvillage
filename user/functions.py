@@ -1585,9 +1585,9 @@ def function111():
     video_left.seek(0)  # Show the first frame only
     print(f"Assigned left video: {utils.task.video_path_function}")
 
-def loop111(timing):
-    video_left.draw()  # Show the first frame
-    window.flip()
+# def loop111(timing):
+#     video_left.draw()  # Show the first frame
+#     window.flip()
 
 
 # Function 112: Display the first frame of Right Video (without playing)
@@ -1600,9 +1600,10 @@ def function112():
     video_right.seek(0)  # Show the first frame only
     print(f"Assigned right video: {utils.task.video_path_function}")
 
-def loop112(timing):
-    video_right.draw()  # Show the first frame
-    window.flip()
+# def loop112(timing):
+#     video_right.draw()  # Show the first frame
+#     window.flip()
+
 
 #Correct:
 def function113():
@@ -1625,7 +1626,6 @@ def function113():
     #     else:
     #         print("Warning: image_path is None or could not be processed. No image will be updated.")
 
-
 def loop113(timing):
     global last_function_called
 
@@ -1638,6 +1638,7 @@ def loop113(timing):
     #     window.flip()
     # else:
     #     window.flip()
+
 
 #Punish:
 def function114():
@@ -1661,7 +1662,6 @@ def function114():
     #         print(f"Incorrect image path: {image_path_replaced}")
     #     else:
     #         print("Warning: image_path is None or could not be processed. No image will be updated.")
-
 
 def loop114(timing):
     global last_function_called
@@ -1687,11 +1687,6 @@ def function115():
     video_left.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing left video from {start_time:.2f} seconds...")
 
-    while video_left.status != visual.FINISHED:
-        video_left.draw()
-        window.flip()
-
-
 def loop115(timing):
     if video_left.status != visual.FINISHED:
         video_left.draw()
@@ -1707,11 +1702,6 @@ def function116():
     video_right.setMovie(utils.task.video_path_function)
     video_right.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing right video from {start_time:.2f} seconds...")
-
-    while video_right.status != visual.FINISHED:
-        video_right.draw()
-        window.flip()
-
 
 def loop116(timing):
     if video_right.status != visual.FINISHED:
