@@ -1166,7 +1166,7 @@ def select_task(df, subject):
 
 
                 # Load dictionary from a file at the beginning
-                file_path = "/home/ratvillage01/academy/user/trial_criteria.json"  # Update this with the actual path
+                file_path = "/home/harsh/academy/user/trial_criteria.json"  # Update this with the actual path
                 try:
                     with open(file_path, "r") as file:
                         trial_message_criteria = json.load(file)
