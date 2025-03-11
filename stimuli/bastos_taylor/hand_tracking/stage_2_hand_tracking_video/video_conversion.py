@@ -3,9 +3,13 @@ import subprocess
 
 def extract_video_segment(input_path, start_time, end_time, output_path, width=1280, height=1024):
     """Extracts a segment from a video, converts resolution, removes audio, and optimizes for H.264."""
+    # ffmpeg_cmd = [
+    #     "ffmpeg", "-i", input_path, "-ss", str(start_time), "-to", str(end_time), "-vf",
+    #     f"scale={width}:{height}", "-c:v", "libx264", "-preset", "fast", "-crf", "23", "-an", output_path, "-y"
+    # ]
     ffmpeg_cmd = [
-        "ffmpeg", "-i", input_path, "-ss", str(start_time), "-to", str(end_time), "-vf",
-        f"scale={width}:{height}", "-c:v", "libx264", "-preset", "fast", "-crf", "23", "-an", output_path, "-y"
+        "ffmpeg", "-i", input_path, "-ss", str(start_time), "-to", str(end_time),
+        "-c:v", "libx264", "-preset", "fast", "-crf", "23", "-an", output_path, "-y"
     ]
     subprocess.run(ffmpeg_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print(f"Extracted and converted segment saved at: {output_path}")

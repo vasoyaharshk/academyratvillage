@@ -159,7 +159,7 @@ class Probability_Bastos_Taylor(Task):
             # Choose a random video
             video_path = os.path.join(video_folder, random.choice(videos))
             print(f'Stage: {utils.task.stage}')
-            print(f'Correct answer on {position} {video_path}')
+            print(f'Video Correct answer on {position} {video_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
 
@@ -192,7 +192,7 @@ class Probability_Bastos_Taylor(Task):
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
 
-            print(f'Correct answer on {position}: {image_path}')
+            print(f'Image Correct answer on {position}: {image_path}')
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -254,7 +254,8 @@ class Probability_Bastos_Taylor(Task):
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
             elif self.stim_trial in [62]:
-                self.video_stim_play = 116
+                self.video_stim_play = 112
+                self.response_image = 118
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
@@ -267,7 +268,8 @@ class Probability_Bastos_Taylor(Task):
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                       self.x_incorrecth)
             elif self.stim_trial in [62]:
-                self.video_stim_play = 116
+                self.video_stim_play = 112
+                self.response_image = 118
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
@@ -291,7 +293,6 @@ class Probability_Bastos_Taylor(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.current_trial == 0:
-            print('here1')
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
@@ -339,7 +340,8 @@ class Probability_Bastos_Taylor(Task):
             state_name='Response_window_image',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, self.self.response_image)])
+            output_actions=[])
+            #output_actions=[(Bpod.OutputChannels.SoftCode, self.response_image)])
 
         self.sma.add_state(
             state_name='Response_window',
@@ -360,7 +362,7 @@ class Probability_Bastos_Taylor(Task):
             state_name='Correct_video_display',
             state_timer=self.video_display,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 113)])
         # Turns on Water port LED and plays correct sound and displays correct stimuli for video_display (3 seconds)
 
         self.sma.add_state(
@@ -397,7 +399,7 @@ class Probability_Bastos_Taylor(Task):
             state_timer=self.video_display,
             state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 64)])
+                            (Bpod.OutputChannels.SoftCode, 114)])
         # Turns on Global LED and water port LED on, and displays incorrect stimuli for video_display (3 seconds) nad plays punish sound for 1 second.
 
         self.sma.add_state(
