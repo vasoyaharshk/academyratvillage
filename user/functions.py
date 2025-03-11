@@ -9,6 +9,14 @@ import random
 import os
 import re
 
+
+#To avoid the video logs debugging prints. Comment this part if there is a need to debug:
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
+os.environ["IMAGEIO_FFMPEG_LOGLEVEL"] = "error"  # Suppress FFmpeg logs
+os.environ["FFREPORT"] = "quiet"  # Fully disable FFmpeg reports
+os.environ["IMAGEIO_NO_INTERNET"] = "1"  # Prevent external FFmpeg updates
+
+
 import traceback
 
 # when softcode n is called, function n runs once
@@ -1582,12 +1590,12 @@ def function111():
 
     video_left.setMovie(utils.task.video_path_function)
     video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-    video_left.seek(0)  # Show the first frame only
     print(f"Assigned left video: {utils.task.video_path_function}")
 
-# def loop111(timing):
-#     video_left.draw()  # Show the first frame
-#     window.flip()
+def loop111(timing):
+    video_left.seek(11)  # Show the first frame only
+    video_left.draw()  # Show the first frame
+    window.flip()
 
 
 # Function 112: Display the first frame of Right Video (without playing)
@@ -1597,12 +1605,12 @@ def function112():
 
     video_right.setMovie(utils.task.video_path_function)
     video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-    video_right.seek(0)  # Show the first frame only
     print(f"Assigned right video: {utils.task.video_path_function}")
 
-# def loop112(timing):
-#     video_right.draw()  # Show the first frame
-#     window.flip()
+def loop112(timing):
+    video_right.seek(11)  # Show the first frame only
+    video_right.draw()  # Show the first frame
+    window.flip()
 
 
 #Correct:
@@ -1683,14 +1691,14 @@ def function115():
     last_function_called = 115
 
     video_left.setMovie(utils.task.video_path_function)
-    start_time = 0.0  # Start video from 0 seconds
+    start_time = 11.0  # Start video from 0 seconds
     video_left.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing left video from {start_time:.2f} seconds...")
 
 def loop115(timing):
-    if video_left.status != visual.FINISHED:
+    if video_left.status == visual.PLAYING:
         video_left.draw()
-    window.flip()
+        window.flip()
 
 
 # Function 116: Play the Right Video from 6.5 Seconds
@@ -1698,12 +1706,12 @@ def function116():
     global last_function_called
     last_function_called = 116
 
-    start_time = 0.0  # Start video from 0 seconds
+    start_time = 11.0  # Start video from 0 seconds
     video_right.setMovie(utils.task.video_path_function)
     video_right.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing right video from {start_time:.2f} seconds...")
 
 def loop116(timing):
-    if video_right.status != visual.FINISHED:
+    if video_right.status == visual.PLAYING:
         video_right.draw()
-    window.flip()
+        window.flip()
