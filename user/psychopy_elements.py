@@ -10,14 +10,14 @@ prefs.hardware['audioLib'] = ['no sound']
 logging.console.setLevel(logging.CRITICAL)
 
 
-#To avoid the video logs debugging prints. Comment this part if there is a need to debug:
-os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
-os.environ["IMAGEIO_FFMPEG_LOGLEVEL"] = "error"  # Suppress FFmpeg logs
-os.environ["FFREPORT"] = "quiet"  # Fully disable FFmpeg reports
-os.environ["IMAGEIO_NO_INTERNET"] = "1"  # Prevent external FFmpeg updates
-
-# Redirect standard error to suppress FFmpeg prints
-sys.stderr = open(os.devnull, "w")
+# #To avoid the video logs debugging prints. Comment this part if there is a need to debug:
+# os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
+# os.environ["IMAGEIO_FFMPEG_LOGLEVEL"] = "error"  # Suppress FFmpeg logs
+# os.environ["FFREPORT"] = "quiet"  # Fully disable FFmpeg reports
+# os.environ["IMAGEIO_NO_INTERNET"] = "1"  # Prevent external FFmpeg updates
+#
+# # Redirect standard error to suppress FFmpeg prints
+# sys.stderr = open(os.devnull, "w")
 
 # create the window
 window = visual.Window(size=settings.WIN_RESOLUTION, screen=settings.SCREEN_NUMBER, color=settings.WIN_COLOR, units='pix', fullscr=False, viewPos=settings.VIEW_POSITION)
@@ -114,5 +114,5 @@ circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], 
 video_placeholder = "/home/ratvillage01/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
 # Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
-video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False)
-video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False)
+video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=window.size, units='pix')
+video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=window.size, units='pix')
