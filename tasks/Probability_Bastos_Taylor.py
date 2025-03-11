@@ -45,7 +45,7 @@ class Probability_Bastos_Taylor(Task):
         self.task_number = 5
         self.stage = 2
         self.response_duration = 60
-        self.video_display = 0  # Number of seconds the video will display after correct and incorrect
+        self.video_display = 3  # Number of seconds the video will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
 
         # accuracy limits for changing something later on:
@@ -325,9 +325,9 @@ class Probability_Bastos_Taylor(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port3In: 'Start_Video'},
+            state_change_conditions={Bpod.Events.Port5In: 'Start_Video'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+        # Does Nothing. Make it close door 3 later when Duncan has fixed it. Change the number in Port5In to select which photogate
 
         self.sma.add_state(
             state_name='Start_Video',
