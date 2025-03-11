@@ -82,7 +82,8 @@ class Probability_Bastos_Taylor(Task):
         self.random_block = 40
         self.random_counter = 0
         self.video_stim_play = 0
-        self.video_length = 0
+        self.video_length = 3
+        self.response_image = 0
 
         self.moved_back_counter = 0  # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
 
@@ -133,17 +134,17 @@ class Probability_Bastos_Taylor(Task):
         Determines whether stim_trial is 111, 112, retrieves the corresponding video path, and returns it.
         """
         video_path = None
-        video_folder = None
+
         try:
             if stim_trial == 111:
                 position = 'left'
             elif stim_trial == 112:
                 position = 'right'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 111, or 112.")
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video'
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
             elif stage == 3:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/'
             else:
@@ -164,12 +165,12 @@ class Probability_Bastos_Taylor(Task):
 
         return video_path
 
-    def get_stim_image_path(self, stim_trial, condition):
+    def get_stim_image_path(self, stim_trial):
         """
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
         """
         image_path = None
-        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training/{condition}'
+        image_folder = f'/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
 
         try:
             if stim_trial == 61:
@@ -182,16 +183,15 @@ class Probability_Bastos_Taylor(Task):
                 # Get relevant images
             images = [f for f in os.listdir(image_folder) if
                       os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower())]
+                      (position in f.lower() and 'both' in f.lower() and 'open' in f.lower())]
 
             if not images:
                 raise ValueError(
-                    f"No images found in {image_folder} for condition {condition} and position {position}.")
+                    f"No images found in {image_folder} for and position {position}.")
 
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
 
-            print(f'Trial Condition: {condition}')
             print(f'Correct answer on {position}: {image_path}')
 
         except Exception as e:
@@ -216,7 +216,8 @@ class Probability_Bastos_Taylor(Task):
 
         ### Randomizing the stimulus positions for both the videos:
         # Choose x positions:
-        self.stim = [111, 112]
+        #self.stim = [111, 112] for video
+        self.stim = [61, 62] #For images
 
         if self.stage == 1:
             pass #Program for images here
@@ -242,45 +243,55 @@ class Probability_Bastos_Taylor(Task):
             self.stim_trial = self.last_stim_trial
             print('last_stim_trial', self.last_stim_trial)
 
-        if self.stage == 2:  # We have only one stimuli in stage 1
+        self.stim_trial = 61
+
+        if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial in [111]:
-                self.video_stim_play = 115
+            if self.stim_trial in [61]:
+                self.video_stim_play = 111
+                self.response_image = 117
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial in [112]:
+            elif self.stim_trial in [62]:
                 self.video_stim_play = 116
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
         else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial in [111]:
-                self.video_stim_play = 115
+            if self.stim_trial in [61]:
+                self.video_stim_play = 111
+                self.response_image = 117
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
                 print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                       self.x_incorrecth)
-            elif self.stim_trial in [112]:
+            elif self.stim_trial in [62]:
                 self.video_stim_play = 116
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
                 print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                       self.x_incorrecth)
 
-        self.video_path_function = self.get_stim_video_path(self.stim_trial, self.stage)
+        print('random counter: ', self.random_counter)
+        print('stim_trial: ', self.stim_trial)
+        print('video_stim_play: ', self.video_stim_play)
+        print('response_image: ', self.response_image)
 
-        print("video_path_function", self.video_path_function)
+        self.image_path_function = self.get_stim_image_path(self.stim_trial)
+        self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage)
 
         directory, filename = os.path.split(self.video_path_function)
         self.video_displayed = filename
         self.video_directory = directory
 
-        print('random counter', self.random_counter)
+        print("image_path_function: ", self.image_path_function)
+        print("video_path_function: ", self.video_path_function)
 
         ############ STATE MACHINE ################
         # First trial:
         if self.current_trial == 0:
+            print('here1')
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
@@ -320,9 +331,15 @@ class Probability_Bastos_Taylor(Task):
         self.sma.add_state(
             state_name='Start_Video',
             state_timer=self.video_length,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            state_change_conditions={Bpod.Events.Tup: 'Response_window_image'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.video_stim_play)])
         # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
+
+        self.sma.add_state(
+            state_name='Response_window_image',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            output_actions=[(Bpod.OutputChannels.SoftCode, self.self.response_image)])
 
         self.sma.add_state(
             state_name='Response_window',
