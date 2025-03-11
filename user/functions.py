@@ -23,8 +23,8 @@ import traceback
 # then loop n runs until another softcode is called
 
 # Global sets for function call groups. All odd numbers are for left and even numbers for right
-LEFT_FUNCTIONS = {31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103, 105, 107}
-RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104, 106, 108}
+LEFT_FUNCTIONS = {31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103, 105, 107, 111, 113, 115, 117}
+RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104, 106, 108, 112, 114, 116, 118}
 
 last_function_called = None  # Global variable to track the last function called
 image_path = None  # Global variable to store the image path
@@ -991,6 +991,7 @@ def loop56(timing):
 def function61():  # When the correct answer is on left
     global last_function_called, image_path
     last_function_called = 61
+    print("61. First image")
 
     image_path = utils.task.image_path_function
 
@@ -1587,13 +1588,13 @@ def loop108(timing):
 def function111():
     global last_function_called
     last_function_called = 111
+    print("111. video starts")
 
     video_left.setMovie(utils.task.video_path_function)
     video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
     print(f"Assigned left video: {utils.task.video_path_function}")
 
 def loop111(timing):
-    video_left.seek(11)  # Show the first frame only
     video_left.draw()  # Show the first frame
     window.flip()
 
@@ -1602,13 +1603,13 @@ def loop111(timing):
 def function112():
     global last_function_called
     last_function_called = 112
+    print("112. video starts")
 
     video_right.setMovie(utils.task.video_path_function)
     video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
     print(f"Assigned right video: {utils.task.video_path_function}")
 
 def loop112(timing):
-    video_right.seek(11)  # Show the first frame only
     video_right.draw()  # Show the first frame
     window.flip()
 
@@ -1689,24 +1690,25 @@ def loop114(timing):
 def function115():
     global last_function_called
     last_function_called = 115
+    print("115. video starts")
 
     video_left.setMovie(utils.task.video_path_function)
-    start_time = 11.0  # Start video from 0 seconds
-    video_left.seek(start_time)  # Seek to the specific time before playing
+    #start_time = 0.0  # Start video from 0 seconds
+    #video_left.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing left video from {start_time:.2f} seconds...")
 
 def loop115(timing):
-    if video_left.status == visual.PLAYING:
-        video_left.draw()
-        window.flip()
+    video_left.draw()
+    window.flip()
 
 
 # Function 116: Play the Right Video from 6.5 Seconds
 def function116():
     global last_function_called
     last_function_called = 116
+    print("116. video starts")
 
-    start_time = 11.0  # Start video from 0 seconds
+    start_time = 0.2  # Start video from 0 seconds
     video_right.setMovie(utils.task.video_path_function)
     video_right.seek(start_time)  # Seek to the specific time before playing
     print(f"Playing right video from {start_time:.2f} seconds...")
@@ -1714,4 +1716,38 @@ def function116():
 def loop116(timing):
     if video_right.status == visual.PLAYING:
         video_right.draw()
+        window.flip()
+
+
+def function117():
+    global last_function_called
+    print("117. response image")
+    stage = utils.task.stage
+    image_path = utils.task.image_path_function
+
+    if stage != 1:
+        image_path_replaced = image_path.replace("open", "close")  # Replace "open" with "close"
+        if image_path_replaced:
+            if last_function_called in LEFT_FUNCTIONS:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = settings.CENTRE_SCREEN
+            elif last_function_called in RIGHT_FUNCTIONS:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = settings.CENTRE_SCREEN
+            print(f"Correct image path: {image_path_replaced}")
+        else:
+            print("Warning: image_path is None or could not be processed. No image will be updated.")
+
+
+def loop117(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.draw()
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.draw()
+        window.flip()
+    else:
         window.flip()
