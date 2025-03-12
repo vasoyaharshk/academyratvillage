@@ -1083,9 +1083,9 @@ def select_task(df, subject):
                 trial_end_criteria = 1500
 
                 if my_subject == 'm2':
-                    trial_criteria = 30
+                    trial_criteria = 72
                     accuracy_criteria = 0.5
-                    trial_end_criteria = 1500
+                    trial_end_criteria = 10
 
                 ror_to_conditions = {
                     16.0: [16, 15],
