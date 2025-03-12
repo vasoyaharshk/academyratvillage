@@ -183,6 +183,6 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000

@@ -105,5 +105,5 @@ circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], 
 video_placeholder = "/home/harsh/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
 # Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
-video_left = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)
-video_right = visual.MovieStim3(win=window, filename=video_placeholder, loop=False)
+video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False)
+video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False)
