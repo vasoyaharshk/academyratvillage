@@ -38,7 +38,7 @@ def select_task(df, subject):
     #Weber's Law Training:
     ror = []
     completed_ror = []
-    current_ror = 0
+    current_ror = 0.0
     trial_counter_ror = 0
 
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
@@ -926,7 +926,7 @@ def select_task(df, subject):
                     stage = 1
                     ror = []
                     completed_ror = []
-                    current_ror = 0
+                    current_ror = 0.0
                     trial_counter_ror = 0
 
                     message = 'PI: Probability_WebersLaw_Post completes, Moving to Bastos and Taylor'
@@ -1059,7 +1059,7 @@ def select_task(df, subject):
                                         pass
                                 else:
                                     print("All RORs are completed. Task ends.")
-                                    current_ror = 0
+                                    current_ror = 0.0
                                     #task = 'Probability_Turtle_Training'
                                     stage = 6
                                     substage = 0
@@ -1192,9 +1192,9 @@ def select_task(df, subject):
                 #             1.5: [216, 432, 648, 864, 1080, 1296]},
                 # }
 
+                # Load dictionary from file
+                file_path = "/home/ratvillage01/academy/user/trial_criteria.json"
 
-                # Load dictionary from a file at the beginning
-                file_path = "/home/ratvillage01/academy/user/trial_criteria.json"  # Update this with the actual path
                 try:
                     with open(file_path, "r") as file:
                         trial_message_criteria = json.load(file)
@@ -1204,23 +1204,16 @@ def select_task(df, subject):
                 except json.JSONDecodeError:
                     print("❌ Error: JSON file is not properly formatted.")
 
-                print(trial_message_criteria)
-
-                if str(current_ror) in trial_message_criteria.get(my_subject, {}):
-                    print(f"✅ ROR {current_ror} found for subject {my_subject} (after conversion)")
-                else:
-                    print(f"❌ ROR {current_ror} NOT found for subject {my_subject}")
-
-                print(f"Available RORs for {my_subject}: {list(trial_message_criteria[my_subject].keys())}")
-                print(f"Type of current_ror: {type(current_ror)}")
-
-                # Convert dictionary keys from strings to floats after loading from JSON
+                # Convert JSON keys to float (since JSON loads numbers as strings)
                 trial_message_criteria = {
                     subject: {float(ror): values for ror, values in ror_dict.items()}
                     for subject, ror_dict in trial_message_criteria.items()
                 }
 
-                # Check for the current subject and ROR
+                # Ensure `current_ror` is treated as a float
+                current_ror = float(current_ror)
+
+                # Debugging Information
                 if my_subject in trial_message_criteria:
                     print(f"✅ {my_subject} found in trial_message_criteria")
                 else:
@@ -1236,45 +1229,34 @@ def select_task(df, subject):
                 else:
                     print(f"❌ No thresholds found for {my_subject} in ROR {current_ror}")
 
-                # Check for the current subject and ROR
+                # Handle threshold check and updating logic
                 if (
                         my_subject in trial_message_criteria
                         and current_ror in trial_message_criteria[my_subject]
                         and trial_message_criteria[my_subject][current_ror]
                 ):
-                    # Debugging: Log current ROR before popping
                     print(f"Current Subject: {my_subject}, Current ROR: {current_ror}")
-                    print(f"Thresholds before pop: {trial_message_criteria[my_subject]}")
+                    print(f"Thresholds before pop: {trial_message_criteria[my_subject][current_ror]}")
 
-                    next_threshold = trial_message_criteria[my_subject][current_ror][0]  # Get the next trial threshold
+                    next_threshold = trial_message_criteria[my_subject][current_ror][0]
 
                     if trial_counter_ror >= next_threshold:
                         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                         print(message)
 
                         try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_finish_session(message, my_subject)
+                            for _ in range(5):
+                                telegram_bot.alarm_finish_session(message, my_subject)
 
-                            # Debugging: Check list before removing
                             print(
                                 f"Before pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
 
-                            # Remove the sent threshold, if possible
                             if trial_message_criteria[my_subject][current_ror]:
                                 trial_message_criteria[my_subject][current_ror].pop(0)
 
-                            # Debugging: Check list after removing
                             print(f"After pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
-
-                            # Debugging: Verify full dictionary structure after pop
                             print("Full trial_message_criteria after pop:",
                                   json.dumps(trial_message_criteria, indent=4))
-
-                            # Debugging: Check object ID to ensure it's the same dictionary
                             print(f"Dictionary ID before and after pop: {id(trial_message_criteria)}")
 
                             # Save updated dictionary back to file
@@ -1284,8 +1266,6 @@ def select_task(df, subject):
 
                         except Exception as e:
                             print(f"Telegram message not sent for {my_subject}. Error: {e}")
-
-
                 trial_urgent_message_criteria = 1300
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
