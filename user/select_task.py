@@ -1108,7 +1108,7 @@ def select_task(df, subject):
                 if my_subject == 'm2':
                     trial_criteria = 72
                     accuracy_criteria = 0.5
-                    trial_end_criteria = 10
+                    trial_end_criteria = 1000
 
                 ror_to_conditions = {
                     16.0: [16, 15],
@@ -1245,7 +1245,7 @@ def select_task(df, subject):
                         print(message)
 
                         try:
-                            for _ in range(5):
+                            for _ in range(3):
                                 telegram_bot.alarm_finish_session(message, my_subject)
 
                             print(
@@ -1266,6 +1266,8 @@ def select_task(df, subject):
 
                         except Exception as e:
                             print(f"Telegram message not sent for {my_subject}. Error: {e}")
+
+
                 trial_urgent_message_criteria = 1300
                 if trial_counter_ror >= trial_urgent_message_criteria:
                     message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
