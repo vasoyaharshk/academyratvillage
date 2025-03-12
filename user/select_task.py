@@ -41,7 +41,12 @@ def select_task(df, subject):
     current_ror = 0
     trial_counter_ror = 0
 
-    moved_back_counter = df.moved_back_counter.iloc[0]
+    last_row = df.iloc[-1]  # Get the last row of the DataFrame
+    #Here the move back is 0 by default if the column is not present in the df.
+    if 'moved_back_counter' in df.columns:
+        moved_back_counter = last_row['moved_back_counter']
+    else:
+        moved_back_counter = 0
 
     my_subject = df.subject.iloc[0]
 
