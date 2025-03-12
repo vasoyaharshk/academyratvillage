@@ -1,10 +1,10 @@
 import numpy as np
 from wx.lib.pubsub.py2and3 import print_
-
 from academy import telegram_bot
 from user import settings
 import random
 import json
+import pandas as pd
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
@@ -42,11 +42,16 @@ def select_task(df, subject):
     trial_counter_ror = 0
 
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
-    #Here the move back is 0 by default if the column is not present in the df.
+
+    # Default move back counter to 0 if the column is missing
     if 'moved_back_counter' in df.columns:
         moved_back_counter = last_row['moved_back_counter']
+        if pd.isna(moved_back_counter):  # Check for NaN values
+            moved_back_counter = 0
+        print('moved_back_counter= ', moved_back_counter)
     else:
         moved_back_counter = 0
+        print('moved_back_counter= ', moved_back_counter)
 
     my_subject = df.subject.iloc[0]
 
@@ -884,9 +889,6 @@ def select_task(df, subject):
             stim_trial_counter = last_row['stim_trial_counter']
 
             if stage == 5:
-                task = 'Probability_WL_Training'
-                # Weber's Law:
-                stage = 5
                 block = 0
                 conditions = []  # Takes the conditions from task file after first session.
                 completed_conditions = []  # To store completed conditions
@@ -899,21 +901,42 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
-                #Weber's Law Training Variables:
-                ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
-                completed_ror = []
-                current_ror = 16.0
-                trial_counter_ror = 0
+                if task != "Probability_WebersLaw_Post":
+                    task = 'Probability_WL_Training'
+                    # Weber's Law:
+                    stage = 5
 
-                message = 'PI: Probability_WebersLaw completes, Moving to Webers law Training.'
-                print(f'{message}')
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                    telegram_bot.alarm_completed_criteria(task, my_subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
+                    #Weber's Law Training Variables:
+                    ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
+                    completed_ror = []
+                    current_ror = 16.0
+                    trial_counter_ror = 0
 
+                    message = 'PI: Probability_WebersLaw completes, Moving to Webers law Training.'
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+                if task == "Probability_WebersLaw_Post":
+                    task = 'Probability_Bastos_Taylor'
+                    # Weber's Law:
+                    stage = 1
+                    ror = []
+                    completed_ror = []
+                    current_ror = 0
+                    trial_counter_ror = 0
+
+                    message = 'PI: Probability_WebersLaw_Post completes, Moving to Bastos and Taylor'
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
 
         elif 'Probability_WL_Training' in task:
             if task == 'Probability_WL_Training':
@@ -1278,6 +1301,9 @@ def select_task(df, subject):
 
                 if trial_counter_ror >= trial_end_criteria:
                     current_ror = 0
+                    ror = []
+                    completed_ror = []
+                    trial_counter_ror = 0
                     task = 'Probability_WebersLaw_Post'
                     stage = 4
                     block = 12  # This is the number of trials one conditions will remain for
@@ -1379,6 +1405,9 @@ def select_task(df, subject):
                                 else:
                                     print("All RORs are completed. Task ends.")
                                     current_ror = 0
+                                    ror = []
+                                    completed_ror = []
+                                    trial_counter_ror = 0
                                     task = 'Probability_WebersLaw_Post'
                                     stage = 4
                                     block = 12  # This is the number of trials one conditions will remain for
