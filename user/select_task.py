@@ -41,6 +41,9 @@ def select_task(df, subject):
     current_ror = 0.0
     trial_counter_ror = 0
 
+    low_trial_count = 0
+    low_accuracy_count = 0
+
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
     # Default move back counter to 0 if the column is missing
@@ -855,6 +858,7 @@ def select_task(df, subject):
                     # Apply move-back logic if all three sessions fail the criteria but track if the discrimination a doesnt go back to indication after 2 times.
                         if stage == 2:
                             moved_back_counter += 1
+
                         if stage == 2 and moved_back_counter >= 2:
                             task = 'Probability_Extra_Training'
                             stage = 1
