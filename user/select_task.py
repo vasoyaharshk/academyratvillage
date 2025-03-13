@@ -500,7 +500,7 @@ def select_task(df, subject):
         second_last_session_substage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
         third_last_session_substage = df_third_last_session['substage'].iloc[0] if third_last_session is not None else None
 
-        # Eight: Check if the last session and second-to-last session are in different substages_bias for bias breaking in Extra training only:
+        # Eight: Check if the last session and second-to-last session are in different substages_bias for bias breaking in extra training only:
         last_session_substage_bias = df_last_session['substage_bias'].iloc[0]  # Substage for bias breaking in the last session
         second_last_session_substage_bias = df_second_last_session['substage_bias'].iloc[0] if second_last_session is not None else None
         third_last_session_substage_bias = df_third_last_session['substage_bias'].iloc[0] if third_last_session is not None else None
