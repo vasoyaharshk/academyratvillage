@@ -925,7 +925,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    task = 'Probability_Bastos_Taylor'
+                    #task = 'Probability_Bastos_Taylor'
                     # Weber's Law:
                     stage = 1
                     ror = []
@@ -946,7 +946,8 @@ def select_task(df, subject):
             if task == 'Probability_WL_Training':
                 trial_criteria = 72
                 accuracy_criteria = 0.70
-                trial_end_criteria = 1500
+                #trial_end_criteria = 1500
+                trial_end_criteria = 15000
 
                 if my_subject == 'm2':
                     trial_criteria = 5
@@ -1110,9 +1111,9 @@ def select_task(df, subject):
                 trial_end_criteria = 1500
 
                 if my_subject == 'm2':
-                    trial_criteria = 72
+                    trial_criteria = 3
                     accuracy_criteria = 0.5
-                    trial_end_criteria = 1000
+                    trial_end_criteria = 10
 
                 ror_to_conditions = {
                     16.0: [16, 15],
@@ -1137,6 +1138,8 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
+
+                #Telegram Messaging for alerts for each ror and subject:
                 # # Define criteria for each subject and ROR
                 # trial_message_criteria = {
                 #     "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
@@ -1198,7 +1201,6 @@ def select_task(df, subject):
 
                 # Load dictionary from file
                 file_path = "/home/ratvillage01/academy/user/trial_criteria.json"
-
                 try:
                     with open(file_path, "r") as file:
                         trial_message_criteria = json.load(file)
@@ -1213,26 +1215,21 @@ def select_task(df, subject):
                     subject: {float(ror): values for ror, values in ror_dict.items()}
                     for subject, ror_dict in trial_message_criteria.items()
                 }
-
                 # Ensure `current_ror` is treated as a float
                 current_ror = float(current_ror)
-
                 # Debugging Information
                 if my_subject in trial_message_criteria:
                     print(f"✅ {my_subject} found in trial_message_criteria")
                 else:
                     print(f"❌ {my_subject} NOT found in trial_message_criteria")
-
                 if current_ror in trial_message_criteria.get(my_subject, {}):
                     print(f"✅ ROR {current_ror} found for subject {my_subject}")
                 else:
                     print(f"❌ ROR {current_ror} NOT found for subject {my_subject}")
-
                 if trial_message_criteria.get(my_subject, {}).get(current_ror):
                     print(f"✅ Threshold list exists for {my_subject} in ROR {current_ror}")
                 else:
                     print(f"❌ No thresholds found for {my_subject} in ROR {current_ror}")
-
                 # Handle threshold check and updating logic
                 if (
                         my_subject in trial_message_criteria
@@ -1241,36 +1238,27 @@ def select_task(df, subject):
                 ):
                     print(f"Current Subject: {my_subject}, Current ROR: {current_ror}")
                     print(f"Thresholds before pop: {trial_message_criteria[my_subject][current_ror]}")
-
                     next_threshold = trial_message_criteria[my_subject][current_ror][0]
-
                     if trial_counter_ror >= next_threshold:
                         message = f"URGENT: {trial_counter_ror} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                         print(message)
-
                         try:
                             for _ in range(3):
                                 telegram_bot.alarm_finish_session(message, my_subject)
-
                             print(
                                 f"Before pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
-
                             if trial_message_criteria[my_subject][current_ror]:
                                 trial_message_criteria[my_subject][current_ror].pop(0)
-
                             print(f"After pop for ROR {current_ror}: {trial_message_criteria[my_subject][current_ror]}")
                             print("Full trial_message_criteria after pop:",
                                   json.dumps(trial_message_criteria, indent=4))
                             print(f"Dictionary ID before and after pop: {id(trial_message_criteria)}")
-
                             # Save updated dictionary back to file
                             with open(file_path, "w") as file:
                                 json.dump(trial_message_criteria, file, indent=4)
                             print("✅ JSON file updated successfully!")
-
                         except Exception as e:
                             print(f"Telegram message not sent for {my_subject}. Error: {e}")
-
 
                 trial_urgent_message_criteria = 1300
                 if trial_counter_ror >= trial_urgent_message_criteria:
@@ -1283,7 +1271,6 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-
 
                 if trial_counter_ror >= trial_end_criteria:
                     current_ror = 0
