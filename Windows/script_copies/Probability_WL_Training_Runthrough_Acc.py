@@ -63,6 +63,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
+        self.accuracy_block = 40
+        self.block_accuracy = 0
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
@@ -685,6 +687,15 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             #self.accuracy = sum(self.accwindow) / len(self.accwindow)
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
+            # Compute overall accuracy
+            self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
+
+            # Check accuracy for every block of 40 trials
+            if self.trial_counter_ror % self.accuracy_block == 0:
+                block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
+                block_passed = block_accuracy >= 0.7
+                print(f"Block Accuracy: {block_accuracy:.2%}, Passed: {block_passed}")
+
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
 
@@ -712,7 +723,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print(f"Responses so far: {self.response_x_array}")
 
             # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-            if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+            if len(self.response_x_array) >= self.side_bias_trigger and self.l is not None and self.accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
                 all_left_side = all(
                     45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
@@ -783,6 +794,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('completed_ror', self.completed_ror)
         self.register_value('current_ror', self.current_ror)
         self.register_value('trial_counter_ror', self.trial_counter_ror)
+        self.register_value('accuracy_block', self.accuracy_block)
+        self.register_value('block_accuracy', self.block_accuracy)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)

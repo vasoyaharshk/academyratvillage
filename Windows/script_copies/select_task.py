@@ -40,6 +40,8 @@ def select_task(df, subject):
     completed_ror = []
     current_ror = 0.0
     trial_counter_ror = 0
+    accuracy_block = 40
+    block_accuracy = 0
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -1512,7 +1514,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, block_accuracy
 
 
 def str_append(my_str: str, value: str) -> str:
