@@ -17,7 +17,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         ########   TASK INFO   ########
         This is the Weber's law training task where: 
         1. Training starts with RoR 16, then 12, 8, 6 (conditions 16 to 9) consecutively, only progressing to the next RoR when they meet 
-        criteria: ≥70% success on at least 36 trials within 2 consecutive sessions
+        criteria: ≥80% success on 40 trials.
         2. Then they get ROR 4 – 1 (conditions 9 to 1) interleaved with easier RoRs (conditions 16 to 9). No more than 2 easy or hard in a row
         3. End point: Cut-off of 1000 trials per RoR of conditions 16 to 9.
 
@@ -63,8 +63,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
-        self.accuracy_block = 40
-        self.block_accuracy = 0
+        self.accuracy_block = 40         # Every 40 blocks the criteria will be tested.
+        self.block_accuracy = 0.0        # Accuracy for that 40 trial block
+        self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
+        self.trial_end_criteria - 1500
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
@@ -428,6 +430,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.stim_trial_counter_wlt = 0
             self.trial_conditions = []
             self.condition_trial_counter = 0
+            print("End Training Criteria: ", self.accuracy_criteria)
 
 
         print('Bias Breaking: ', self.bias_breaking)
@@ -683,18 +686,15 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
-            #self.accuracy = sum(self.accwindow) / len(self.accwindow)
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-
-            # Compute overall accuracy
+            # Compute overall accuracy for the session:
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
             # Check accuracy for every block of 40 trials
             if self.trial_counter_ror % self.accuracy_block == 0:
-                block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
-                block_passed = block_accuracy >= 0.7
-                print(f"Block Accuracy: {block_accuracy:.2%}, Passed: {block_passed}")
+                self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
+                if self.block_accuracy >= self.accuracy_criteria:
+                    pass
+
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
@@ -796,6 +796,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('trial_counter_ror', self.trial_counter_ror)
         self.register_value('accuracy_block', self.accuracy_block)
         self.register_value('block_accuracy', self.block_accuracy)
+        self.register_value('accuracy_criteria', self.accuracy_criteria)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)

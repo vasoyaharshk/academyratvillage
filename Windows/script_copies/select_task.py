@@ -39,9 +39,11 @@ def select_task(df, subject):
     ror = []
     completed_ror = []
     current_ror = 0.0
+    #Variables for accuracy testing in Weber's Law Training:
     trial_counter_ror = 0
-    accuracy_block = 40
-    block_accuracy = 0
+    accuracy_block = 40            #Every 40 blocks the criteria will be tested.
+    block_accuracy = 0.0            #Accuracy for that 40 trial block
+    accuracy_criteria = 0.80  # 80% success on accuracy_block(32/40 trials correct)
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -1514,8 +1516,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, block_accuracy
-
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, block_accuracy, accuracy_criteria
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
