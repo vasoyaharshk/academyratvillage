@@ -432,6 +432,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print('ROR: ', self.current_ror)
         print('stim_trial_wlt: ', self.stim_trial_wlt)
         print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
+        print('ror_change: ', self.ror_change)
+        print("Block_accuracy:", self.block_accuracy)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -492,6 +494,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     print(f"Successfully generated stimulus trials: {self.stim_trials_wlt}")
 
             self.stim_trial_counter_wlt = 0
+
+        print("self.current_ror", self.current_ror)
+        print("self.previous_ror", self.previous_ror)
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.current_ror != self.previous_ror:
@@ -745,10 +750,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
             # Check accuracy for every block of 40 trials
+            self.block_accuracy = (self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0)
+            print("Self.block_accuracy: ", self.block_accuracy)
 
             if self.accuracy_counter % self.accuracy_block == 0:
-                self.block_accuracy = (self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0)
-                print("Self.block_accuracy: ", self.block_accuracy)
                 if self.block_accuracy >= self.accuracy_criteria:
                     self.ror_change = True  # Indicate that a ROR change is due
                     self.accuracy_counter = 0  # Reset the counter after the block
