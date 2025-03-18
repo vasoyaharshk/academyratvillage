@@ -643,9 +643,11 @@ def go_to_state(num):
         if isinstance(utils.subject.completed_ror, str):
             utils.subject.completed_ror = ast.literal_eval(utils.subject.completed_ror)
         utils.subject.completed_ror = list(map(float, utils.subject.completed_ror))
-        utils.subject.current_ror = float(utils.subject.current_ror)  # Cast to int
+        utils.subject.current_ror = float(utils.subject.current_ror)  # Cast to float
         utils.subject.trial_counter_ror = int(utils.subject.trial_counter_ror)  # Cast to int
-
+        utils.subject.accuracy_block = int(utils.subject.accuracy_block)  # Cast to int
+        utils.subject.accuracy_counter = int(utils.subject.accuracy_counter)  # Cast to int
+        utils.subject.block_accuracy = float(utils.subject.block_accuracy)  # Cast to float
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -670,6 +672,9 @@ def go_to_state(num):
         utils.task.completed_ror = utils.subject.completed_ror
         utils.task.current_ror = utils.subject.current_ror
         utils.task.trial_counter_ror = utils.subject.trial_counter_ror
+        utils.task.accuracy_block = utils.subject.accuracy_block
+        utils.task.accuracy_counter = utils.subject.accuracy_counter
+        utils.task.block_accuracy = utils.subject.block_accuracy
 
 
         utils.task_manager = TaskManager(utils.subject)

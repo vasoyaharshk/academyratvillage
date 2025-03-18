@@ -63,11 +63,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
-        self.accuracy_block = 40         # Every 40 blocks the criteria will be tested.
-        self.accuracy_counter = 1         # Counter for accuracy.
-        self.block_accuracy = 0.0        # Accuracy for that 40 trial block
-        self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
-        self.trial_end_criteria - 1500
+
 
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
@@ -111,11 +107,21 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.condition_trial_counter = 0
         self.trial_conditions = []
 
+        self.allowed_conditions = []
+        self.accuracy_correct_count = 0
+        self.accuracy_valid_count = 0
+        self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
+
         #Variables tracked:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
         self.completed_ror = []
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
+
+        self.accuracy_block = 40         # Every 40 blocks the criteria will be tested.
+        self.accuracy_counter = 1         # Counter for accuracy.
+        self.block_accuracy = 0.0        # Accuracy for that 40 trial block
+
 
     def get_stim_image_path(self, stim_trial, condition):
         """
@@ -530,7 +536,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.image_displayed = filename
         self.image_directory = directory
 
-        print('Stimulus Condition', self.trial_conditions)
+        print('Stimulus Conditions', self.trial_conditions)
         print('Stimulus Condition', self.trial_condition)
         print('Stimulus trial: ', self.stim_trial_wlt)
         print('Stimulus Trial Counter',self.stim_trial_counter_wlt)
@@ -667,6 +673,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.trial_counter_ror += 1
             self.stim_trial_counter_wlt += 1
             self.condition_trial_counter += 1
+            self.accuracy_counter += 1
+
+            self.allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
+            print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {allowed_conditions}")
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -677,16 +687,22 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
+                if self.trial_condition in self.allowed_conditions:
+                    self.accuracy_valid_count += 1
                 self.accwindow = self.accwindow[1:] + [0]
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
+                if self.trial_condition in self.allowed_conditions:
+                    self.accuracy_valid_count += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.accwindow = self.accwindow[1:] + [1]
                 self.correct_count += 1
                 print('Correct_count: ', self.correct_count)
+                if self.trial_condition in self.allowed_conditions:
+                    self.accuracy_correct_count += 1
 
                 # Check if side bias is active and if the current trial was correct
                 if self.bias_breaking == 1:  # Side bias active
@@ -717,68 +733,48 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             # Compute overall accuracy for the session:
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
-            if self.current_ror in self.easy_ror:
-                self.block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
-            elif self.current_ror in self.hard_ror:
-                last_condition_trials = df_last_session[df_last_session['trial_condition'].isin(allowed_conditions)]
-                correct_trials = last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
-                valid_trials = last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
-                self.block_accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
 
             # Check accuracy for every block of 40 trials
             if self.accuracy_counter % self.accuracy_block == 0:
                 self.accuracy_counter = 1
-                #self.block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
                 #Calculate the accuracy for specific ror including only the conditions that are in the list:
-                # Update the logic to use trial_condition:
-                allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
-                print(f"Current ROR: {self.current_ror}, Allowed Conditions: {allowed_conditions}")
-
-                #Calculate the accuracy for specific trial conditions only:
-
-
-
-            if self.block_accuracy >= self.accuracy_criteria:
-                self.completed_ror = str_append(self.completed_ror, self.current_ror)  # Append using str_append
-                trial_counter_ror = 0
-                # Move to the next ror, if any are left
-                if self.ror != "[]" and self.ror:  # Check if self.ror is not empty
-                    self.ror, self.current_ror = str_pop(self.ror)  # Use str_pop to remove the first self.ror
-                    if self.ror != "[]" and self.ror:
-                        self.current_ror = self.ror[1:-1].split(", ")[0]  # Get the first self.ror
-                        # Create a message indicating the change in self.current_ror
-                        message = (
-                            f"Current self.ror has been updated.\n"
-                            f"Remaining self.ror: {self.ror}\n"
-                            f"New Current self.ror: {self.current_ror}\n"
-                            f"Completed RORs: {self.completed_ror}"
-                        )
-                        print(message)
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except Exception as e:
-                            print('Telegram message not sent:', e)
-                            pass
-                    else:
-                        print("All RORs are completed. Task ends.")
-                        self.current_ror = 0
-                        self.ror = []
-                        self.completed_ror = []
-                        self.stage = 4
-                        self.block = 12  # This is the number of trials one conditions will remain for
-                        self.conditions = []  # Takes the conditions from select task file.
-                        self.completed_conditions = []  # To store completed conditions
-                        self.current_condition = 0  # To track the current condition in progress
-                        self.repetition = 2  # To store how many times the conditions needs to repeat.
-                        self.current_repetition = 0  # To store how many times the condition has repeated.
-                        self.trial_counter = 0  # Track the number of trials for the current condition
-                        # Image output stims:
-                        self.stim_trial = 0
-                        self.stim_trials = []
-                        self.stim_trial_counter = 0
-                        self.substage = 0
-            else:
-                self.accuracy_counter = 1
+                self.block_accuracy = self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0
+                if self.block_accuracy >= self.accuracy_criteria:
+                    self.accuracy_counter = 1
+                    self.completed_ror = str_append(self.completed_ror, self.current_ror)  # Append using str_append
+                    # Move to the next ror, if any are left
+                    if self.ror != "[]" and self.ror:  # Check if self.ror is not empty
+                        self.ror, self.current_ror = str_pop(self.ror)  # Use str_pop to remove the first self.ror
+                        if self.ror != "[]" and self.ror:
+                            self.current_ror = self.ror[1:-1].split(", ")[0]  # Get the first self.ror
+                            # Create a message indicating the change in self.current_ror
+                            message = (
+                                f"Current self.ror has been updated.\n"
+                                f"Remaining self.ror: {self.ror}\n"
+                                f"New Current self.ror: {self.current_ror}\n"
+                                f"Completed RORs: {self.completed_ror}"
+                            )
+                            print(message)
+                        else:
+                            print("All RORs are completed. Task ends.")
+                            self.current_ror = 0
+                            self.ror = []
+                            self.completed_ror = []
+                            self.stage = 4
+                            self.block = 12  # This is the number of trials one conditions will remain for
+                            self.conditions = []  # Takes the conditions from select task file.
+                            self.completed_conditions = []  # To store completed conditions
+                            self.current_condition = 0  # To track the current condition in progress
+                            self.repetition = 2  # To store how many times the conditions needs to repeat.
+                            self.current_repetition = 0  # To store how many times the condition has repeated.
+                            self.trial_counter = 0  # Track the number of trials for the current condition
+                            # Image output stims:
+                            self.stim_trial = 0
+                            self.stim_trials = []
+                            self.stim_trial_counter = 0
+                            self.substage = 0
+                else:
+                    self.accuracy_counter = 1
 
         # Ensure self.current_ror is an integer after processing
         if isinstance(self.current_ror, str):
@@ -901,6 +897,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('block_accuracy', self.block_accuracy)
         self.register_value('accuracy_criteria', self.accuracy_criteria)
         self.register_value('accuracy_counter', self.accuracy_counter)
+        self.register_value('allowed_conditions', self.allowed_conditions)
+        self.register_value('accuracy_correct_count', self.accuracy_correct_count)
+        self.register_value('accuracy_valid_count', self.accuracy_valid_count)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)
