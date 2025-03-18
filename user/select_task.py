@@ -45,6 +45,7 @@ def select_task(df, subject):
     accuracy_block = 0  # Every 40 blocks the criteria will be tested.
     accuracy_counter = 0  # Counter for accuracy.
     block_accuracy = 0.0  # Accuracy for that 40 trial block
+    ror_change = False
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -415,13 +416,12 @@ def select_task(df, subject):
             accuracy_criteria = 0.5
             accuracy_moveback_criteria = 0.4
 
-
         # First: Identify the last session and second-to-last session and seven sessions:
         unique_sessions = sorted(df['session'].unique(), reverse=True)  # Get unique sessions, sorted newest first
         last_session = unique_sessions[0]  # The most recent session
         second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None
         third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None
-        last_7_sessions = unique_sessions[:7] if len(unique_sessions) >= 7 else None  # Select most recent 7
+        last_7_sessions = unique_sessions[:7] if len(unique_sessions) >= 7 else []
 
         # Second: Filter the DataFrame to include only the last two sessions/three sessions/seven sessions
         df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
@@ -448,9 +448,9 @@ def select_task(df, subject):
             if my_subject not in settings.INACTIVE_SUBJECTS:
                 telegram_bot.alarm_few_trials(n_trials_last, my_subject)
 
+
         # Fourth: Calculate accuracy for the last session and second last session (if exists)
-        correct_trials_last = df_last_session[df_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[
-            0]
+        correct_trials_last = df_last_session[df_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[0]
         valid_trials_last = df_last_session[df_last_session['trial_result'] != 'miss'].shape[0]
         message = f"Valid trials in session: {valid_trials_last}"
         print(f'{message}')
@@ -1020,6 +1020,7 @@ def select_task(df, subject):
 
                         # Filter for the specific trial_condition in the last session and calculate accuracy and
                         last_condition_trials = df_last_session[df_last_session['trial_condition'].isin(allowed_conditions_last)]
+
                         correct_trials_last = last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
                         valid_trials_last = last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
                         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
@@ -1134,6 +1135,8 @@ def select_task(df, subject):
                 accuracy_block = last_row['accuracy_block']
                 accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
                 block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
+                ror_change = last_row['ror_change']  # Accuracy for that 40 trial block
+                print(type(ror_change))
 
                 #Telgram warning messages:
                 # Load dictionary from file
@@ -1383,7 +1386,6 @@ def select_task(df, subject):
                     print(f"Converted completed_ror to list: {completed_ror}")
 
 
-
         elif 'Probability_Turtle_Training' in task:
             trial_criteria = 30
             accuracy_criteria = 0.80
@@ -1466,7 +1468,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
