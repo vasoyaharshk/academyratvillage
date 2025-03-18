@@ -56,6 +56,9 @@ class Task(object):
         self.completed_ror = []
         self.current_ror = 0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
+        self.accuracy_block = 0  # Every 40 blocks the criteria will be tested.
+        self.accuracy_counter = 0  # Counter for accuracy.
+        self.block_accuracy = 0  # Accuracy for that 40 trial block
 
         self.checksum = None
         self.subject_class = None

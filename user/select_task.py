@@ -39,7 +39,12 @@ def select_task(df, subject):
     ror = []
     completed_ror = []
     current_ror = 0.0
+    #Variables for accuracy testing in Weber's Law Training:
     trial_counter_ror = 0
+
+    accuracy_block = 0  # Every 40 blocks the criteria will be tested.
+    accuracy_counter = 0  # Counter for accuracy.
+    block_accuracy = 0.0  # Accuracy for that 40 trial block
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -905,8 +910,14 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
-                if task == "Probability_WebersLaw":
-                    #task = 'Probability_WL_Training'
+                if task != "Probability_WebersLaw_Post":
+                    task = 'Probability_WL_Training_Acc'
+
+                    accuracy_block = 40  # Every 40 blocks the criteria will be tested.
+                    accuracy_counter = 1  # Counter for accuracy.
+                    block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    accuracy_criteria = 0.80  # 80% success on accuracy_block(32/40 trials correct)
+
                     # Weber's Law:
                     stage = 5
 
@@ -924,7 +935,7 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-                elif task == "Probability_WebersLaw_Post":
+                if task == "Probability_WebersLaw_Post":
                     #task = 'Probability_Bastos_Taylor'
                     # Weber's Law:
                     stage = 1
@@ -1104,32 +1115,13 @@ def select_task(df, subject):
                     completed_ror = str_to_list(completed_ror)
                     print(f"Converted completed_ror to list: {completed_ror}")
 
-            elif task == 'Probability_WL_Training_Runthrough':
-                trial_criteria = 72
-                accuracy_criteria = 0.70
-                trial_end_criteria = 15000
+            elif task == 'Probability_WL_Training_Runthrough_Acc':
+                trial_end_criteria = 1500
 
                 if my_subject == 'm2':
-                    trial_criteria = 3
-                    accuracy_criteria = 0.5
                     trial_end_criteria = 10
 
-                ror_to_conditions = {
-                    16.0: [16, 15],
-                    12.0: [14, 13],
-                    8.0: [12, 11],
-                    6.0: [10, 9],
-                    4.0: [8, 7],
-                    2.0: [6, 5],
-                    1.5: [4, 3],
-                }
-
                 last_row = df.iloc[-1]  # Get the last row of the DataFrame
-
-                # Check if the last session and second-to-last session are in different rors:
-                last_session_ror = df_last_session['current_ror'].iloc[0]  # Stage in the last session
-                second_last_session_ror = df_second_last_session['current_ror'].iloc[
-                    0] if second_last_session is not None else None
 
                 # Assign each value from the last row to the variables:
                 ror = last_row['ror']
@@ -1137,67 +1129,11 @@ def select_task(df, subject):
                 current_ror = last_row['current_ror']
                 trial_counter_ror = last_row['trial_counter_ror']
 
+                accuracy_block = last_row['accuracy_block']
+                accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
+                block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
 
-                #Telegram Messaging for alerts for each ror and subject:
-                # # Define criteria for each subject and ROR
-                # trial_message_criteria = {
-                #     "ciri": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #              12.0: [216, 432, 648, 864, 1080, 1296],
-                #              8.0: [216, 432, 648, 864, 1080, 1296],
-                #              6.0: [216, 432, 648, 864, 1080, 1296],
-                #              4.0: [216, 432, 648, 864, 1080, 1296],
-                #              2.0: [216, 432, 648, 864, 1080, 1296],
-                #              1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "gal": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #             12.0: [216, 432, 648, 864, 1080, 1296],
-                #             8.0: [864, 1080, 1296],
-                #             6.0: [216, 432, 648, 864, 1080, 1296],
-                #             4.0: [216, 432, 648, 864, 1080, 1296],
-                #             2.0: [216, 432, 648, 864, 1080, 1296],
-                #             1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "joy": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #             12.0: [216, 432, 648, 864, 1080, 1296],
-                #             8.0: [216, 432, 648, 864, 1080, 1296],
-                #             6.0: [216, 432, 648, 864, 1080, 1296],
-                #             4.0: [216, 432, 648, 864, 1080, 1296],
-                #             2.0: [216, 432, 648, 864, 1080, 1296],
-                #             1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "luna": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #              12.0: [216, 432, 648, 864, 1080, 1296],
-                #              8.0: [216, 432, 648, 864, 1080, 1296],
-                #              6.0: [216, 432, 648, 864, 1080, 1296],
-                #              4.0: [216, 432, 648, 864, 1080, 1296],
-                #              2.0: [216, 432, 648, 864, 1080, 1296],
-                #              1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "sorrel": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #                12.0: [216, 432, 648, 864, 1080, 1296],
-                #                8.0: [216, 432, 648, 864, 1080, 1296],
-                #                6.0: [216, 432, 648, 864, 1080, 1296],
-                #                4.0: [216, 432, 648, 864, 1080, 1296],
-                #                2.0: [216, 432, 648, 864, 1080, 1296],
-                #                1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "sparky": {16.0: [648, 864, 1080, 1296],
-                #                12.0: [216, 432, 648, 864, 1080, 1296],
-                #                8.0: [216, 432, 648, 864, 1080, 1296],
-                #                6.0: [216, 432, 648, 864, 1080, 1296],
-                #                4.0: [216, 432, 648, 864, 1080, 1296],
-                #                2.0: [216, 432, 648, 864, 1080, 1296],
-                #                1.5: [216, 432, 648, 864, 1080, 1296]},
-                #
-                #     "m2": {16.0: [216, 432, 648, 864, 1080, 1296],
-                #             12.0: [216, 432, 648, 864, 1080, 1296],
-                #             8.0: [216, 432, 648, 864, 1080, 1296],
-                #             6.0: [216, 432, 648, 864, 1080, 1296],
-                #             4.0: [216, 432, 648, 864, 1080, 1296],
-                #             2.0: [216, 432, 648, 864, 1080, 1296],
-                #             1.5: [216, 432, 648, 864, 1080, 1296]},
-                # }
-
+                #Telgram warning messages:
                 # Load dictionary from file
                 file_path = "/home/ratvillage01/academy/user/trial_criteria.json"
                 try:
@@ -1299,136 +1235,158 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
-                elif last_session_task == second_last_session_task:
-                    # Update the logic to use trial_condition
-                    if last_session_ror == second_last_session_ror:
-                        # Allowed trial_conditions for the current ROR
-                        allowed_conditions_last = ror_to_conditions.get(last_session_ror, [])
-                        allowed_conditions_second_last = ror_to_conditions.get(second_last_session_ror, [])
-                        print(f"Current ROR: {last_session_ror}, Allowed Conditions: {allowed_conditions_last}")
-                        print(
-                            f"Second Last ROR: {second_last_session_ror}, Allowed Conditions: {allowed_conditions_second_last}")
+                message = (
+                    f"Last Session ROR: {current_ror}\n"
+                    f"Total trials in current ROR: {trial_counter_ror}"
+                )
+                print(message)
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except Exception as e:
+                    print('Telegram message not sent:', e)
+                    pass
 
-                        # Filter for the specific trial_condition in the last session and calculate accuracy and
-                        last_condition_trials = df_last_session[
-                            df_last_session['trial_condition'].isin(allowed_conditions_last)]
-                        correct_trials_last = \
-                        last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
-                        valid_trials_last = \
-                        last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
-                        accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-                        print(f"Accuracy for last session in trial_condition: {accuracy_last * 100:.2f}%")
-
-                        # Filter for the specific trial_condition in the second last session
-                        if second_last_session is not None:
-                            second_last_condition_trials = df_second_last_session[
-                                df_second_last_session['trial_condition'].isin(allowed_conditions_second_last)]
-                            correct_trials_second_last = second_last_condition_trials[
-                                second_last_condition_trials['trial_result'] == 'correct'].shape[0]
-                            valid_trials_second_last = \
-                            second_last_condition_trials[second_last_condition_trials['trial_result'] != 'miss'].shape[
-                                0]
-                            accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
-                            print(
-                                f"Accuracy for second last session in trial_condition: {accuracy_second_last * 100:.2f}%")
-                        else:
-                            accuracy_second_last = 0
-                            print("No second last session available.")
-
-                        total_trials = valid_trials_last + valid_trials_second_last
-
-                        message = (
-                            f"Last Session ROR: {last_session_ror}\n"
-                            f"Second Last Session ROR: {second_last_session_ror}\n"
-                            f"Total Trials in last two sessions: {total_trials}\n"
-                            f"Total trials in current ROR: {trial_counter_ror}"
-                        )
-                        print(message)
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except Exception as e:
-                            print('Telegram message not sent:', e)
-                            pass
-
-                        if ((
-                                total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
-                                or (trial_counter_ror >= trial_end_criteria)):
-                            # Move the current_ror to completed_ror
-                            completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
-                            trial_counter_ror = 0
-                            # Move to the next ror, if any are left
-                            if ror != "[]" and ror:  # Check if ror is not empty
-                                ror, current_ror = str_pop(ror)  # Use str_pop to remove the first ROR
-                                if ror != "[]" and ror:
-                                    current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
-                                    # Create a message indicating the change in current_ror
-                                    message = (
-                                        f"Current ROR has been updated.\n"
-                                        f"Remaining ROR: {ror}\n"
-                                        f"New Current ROR: {current_ror}\n"
-                                        f"Completed RORs: {completed_ror}"
-                                    )
-                                    print(message)
-                                    try:
-                                        telegram_bot.alarm_finish_session(message, my_subject)
-                                    except Exception as e:
-                                        print('Telegram message not sent:', e)
-                                        pass
-                                else:
-                                    print("All RORs are completed. Task ends.")
-                                    current_ror = 0
-                                    ror = []
-                                    completed_ror = []
-                                    trial_counter_ror = 0
-                                    task = 'Probability_WebersLaw_Post'
-                                    stage = 4
-                                    block = 12  # This is the number of trials one conditions will remain for
-                                    conditions = []  # Takes the conditions from select task file.
-                                    completed_conditions = []  # To store completed conditions
-                                    current_condition = 0  # To track the current condition in progress
-                                    repetition = 2  # To store how many times the conditions needs to repeat.
-                                    current_repetition = 0  # To store how many times the condition has repeated.
-                                    trial_counter = 0  # Track the number of trials for the current condition
-                                    # Image output stims:
-                                    stim_trial = 0
-                                    stim_trials = []
-                                    stim_trial_counter = 0
-                                    substage = 0
-                                    message = 'PI: Webers law Training completed. Move to Probability_WebersLaw_Post'
-                                    print(f'{message}')
-                                    try:
-                                        telegram_bot.alarm_finish_session(message, my_subject)
-                                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                                    except:
-                                        print('Telegram message not sent')
-                                        pass
-                            else:
-                                message = (
-                                    f"Criteria not met.\n"
-                                    f"Current ROR not updated.\n"
-                                    f"Current ROR: {current_ror}\n"
-                                    f"Completed RORs: {completed_ror}"
-                                )
-                                print(message)
-                                try:
-                                    telegram_bot.alarm_finish_session(message, my_subject)
-                                except Exception as e:
-                                    print('Telegram message not sent:', e)
-                                    pass
-
-                # Ensure current_ror is an integer after processing
-                if isinstance(current_ror, str):
-                    current_ror = float(current_ror)  # Convert to int if it's a string
-                    print(f"current_ror converted to int: {current_ror}")
-
-                # Convert ror and completed_ror to lists using isinstance
-                if isinstance(ror, str):
-                    ror = str_to_list(ror)
-                    print(f"Converted ror to list: {ror}")
-
-                if isinstance(completed_ror, str):
-                    completed_ror = str_to_list(completed_ror)
-                    print(f"Converted completed_ror to list: {completed_ror}")
+                # elif last_session_task == second_last_session_task:
+                #     # Update the logic to use trial_condition
+                #     if last_session_ror == second_last_session_ror:
+                #         # Allowed trial_conditions for the current ROR
+                #         allowed_conditions_last = ror_to_conditions.get(last_session_ror, [])
+                #         allowed_conditions_second_last = ror_to_conditions.get(second_last_session_ror, [])
+                #         print(f"Current ROR: {last_session_ror}, Allowed Conditions: {allowed_conditions_last}")
+                #         print(
+                #             f"Second Last ROR: {second_last_session_ror}, Allowed Conditions: {allowed_conditions_second_last}")
+                #
+                #         # Filter for the specific trial_condition in the last session and calculate accuracy and
+                #         last_condition_trials = df_last_session[
+                #             df_last_session['trial_condition'].isin(allowed_conditions_last)]
+                #         correct_trials_last = \
+                #         last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
+                #         valid_trials_last = \
+                #         last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
+                #         accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
+                #         print(f"Accuracy for last session in trial_condition: {accuracy_last * 100:.2f}%")
+                #
+                #         # Filter for the specific trial_condition in the second last session
+                #         if second_last_session is not None:
+                #             second_last_condition_trials = df_second_last_session[
+                #                 df_second_last_session['trial_condition'].isin(allowed_conditions_second_last)]
+                #             correct_trials_second_last = second_last_condition_trials[
+                #                 second_last_condition_trials['trial_result'] == 'correct'].shape[0]
+                #             valid_trials_second_last = \
+                #             second_last_condition_trials[second_last_condition_trials['trial_result'] != 'miss'].shape[
+                #                 0]
+                #             accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
+                #             print(
+                #                 f"Accuracy for second last session in trial_condition: {accuracy_second_last * 100:.2f}%")
+                #         else:
+                #             accuracy_second_last = 0
+                #             print("No second last session available.")
+                #
+                #         total_trials = valid_trials_last + valid_trials_second_last
+                #
+                #         message = (
+                #             f"Last Session ROR: {last_session_ror}\n"
+                #             f"Second Last Session ROR: {second_last_session_ror}\n"
+                #             f"Total Trials in last two sessions: {total_trials}\n"
+                #             f"Total trials in current ROR: {trial_counter_ror}"
+                #         )
+                #         print(message)
+                #         try:
+                #             telegram_bot.alarm_finish_session(message, my_subject)
+                #         except Exception as e:
+                #             print('Telegram message not sent:', e)
+                #             pass
+                #
+                #         if ((
+                #                 total_trials >= trial_criteria and accuracy_last >= accuracy_criteria and accuracy_second_last >= accuracy_criteria)
+                #                 or (trial_counter_ror >= trial_end_criteria)):
+                #             # Move the current_ror to completed_ror
+                #             completed_ror = str_append(completed_ror, current_ror)  # Append using str_append
+                #             trial_counter_ror = 0
+                #             # Move to the next ror, if any are left
+                #             if ror != "[]" and ror:  # Check if ror is not empty
+                #                 ror, current_ror = str_pop(ror)  # Use str_pop to remove the first ROR
+                #                 if ror != "[]" and ror:
+                #                     current_ror = ror[1:-1].split(", ")[0]  # Get the first ROR
+                #                     # Create a message indicating the change in current_ror
+                #                     message = (
+                #                         f"Current ROR has been updated.\n"
+                #                         f"Remaining ROR: {ror}\n"
+                #                         f"New Current ROR: {current_ror}\n"
+                #                         f"Completed RORs: {completed_ror}"
+                #                     )
+                #                     print(message)
+                #                     try:
+                #                         telegram_bot.alarm_finish_session(message, my_subject)
+                #                     except Exception as e:
+                #                         print('Telegram message not sent:', e)
+                #                         pass
+                #                 else:
+                #                     print("All RORs are completed. Task ends.")
+                #                     current_ror = 0
+                #                     ror = []
+                #                     completed_ror = []
+                #                     trial_counter_ror = 0
+                #                     task = 'Probability_WebersLaw_Post'
+                #                     stage = 4
+                #                     block = 12  # This is the number of trials one conditions will remain for
+                #                     conditions = []  # Takes the conditions from select task file.
+                #                     completed_conditions = []  # To store completed conditions
+                #                     current_condition = 0  # To track the current condition in progress
+                #                     repetition = 2  # To store how many times the conditions needs to repeat.
+                #                     current_repetition = 0  # To store how many times the condition has repeated.
+                #                     trial_counter = 0  # Track the number of trials for the current condition
+                #                     # Image output stims:
+                #                     stim_trial = 0
+                #                     stim_trials = []
+                #                     stim_trial_counter = 0
+                #                     substage = 0
+                #                     message = 'PI: Webers law Training completed. Move to Probability_WebersLaw_Post'
+                #                     print(f'{message}')
+                #                     try:
+                #                         telegram_bot.alarm_finish_session(message, my_subject)
+                #                         telegram_bot.alarm_completed_criteria(task, my_subject)
+                #                     except:
+                #                         print('Telegram message not sent')
+                #                         pass
+                #             else:
+                #                 message = (
+                #                     f"Criteria not met.\n"
+                #                     f"Current ROR not updated.\n"
+                #                     f"Current ROR: {current_ror}\n"
+                #                     f"Completed RORs: {completed_ror}"
+                #                 )
+                #                     telegram_bot.alarm_finish_session(message, my_subject)
+                #                 except Exception as e:
+                #                     print('Telegram message not sent:', e)
+                #                     pass                    print(message)
+                #                 try:
+                #                     telegram_bot.alarm_finish_session(message, my_subject)
+                #                 except Exception as e:
+                #                     print('Telegram message not sent:', e)
+                #                     pass
+                #
+                # # Ensure current_ror is an integer after processing
+                # if isinstance(current_ror, str):
+                #     current_ror = float(current_ror)  # Convert to int if it's a string
+                #     print(f"current_ror converted to int: {current_ror}")
+                #
+                # # Convert ror and completed_ror to lists using isinstance
+                # if isinstance(ror, str):
+                #     ror = str_to_list(ror)
+                #     print(f"Converted ror to list: {ror}")
+                #
+                # if isinstance(completed_ror, str):
+                #     completed_ror = str_to_list(completed_ror)
+                #     print(f"Converted completed_ror to list: {completed_ror}")
+                # # Convert ror and completed_ror to lists using isinstance
+                # if isinstance(ror, str):
+                #     ror = str_to_list(ror)
+                #     print(f"Converted ror to list: {ror}")
+                #
+                # if isinstance(completed_ror, str):
+                #     completed_ror = str_to_list(completed_ror)
+                #     print(f"Converted completed_ror to list: {completed_ror}")
 
         elif 'Probability_Turtle_Training' in task:
             trial_criteria = 30
@@ -1512,8 +1470,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter
-
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
@@ -1632,4 +1589,3 @@ def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_crite
         if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
             return False  # If either condition is not met in any session, do not move forward
     return True  # Move forward if all sessions meet the criteria
-
