@@ -65,7 +65,7 @@ def select_task(df, subject):
     my_subject = df.subject.iloc[0]
 
     #Remove all the blank trials:
-    #df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+    df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
