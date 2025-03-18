@@ -1121,7 +1121,7 @@ def select_task(df, subject):
                 trial_end_criteria = 1500
 
                 if my_subject == 'm2':
-                    trial_end_criteria = 10
+                    trial_end_criteria = 1000
 
                 last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
