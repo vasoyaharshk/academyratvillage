@@ -100,7 +100,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
         self.easy_ror = [16.0, 12.0, 8.0, 6.0]
         self.hard_ror = [4.0, 2.0, 1.5]
-        self.block_wlt = 40
+        self.block_wlt = 20                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
         self.stim_trial_counter_wlt = 0
@@ -118,9 +118,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
-        self.accuracy_block = 10         # Every 40 blocks the criteria will be tested.
+        self.accuracy_block = 4         # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 1         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
+        self.previous_ror = 0
 
 
     def get_stim_image_path(self, stim_trial, condition):
@@ -212,6 +213,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
         #    - Proportions:
         #      ROR = 4   -> Hard: 70%, Easy: 30%
+        #      ROR = 4   -> Hard: 67.5%%, Easy: 32.5%
         #      ROR = 2   -> Hard: 60%, Easy: 40%
         #      ROR = 1.5 -> Hard: 50%, Easy: 50%
         #    - Proportions and counts must fall within ±2% of the expected values.
@@ -416,35 +418,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                         continue
 
                 return sequence
-
-        raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
-
-    def str_append(my_str: str, value: str) -> str:
-        """Simulate appending a value to a string representation of a list."""
-        my_str = my_str.strip()  # Ensure no leading/trailing spaces
-        if my_str == "[]" or not my_str:  # If empty list, add value directly
-            return f"[{value}]"
-        return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
-
-    def str_pop(my_str: str) -> tuple[str, str]:
-        """Simulate popping the first value from a string representation of a list."""
-        my_str = my_str.strip()  # Ensure no leading/trailing spaces
-        if my_str == "[]" or not my_str:  # Handle empty list
-            raise ValueError("Cannot pop from an empty list")
-
-        # Remove the brackets and split by commas
-        parts = my_str[1:-1].split(", ")
-        popped_value = parts.pop(0)  # Remove the first element
-        new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
-        return new_str, popped_value
-
-    # Convert ror and completed_ror back to lists
-    def str_to_list(my_str: str) -> list:
-        """Convert a string representation of a list back to a Python list."""
-        my_str = my_str.strip()  # Ensure no leading/trailing spaces
-        if my_str == "[]" or not my_str:
-            return []  # Return an empty list if the string is empty or '[]'
-        return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+        return None
+        #raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
 
     def configure_gui(self):
         self.gui_input = ['duration_max', 'stage']
@@ -456,11 +431,6 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print('ROR: ', self.current_ror)
         print('stim_trial_wlt: ', self.stim_trial_wlt)
         print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
-
-        print("Accuracy_counter: ", self.accuracy_counter)
-        print("Accuracy_block: ", self.accuracy_block)
-        print("Self.block_accuracy: ", self.block_accuracy)
-
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -491,10 +461,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials_wlt}")
+
             self.stim_trial_counter_wlt = 0
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
-        if self.condition_trial_counter % self.block_wlt == 0:
+        if self.current_ror != self.previous_ror:
             last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
             if self.current_ror in self.easy_ror:
                 self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial_conditions)
@@ -516,7 +487,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                         print("generate_random_trial_conditions_hard returned None. Retrying...")
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
-            self.condition_trial_counter = 0
+
+                # Update previous ROR so that conditions won't be regenerated again until it changes.
+                self.previous_ror = self.current_ror
+                self.condition_trial_counter = 0  # Optionally reset your counter if needed.
 
         self.trial_condition = self.trial_conditions[self.condition_trial_counter]
 
@@ -700,15 +674,15 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
-                if self.trial_condition in self.allowed_conditions:
-                    self.accuracy_valid_count += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.accwindow = self.accwindow[1:] + [1]
                 self.correct_count += 1
                 print('Correct_count: ', self.correct_count)
                 if self.trial_condition in self.allowed_conditions:
                     self.accuracy_correct_count += 1
+                    self.accuracy_valid_count += 1
                     print('Acc Correct_count: ', self.accuracy_correct_count)
+                    print('Acc Valid_count: ', self.accuracy_valid_count)
 
                 # Check if side bias is active and if the current trial was correct
                 if self.bias_breaking == 1:  # Side bias active
@@ -742,17 +716,25 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             # Check accuracy for every block of 40 trials
             if self.accuracy_counter % self.accuracy_block == 0:
                 self.accuracy_counter = 1
-                #Calculate the accuracy for specific ror including only the conditions that are in the list:
                 self.block_accuracy = self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0
+
                 if self.block_accuracy >= self.accuracy_criteria:
                     self.accuracy_counter = 1
-                    self.completed_ror = str_append(self.completed_ror, self.current_ror)  # Append using str_append
-                    # Move to the next ror, if any are left
-                    if self.ror != "[]" and self.ror:  # Check if self.ror is not empty
-                        self.ror, self.current_ror = str_pop(self.ror)  # Use str_pop to remove the first self.ror
-                        if self.ror != "[]" and self.ror:
-                            self.current_ror = self.ror[1:-1].split(", ")[0]  # Get the first self.ror
-                            # Create a message indicating the change in self.current_ror
+                    self.ror_change = True
+                    if self.completed_ror is None:
+                        self.completed_ror = []  # Initialize if None
+
+                    self.completed_ror.append(self.current_ror)  # Only one append
+                    print("completed_ror:", self.completed_ror)
+
+                    if self.current_ror in self.ror:  # Ensure current_ror exists in ror before removing
+                        print("ROR before:", self.ror)
+                        self.ror.remove(self.current_ror)
+                        print("ROR after removal:", self.ror)
+
+                        if self.ror:  # If ror is not empty, update current_ror
+                            self.current_ror = self.ror[0]
+                            print(f"Updated current_ror: {self.current_ror}")
                             message = (
                                 f"Current self.ror has been updated.\n"
                                 f"Remaining self.ror: {self.ror}\n"
@@ -767,38 +749,24 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                             self.ror = []
                             self.completed_ror = []
                             self.stage = 4
-                            self.block = 12  # This is the number of trials one conditions will remain for
-                            self.conditions = []  # Takes the conditions from select task file.
-                            self.completed_conditions = []  # To store completed conditions
-                            self.current_condition = 0  # To track the current condition in progress
-                            self.repetition = 2  # To store how many times the conditions needs to repeat.
-                            self.current_repetition = 0  # To store how many times the condition has repeated.
-                            self.trial_counter = 0  # Track the number of trials for the current condition
-                            # Image output stims:
+                            self.block = 12
+                            self.conditions = []
+                            self.completed_conditions = []
+                            self.current_condition = 0
+                            self.repetition = 2
+                            self.current_repetition = 0
+                            self.trial_counter = 0
                             self.stim_trial = 0
                             self.stim_trials = []
                             self.stim_trial_counter = 0
                             self.substage = 0
                 else:
+                    print("here10")
                     self.accuracy_counter = 1
 
-        print("Accuracy_counter: ", self.accuracy_counter)
-        print("Accuracy_block: ", self.accuracy_block)
-        print("Self.block_accuracy: ", self.block_accuracy)
-
-        # Ensure self.current_ror is an integer after processing
-        if isinstance(self.current_ror, str):
-            self.current_ror = float(self.current_ror)  # Convert to int if it's a string
-            print(f"self.current_ror converted to int: {self.current_ror}")
-
-            # Convert self.ror and self.completed_ror to lists using isinstance
-        if isinstance(self.ror, str):
-            self.ror = str_to_list(self.ror)
-            print(f"Converted self.ror to list: {self.ror}")
-
-        if isinstance(self.completed_ror, str):
-            self.completed_ror = str_to_list(self.completed_ror)
-            print(f"Converted self.completed_ror to list: {self.completed_ror}")
+            print("Accuracy_counter: ", self.accuracy_counter)
+            print("Accuracy_block: ", self.accuracy_block)
+            print("Self.block_accuracy: ", self.block_accuracy)
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
@@ -827,7 +795,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print(f"Responses so far: {self.response_x_array}")
 
             # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-            if len(self.response_x_array) >= self.side_bias_trigger and self.l is not None and self.accuracy < self.side_bias_trigger_acc:
+            if len(self.response_x_array) >= self.side_bias_trigger and self.block_accuracy is not None and self.block_accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
                 all_left_side = all(
                     45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
