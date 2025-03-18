@@ -100,7 +100,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
         self.easy_ror = [16.0, 12.0, 8.0, 6.0]
         self.hard_ror = [4.0, 2.0, 1.5]
-        self.block_wlt = 20
+        self.block_wlt = 40
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
         self.stim_trial_counter_wlt = 0
@@ -118,7 +118,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
-        self.accuracy_block = 40         # Every 40 blocks the criteria will be tested.
+        self.accuracy_block = 10         # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 1         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
 
@@ -457,6 +457,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print('stim_trial_wlt: ', self.stim_trial_wlt)
         print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
 
+        print("Accuracy_counter: ", self.accuracy_counter)
+        print("Accuracy_block: ", self.accuracy_block)
+        print("Self.block_accuracy: ", self.block_accuracy)
+
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -464,7 +468,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.stim_trial_counter_wlt = 0
             self.trial_conditions = []
             self.condition_trial_counter = 0
-            print("End Training Criteria: ", self.accuracy_criteria)
+            print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
 
 
         print('Bias Breaking: ', self.bias_breaking)
@@ -676,7 +680,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.accuracy_counter += 1
 
             self.allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
-            print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {allowed_conditions}")
+            print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {self.allowed_conditions}")
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -689,6 +693,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.valid_counter += 1
                 if self.trial_condition in self.allowed_conditions:
                     self.accuracy_valid_count += 1
+                    print('Acc Valid_count: ', self.accuracy_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
 
             ##### COUNT CORRECTS FIRST POKE
@@ -703,6 +708,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 print('Correct_count: ', self.correct_count)
                 if self.trial_condition in self.allowed_conditions:
                     self.accuracy_correct_count += 1
+                    print('Acc Correct_count: ', self.accuracy_correct_count)
 
                 # Check if side bias is active and if the current trial was correct
                 if self.bias_breaking == 1:  # Side bias active
@@ -733,7 +739,6 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             # Compute overall accuracy for the session:
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
-
             # Check accuracy for every block of 40 trials
             if self.accuracy_counter % self.accuracy_block == 0:
                 self.accuracy_counter = 1
@@ -757,6 +762,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                             print(message)
                         else:
                             print("All RORs are completed. Task ends.")
+                            self.tired = True
                             self.current_ror = 0
                             self.ror = []
                             self.completed_ror = []
@@ -776,6 +782,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 else:
                     self.accuracy_counter = 1
 
+        print("Accuracy_counter: ", self.accuracy_counter)
+        print("Accuracy_block: ", self.accuracy_block)
+        print("Self.block_accuracy: ", self.block_accuracy)
+
         # Ensure self.current_ror is an integer after processing
         if isinstance(self.current_ror, str):
             self.current_ror = float(self.current_ror)  # Convert to int if it's a string
@@ -789,11 +799,6 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         if isinstance(self.completed_ror, str):
             self.completed_ror = str_to_list(self.completed_ror)
             print(f"Converted self.completed_ror to list: {self.completed_ror}")
-
-
-
-
-
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
