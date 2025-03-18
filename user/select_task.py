@@ -1136,7 +1136,6 @@ def select_task(df, subject):
                 accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
                 block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
                 ror_change = last_row['ror_change']  # Accuracy for that 40 trial block
-                print(type(ror_change))
 
                 #Telgram warning messages:
                 # Load dictionary from file
