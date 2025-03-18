@@ -119,8 +119,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
 
         self.accuracy_block = 4         # Every 40 blocks the criteria will be tested.
-        self.accuracy_counter = 1         # Counter for accuracy.
+        self.accuracy_counter = 0         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
+        self.ror_change = False
         self.previous_ror = 0
 
 
@@ -440,13 +441,40 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.condition_trial_counter = 0
             print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
 
-
         print('Bias Breaking: ', self.bias_breaking)
         #print('stim_trials_wlt: ', self.stim_trials_wlt)
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
         self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
+
+        if self.ror_change:
+            if self.current_ror in self.ror:  # Ensure the current ROR exists in self.ror list
+                print("ROR before update:", self.ror)
+                self.ror.remove(self.current_ror)
+                print("ROR after removal:", self.ror)
+                if self.ror:
+                    self.current_ror = self.ror[0]
+                    print(f"Updated current_ror: {self.current_ror}")
+                else:
+                    print("All RORs are completed. Task ends.")
+                    self.tired = True
+                    self.current_ror = 0
+                    self.ror = []
+                    self.completed_ror = []
+                    self.stage = 4
+                    self.block = 12
+                    self.conditions = []
+                    self.completed_conditions = []
+                    self.current_condition = 0
+                    self.repetition = 2
+                    self.current_repetition = 0
+                    self.trial_counter = 0
+                    self.stim_trial = 0
+                    self.stim_trials = []
+                    self.stim_trial_counter = 0
+                    self.substage = 0
+            self.ror_change = False  # Reset the flag so it only triggers once
 
         # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
         if self.stim_trial_counter_wlt % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
@@ -488,9 +516,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
 
-                # Update previous ROR so that conditions won't be regenerated again until it changes.
-                self.previous_ror = self.current_ror
-                self.condition_trial_counter = 0  # Optionally reset your counter if needed.
+            # Update previous ROR so that conditions won't be regenerated again until it changes.
+            self.previous_ror = self.current_ror
+            self.condition_trial_counter = 0  # Optionally reset your counter if needed.
+
+        #self.trial_condition = self.trial_conditions[self.condition_trial_counter % len(self.trial_conditions)]
 
         self.trial_condition = self.trial_conditions[self.condition_trial_counter]
 
@@ -522,7 +552,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
 
         ############ STATE MACHINE ################
-        if self.stage != 6:
+        if self.stage != 4:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
@@ -647,7 +677,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        if self.stage != 6:
+        if self.stage != 4:
             self.trial_counter_ror += 1
             self.stim_trial_counter_wlt += 1
             self.condition_trial_counter += 1
@@ -714,55 +744,16 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
             # Check accuracy for every block of 40 trials
+
             if self.accuracy_counter % self.accuracy_block == 0:
-                self.accuracy_counter = 1
-                self.block_accuracy = self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0
-
+                self.block_accuracy = (self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0)
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.accuracy_counter = 1
-                    self.ror_change = True
-                    if self.completed_ror is None:
-                        self.completed_ror = []  # Initialize if None
-
-                    self.completed_ror.append(self.current_ror)  # Only one append
-                    print("completed_ror:", self.completed_ror)
-
-                    if self.current_ror in self.ror:  # Ensure current_ror exists in ror before removing
-                        print("ROR before:", self.ror)
-                        self.ror.remove(self.current_ror)
-                        print("ROR after removal:", self.ror)
-
-                        if self.ror:  # If ror is not empty, update current_ror
-                            self.current_ror = self.ror[0]
-                            print(f"Updated current_ror: {self.current_ror}")
-                            message = (
-                                f"Current self.ror has been updated.\n"
-                                f"Remaining self.ror: {self.ror}\n"
-                                f"New Current self.ror: {self.current_ror}\n"
-                                f"Completed RORs: {self.completed_ror}"
-                            )
-                            print(message)
-                        else:
-                            print("All RORs are completed. Task ends.")
-                            self.tired = True
-                            self.current_ror = 0
-                            self.ror = []
-                            self.completed_ror = []
-                            self.stage = 4
-                            self.block = 12
-                            self.conditions = []
-                            self.completed_conditions = []
-                            self.current_condition = 0
-                            self.repetition = 2
-                            self.current_repetition = 0
-                            self.trial_counter = 0
-                            self.stim_trial = 0
-                            self.stim_trials = []
-                            self.stim_trial_counter = 0
-                            self.substage = 0
+                    self.ror_change = True  # Indicate that a ROR change is due
+                    self.accuracy_counter = 0  # Reset the counter after the block
+                    # Do not update current_ror here! Instead do it in the start of the next trial
                 else:
-                    print("here10")
-                    self.accuracy_counter = 1
+                    print("Accuracy criteria not met.")
+                self.accuracy_counter = 0  # Reset the counter after the block
 
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)

@@ -1368,27 +1368,21 @@ def select_task(df, subject):
                 #                     print('Telegram message not sent:', e)
                 #                     pass
                 #
-                # # Ensure current_ror is an integer after processing
-                # if isinstance(current_ror, str):
-                #     current_ror = float(current_ror)  # Convert to int if it's a string
-                #     print(f"current_ror converted to int: {current_ror}")
-                #
-                # # Convert ror and completed_ror to lists using isinstance
-                # if isinstance(ror, str):
-                #     ror = str_to_list(ror)
-                #     print(f"Converted ror to list: {ror}")
-                #
-                # if isinstance(completed_ror, str):
-                #     completed_ror = str_to_list(completed_ror)
-                #     print(f"Converted completed_ror to list: {completed_ror}")
-                # # Convert ror and completed_ror to lists using isinstance
-                # if isinstance(ror, str):
-                #     ror = str_to_list(ror)
-                #     print(f"Converted ror to list: {ror}")
-                #
-                # if isinstance(completed_ror, str):
-                #     completed_ror = str_to_list(completed_ror)
-                #     print(f"Converted completed_ror to list: {completed_ror}")
+                # Ensure current_ror is an integer after processing
+                if isinstance(current_ror, str):
+                    current_ror = float(current_ror)  # Convert to float if it's a string
+                    print(f"current_ror converted to int: {current_ror}")
+
+                # Convert ror and completed_ror to lists using isinstance
+                if isinstance(ror, str):
+                    ror = str_to_list(ror)
+                    print(f"Converted ror to list: {ror}")
+
+                if isinstance(completed_ror, str):
+                    completed_ror = str_to_list(completed_ror)
+                    print(f"Converted completed_ror to list: {completed_ror}")
+
+
 
         elif 'Probability_Turtle_Training' in task:
             trial_criteria = 30
@@ -1494,6 +1488,7 @@ def str_pop(my_str: str) -> tuple[str, str]:
     new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
     return new_str, popped_value
 
+# Convert ror and completed_ror back to lists
 # Convert ror and completed_ror back to lists
 def str_to_list(my_str: str) -> list:
     """Convert a string representation of a list back to a Python list."""
