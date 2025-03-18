@@ -64,6 +64,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.correct_count = 0
         self.accuracy = 0
         self.accuracy_block = 40         # Every 40 blocks the criteria will be tested.
+        self.accuracy_counter = 1         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
         self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
         self.trial_end_criteria - 1500
@@ -412,6 +413,33 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
         raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
 
+    def str_append(my_str: str, value: str) -> str:
+        """Simulate appending a value to a string representation of a list."""
+        my_str = my_str.strip()  # Ensure no leading/trailing spaces
+        if my_str == "[]" or not my_str:  # If empty list, add value directly
+            return f"[{value}]"
+        return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
+
+    def str_pop(my_str: str) -> tuple[str, str]:
+        """Simulate popping the first value from a string representation of a list."""
+        my_str = my_str.strip()  # Ensure no leading/trailing spaces
+        if my_str == "[]" or not my_str:  # Handle empty list
+            raise ValueError("Cannot pop from an empty list")
+
+        # Remove the brackets and split by commas
+        parts = my_str[1:-1].split(", ")
+        popped_value = parts.pop(0)  # Remove the first element
+        new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
+        return new_str, popped_value
+
+    # Convert ror and completed_ror back to lists
+    def str_to_list(my_str: str) -> list:
+        """Convert a string representation of a list back to a Python list."""
+        my_str = my_str.strip()  # Ensure no leading/trailing spaces
+        if my_str == "[]" or not my_str:
+            return []  # Return an empty list if the string is empty or '[]'
+        return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+
     def configure_gui(self):
         self.gui_input = ['duration_max', 'stage']
 
@@ -689,11 +717,86 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             # Compute overall accuracy for the session:
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
+            if self.current_ror in self.easy_ror:
+                self.block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
+            elif self.current_ror in self.hard_ror:
+                last_condition_trials = df_last_session[df_last_session['trial_condition'].isin(allowed_conditions)]
+                correct_trials = last_condition_trials[last_condition_trials['trial_result'] == 'correct'].shape[0]
+                valid_trials = last_condition_trials[last_condition_trials['trial_result'] != 'miss'].shape[0]
+                self.block_accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+
             # Check accuracy for every block of 40 trials
-            if self.trial_counter_ror % self.accuracy_block == 0:
-                self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
-                if self.block_accuracy >= self.accuracy_criteria:
-                    pass
+            if self.accuracy_counter % self.accuracy_block == 0:
+                self.accuracy_counter = 1
+                #self.block_accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
+                #Calculate the accuracy for specific ror including only the conditions that are in the list:
+                # Update the logic to use trial_condition:
+                allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
+                print(f"Current ROR: {self.current_ror}, Allowed Conditions: {allowed_conditions}")
+
+                #Calculate the accuracy for specific trial conditions only:
+
+
+
+            if self.block_accuracy >= self.accuracy_criteria:
+                self.completed_ror = str_append(self.completed_ror, self.current_ror)  # Append using str_append
+                trial_counter_ror = 0
+                # Move to the next ror, if any are left
+                if self.ror != "[]" and self.ror:  # Check if self.ror is not empty
+                    self.ror, self.current_ror = str_pop(self.ror)  # Use str_pop to remove the first self.ror
+                    if self.ror != "[]" and self.ror:
+                        self.current_ror = self.ror[1:-1].split(", ")[0]  # Get the first self.ror
+                        # Create a message indicating the change in self.current_ror
+                        message = (
+                            f"Current self.ror has been updated.\n"
+                            f"Remaining self.ror: {self.ror}\n"
+                            f"New Current self.ror: {self.current_ror}\n"
+                            f"Completed RORs: {self.completed_ror}"
+                        )
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                        except Exception as e:
+                            print('Telegram message not sent:', e)
+                            pass
+                    else:
+                        print("All RORs are completed. Task ends.")
+                        self.current_ror = 0
+                        self.ror = []
+                        self.completed_ror = []
+                        self.stage = 4
+                        self.block = 12  # This is the number of trials one conditions will remain for
+                        self.conditions = []  # Takes the conditions from select task file.
+                        self.completed_conditions = []  # To store completed conditions
+                        self.current_condition = 0  # To track the current condition in progress
+                        self.repetition = 2  # To store how many times the conditions needs to repeat.
+                        self.current_repetition = 0  # To store how many times the condition has repeated.
+                        self.trial_counter = 0  # Track the number of trials for the current condition
+                        # Image output stims:
+                        self.stim_trial = 0
+                        self.stim_trials = []
+                        self.stim_trial_counter = 0
+                        self.substage = 0
+            else:
+                self.accuracy_counter = 1
+
+        # Ensure self.current_ror is an integer after processing
+        if isinstance(self.current_ror, str):
+            self.current_ror = float(self.current_ror)  # Convert to int if it's a string
+            print(f"self.current_ror converted to int: {self.current_ror}")
+
+            # Convert self.ror and self.completed_ror to lists using isinstance
+        if isinstance(self.ror, str):
+            self.ror = str_to_list(self.ror)
+            print(f"Converted self.ror to list: {self.ror}")
+
+        if isinstance(self.completed_ror, str):
+            self.completed_ror = str_to_list(self.completed_ror)
+            print(f"Converted self.completed_ror to list: {self.completed_ror}")
+
+
+
+
 
 
             # Side Bias Breaking formula:
@@ -797,6 +900,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('accuracy_block', self.accuracy_block)
         self.register_value('block_accuracy', self.block_accuracy)
         self.register_value('accuracy_criteria', self.accuracy_criteria)
+        self.register_value('accuracy_counter', self.accuracy_counter)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)
