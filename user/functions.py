@@ -486,7 +486,7 @@ def function35():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Correct image path: {image_path_replaced}")
+            #print(f"Correct image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
 
@@ -523,7 +523,7 @@ def function36():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Incorrect image path: {image_path_replaced}")
+            #print(f"Incorrect image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
 
@@ -931,7 +931,7 @@ def function55():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Correct image path: {image_path_replaced}")
+            #print(f"Correct image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
 
@@ -968,7 +968,7 @@ def function56():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Incorrect image path: {image_path_replaced}")
+            #print(f"Incorrect image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
 
@@ -991,7 +991,6 @@ def loop56(timing):
 def function61():  # When the correct answer is on left
     global last_function_called, image_path
     last_function_called = 61
-    print("61. First image")
 
     image_path = utils.task.image_path_function
 
@@ -1035,7 +1034,7 @@ def function63():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Correct image path: {image_path_replaced}")
+            #print(f"Correct image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1072,7 +1071,7 @@ def function64():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Incorrect image path: {image_path_replaced}")
+            #print(f"Incorrect image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1633,7 +1632,7 @@ def function113():
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
             video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        print(f"Correct image path: {video_path_replaced}")
+        #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1669,7 +1668,7 @@ def function114():
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
             video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-        print(f"Correct image path: {video_path_replaced}")
+        #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")
 

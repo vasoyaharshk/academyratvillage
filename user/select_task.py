@@ -919,7 +919,6 @@ def select_task(df, subject):
                     accuracy_block = 40  # Every 40 blocks the criteria will be tested.
                     accuracy_counter = 1  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    accuracy_criteria = 0.80  # 80% success on accuracy_block(32/40 trials correct)
 
                     # Weber's Law:
                     stage = 5
