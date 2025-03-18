@@ -1262,7 +1262,12 @@ def select_task(df, subject):
                 accuracy_block = last_row['accuracy_block']
                 accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
                 block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
-                ror_change = last_row['ror_change']  # Accuracy for that 40 trial block
+                #ror_change = last_row['ror_change']  # Accuracy for that 40 trial block
+                #ror_change = bool(last_row['ror_change'])  # Convert to bool if necessary. This doenst work as it always returns True
+
+                ror_change = last_row['ror_change'].lower() == "true" if isinstance(last_row['ror_change'],str) else bool(last_row['ror_change'])
+
+                print("ror_change", ror_change)
 
                 #Telgram warning messages:
                 # Load dictionary from file
