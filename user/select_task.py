@@ -905,8 +905,8 @@ def select_task(df, subject):
                 stim_trials = []
                 stim_trial_counter = 0
 
-                if task != "Probability_WebersLaw_Post":
-                    task = 'Probability_WL_Training'
+                if task == "Probability_WebersLaw":
+                    #task = 'Probability_WL_Training'
                     # Weber's Law:
                     stage = 5
 
@@ -924,7 +924,7 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-                if task == "Probability_WebersLaw_Post":
+                elif task == "Probability_WebersLaw_Post":
                     #task = 'Probability_Bastos_Taylor'
                     # Weber's Law:
                     stage = 1
