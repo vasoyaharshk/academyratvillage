@@ -59,6 +59,7 @@ class Task(object):
         self.accuracy_block = 0  # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 0  # Counter for accuracy.
         self.block_accuracy = 0  # Accuracy for that 40 trial block
+        self.ror_change = False  # Accuracy for that 40 trial block
 
         self.checksum = None
         self.subject_class = None

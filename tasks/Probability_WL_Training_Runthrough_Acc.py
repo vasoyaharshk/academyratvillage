@@ -453,6 +453,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 print("ROR before update:", self.ror)
                 self.ror.remove(self.current_ror)
                 print("ROR after removal:", self.ror)
+                print("Block_accuracy:", self.block_accuracy)
                 if self.ror:
                     self.current_ror = self.ror[0]
                     print(f"Updated current_ror: {self.current_ror}")
@@ -747,9 +748,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
             if self.accuracy_counter % self.accuracy_block == 0:
                 self.block_accuracy = (self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0)
+                print("Self.block_accuracy: ", self.block_accuracy)
                 if self.block_accuracy >= self.accuracy_criteria:
                     self.ror_change = True  # Indicate that a ROR change is due
                     self.accuracy_counter = 0  # Reset the counter after the block
+                    self.block_accuracy = 0.0
                     # Do not update current_ror here! Instead do it in the start of the next trial
                 else:
                     print("Accuracy criteria not met.")
@@ -757,7 +760,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)
-            print("Self.block_accuracy: ", self.block_accuracy)
+
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
@@ -834,6 +837,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('trial_result', self.trial_result)
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('accuracy', self.accuracy)
+        self.register_value('ror_change', self.ror_change)
         #Bias Breaking:
         self.register_value('bias_breaking', self.bias_breaking)
         self.register_value('sameside', self.sameside)

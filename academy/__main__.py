@@ -648,6 +648,7 @@ def go_to_state(num):
         utils.subject.accuracy_block = int(utils.subject.accuracy_block)  # Cast to int
         utils.subject.accuracy_counter = int(utils.subject.accuracy_counter)  # Cast to int
         utils.subject.block_accuracy = float(utils.subject.block_accuracy)  # Cast to float
+        utils.subject.ror_change = bool(utils.subject.ror_change)  #Cast to Boolean
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -675,6 +676,7 @@ def go_to_state(num):
         utils.task.accuracy_block = utils.subject.accuracy_block
         utils.task.accuracy_counter = utils.subject.accuracy_counter
         utils.task.block_accuracy = utils.subject.block_accuracy
+        utils.task.ror_change = utils.subject.ror_change
 
 
         utils.task_manager = TaskManager(utils.subject)
