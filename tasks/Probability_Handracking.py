@@ -8,7 +8,7 @@ import os
 import re
 
 
-class Probability_Bastos_Taylor(Task):
+class Probability_Handracking(Task):
     def __init__(self):
         super().__init__()
 

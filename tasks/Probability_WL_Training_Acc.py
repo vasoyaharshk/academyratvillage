@@ -1,4 +1,5 @@
 from academy.task_collection import Task
+from academy import telegram_bot
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 from user import settings
@@ -7,7 +8,7 @@ import numpy as np
 import os
 import re
 
-class Probability_WL_Training_Acc(Task):
+class Probability_WL_Training_Runthrough_Acc(Task):
     def __init__(self):
         super().__init__()
 
@@ -97,10 +98,10 @@ class Probability_WL_Training_Acc(Task):
             2.0: [6, 5],
             1.5: [4, 3],
         }
-        self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
+        self.easy_conditions = [16, 15, 14, 13]
         self.easy_ror = [16.0, 12.0, 8.0, 6.0]
         self.hard_ror = [4.0, 2.0, 1.5]
-        self.block_wlt = 20                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
+        self.block_wlt = 10                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
         self.stim_trial_counter_wlt = 0
@@ -111,6 +112,7 @@ class Probability_WL_Training_Acc(Task):
         self.accuracy_correct_count = 0
         self.accuracy_valid_count = 0
         self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
+        self.trial_end_criteria = 1500
 
         #Variables tracked:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
@@ -220,10 +222,9 @@ class Probability_WL_Training_Acc(Task):
         # 4. ROR Proportion Rule:
         #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
         #    - Proportions:
-        #      ROR = 4   -> Hard: 70%, Easy: 30%
-        #      ROR = 4   -> Hard: 67.5%%, Easy: 32.5%
+        #      ROR = 4   -> Hard: 60%, Easy: 40%
         #      ROR = 2   -> Hard: 60%, Easy: 40%
-        #      ROR = 1.5 -> Hard: 50%, Easy: 50%
+        #      ROR = 1.5 -> Hard: 60%, Easy: 40%
         #    - Proportions and counts must fall within ±2% of the expected values.
         #
         # 5. Hard Condition Distribution Rule:
@@ -279,17 +280,17 @@ class Probability_WL_Training_Acc(Task):
             1.5: [4, 3]
         }
         if current_ror not in ror_to_hard_conditions:
-            raise ValueError("Invalid ROR. Must be 4 or 2.")
+            raise ValueError("Invalid ROR. Must be 4 or 2 or 1.5.")
         hard_conditions = ror_to_hard_conditions[current_ror]
 
         # Easy conditions
-        easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
+        easy_conditions = self.easy_conditions
 
         # ROR proportions
         ror_to_proportion = {
-            4: 0.7,
+            4: 0.6,
             2: 0.6,
-            1.5: 0.5
+            1.5: 0.6
         }
 
         hard_prop = ror_to_proportion[current_ror]
@@ -567,7 +568,7 @@ class Probability_WL_Training_Acc(Task):
 
 
         ############ STATE MACHINE ################
-        if self.stage != 4:
+        if self.stage == 5:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
@@ -689,17 +690,20 @@ class Probability_WL_Training_Acc(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print("Stage is 5. All repetitions completed. Task Ended.")
+            print("Stage is 4. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        if self.stage != 4:
+        if self.stage == 5:
             self.trial_counter_ror += 1
             self.stim_trial_counter_wlt += 1
             self.condition_trial_counter += 1
-            self.accuracy_counter += 1
 
             self.allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
             print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {self.allowed_conditions}")
+
+            if self.trial_condition in self.allowed_conditions:
+                self.accuracy_counter += 1
+                self.accuracy_valid_count += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -775,6 +779,11 @@ class Probability_WL_Training_Acc(Task):
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)
 
+            if accuracy_counter >= self.trial_end_criteria:
+                self.stage = 4
+                print("Stage is 4. All RORs completed. Task Ended.")
+
+
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
@@ -823,7 +832,7 @@ class Probability_WL_Training_Acc(Task):
 
                 self.response_x_array = []  # Clearing the array
         else:
-            print("Stage is 6. All RORs completed. Task Ended.")
+            print("Stage is 4. All RORs completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
 
@@ -884,6 +893,7 @@ class Probability_WL_Training_Acc(Task):
         self.register_value('accuracy_valid_count', self.accuracy_valid_count)
         self.register_value('last_stim_trial', self.last_stim_trial)
         self.register_value('last_condition_trial', self.last_condition_trial)
+        self.register_value('trial_end_criteria', self.trial_end_criteria)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)
