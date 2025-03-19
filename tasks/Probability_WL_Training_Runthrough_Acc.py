@@ -114,6 +114,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
         self.trial_end_criteria = 1500
         self.previous_ror = 0
+        self.total_trials = 0
 
         #Variables tracked:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
@@ -514,8 +515,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print("self.previous_ror", self.previous_ror)
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
-        if self.current_ror != self.previous_ror or not self.trial_conditions:
-            self.last_condition_trial = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
+        if self.current_ror != self.previous_ror or not self.trial_conditions or self.condition_trial_counter % self.block_wlt == 0:
+            print("IF statement entered!")
+            self.last_condition_trial = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else 0
             if self.current_ror in self.motivational_ror:
                 self.trial_conditions = self.generate_random_trial_conditions_motivational(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
@@ -699,9 +701,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
     def after_trial(self):
         if self.stage == 5:
-            self.trial_counter_ror += 1
-            self.stim_trial_counter_wlt += 1
+            self.total_trials += 1
             self.condition_trial_counter += 1
+
+            if self.bias_breaking == 0:
+                self.stim_trial_counter_wlt += 1
 
             #This means that only the trials of the target conditions are counted towards the block (40 trials). This makes sure that the motivational trials from ror 4 down are not included.
             #This means that only the trials of the target conditions are counted towards the block (40 trials). This makes sure that the motivational trials from ror 4 down are not included.
@@ -710,6 +714,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             
             if self.trial_condition in self.allowed_conditions:
                 self.accuracy_counter += 1
+                self.trial_counter_ror += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -777,15 +782,19 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     self.ror_change = True  # Indicate that a ROR change is due
                     self.accuracy_counter = 0  # Reset the counter after the block
                     self.block_accuracy = 0.0
+                    self.accuracy_correct_count = 0
+                    self.accuracy_valid_count = 0
                     # Do not update current_ror here! Instead do it in the start of the next trial
                 else:
                     print("Accuracy criteria not met.")
                 self.accuracy_counter = 0  # Reset the counter after the block
+                self.accuracy_correct_count = 0
+                self.accuracy_valid_count = 0
 
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)
 
-            if self.accuracy_counter >= self.trial_end_criteria:
+            if self.trial_counter_ror >= self.trial_end_criteria:
                 self.stage = 4
                 self.tired = True
                 print("Stage is 4. All RORs completed. Task Ended.")
@@ -899,6 +908,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('last_stim_trial', self.last_stim_trial)
         self.register_value('last_condition_trial', self.last_condition_trial)
         self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('total_trials', self.total_trials)
         # Weber's Law Training unTracked:
         self.register_value('motivational_conditions', self.motivational_conditions)
         self.register_value('motivational_ror', self.motivational_ror)
