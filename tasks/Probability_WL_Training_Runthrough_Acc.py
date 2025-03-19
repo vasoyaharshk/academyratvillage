@@ -117,6 +117,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.completed_ror = []
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
+        self.last_stim_trial = 0
+        self.last_condition_trial = 0
 
         self.accuracy_block = 4         # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 0         # Counter for accuracy.
@@ -161,6 +163,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         return image_path
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+        if last_trial == 0:
+            last_trial = None
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
@@ -179,6 +183,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         """
         Generate a list of conditions for a session based on the given ROR for easy conditions.
         """
+        if last_trial == 0:
+            last_trial = None
+
         if current_ror not in self.ror_to_conditions:
             raise ValueError("Invalid ROR value provided.")
 
@@ -231,6 +238,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         #
         # 7. Failure Handling:
         #    - If a valid sequence cannot be generated within the maximum attempts, an exception is raised.
+        if last_trial == 0:
+            last_trial = None
 
         def check_max_consecutive_type(seq, hard_conditions):
             last_type = None
@@ -482,12 +491,12 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
         if self.stim_trial_counter_wlt % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
-            last_trial = self.stim_trials_wlt[self.stim_trial_counter_wlt - 1] if self.stim_trial_counter_wlt > 0 else None
-            self.stim_trials_wlt = self.generate_random_trials(last_trial)
+            self.last_stim_trial = self.stim_trials_wlt[self.stim_trial_counter_wlt - 1] if self.stim_trial_counter_wlt > 0 else None
+            self.stim_trials_wlt = self.generate_random_trials(self.last_stim_trial)
             print(f"Stimulus trials after first attempt: {self.stim_trials_wlt}")
             while self.stim_trials_wlt is None:
                 print("Retrying to generate stimulus trials...")
-                self.stim_trials_wlt = self.generate_random_trials(last_trial)
+                self.stim_trials_wlt = self.generate_random_trials(self.last_stim_trial)
                 if self.stim_trials_wlt is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
@@ -499,24 +508,24 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print("self.previous_ror", self.previous_ror)
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
-        if self.current_ror != self.previous_ror:
-            last_trial_conditions = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
+        if self.current_ror != self.previous_ror or not self.trial_conditions:
+            self.last_condition_trial = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
             if self.current_ror in self.easy_ror:
-                self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial_conditions)
+                self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, last_trial)
+                    self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_easy returned None. Retrying...")
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
             elif self.current_ror in self.hard_ror:
-                self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, last_trial_conditions)
+                self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, last_trial_conditions)
+                    self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_hard returned None. Retrying...")
                     else:
@@ -873,6 +882,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('allowed_conditions', self.allowed_conditions)
         self.register_value('accuracy_correct_count', self.accuracy_correct_count)
         self.register_value('accuracy_valid_count', self.accuracy_valid_count)
+        self.register_value('last_stim_trial', self.last_stim_trial)
+        self.register_value('last_condition_trial', self.last_condition_trial)
         # Weber's Law Training unTracked:
         self.register_value('easy_conditions', self.easy_conditions)
         self.register_value('easy_ror', self.easy_ror)

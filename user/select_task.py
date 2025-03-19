@@ -46,6 +46,8 @@ def select_task(df, subject):
     accuracy_counter = 0  # Counter for accuracy.
     block_accuracy = 0.0  # Accuracy for that 40 trial block
     ror_change = False
+    last_stim_trial = 0
+    last_condition_trial = 0
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -974,6 +976,8 @@ def select_task(df, subject):
                 accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
                 block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
                 ror_change = last_row['ror_change']  # Accuracy for that 40 trial block
+                last_stim_trial = last_row['last_stim_trial']  # Accuracy for that 40 trial block
+                last_condition_trial = last_row['last_condition_trial']  # Accuracy for that 40 trial block
 
                 # #Telgram warning messages:
                 # # Load dictionary from file
@@ -1599,7 +1603,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change, last_stim_trial, last_condition_trial
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
