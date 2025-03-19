@@ -985,7 +985,10 @@ def select_task(df, subject):
 
             # Telgram warning messages:
             # Load dictionary from file
-            file_path = "/user/trial_criteria_training.json"
+            if task == 'Probability_WL_Training_Acc':
+                file_path = "/user/trial_criteria_training.json"
+            if task == 'Probability_WL_Training_Runthrough_Acc':
+                file_path = "/user/trial_criteria_runthrough.json"
             try:
                 with open(file_path, "r") as file:
                     trial_message_criteria = json.load(file)
