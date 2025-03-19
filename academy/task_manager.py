@@ -59,7 +59,7 @@ class TaskManager:
             self.df_all.to_csv(subject_path, header=True, index=False, sep=';')
             self.df_all = self.df_all.apply(pd.to_numeric, args=('ignore', ))
 
-            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change = select_task.select_task(self.df_all, self.subject)
+            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change, last_stim_trial, last_condition_trial  = select_task.select_task(self.df_all, self.subject)
 
             if weight:
                 utils.subjects.add_new_item({'task': task,
@@ -92,6 +92,8 @@ class TaskManager:
                                              'accuracy_counter': accuracy_counter,
                                              'block_accuracy': block_accuracy,
                                              'ror_change': ror_change,
+                                             'last_stim_trial': last_stim_trial,
+                                             'last_condition_trial': last_condition_trial,
                                              }, item=self.subject)
 
             else:
@@ -123,6 +125,8 @@ class TaskManager:
                                              'accuracy_counter': accuracy_counter,
                                              'block_accuracy': block_accuracy,
                                              'ror_change': ror_change,
+                                             'last_stim_trial': last_stim_trial,
+                                             'last_condition_trial': last_condition_trial,
                                              }, item=self.subject)
         else:
             pass

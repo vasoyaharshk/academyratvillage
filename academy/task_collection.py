@@ -60,6 +60,8 @@ class Task(object):
         self.accuracy_counter = 0  # Counter for accuracy.
         self.block_accuracy = 0  # Accuracy for that 40 trial block
         self.ror_change = False
+        self.last_stim_trial = 0
+        self.last_condition_trial = 0
 
         self.checksum = None
         self.subject_class = None
