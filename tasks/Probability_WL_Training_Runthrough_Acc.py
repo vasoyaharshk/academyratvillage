@@ -1,4 +1,5 @@
 from academy.task_collection import Task
+from academy import telegram_bot
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 from user import settings
@@ -18,7 +19,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         This is the Weber's law training task where: 
         1. Training starts with RoR 16, then 12, 8, 6 (conditions 16 to 9) consecutively, only progressing to the next RoR when they meet 
         criteria: ≥80% success on 40 trials.
-        2. Then they get ROR 4 – 1 (conditions 9 to 1) interleaved with easier RoRs (conditions 16 to 9). No more than 2 easy or hard in a row
+        2. Then they get ROR 4 – 1 (conditions 9 to 1) interleaved with easier RoRs (conditions 16 to 9). No more than 2 motivational or target in a row
         3. End point: Cut-off of 1000 trials per RoR of conditions 16 to 9.
 
                 ########   PORTS INFO   ########
@@ -97,10 +98,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             2.0: [6, 5],
             1.5: [4, 3],
         }
-        self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
-        self.easy_ror = [16.0, 12.0, 8.0, 6.0]
-        self.hard_ror = [4.0, 2.0, 1.5]
-        self.block_wlt = 8                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
+        self.motivational_conditions = [16, 15, 14, 13]     #These are the actual motivational conditions that will be interleaved with RoR 4 and below
+        self.motivational_ror = [16.0, 12.0, 8.0, 6.0]      #This is the list of easy rors but called motivational here to make it easy for us
+        self.target_ror = [4.0, 2.0, 1.5]                   #This is the list of hard rors but called target here to make it easy for us
+
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
         self.stim_trial_counter_wlt = 0
@@ -111,21 +112,22 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.accuracy_correct_count = 0
         self.accuracy_valid_count = 0
         self.accuracy_criteria = 0.80    # 80% success on accuracy_block(32/40 trials correct)
+        self.trial_end_criteria = 1500
+        self.previous_ror = 0
 
         #Variables tracked:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
         self.completed_ror = []
         self.current_ror = 16.0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
-        self.last_stim_trial = 0
-        self.last_condition_trial = 0
-
+        self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
+        self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
         self.accuracy_block = 4         # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 0         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
         self.ror_change = False
-        self.previous_ror = 0
 
+        self.block_wlt = self.accuracy_block                 #This is for presenting equal number of trial types every x trials.
 
     def get_stim_image_path(self, stim_trial, condition):
         """
@@ -179,9 +181,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_random_trial_conditions_easy(self, current_ror, last_trial=None):
+    def generate_random_trial_conditions_motivational(self, current_ror, last_trial=None):
         """
-        Generate a list of conditions for a session based on the given ROR for easy conditions.
+        Generate a list of conditions for a session based on the given ROR.
         """
         if last_trial == 0:
             last_trial = None
@@ -205,10 +207,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             trials.append(candidate)
         return trials
 
-    def generate_random_trial_conditions_hard(self, current_ror, last_trial=None):
+    def generate_random_trial_conditions_target(self, current_ror, last_trial=None):
         # Rules enforced by this function:
         # 1. Trial Type Constraints:
-        #    - No more than two consecutive trials of the same type (hard or easy).
+        #    - No more than two consecutive trials of the same type (target or motivational).
         #
         # 2. Parity Constraints:
         #    - No more than two consecutive trials with the same parity (odd or even).
@@ -218,22 +220,21 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         #      must not match the parity of `last_trial`.
         #
         # 4. ROR Proportion Rule:
-        #    - The proportion of hard to easy trials is determined by the ROR (Rate of Reinforcement) parameter.
+        #    - The proportion of target to motivational trials is determined by the ROR (Rate of Reinforcement) parameter.
         #    - Proportions:
-        #      ROR = 4   -> Hard: 70%, Easy: 30%
-        #      ROR = 4   -> Hard: 67.5%%, Easy: 32.5%
+        #      ROR = 4   -> Hard: 60%, Easy: 40%
         #      ROR = 2   -> Hard: 60%, Easy: 40%
-        #      ROR = 1.5 -> Hard: 50%, Easy: 50%
+        #      ROR = 1.5 -> Hard: 60%, Easy: 40%
         #    - Proportions and counts must fall within ±2% of the expected values.
         #
         # 5. Hard Condition Distribution Rule:
         #    - Hard conditions are evenly distributed among their respective values.
-        #      Example: For ROR=4, "8" and "7" split the hard trials equally (50% each).
+        #      Example: For ROR=4, "8" and "7" split the target trials equally (50% each).
         #    - Edge cases (e.g., uneven splits due to rounding) are handled by assigning
         #      remaining trials to the first conditions in the list.
         #
         # 6. Randomization within Constraints:
-        #    - Hard and easy trials are shuffled to ensure no fixed ordering.
+        #    - Hard and motivational trials are shuffled to ensure no fixed ordering.
         #    - Randomization respects all constraints (e.g., type, parity, proportion).
         #
         # 7. Failure Handling:
@@ -241,11 +242,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         if last_trial == 0:
             last_trial = None
 
-        def check_max_consecutive_type(seq, hard_conditions):
+        def check_max_consecutive_type(seq, target_conditions):
             last_type = None
             count = 0
             for t in seq:
-                current_type = "hard" if t in hard_conditions else "easy"
+                current_type = "target" if t in target_conditions else "motivational"
                 if current_type == last_type:
                     count += 1
                     if count > 2:
@@ -273,58 +274,58 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             return True
 
         # Hard conditions mapping
-        ror_to_hard_conditions = {
+        ror_to_target_conditions = {
             4: [8, 7],
             2: [6, 5],
             1.5: [4, 3]
         }
-        if current_ror not in ror_to_hard_conditions:
-            raise ValueError("Invalid ROR. Must be 4 or 2.")
-        hard_conditions = ror_to_hard_conditions[current_ror]
+        if current_ror not in ror_to_target_conditions:
+            raise ValueError("Invalid ROR. Must be 4 or 2 or 1.5.")
+        target_conditions = ror_to_target_conditions[current_ror]
 
         # Easy conditions
-        easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
+        motivational_conditions = self.motivational_conditions
 
         # ROR proportions
         ror_to_proportion = {
-            4: 0.7,
+            4: 0.6,
             2: 0.6,
-            1.5: 0.5
+            1.5: 0.6
         }
 
-        hard_prop = ror_to_proportion[current_ror]
-        hard_count_total = int(round(self.block_wlt * hard_prop))
-        easy_count_total = self.block_wlt - hard_count_total
+        target_prop = ror_to_proportion[current_ror]
+        target_count_total = int(round(self.block_wlt * target_prop))
+        motivational_count_total = self.block_wlt - target_count_total
 
-        print(f"Expected proportions -> Hard: {hard_prop * 100:.2f}%, Easy: {(1 - hard_prop) * 100:.2f}%")
-        print(f"Expected counts -> Hard: {hard_count_total}, Easy: {easy_count_total}")
+        print(f"Expected proportions -> Hard: {target_prop * 100:.2f}%, Easy: {(1 - target_prop) * 100:.2f}%")
+        print(f"Expected counts -> Hard: {target_count_total}, Easy: {motivational_count_total}")
 
-        # Distribute hard conditions evenly
-        num_hard_conditions = len(hard_conditions)
-        hard_count_per_condition = {c: hard_count_total // num_hard_conditions for c in hard_conditions}
-        remainder = hard_count_total % num_hard_conditions
+        # Distribute target conditions evenly
+        num_target_conditions = len(target_conditions)
+        target_count_per_condition = {c: target_count_total // num_target_conditions for c in target_conditions}
+        remainder = target_count_total % num_target_conditions
         for i in range(remainder):
-            c = hard_conditions[i]
-            hard_count_per_condition[c] += 1
+            c = target_conditions[i]
+            target_count_per_condition[c] += 1
 
-        # Distribute easy conditions evenly
-        num_easy_conditions = len(easy_conditions)
-        easy_count_per_condition = {c: easy_count_total // num_easy_conditions for c in easy_conditions}
-        remainder = easy_count_total % num_easy_conditions
+        # Distribute motivational conditions evenly
+        num_motivational_conditions = len(motivational_conditions)
+        motivational_count_per_condition = {c: motivational_count_total // num_motivational_conditions for c in motivational_conditions}
+        remainder = motivational_count_total % num_motivational_conditions
         for i in range(remainder):
-            c = easy_conditions[i]
-            easy_count_per_condition[c] += 1
+            c = motivational_conditions[i]
+            motivational_count_per_condition[c] += 1
 
-        hard_trials = []
-        for c, cnt in hard_count_per_condition.items():
-            hard_trials += [c] * cnt
+        target_trials = []
+        for c, cnt in target_count_per_condition.items():
+            target_trials += [c] * cnt
 
-        easy_trials = []
-        for c, cnt in easy_count_per_condition.items():
-            easy_trials += [c] * cnt
+        motivational_trials = []
+        for c, cnt in motivational_count_per_condition.items():
+            motivational_trials += [c] * cnt
 
-        random.shuffle(hard_trials)
-        random.shuffle(easy_trials)
+        random.shuffle(target_trials)
+        random.shuffle(motivational_trials)
 
         def get_parity(t):
             return "odd" if t % 2 != 0 else "even"
@@ -332,8 +333,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         def is_valid_addition(seq, trial):
             # Check max consecutive type
             if len(seq) >= 2:
-                last_two_types = ["hard" if x in hard_conditions else "easy" for x in seq[-2:]]
-                current_type = "hard" if trial in hard_conditions else "easy"
+                last_two_types = ["target" if x in target_conditions else "motivational" for x in seq[-2:]]
+                current_type = "target" if trial in target_conditions else "motivational"
                 if last_two_types[0] == last_two_types[1] == current_type:
                     return False
 
@@ -356,42 +357,42 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         max_attempts = 100000
         for attempt in range(max_attempts):
             sequence = []
-            temp_hard = hard_trials.copy()
-            temp_easy = easy_trials.copy()
+            temp_target = target_trials.copy()
+            temp_motivational = motivational_trials.copy()
 
             while len(sequence) < self.block_wlt:
                 if len(sequence) >= 2:
-                    last_two_types = ["hard" if x in hard_conditions else "easy" for x in sequence[-2:]]
-                    if last_two_types[0] == last_two_types[1] == "hard":
-                        possible_types = ["easy"]
-                    elif last_two_types[0] == last_two_types[1] == "easy":
-                        possible_types = ["hard"]
+                    last_two_types = ["target" if x in target_conditions else "motivational" for x in sequence[-2:]]
+                    if last_two_types[0] == last_two_types[1] == "target":
+                        possible_types = ["motivational"]
+                    elif last_two_types[0] == last_two_types[1] == "motivational":
+                        possible_types = ["target"]
                     else:
-                        possible_types = ["hard", "easy"]
+                        possible_types = ["target", "motivational"]
                 else:
-                    possible_types = ["hard", "easy"]
+                    possible_types = ["target", "motivational"]
 
                 random.shuffle(possible_types)
                 added = False
                 for ttype in possible_types:
-                    if ttype == "hard" and len(temp_hard) > 0:
-                        candidates = temp_hard.copy()
+                    if ttype == "target" and len(temp_target) > 0:
+                        candidates = temp_target.copy()
                         random.shuffle(candidates)
                         for c in candidates:
                             if is_valid_addition(sequence, c):
                                 sequence.append(c)
-                                temp_hard.remove(c)
+                                temp_target.remove(c)
                                 added = True
                                 break
                         if added:
                             break
-                    elif ttype == "easy" and len(temp_easy) > 0:
-                        candidates = temp_easy.copy()
+                    elif ttype == "motivational" and len(temp_motivational) > 0:
+                        candidates = temp_motivational.copy()
                         random.shuffle(candidates)
                         for e in candidates:
                             if is_valid_addition(sequence, e):
                                 sequence.append(e)
-                                temp_easy.remove(e)
+                                temp_motivational.remove(e)
                                 added = True
                                 break
                         if added:
@@ -403,20 +404,20 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
             if len(sequence) == self.block_wlt:
                 # Validate
-                hard_count = sum(1 for x in sequence if x in hard_conditions)
-                easy_count = self.block_wlt - hard_count
-                actual_hard_prop = hard_count / self.block_wlt
-                expected_hard_prop = ror_to_proportion[current_ror]
+                target_count = sum(1 for x in sequence if x in target_conditions)
+                motivational_count = self.block_wlt - target_count
+                actual_target_prop = target_count / self.block_wlt
+                expected_target_prop = ror_to_proportion[current_ror]
 
                 print(
-                    f"Generated proportions -> Hard: {actual_hard_prop * 100:.2f}%, Easy: {(1 - actual_hard_prop) * 100:.2f}%")
-                print(f"Generated counts -> Hard: {hard_count}, Easy: {easy_count}")
+                    f"Generated proportions -> Hard: {actual_target_prop * 100:.2f}%, Easy: {(1 - actual_target_prop) * 100:.2f}%")
+                print(f"Generated counts -> Hard: {target_count}, Easy: {motivational_count}")
 
                 # Proportion tolerance ±2%
-                if abs(actual_hard_prop - expected_hard_prop) > 0.02:
+                if abs(actual_target_prop - expected_target_prop) > 0.02:
                     continue
 
-                if not check_max_consecutive_type(sequence, hard_conditions):
+                if not check_max_consecutive_type(sequence, target_conditions):
                     continue
                 if not check_max_consecutive_parity(sequence):
                     continue
@@ -510,24 +511,24 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.current_ror != self.previous_ror or not self.trial_conditions:
             self.last_condition_trial = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else None
-            if self.current_ror in self.easy_ror:
-                self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, self.last_condition_trial)
+            if self.current_ror in self.motivational_ror:
+                self.trial_conditions = self.generate_random_trial_conditions_motivational(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_easy(self.current_ror, self.last_condition_trial)
+                    self.trial_conditions = self.generate_random_trial_conditions_motivational(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
-                        print("generate_random_trial_conditions_easy returned None. Retrying...")
+                        print("generate_random_trial_conditions_motivational returned None. Retrying...")
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
-            elif self.current_ror in self.hard_ror:
-                self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, self.last_condition_trial)
+            elif self.current_ror in self.target_ror:
+                self.trial_conditions = self.generate_random_trial_conditions_target(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
                     print("Retrying to generate trial conditions...")
-                    self.trial_conditions = self.generate_random_trial_conditions_hard(self.current_ror, self.last_condition_trial)
+                    self.trial_conditions = self.generate_random_trial_conditions_target(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
-                        print("generate_random_trial_conditions_hard returned None. Retrying...")
+                        print("generate_random_trial_conditions_target returned None. Retrying...")
                     else:
                         print(f"Successfully generated stimulus trials: {self.trial_conditions}")
 
@@ -567,7 +568,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
 
         ############ STATE MACHINE ################
-        if self.stage != 4:
+        if self.stage == 5:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
@@ -689,17 +690,21 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print("Stage is 5. All repetitions completed. Task Ended.")
+            print("Stage is 4. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        if self.stage != 4:
+        if self.stage == 5:
             self.trial_counter_ror += 1
             self.stim_trial_counter_wlt += 1
             self.condition_trial_counter += 1
-            self.accuracy_counter += 1
 
+            #This means that only the trials of the target conditions are counted towards the block (40 trials). This makes sure that the motivational trials from ror 4 down are not included.
+            #This means that only the trials of the target conditions are counted towards the block (40 trials). This makes sure that the motivational trials from ror 4 down are not included.
             self.allowed_conditions = self.ror_to_conditions.get(self.current_ror, [])
             print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {self.allowed_conditions}")
+            
+            if self.trial_condition in self.allowed_conditions:
+                self.accuracy_counter += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -775,6 +780,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)
 
+            if accuracy_counter >= self.trial_end_criteria:
+                self.stage = 4
+                self.tired = True
+                print("Stage is 4. All RORs completed. Task Ended.")
 
             # Side Bias Breaking formula:
             self.last_stim_trial = self.stim_trial_wlt
@@ -823,7 +832,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
                 self.response_x_array = []  # Clearing the array
         else:
-            print("Stage is 6. All RORs completed. Task Ended.")
+            print("Stage is 4. All RORs completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
 
@@ -884,10 +893,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('accuracy_valid_count', self.accuracy_valid_count)
         self.register_value('last_stim_trial', self.last_stim_trial)
         self.register_value('last_condition_trial', self.last_condition_trial)
+        self.register_value('trial_end_criteria', self.trial_end_criteria)
         # Weber's Law Training unTracked:
-        self.register_value('easy_conditions', self.easy_conditions)
-        self.register_value('easy_ror', self.easy_ror)
-        self.register_value('hard_ror', self.hard_ror)
+        self.register_value('motivational_conditions', self.motivational_conditions)
+        self.register_value('motivational_ror', self.motivational_ror)
+        self.register_value('target_ror', self.target_ror)
         self.register_value('block_wlt', self.block_wlt)
         self.register_value('stim_trial_wlt', self.stim_trial_wlt)
         self.register_value('stim_trials_wlt', self.stim_trials_wlt)

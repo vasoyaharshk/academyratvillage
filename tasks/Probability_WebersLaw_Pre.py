@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class Probability_WebersLaw(Task):
+class Probability_WebersLaw_Pre(Task):
     def __init__(self):
         super().__init__()
 
@@ -370,7 +370,7 @@ class Probability_WebersLaw(Task):
         print('Stimulus Trial Counter',self.stim_trial_counter)
 
         ############ STATE MACHINE ################
-        if self.stage != 5:
+        if self.stage == 4:
             #First trial:
             if self.current_trial == 0:
                 self.sma.add_state(
@@ -495,7 +495,7 @@ class Probability_WebersLaw(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
 
     def after_trial(self):
-        if self.stage != 5:
+        if self.stage == 4:
             self.trial_counter += 1
             self.stim_trial_counter += 1
 
