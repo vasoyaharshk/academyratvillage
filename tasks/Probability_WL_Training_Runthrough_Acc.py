@@ -444,6 +444,10 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
         print('ror_change: ', self.ror_change)
         print("Block_accuracy:", self.block_accuracy)
+        print("Accuracy_counter:", self.accuracy_counter)
+
+        print("accuracy_block:", self.accuracy_block)
+        print("block_wlt:", self.block_wlt)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
