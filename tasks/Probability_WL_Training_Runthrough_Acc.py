@@ -122,7 +122,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
         self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
-        self.accuracy_block = 4         # Every 40 blocks the criteria will be tested.
+        self.accuracy_block = 10         # Every 40 blocks the criteria will be tested.
         self.accuracy_counter = 0         # Counter for accuracy.
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
         self.ror_change = False
@@ -452,6 +452,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.trial_conditions = []
             self.condition_trial_counter = 0
             print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
+            self.block_wlt = self.accuracy_block  # This is for presenting equal number of trial types every x trials.
 
         print('Bias Breaking: ', self.bias_breaking)
         #print('stim_trials_wlt: ', self.stim_trials_wlt)
@@ -780,7 +781,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print("Accuracy_counter: ", self.accuracy_counter)
             print("Accuracy_block: ", self.accuracy_block)
 
-            if accuracy_counter >= self.trial_end_criteria:
+            if self.accuracy_counter >= self.trial_end_criteria:
                 self.stage = 4
                 self.tired = True
                 print("Stage is 4. All RORs completed. Task Ended.")
