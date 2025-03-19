@@ -1271,6 +1271,9 @@ def select_task(df, subject):
 
                 ror_change = last_row['ror_change'].lower() == "true" if isinstance(last_row['ror_change'],str) else bool(last_row['ror_change'])
 
+                last_stim_trial = last_row['last_stim_trial']  # Accuracy for that 40 trial block
+                last_condition_trial = last_row['last_condition_trial']  # Accuracy for that 40 trial block
+
                 print("ror_change", ror_change)
 
                 #Telgram warning messages:

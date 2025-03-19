@@ -100,7 +100,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.easy_conditions = [16, 15, 14, 13, 12, 11, 10, 9]
         self.easy_ror = [16.0, 12.0, 8.0, 6.0]
         self.hard_ror = [4.0, 2.0, 1.5]
-        self.block_wlt = 20                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
+        self.block_wlt = 8                 #This is for presenting equal number of trial types every 20 trials. It is supposed to be "13, 14, 15, 16, 17, 19, 20, 22, 23, 26, 29, 32, and 35" otherwise ROR = 4 wll fail due to more restrictive critetia.
         self.stim_trial_wlt = 0
         self.stim_trials_wlt = []
         self.stim_trial_counter_wlt = 0
