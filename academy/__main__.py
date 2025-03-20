@@ -622,27 +622,35 @@ def go_to_state(num):
         #PI variables:
         utils.subject.moved_back_counter = float(utils.subject.moved_back_counter)
         utils.subject.block = int(utils.subject.block)  # Cast to int
+
         if isinstance(utils.subject.conditions, str):
             utils.subject.conditions = ast.literal_eval(utils.subject.conditions)
         utils.subject.conditions = list(map(int, utils.subject.conditions))
+
         if isinstance(utils.subject.completed_conditions, str):
             utils.subject.completed_conditions = ast.literal_eval(utils.subject.completed_conditions)
         utils.subject.completed_conditions = list(map(int, utils.subject.completed_conditions))
+
         utils.subject.current_condition = int(utils.subject.current_condition)  # Cast to int
         utils.subject.repetition = int(utils.subject.repetition)  # Cast to int
         utils.subject.current_repetition = int(utils.subject.current_repetition)  # Cast to int
         utils.subject.trial_counter = int(utils.subject.trial_counter)  # Cast to int
         utils.subject.stim_trial = int(utils.subject.stim_trial)  # Cast to int.
+
         if isinstance(utils.subject.stim_trials, str):
             utils.subject.stim_trials = ast.literal_eval(utils.subject.stim_trials)
         utils.subject.stim_trials = list(map(int, utils.subject.stim_trials))
+
         utils.subject.stim_trial_counter = int(utils.subject.stim_trial_counter)  # Cast to int
+
         if isinstance(utils.subject.ror, str):
             utils.subject.ror = ast.literal_eval(utils.subject.ror)
         utils.subject.ror = list(map(float, utils.subject.ror))
+
         if isinstance(utils.subject.completed_ror, str):
             utils.subject.completed_ror = ast.literal_eval(utils.subject.completed_ror)
         utils.subject.completed_ror = list(map(float, utils.subject.completed_ror))
+
         utils.subject.current_ror = float(utils.subject.current_ror)  # Cast to float
         utils.subject.trial_counter_ror = int(utils.subject.trial_counter_ror)  # Cast to int
         utils.subject.block_size = int(utils.subject.block_size)  # Cast to int
