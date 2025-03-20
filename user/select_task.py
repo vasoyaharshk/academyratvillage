@@ -53,6 +53,7 @@ def select_task(df, subject):
     total_trials = 0
     block_correct_count = 0  # Tracks the number of corrects in the block
     block_valid_count = 0  ##Tracks the number of valid trials in the block
+    condition_trial_counter = 0
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -1002,6 +1003,14 @@ def select_task(df, subject):
             block_valid_count = last_row['block_valid_count']
             trial_end_criteria = last_row['trial_end_criteria']
 
+            stim_trial = last_row['stim_trial']
+            stim_trials = last_row['stim_trials']
+            stim_trial_counter = last_row['stim_trial_counter']
+
+            condition_trial_counter = last_row['condition_trial_counter']
+            conditions = last_row['conditions']
+
+
             # Telgram warning messages:
             # Load dictionary from file
             if task == 'Probability_WL_Training_Acc':
@@ -1240,7 +1249,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
