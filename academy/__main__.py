@@ -645,12 +645,15 @@ def go_to_state(num):
         utils.subject.completed_ror = list(map(float, utils.subject.completed_ror))
         utils.subject.current_ror = float(utils.subject.current_ror)  # Cast to float
         utils.subject.trial_counter_ror = int(utils.subject.trial_counter_ror)  # Cast to int
-        utils.subject.accuracy_block = int(utils.subject.accuracy_block)  # Cast to int
-        utils.subject.accuracy_counter = int(utils.subject.accuracy_counter)  # Cast to int
+        utils.subject.block_size = int(utils.subject.block_size)  # Cast to int
+        utils.subject.block_trial_counter = int(utils.subject.block_trial_counter)  # Cast to int
         utils.subject.block_accuracy = float(utils.subject.block_accuracy)  # Cast to float
-        utils.subject.ror_change = bool(utils.subject.ror_change)  #Cast to Boolean
-        utils.subject.last_stim_trial = bool(utils.subject.last_stim_trial)  #Cast to Boolean
-        utils.subject.last_condition_trial = bool(utils.subject.last_condition_trial)  #Cast to Boolean
+        utils.subject.block_number = int(utils.subject.block_number)  # Cast to int
+        utils.subject.ror_change = int(utils.subject.ror_change)  #Cast to Boolean
+        utils.subject.block_change = int(utils.subject.block_change)  #Cast to Boolean
+        utils.subject.last_stim_trial = int(utils.subject.last_stim_trial)  #Cast to int
+        utils.subject.last_condition_trial = int(utils.subject.last_condition_trial)  #Cast to int
+        utils.subject.total_trials = int(utils.subject.total_trials)  #Cast to int
 
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -675,12 +678,15 @@ def go_to_state(num):
         utils.task.completed_ror = utils.subject.completed_ror
         utils.task.current_ror = utils.subject.current_ror
         utils.task.trial_counter_ror = utils.subject.trial_counter_ror
-        utils.task.accuracy_block = utils.subject.accuracy_block
-        utils.task.accuracy_counter = utils.subject.accuracy_counter
+        utils.task.block_size = utils.subject.block_size
+        utils.task.block_trial_counter = utils.subject.block_trial_counter
         utils.task.block_accuracy = utils.subject.block_accuracy
+        utils.task.block_number = utils.subject.block_number
         utils.task.ror_change = utils.subject.ror_change
+        utils.task.block_change = utils.subject.block_change
         utils.task.last_stim_trial = utils.subject.last_stim_trial
         utils.task.last_condition_trial = utils.subject.last_condition_trial
+        utils.task.total_trials = utils.subject.total_trials
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

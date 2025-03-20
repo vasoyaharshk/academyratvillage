@@ -56,12 +56,15 @@ class Task(object):
         self.completed_ror = []
         self.current_ror = 0
         self.trial_counter_ror = 0  # Track the number of trials for the current ror
-        self.accuracy_block = 0  # Every 40 blocks the criteria will be tested.
-        self.accuracy_counter = 0  # Counter for accuracy.
-        self.block_accuracy = 0  # Accuracy for that 40 trial block
-        self.ror_change = False
-        self.last_stim_trial = 0
-        self.last_condition_trial = 0
+        self.block_size = 0         # Every 40 blocks the criteria will be tested.
+        self.block_trial_counter = 0         # Counter for block
+        self.block_accuracy = 0.0        # Accuracy for that 40 trial block
+        self.block_number = 0
+        self.ror_change = 0
+        self.block_change = 0
+        self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
+        self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
+        self.total_trials = 0               #Total number of trials in that ROR irrespective of conditions
 
         self.checksum = None
         self.subject_class = None

@@ -42,12 +42,15 @@ def select_task(df, subject):
     #Variables for accuracy testing in Weber's Law Training:
     trial_counter_ror = 0
 
-    accuracy_block = 0  # Every 40 blocks the criteria will be tested.
-    accuracy_counter = 0  # Counter for accuracy.
+    block_size = 0  # Every 40 blocks the criteria will be tested.
+    block_trial_counter = 0  # Counter for accuracy.
     block_accuracy = 0.0  # Accuracy for that 40 trial block
-    ror_change = False
+    block_number = 0
+    ror_change = 0
+    block_change = 0
     last_stim_trial = 0
     last_condition_trial = 0
+    total_trials = 0
 
     low_trial_count = 0
     low_accuracy_count = 0
@@ -924,14 +927,17 @@ def select_task(df, subject):
                     completed_ror = []
                     current_ror = 16.0
                     trial_counter_ror = 0
-                    last_stim_trial = 0
-                    last_condition_trial = 0
                     substage = 0
                     trial_counter = 0
-                    accuracy_block = 40  # Every 40 blocks the criteria will be tested.
-                    accuracy_counter = 0  # Counter for accuracy.
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    ror_change = False
+                    block_number = 0
+                    ror_change = 0
+                    block_change = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
 
                     message = 'PI: Probability_WebersLaw_Pre Test complete, Moving to Webers law Training on next session.'
                     print(f'{message}')
@@ -950,13 +956,15 @@ def select_task(df, subject):
                     current_ror = 0.0
                     trial_counter_ror = 0
 
-                    accuracy_block = 0  # Every 40 blocks the criteria will be tested.
-                    accuracy_counter = 0  # Counter for accuracy.
+                    block_size = 0  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-
-                    # Weber's Law Training Variables:
+                    block_number = 0
+                    ror_change = 0
+                    block_change = 0
                     last_stim_trial = 0
                     last_condition_trial = 0
+                    total_trials = 0
 
                     message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Handtracking'
                     print(f'{message}')
@@ -975,12 +983,15 @@ def select_task(df, subject):
             completed_ror = last_row['completed_ror']
             current_ror = last_row['current_ror']
             trial_counter_ror = last_row['trial_counter_ror']
-            accuracy_block = last_row['accuracy_block']
-            accuracy_counter = last_row['accuracy_counter']  # Counter for accuracy.
+            block_size = last_row['block_size']
+            block_trial_counter = last_row['block_trial_counter']  # Counter for accuracy.
             block_accuracy = last_row['block_accuracy']  # Accuracy for that 40 trial block
+            block_number = last_row['block_number']  # Accuracy for that 40 trial block
             ror_change = last_row['ror_change']
+            block_change = last_row['block_change']
             last_stim_trial = last_row['last_stim_trial']
             last_condition_trial = last_row['last_condition_trial']
+            total_trials = last_row['total_trials']
             trial_end_criteria = last_row['trial_end_criteria']
 
             # Telgram warning messages:
@@ -1027,8 +1038,8 @@ def select_task(df, subject):
                 print(f"Current Subject: {my_subject}, Current ROR: {current_ror}")
                 print(f"Thresholds before pop: {trial_message_criteria[my_subject][current_ror]}")
                 next_threshold = trial_message_criteria[my_subject][current_ror][0]
-                if accuracy_counter >= next_threshold:
-                    message = f"URGENT: {accuracy_counter} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
+                if block_trial_counter >= next_threshold:
+                    message = f"URGENT: {block_trial_counter} TRIALS COMPLETED IN ROR {current_ror} FOR {my_subject}. CHECK DATA."
                     print(message)
                     try:
                         for _ in range(3):
@@ -1063,10 +1074,15 @@ def select_task(df, subject):
                     last_condition_trial = 0
                     substage = 0
                     trial_counter = 0
-                    accuracy_block = 40  # Every 40 blocks the criteria will be tested.
-                    accuracy_counter = 0  # Counter for accuracy.
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    ror_change = False
+                    block_number = 0
+                    ror_change = 0
+                    block_change = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
 
                     message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
                     print(f'{message}')
@@ -1084,12 +1100,15 @@ def select_task(df, subject):
                     current_ror = 0.0
                     # Variables for accuracy testing in Weber's Law Training:
                     trial_counter_ror = 0
-                    accuracy_block = 0  # Every 40 blocks the criteria will be tested.
-                    accuracy_counter = 0  # Counter for accuracy.
+                    block_size = 0  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    ror_change = False
+                    block_number = 0
+                    ror_change = 0
+                    block_change = 0
                     last_stim_trial = 0
                     last_condition_trial = 0
+                    total_trials = 0
                     substage = 0
 
                     task = 'Probability_WebersLaw_Post'
@@ -1209,7 +1228,7 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, accuracy_block, accuracy_counter, block_accuracy, ror_change, last_stim_trial, last_condition_trial
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
