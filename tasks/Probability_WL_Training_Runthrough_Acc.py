@@ -123,15 +123,12 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.block_size = 40         # Every 40 blocks the criteria will be tested.
         self.block_trial_counter = 0         # Counter for block
         self.block_accuracy = 0.0        # Accuracy for that 40 trial block
-        self.block_number = 0
+        self.block_number = 1
         self.ror_change = 0
         self.block_change = 0
         self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
         self.total_trials = 0               #Total number of trials in that ROR irrespective of conditions
-
-        self.block_wlt = self.block_size                 #This is for presenting equal number of trial types every x trials.
-
 
     def get_stim_image_path(self, stim_trial, condition):
         """
@@ -469,11 +466,18 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         # Choose x positions:
         self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
-        if self.block_change:
+        if self.block_change == 1:
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.accuracy_correct_count = 0
+            self.accuracy_valid_count = 0
 
-        if self.ror_change:
+        if self.ror_change == 1:
             if self.current_ror in self.ror:  # Ensure the current ROR exists in self.ror list
                 print("ROR before update:", self.ror)
+                # Append current_ror to completed_ror before removing it
+                self.completed_ror.append(self.current_ror)
+                #Remove current_ror from ror
                 self.ror.remove(self.current_ror)
                 print("ROR after removal:", self.ror)
                 print("Block_accuracy:", self.block_accuracy)
@@ -498,7 +502,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     self.stim_trials = []
                     self.stim_trial_counter = 0
                     self.substage = 0
-            self.ror_change = False  # Reset the flag so it only triggers once
+            self.ror_change = 0  # Reset the flag so it only triggers once
 
         # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
         if self.stim_trial_counter_wlt % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
@@ -732,6 +736,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.valid_counter += 1
                 if self.trial_condition in self.allowed_conditions:
                     self.accuracy_valid_count += 1
+                    self.success = 0
                     print('Acc Valid_count: ', self.accuracy_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
 
@@ -746,6 +751,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 if self.trial_condition in self.allowed_conditions:
                     self.accuracy_correct_count += 1
                     self.accuracy_valid_count += 1
+                    self.success = 1
                     print('Acc Correct_count: ', self.accuracy_correct_count)
                     print('Acc Valid_count: ', self.accuracy_valid_count)
 
@@ -784,22 +790,12 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
             #Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter % self.block_size == 0:
+                self.block_number += 1
+                self.block_change = 1
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.ror_change = True  # Indicate that a ROR change is due
-                    # self.block_trial_counter = 0  # Reset the counter after the block
-                    # self.block_accuracy = 0.0
-                    # self.accuracy_correct_count = 0
-                    # self.accuracy_valid_count = 0
-                    # Do not update current_ror here! Instead do it in the start of the next trial
+                    self.ror_change = 1  # Indicate that a ROR change is due
                 else:
                     print("Accuracy criteria not met.")
-                self.block_accuracy = 0.0
-                self.block_trial_counter = 0  # Reset the counter after the block
-                self.accuracy_correct_count = 0
-                self.accuracy_valid_count = 0
-
-            print("block_trial_counter: ", self.block_trial_counter)
-            print("block_size: ", self.block_size)
 
             if self.trial_counter_ror >= self.trial_end_criteria:
                 self.stage = 4
@@ -931,3 +927,4 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('accuracy_correct_count', self.accuracy_correct_count)
         self.register_value('accuracy_valid_count', self.accuracy_valid_count)
         self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('success', self.success)

@@ -932,7 +932,7 @@ def select_task(df, subject):
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 0
+                    block_number = 1
                     ror_change = 0
                     block_change = 0
                     last_stim_trial = 0
@@ -1077,7 +1077,7 @@ def select_task(df, subject):
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 0
+                    block_number = 1
                     ror_change = 0
                     block_change = 0
                     last_stim_trial = 0
