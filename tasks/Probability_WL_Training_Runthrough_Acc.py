@@ -107,7 +107,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.allowed_conditions = []
 
         self.accuracy_criteria = 0.80    # 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 1500
+        self.trial_end_criteria = 20
         self.previous_ror = 0
         self.success = 0                #tracks if trial is correct or incorrect (1 or 0)
         self.block_wlt = self.block_size
@@ -135,10 +135,6 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.stim_trial_counter = 0
         self.condition_trial_counter = 0
         self.conditions = []
-
-
-
-
 
     def get_stim_image_path(self, stim_trial, condition):
         """
