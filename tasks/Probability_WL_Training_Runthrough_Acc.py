@@ -107,7 +107,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.allowed_conditions = []
 
         self.accuracy_criteria = 0.80    # 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 20
+        self.trial_end_criteria = 1500
         self.previous_ror = 0
         self.success = 0                #tracks if trial is correct or incorrect (1 or 0)
         self.block_wlt = self.block_size
@@ -436,8 +436,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                         continue
 
                 return sequence
-        return None
-        #raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
+        raise ValueError("Could not generate a valid sequence for given ROR and constraints within max_attempts.")
 
     def configure_gui(self):
         self.gui_input = ['duration_max', 'stage']
