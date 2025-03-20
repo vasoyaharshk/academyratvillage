@@ -65,6 +65,8 @@ class Task(object):
         self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
         self.total_trials = 0               #Total number of trials in that ROR irrespective of conditions
+        self.block_correct_count = 0   #Tracks the number of corrects in the block
+        self.block_valid_count = 0   ##Tracks the number of valid trials in the block
 
         self.checksum = None
         self.subject_class = None

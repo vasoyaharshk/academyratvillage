@@ -86,6 +86,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.status = None              #Stores the Touch_outside condition
         self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+        #New variables for 40 trial blocks:
+        self.bias_accuracy_trials = []
+        self.bias_accuracy = 0
 
         #Weber's Law Training Variables:
         # Variables not tracked:
@@ -107,12 +110,12 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.condition_trial_counter = 0
         self.trial_conditions = []
         self.allowed_conditions = []
-        self.accuracy_correct_count = 0
-        self.accuracy_valid_count = 0
+
         self.accuracy_criteria = 0.80    # 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 1500
         self.previous_ror = 0
         self.success = 0                #tracks if trial is correct or incorrect (1 or 0)
+        self.block_wlt = self.block_size
 
         #Variables tracked:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
@@ -129,6 +132,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.last_stim_trial = 0            #It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.last_condition_trial = 0       #It stores the condition of the last trial of the previous randomisation block
         self.total_trials = 0               #Total number of trials in that ROR irrespective of conditions
+        self.block_correct_count = 0   #Tracks the number of corrects in the block
+        self.block_valid_count = 0   ##Tracks the number of valid trials in the block
+
 
     def get_stim_image_path(self, stim_trial, condition):
         """
@@ -438,17 +444,17 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
     def main_loop(self):
         print('')
-        print('Trial: ' + str(self.current_trial))
-        print('Total Accuracy for the session: ', self.accuracy)
         print('ROR: ', self.current_ror)
-        print('stim_trial_wlt: ', self.stim_trial_wlt)
-        print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
-        print('ror_change: ', self.ror_change)
-        print("Block_accuracy:", self.block_accuracy)
-        print("block_trial_counter:", self.block_trial_counter)
+        print("Block Trial Counter: ", self.block_trial_counter)
+        print("Block Accuracy: ", self.block_accuracy)
+        print("Block Number: ", self.block_number)
+        print("Block Change: ", self.block_change)
+        print("ROR Change: ", self.ror_change)
 
-        print("block_size:", self.block_size)
-        print("block_wlt:", self.block_wlt)
+        #print('Trial: ' + str(self.current_trial))
+        #print('Total Accuracy for the session: ', self.accuracy)
+        #print('stim_trial_wlt: ', self.stim_trial_wlt)
+        #print('stim_trial_counter_wlt: ', self.stim_trial_counter_wlt)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -456,7 +462,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.stim_trial_counter_wlt = 0
             self.trial_conditions = []
             self.condition_trial_counter = 0
-            print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
+            #print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
             self.block_wlt = self.block_size  # This is for presenting equal number of trial types every x trials.
 
         print('Bias Breaking: ', self.bias_breaking)
@@ -467,16 +473,19 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
         if self.block_change == 1:
+            self.block_number += 1
+            self.block_change = 0
             self.block_accuracy = 0.0
             self.block_trial_counter = 0  # Reset the counter after the block
-            self.accuracy_correct_count = 0
-            self.accuracy_valid_count = 0
+            self.block_correct_count = 0
+            self.block_valid_count = 0
 
         if self.ror_change == 1:
             if self.current_ror in self.ror:  # Ensure the current ROR exists in self.ror list
                 print("ROR before update:", self.ror)
                 # Append current_ror to completed_ror before removing it
                 self.completed_ror.append(self.current_ror)
+                print("Completed ROR after update:", self.completed_ror)
                 #Remove current_ror from ror
                 self.ror.remove(self.current_ror)
                 print("ROR after removal:", self.ror)
@@ -509,9 +518,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
             self.last_stim_trial = self.stim_trials_wlt[self.stim_trial_counter_wlt - 1] if self.stim_trial_counter_wlt > 0 else None
             self.stim_trials_wlt = self.generate_random_trials(self.last_stim_trial)
-            print(f"Stimulus trials after first attempt: {self.stim_trials_wlt}")
+            #print(f"Stimulus trials after first attempt: {self.stim_trials_wlt}")
             while self.stim_trials_wlt is None:
-                print("Retrying to generate stimulus trials...")
+                #print("Retrying to generate stimulus trials...")
                 self.stim_trials_wlt = self.generate_random_trials(self.last_stim_trial)
                 if self.stim_trials_wlt is None:
                     print("generate_random_trials returned None. Retrying...")
@@ -520,18 +529,17 @@ class Probability_WL_Training_Runthrough_Acc(Task):
 
             self.stim_trial_counter_wlt = 0
 
-        print("self.current_ror", self.current_ror)
-        print("self.previous_ror", self.previous_ror)
+        print("Current_ror", self.current_ror)
+        print("Previous_ror", self.previous_ror)
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.current_ror != self.previous_ror or not self.trial_conditions or self.condition_trial_counter % self.block_wlt == 0:
-            print("IF statement entered!")
             self.last_condition_trial = self.trial_conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else 0
             if self.current_ror in self.motivational_ror:
                 self.trial_conditions = self.generate_random_trial_conditions_motivational(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
-                    print("Retrying to generate trial conditions...")
+                    #print("Retrying to generate trial conditions...")
                     self.trial_conditions = self.generate_random_trial_conditions_motivational(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_motivational returned None. Retrying...")
@@ -541,7 +549,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.trial_conditions = self.generate_random_trial_conditions_target(self.current_ror, self.last_condition_trial)
                 print(f"Trial conditions after first attempt: {self.trial_conditions}")
                 while self.trial_conditions is None:
-                    print("Retrying to generate trial conditions...")
+                    #print("Retrying to generate trial conditions...")
                     self.trial_conditions = self.generate_random_trial_conditions_target(self.current_ror, self.last_condition_trial)
                     if self.trial_conditions is None:
                         print("generate_random_trial_conditions_target returned None. Retrying...")
@@ -564,11 +572,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         if self.stim_trial_wlt == 61:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = self.x_correcth_pos[1]
-            print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
         elif self.stim_trial_wlt == 62:
             self.x_correcth = self.x_correcth_pos[1]
             self.x_incorrecth = self.x_correcth_pos[0]
-            print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            #print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
         self.image_path_function = self.get_stim_image_path(self.stim_trial_wlt, self.trial_condition)
 
@@ -735,9 +743,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
                 if self.trial_condition in self.allowed_conditions:
-                    self.accuracy_valid_count += 1
+                    self.block_valid_count += 1
                     self.success = 0
-                    print('Acc Valid_count: ', self.accuracy_valid_count)
+                    print('Acc Valid_count: ', self.block_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
 
             ##### COUNT CORRECTS FIRST POKE
@@ -749,11 +757,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.correct_count += 1
                 print('Correct_count: ', self.correct_count)
                 if self.trial_condition in self.allowed_conditions:
-                    self.accuracy_correct_count += 1
-                    self.accuracy_valid_count += 1
+                    self.block_correct_count += 1
+                    self.block_valid_count += 1
                     self.success = 1
-                    print('Acc Correct_count: ', self.accuracy_correct_count)
-                    print('Acc Valid_count: ', self.accuracy_valid_count)
+                    print('Acc Correct_count: ', self.block_correct_count)
+                    print('Acc Valid_count: ', self.block_valid_count)
 
                 # Check if side bias is active and if the current trial was correct and display the unbiased side three times:
                 if self.bias_breaking == 1:  # Side bias active
@@ -785,12 +793,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.valid_counter > 0 else 0
 
             # Check accuracy for every block of 40 trials
-            self.block_accuracy = (self.accuracy_correct_count / self.accuracy_valid_count if self.accuracy_valid_count > 0 else 0)
-            print("Self.block_accuracy: ", self.block_accuracy)
+            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            print("Block Accuracy: ", self.block_accuracy)
 
             #Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter % self.block_size == 0:
-                self.block_number += 1
                 self.block_change = 1
                 if self.block_accuracy >= self.accuracy_criteria:
                     self.ror_change = 1  # Indicate that a ROR change is due
@@ -802,7 +809,19 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.tired = True
                 print("Stage is 4. All RORs completed. Task Ended.")
 
-            # Side Bias Breaking formula:
+
+            # SIDE BIAS BREAKING FORMULA FROM HERE:
+
+            # Calculate bias accuracy for the last five trials without using accuracy window
+            self.bias_accuracy_trials.append(self.success)  # Append current trial success (0 or 1)
+            if len(self.bias_accuracy_trials) > 5:
+                self.bias_accuracy_trials.pop(0)  # Keep only the last 5 trials
+
+            self.bias_accuracy = sum(self.bias_accuracy_trials) / len(
+                self.bias_accuracy_trials) if self.bias_accuracy_trials else 0
+
+            print(f"Bias Accuracy (last 5 trials): {self.bias_accuracy}")
+
             self.last_stim_trial = self.stim_trial_wlt
 
             try:
@@ -821,10 +840,9 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                     print(f"Using last value from response_x array: {self.response_x_bias}")
                 except Exception as e:
                     # print(f"Failed to process response_x as array. Error: {e}")
-                    return  # Handle this case if needed
+                    return
 
             # Append the response to the array:
-            # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
             self.response_x_array.append(self.response_x_bias)
             print(f"Responses so far: {self.response_x_array}")
 
@@ -884,6 +902,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
+        self.register_value('bias_accuracy', self.bias_accuracy)
         # #Weber's Law:
         # self.register_value('block', self.block)
         # self.register_value('conditions', self.conditions)
@@ -924,7 +944,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('image_directory', self.image_directory)
         self.register_value('accuracy_criteria', self.accuracy_criteria)
         self.register_value('allowed_conditions', self.allowed_conditions)
-        self.register_value('accuracy_correct_count', self.accuracy_correct_count)
-        self.register_value('accuracy_valid_count', self.accuracy_valid_count)
+        self.register_value('block_correct_count', self.block_correct_count)
+        self.register_value('block_valid_count', self.block_valid_count)
         self.register_value('trial_end_criteria', self.trial_end_criteria)
         self.register_value('success', self.success)
