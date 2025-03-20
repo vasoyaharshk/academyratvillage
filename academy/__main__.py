@@ -664,7 +664,10 @@ def go_to_state(num):
         utils.subject.total_trials = int(utils.subject.total_trials)  #Cast to int
         utils.subject.block_correct_count = int(utils.subject.block_correct_count)  #Cast to int
         utils.subject.block_valid_count = int(utils.subject.block_valid_count)  #Cast to int
+        utils.subject.condition_trial_counter = int(utils.subject.condition_trial_counter)  #Cast to int
 
+
+        #From subject to task:
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
         utils.task.substage_bias = utils.subject.substage_bias
@@ -699,6 +702,7 @@ def go_to_state(num):
         utils.task.total_trials = utils.subject.total_trials
         utils.task.block_correct_count = utils.subject.block_correct_count
         utils.task.block_valid_count = utils.subject.block_valid_count
+        utils.task.condition_trial_counter = utils.subject.condition_trial_counter
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

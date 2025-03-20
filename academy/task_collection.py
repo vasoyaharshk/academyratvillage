@@ -67,6 +67,7 @@ class Task(object):
         self.total_trials = 0               #Total number of trials in that ROR irrespective of conditions
         self.block_correct_count = 0   #Tracks the number of corrects in the block
         self.block_valid_count = 0   ##Tracks the number of valid trials in the block
+        self.condition_trial_counter = 0   ##Tracks the number of trials in the randomised condition block
 
         self.checksum = None
         self.subject_class = None
