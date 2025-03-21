@@ -72,8 +72,7 @@ def select_task(df, subject):
 
     my_subject = df.subject.iloc[0]
 
-    #Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
-    #df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
@@ -909,6 +908,9 @@ def select_task(df, subject):
             stim_trials = last_row['stim_trials']
             stim_trial_counter = last_row['stim_trial_counter']
 
+            # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
+            df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+
             if stage == 5:
                 block = 0
                 conditions = []  # Takes the conditions from task file after first session.
@@ -1088,8 +1090,6 @@ def select_task(df, subject):
                     completed_ror = []
                     current_ror = 16.0
                     trial_counter_ror = 0
-                    last_stim_trial = 0
-                    last_condition_trial = 0
                     substage = 0
                     trial_counter = 0
                     block_size = 40  # Every 40 blocks the criteria will be tested.

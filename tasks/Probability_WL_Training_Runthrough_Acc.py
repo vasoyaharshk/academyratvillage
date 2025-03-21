@@ -866,6 +866,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print("Stage is 4. All RORs completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
+            self.last_stim_trial = 0
 
 
 
