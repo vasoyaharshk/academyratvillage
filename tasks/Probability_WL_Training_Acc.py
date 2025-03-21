@@ -728,7 +728,7 @@ class Probability_WL_Training_Acc(Task):
 
     def after_trial(self):
         if self.stage == 5:
-            self.total_trials += 1  # remove this
+            self.total_trials += 1
             self.condition_trial_counter += 1  # checks for condition randomisation
 
             if self.bias_breaking == 0:
@@ -788,7 +788,7 @@ class Probability_WL_Training_Acc(Task):
             # End-trial calculations
             # self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
-            print('Trial length: ' + str(self.trial_length))
+            #print('Trial length: ' + str(self.trial_length))
 
             ### Checks if the rat is tired (rate of trial is low) and opens the gate after 30 mins rather than 35:
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -838,7 +838,7 @@ class Probability_WL_Training_Acc(Task):
                 # Try converting response_x directly to a float
                 self.response_x_bias = float(self.response_x)
             except ValueError:
-                print(f"No response_x value or response other: {self.response_x}")
+                #print(f"No response_x value or response other: {self.response_x}")
 
                 # Split the string by commas and convert it to a list of floats
                 try:
@@ -847,14 +847,14 @@ class Probability_WL_Training_Acc(Task):
 
                     # Use the last element of the list as response_x_bias
                     self.response_x_bias = response_x_list[-1]
-                    print(f"Using last value from response_x array: {self.response_x_bias}")
+                    #print(f"Using last value from response_x array: {self.response_x_bias}")
                 except Exception as e:
                     # print(f"Failed to process response_x as array. Error: {e}")
                     return
 
             # Append the response to the array:
             self.response_x_array.append(self.response_x_bias)
-            print(f"Responses so far: {self.response_x_array}")
+            #print(f"Responses so far: {self.response_x_array}")
 
             # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.bias_accuracy is not None and self.bias_accuracy < self.side_bias_trigger_acc:

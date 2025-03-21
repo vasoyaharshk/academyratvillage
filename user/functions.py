@@ -33,7 +33,7 @@ image_path = None  # Global variable to store the image path
 def update_image_path_size_position(correct=True):
     global image_path
     if image_path and "both" in image_path:
-        print(f"Original image path: {image_path}")
+        #print(f"Original image path: {image_path}")
         directory, filename = os.path.split(image_path)
         if correct:
             filename = re.sub(r'_[^_]+_[^_]+\.png$', '.png', filename)
@@ -42,7 +42,7 @@ def update_image_path_size_position(correct=True):
             filename = re.sub(r'_\d+(?=\.png)', '', filename)
         filename = filename.replace("both", "correct" if correct else "incorrect")
         image_path_replaced = os.path.join(directory, filename)
-        print(f"Modified image path: {image_path_replaced}")
+        #print(f"Modified image path: {image_path_replaced}")
         return image_path_replaced
     return None
 
