@@ -112,7 +112,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.success = 0                #tracks if trial is correct or incorrect (1 or 0)
         self.block_wlt = self.block_size
 
-        #Variables tracked:
+        #Variables TRACKED:
         self.ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
         self.completed_ror = []
         self.current_ror = 16.0

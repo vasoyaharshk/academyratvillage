@@ -1080,7 +1080,7 @@ def select_task(df, subject):
                         print(f"Telegram message not sent for {my_subject}. Error: {e}")
 
             if task == "Probability_WL_Training_Acc":
-                if stage == 4:
+                if stage == 4: # when Probability_WL_Training_Acc is complete, it changes stage to 4
                     task = 'Probability_WL_Training_Runthrough_Acc'
                     stage = 5
                     # if isinstance(completed_ror, str):
@@ -1103,6 +1103,12 @@ def select_task(df, subject):
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
+                    condition_trial_counter = 0
+                    conditions = []
+
 
                     message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
                     print(f'{message}')
