@@ -1139,7 +1139,7 @@ def select_task(df, subject):
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
 
-                    task = 'Probability_WebersLaw_Post'
+                    #task = 'Probability_WebersLaw_Post'
                     stage = 4
                     block = 12  # This is the number of trials one conditions will remain for
                     conditions = []  # Takes the conditions from select task file.

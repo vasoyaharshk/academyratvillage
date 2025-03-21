@@ -164,7 +164,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             image_path = os.path.join(image_folder, random.choice(images))
 
             print(f'Trial Condition: {condition}')
-            print(f'Correct answer on {position}: {image_path}')
+            #print(f'Correct answer on {position}: {image_path}')
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -449,6 +449,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print("Block Number: ", self.block_number)
         print("Block Change: ", self.block_change)
         print("ROR Change: ", self.ror_change)
+        print("Total Trials: ", self.total_trials)
 
         #print('Trial: ' + str(self.current_trial))
         #print('Total Accuracy for the session: ', self.accuracy)
@@ -526,7 +527,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.stim_trial_counter = 0
 
         print("Current_ror", self.current_ror)
-        print("Previous_ror", self.previous_ror)
+        #print("Previous_ror", self.previous_ror)
 
         # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
         if self.current_ror != self.previous_ror or not self.conditions or self.condition_trial_counter % self.block_wlt == 0:
@@ -580,11 +581,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.image_displayed = filename
         self.image_directory = directory
 
-        print('Stimulus Conditions', self.conditions)
-        print('Stimulus Condition', self.trial_condition)
-        print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter',self.stim_trial_counter)
-        print('Stimulus Condition Counter', self.condition_trial_counter)
+        #print('Stimulus Conditions', self.conditions)
+        #print('Stimulus Condition', self.trial_condition)
+        #print('Stimulus trial: ', self.stim_trial)
+        #print('Stimulus Trial Counter',self.stim_trial_counter)
+        #print('Stimulus Condition Counter', self.condition_trial_counter)
 
 
         ############ STATE MACHINE ################
