@@ -986,6 +986,7 @@ def select_task(df, subject):
             last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
             # Assign each value from the last row to the variables:
+            stage = last_row['stage']
             ror = last_row['ror']
             completed_ror = last_row['completed_ror']
             current_ror = last_row['current_ror']
