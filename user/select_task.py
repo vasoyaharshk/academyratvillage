@@ -1013,6 +1013,15 @@ def select_task(df, subject):
             condition_trial_counter = last_row['condition_trial_counter']
             conditions = last_row['conditions']
 
+            message = f"PI: {current_ror} and {block_number} for subject {my_subject}. Total Trials are {trial_counter_ror}"
+            print(f'{message}')
+            try:
+                telegram_bot.alarm_finish_session(message, my_subject)
+                telegram_bot.alarm_completed_criteria(task, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
+
 
             # Telgram warning messages:
             # Load dictionary from file
