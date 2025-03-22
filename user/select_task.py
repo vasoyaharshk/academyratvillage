@@ -1017,10 +1017,18 @@ def select_task(df, subject):
             print(f'{message}')
             try:
                 telegram_bot.alarm_finish_session(message, my_subject)
-                telegram_bot.alarm_completed_criteria(task, my_subject)
             except:
                 print('Telegram message not sent')
                 pass
+
+            if trial_counter_ror >= 216:
+                message = f"URGENT PI: {current_ror} and {block_number} for subject {my_subject}. Total Trials are {trial_counter_ror}"
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
 
             # Telgram warning messages:
