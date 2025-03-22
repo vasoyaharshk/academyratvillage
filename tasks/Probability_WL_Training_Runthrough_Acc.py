@@ -478,6 +478,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.block_valid_count = 0
 
         if self.ror_change == 1:
+            self.trial_counter_ror = 0
             if self.current_ror in self.ror:  # Ensure the current ROR exists in self.ror list
                 print("ROR before update:", self.ror)
                 # Append current_ror to completed_ror before removing it
