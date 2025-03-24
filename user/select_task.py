@@ -5,6 +5,8 @@ from user import settings
 import random
 import json
 import pandas as pd
+from types import SimpleNamespace
+
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
