@@ -1013,7 +1013,7 @@ def select_task(df, subject):
             condition_trial_counter = last_row['condition_trial_counter']
             conditions = last_row['conditions']
 
-            message = f"PI: {current_ror} and {block_number} for subject {my_subject}. Total Trials are {trial_counter_ror}"
+            message = f"PI: ROR {current_ror} and Block {block_number} for subject {my_subject}. Total Trials in ROR are {trial_counter_ror}"
             print(f'{message}')
             try:
                 telegram_bot.alarm_finish_session(message, my_subject)
