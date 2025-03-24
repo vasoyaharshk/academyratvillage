@@ -11,66 +11,126 @@ import pandas as pd
 # df is the session dataframe for the subject
 
 
+
+
 def select_task(df, subject):
-
-    # variables by default
     task = subject.task
-    stage = float(subject.stage)
-    substage = float(subject.substage)
-    substage_bias = float(subject.substage_bias)
-    choice = 0
-    wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
-    stim_dur_ds= 0
-    stim_dur_dm= 0
-    stim_dur_dl= 0
-    #Weber's Law Test:
-    block = 0
-    conditions = []  # Takes the conditions from task file after first session.
-    completed_conditions = []  # To store completed conditions
-    current_condition = 0  # To track the current condition in progress
-    repetition = 0
-    current_repetition = 0  # To store how many times the condition has repeated.
-    trial_counter = 0  # Track the number of trials for the current condition.
-    # Image output stims:
-    stim_trial = 0
-    stim_trials = []
-    stim_trial_counter = 0
-    #Weber's Law Training:
-    ror = []
-    completed_ror = []
-    current_ror = 0.0
-    #Variables for accuracy testing in Weber's Law Training:
-    trial_counter_ror = 0
-
-    block_size = 0  # Every 40 blocks the criteria will be tested.
-    block_trial_counter = 0  # Counter for accuracy.
-    block_accuracy = 0.0  # Accuracy for that 40 trial block
-    block_number = 0
-    ror_change = 0
-    block_change = 0
-    last_stim_trial = 0
-    last_condition_trial = 0
-    total_trials = 0
-    block_correct_count = 0  # Tracks the number of corrects in the block
-    block_valid_count = 0  ##Tracks the number of valid trials in the block
-    condition_trial_counter = 0
-
-    low_trial_count = 0
-    low_accuracy_count = 0
-
+    wait_seconds = 3600 * settings.TIME_TO_ENTER
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
-    # Default move back counter to 0 if the column is missing
-    if 'moved_back_counter' in df.columns:
-        moved_back_counter = last_row['moved_back_counter']
-        if pd.isna(moved_back_counter):  # Check for NaN values
-            moved_back_counter = 0
-        print('moved_back_counter= ', moved_back_counter)
-    else:
-        moved_back_counter = 0
-        print('moved_back_counter= ', moved_back_counter)
+    # def get_val_from_df_or_default(column_name, default_val):
+    #     if column_name in df.columns:
+    #         val = last_row[column_name]
+    #         if pd.isna(val):
+    #             return default_val
+    #         return val
+    #     return default_val
+    #
+    #
+    # stage = get_val_from_df_or_default('stage', 0)
+    # substage = get_val_from_df_or_default('substage', 0)
+    # substage_bias = get_val_from_df_or_default('substage_bias', 0)
+    # choice = get_val_from_df_or_default('choice', 0)
 
-    my_subject = df.subject.iloc[0]
+    # stim_dur_ds = get_val_from_df_or_default('stim_dur_ds', 0)
+    # stim_dur_dm = get_val_from_df_or_default('stim_dur_dm', 0)
+    # stim_dur_dl = get_val_from_df_or_default('stim_dur_dl', 0)
+    # block = get_val_from_df_or_default('block', 0)
+    # conditions = get_val_from_df_or_default('conditions', [])
+    # completed_conditions = get_val_from_df_or_default('completed_conditions', [])
+    # current_condition = get_val_from_df_or_default('current_condition', 0)
+    # repetition = get_val_from_df_or_default('repetition', 0)
+    # current_repetition = get_val_from_df_or_default('current_repetition', 0)
+    # trial_counter = get_val_from_df_or_default('trial_counter', 0)
+    # stim_trial = get_val_from_df_or_default('stim_trial', 0)
+    # stim_trials = get_val_from_df_or_default('stim_trials', [])
+    # stim_trial_counter = get_val_from_df_or_default('stim_trial_counter', 0)
+    #
+    # ror = get_val_from_df_or_default('ror', [])
+    # completed_ror = get_val_from_df_or_default('completed_ror', [])
+    # current_ror = get_val_from_df_or_default('current_ror', 0.0)
+    # trial_counter_ror = get_val_from_df_or_default('trial_counter_ror', 0)
+    #
+    # block_size = get_val_from_df_or_default('block_size', 0)
+    # block_trial_counter = get_val_from_df_or_default('block_trial_counter', 0)
+    # block_accuracy = get_val_from_df_or_default('block_accuracy', 0.0)
+    # block_number = get_val_from_df_or_default('block_number', 0)
+    # ror_change = get_val_from_df_or_default('ror_change', 0)
+    # block_change = get_val_from_df_or_default('block_change', 0)
+    # last_stim_trial = get_val_from_df_or_default('last_stim_trial', 0)
+    # last_condition_trial = get_val_from_df_or_default('last_condition_trial', 0)
+    # total_trials = get_val_from_df_or_default('total_trials', 0)
+    # block_correct_count = get_val_from_df_or_default('block_correct_count', 0)
+    # block_valid_count = get_val_from_df_or_default('block_valid_count', 0)
+    # condition_trial_counter = get_val_from_df_or_default('condition_trial_counter', 0)
+    # low_trial_count = get_val_from_df_or_default('low_trial_count', 0)
+    # low_accuracy_count = get_val_from_df_or_default('low_accuracy_count', 0)
+    # stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
+    # stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
+
+    variable_defaults = {
+        'stage': 0,
+        'substage': 0,
+        'substage_bias': 0,
+        'choice': 0,
+        'stim_dur_ds': 0,
+        'stim_dur_dm': 0,
+        'stim_dur_dl': 0,
+        'block': 0,
+        'conditions': [],
+        'completed_conditions': [],
+        'current_condition': 0,
+        'repetition': 0,
+        'current_repetition': 0,
+        'trial_counter': 0,
+        'stim_trial': 0,
+        'stim_trials': [],
+        'stim_trial_counter': 0,
+        'ror': [],
+        'completed_ror': [],
+        'current_ror': 0.0,
+        'trial_counter_ror': 0,
+        'block_size': 0,
+        'block_trial_counter': 0,
+        'block_accuracy': 0.0,
+        'block_number': 0,
+        'ror_change': 0,
+        'block_change': 0,
+        'last_stim_trial': 0,
+        'last_condition_trial': 0,
+        'total_trials': 0,
+        'block_correct_count': 0,
+        'block_valid_count': 0,
+        'condition_trial_counter': 0,
+        'low_trial_count': 0,
+        'low_accuracy_count': 0,
+        'stage_forward_change': 0,
+        'stage_backward_change': 0,
+    }
+
+    def get_val(column_name, default_val):
+        if column_name in df.columns:
+            val = last_row[column_name]
+            return val if pd.notna(val) else default_val
+        return default_val
+
+    # Create a namespace and assign variables
+    vars_ns = SimpleNamespace()
+    for var_name, default in variable_defaults.items():
+        setattr(vars_ns, var_name, get_val(var_name, default))
+
+
+    # # Default move back counter to 0 if the column is missing
+    # if 'moved_back_counter' in df.columns:
+    #     moved_back_counter = last_row['moved_back_counter']
+    #     if pd.isna(moved_back_counter):  # Check for NaN values
+    #         moved_back_counter = 0
+    #     print('moved_back_counter= ', moved_back_counter)
+    # else:
+    #     moved_back_counter = 0
+    #     print('moved_back_counter= ', moved_back_counter)
+    #
+    # my_subject = df.subject.iloc[0]
 
 
 
@@ -1256,7 +1316,8 @@ def select_task(df, subject):
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter
+    #all of these are written in subjects.csv:
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

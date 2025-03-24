@@ -68,6 +68,9 @@ class Task(object):
         self.block_correct_count = 0   #Tracks the number of corrects in the block
         self.block_valid_count = 0   ##Tracks the number of valid trials in the block
         self.condition_trial_counter = 0   ##Tracks the number of trials in the randomised condition block
+        self.stage_backward_change = 0
+        self.stage_forward_change = 0
+
 
         self.checksum = None
         self.subject_class = None
