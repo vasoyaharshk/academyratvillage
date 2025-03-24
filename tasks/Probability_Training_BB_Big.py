@@ -143,11 +143,11 @@ class Probability_Training_BB_Big(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 103, or 104.")
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/1_indication'
+                image_folder = '/home/harsh/academy/stimuli/urn_training/joy/1_indication'
             elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/2_discrimination_a'
+                image_folder = '/home/harsh/academy/stimuli/urn_training/joy/2_discrimination_a'
             elif stage == 3:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/joy/3_discrimination_b'
+                image_folder = '/home/harsh/academy/stimuli/urn_training/joy/3_discrimination_b'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
             # Get relevant images based on position and size
