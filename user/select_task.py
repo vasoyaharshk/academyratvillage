@@ -115,11 +115,24 @@ def select_task(df, subject):
             return val if pd.notna(val) else default_val
         return default_val
 
-    # Create a namespace and assign variables
+    # Create a SimpleNamespace for all session variables
     vars_ns = SimpleNamespace()
+
+    # Assign default or recovered values
     for var_name, default in variable_defaults.items():
         setattr(vars_ns, var_name, get_val(var_name, default))
 
+    # Add all other last_row variables (those not in variable_defaults)
+    for key, val in last_row.items():
+        if key not in variable_defaults:
+            setattr(vars_ns, key, val)
+
+    print("stage_backward_change: ", vars_ns.stage_backward_change)      #Check if the variable is in df and defaults
+    print("stim_dur_ds: ", vars_ns.stim_dur_ds)      #Check if the variable is not in df but in defaults
+    print("max_move_backs: ", vars_ns.max_move_backs)  #Check if the variable is in df but not in defaults
+
+    #Takes the last row values of each column and assigns them to variables of the same name:
+    #locals().update(last_row.to_dict())
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
@@ -128,7 +141,7 @@ def select_task(df, subject):
     elif 'Probability' in task:     #Includes all the task without the word Probability
         if 'Probability_Training_BB_Size' in task:
             if moved_back_counter > 5:
-                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA.
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
                 except:
