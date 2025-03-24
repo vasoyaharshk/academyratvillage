@@ -277,8 +277,7 @@ class Probability_Extra_Training_Acc(Task):
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
-                #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                      self.x_incorrecth)
+                #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
             elif self.stim_trial == 52:
                 self.x_correcth = self.x_correcth_pos[1]
                 self.x_incorrecth = self.x_correcth_pos[0]
@@ -413,7 +412,7 @@ class Probability_Extra_Training_Acc(Task):
                 state_name='Exit',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
-                output_actions=[]
+                output_actions=[])
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
@@ -500,7 +499,7 @@ class Probability_Extra_Training_Acc(Task):
 
 
             # Side Bias Breaking formula:
-            
+
             # Calculate bias accuracy for the last five trials without using accuracy window
             self.bias_accuracy_trials.append(self.success)  # Append current trial success (0 or 1)
             if len(self.bias_accuracy_trials) > self.side_bias_trigger:
