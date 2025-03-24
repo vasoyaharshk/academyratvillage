@@ -5,6 +5,8 @@ from user import settings
 import random
 import json
 import pandas as pd
+from types import SimpleNamespace
+
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
@@ -12,888 +14,142 @@ import pandas as pd
 
 
 def select_task(df, subject):
-
-    # variables by default
     task = subject.task
-    stage = float(subject.stage)
-    substage = float(subject.substage)
-    substage_bias = float(subject.substage_bias)
-    choice = 0
-    wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
-    stim_dur_ds= 0
-    stim_dur_dm= 0
-    stim_dur_dl= 0
-    #Weber's Law Test:
-    block = 0
-    conditions = []  # Takes the conditions from task file after first session.
-    completed_conditions = []  # To store completed conditions
-    current_condition = 0  # To track the current condition in progress
-    repetition = 0
-    current_repetition = 0  # To store how many times the condition has repeated.
-    trial_counter = 0  # Track the number of trials for the current condition.
-    # Image output stims:
-    stim_trial = 0
-    stim_trials = []
-    stim_trial_counter = 0
-    #Weber's Law Training:
-    ror = []
-    completed_ror = []
-    current_ror = 0.0
-    #Variables for accuracy testing in Weber's Law Training:
-    trial_counter_ror = 0
-
-    block_size = 0  # Every 40 blocks the criteria will be tested.
-    block_trial_counter = 0  # Counter for accuracy.
-    block_accuracy = 0.0  # Accuracy for that 40 trial block
-    block_number = 0
-    ror_change = 0
-    block_change = 0
-    last_stim_trial = 0
-    last_condition_trial = 0
-    total_trials = 0
-    block_correct_count = 0  # Tracks the number of corrects in the block
-    block_valid_count = 0  ##Tracks the number of valid trials in the block
-    condition_trial_counter = 0
-
-    low_trial_count = 0
-    low_accuracy_count = 0
-
+    wait_seconds = 3600 * settings.TIME_TO_ENTER
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
-
-    # Default move back counter to 0 if the column is missing
-    if 'moved_back_counter' in df.columns:
-        moved_back_counter = last_row['moved_back_counter']
-        if pd.isna(moved_back_counter):  # Check for NaN values
-            moved_back_counter = 0
-        print('moved_back_counter= ', moved_back_counter)
-    else:
-        moved_back_counter = 0
-        print('moved_back_counter= ', moved_back_counter)
-
     my_subject = df.subject.iloc[0]
 
+    # def get_val_from_df_or_default(column_name, default_val):
+    #     if column_name in df.columns:
+    #         val = last_row[column_name]
+    #         if pd.isna(val):
+    #             return default_val
+    #         return val
+    #     return default_val
+    #
+    #
+    # stage = get_val_from_df_or_default('stage', 0)
+    # substage = get_val_from_df_or_default('substage', 0)
+    # substage_bias = get_val_from_df_or_default('substage_bias', 0)
+    # choice = get_val_from_df_or_default('choice', 0)
+
+    # stim_dur_ds = get_val_from_df_or_default('stim_dur_ds', 0)
+    # stim_dur_dm = get_val_from_df_or_default('stim_dur_dm', 0)
+    # stim_dur_dl = get_val_from_df_or_default('stim_dur_dl', 0)
+    # block = get_val_from_df_or_default('block', 0)
+    # conditions = get_val_from_df_or_default('conditions', [])
+    # completed_conditions = get_val_from_df_or_default('completed_conditions', [])
+    # current_condition = get_val_from_df_or_default('current_condition', 0)
+    # repetition = get_val_from_df_or_default('repetition', 0)
+    # current_repetition = get_val_from_df_or_default('current_repetition', 0)
+    # trial_counter = get_val_from_df_or_default('trial_counter', 0)
+    # stim_trial = get_val_from_df_or_default('stim_trial', 0)
+    # stim_trials = get_val_from_df_or_default('stim_trials', [])
+    # stim_trial_counter = get_val_from_df_or_default('stim_trial_counter', 0)
+    #
+    # ror = get_val_from_df_or_default('ror', [])
+    # completed_ror = get_val_from_df_or_default('completed_ror', [])
+    # current_ror = get_val_from_df_or_default('current_ror', 0.0)
+    # trial_counter_ror = get_val_from_df_or_default('trial_counter_ror', 0)
+    #
+    # block_size = get_val_from_df_or_default('block_size', 0)
+    # block_trial_counter = get_val_from_df_or_default('block_trial_counter', 0)
+    # block_accuracy = get_val_from_df_or_default('block_accuracy', 0.0)
+    # block_number = get_val_from_df_or_default('block_number', 0)
+    # ror_change = get_val_from_df_or_default('ror_change', 0)
+    # block_change = get_val_from_df_or_default('block_change', 0)
+    # last_stim_trial = get_val_from_df_or_default('last_stim_trial', 0)
+    # last_condition_trial = get_val_from_df_or_default('last_condition_trial', 0)
+    # total_trials = get_val_from_df_or_default('total_trials', 0)
+    # block_correct_count = get_val_from_df_or_default('block_correct_count', 0)
+    # block_valid_count = get_val_from_df_or_default('block_valid_count', 0)
+    # condition_trial_counter = get_val_from_df_or_default('condition_trial_counter', 0)
+    # low_trial_count = get_val_from_df_or_default('low_trial_count', 0)
+    # low_accuracy_count = get_val_from_df_or_default('low_accuracy_count', 0)
+    # stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
+    # stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
+
+    variable_defaults = {
+        'stage': 0,
+        'substage': 0,
+        'substage_bias': 0,
+        'choice': 0,
+        'stim_dur_ds': 0,
+        'stim_dur_dm': 0,
+        'stim_dur_dl': 0,
+        'block': 0,
+        'conditions': [],
+        'completed_conditions': [],
+        'current_condition': 0,
+        'repetition': 0,
+        'current_repetition': 0,
+        'trial_counter': 0,
+        'stim_trial': 0,
+        'stim_trials': [],
+        'stim_trial_counter': 0,
+        'ror': [],
+        'completed_ror': [],
+        'current_ror': 0.0,
+        'trial_counter_ror': 0,
+        'block_size': 0,
+        'block_trial_counter': 0,
+        'block_accuracy': 0.0,
+        'block_number': 0,
+        'ror_change': 0,
+        'block_change': 0,
+        'last_stim_trial': 0,
+        'last_condition_trial': 0,
+        'total_trials': 0,
+        'block_correct_count': 0,
+        'block_valid_count': 0,
+        'condition_trial_counter': 0,
+        'low_trial_count': 0,
+        'low_accuracy_count': 0,
+        'stage_forward_change': 0,
+        'stage_backward_change': 0,
+    }
+
+    def get_val(column_name, default_val):
+        if column_name in df.columns:
+            val = last_row[column_name]
+            return val if pd.notna(val) else default_val
+        return default_val
+
+    # Create a namespace and assign variables
+    vars_ns = SimpleNamespace()
+    for var_name, default in variable_defaults.items():
+        setattr(vars_ns, var_name, get_val(var_name, default))
 
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
-        pass
-        # dataframes
-        # last_session = df.session.max()
-        # df_last14 = df.loc[df['session'] > last_session - 14].copy()  # last 14 sessions
-        # df_last5 = df.loc[df['session'] > last_session - 5].copy()  # last five sessions
-        # df_last3 = df.loc[df['session'] > last_session - 3].copy()  # last three sessions
-        # df_last2 = df.loc[df['session'] > last_session - 2].copy()  # last two sessions
-        # #df = df.loc[df['session'] == last_session].copy()           # last session
-        # # VERY IMPORTANT, THE ABOVE LINE IS COMMENTED OUT BECAUSE WE WANT THE DF TO REMAIN THE SUBJECT'S ALL SESSIONS INSTEAD OF JUST LAST AS
-        # # WE WANT TO GET LAST 55 TRIALS FOR THE CRITERIA CHANGED.
-        #
-        # # number of trials
-        # n_trials = df.trial.max()  # number of trials in current session
-        # n_trials_prev = df_last2.groupby('session')['trial'].max().values[0]  # number of trials in previous session
-        #
-        # #setup
-        # setup = df.box.unique()
-        #
-        # #Long time to enter for certain subjects
-        # if df.subject.iloc[0] in settings.LONGER_TIME_TO_ENTER:
-        #     wait_seconds = 3600 * 24  #longer times for lazy animals
-        #     print('Longer time to enter!')
-        #
-        # if task == 'Automatic_Water': # We want to recover previous sessions parameters after this emergency water stage
-        #     prev_session = df.loc[df['session'] == last_session - 2].iloc[-1]
-        #     wait_seconds = 3600 * 5
-        #     task = prev_session.task
-        #     stage = float(prev_session.stage)
-        #     substage = float(prev_session.substage)
-        #     stim_dur_ds = float(prev_session.stim_dur_ds)
-        #     stim_dur_dm = float(prev_session.stim_dur_dm)
-        #     stim_dur_dl= float(prev_session.stim_dur_dl)
-        #
-        # elif task == 'Habituation':
-        #     wait_seconds = 3600 * 1
-        #     if len(df_last2.session.unique())>=2: # Pass after 2 sessions
-        #         task = 'LickTeaching'
-        #
-        # elif task == 'LickTeaching':
-        #     wait_seconds = 3600 * 2
-        #     if n_trials > 55:
-        #         task = 'TouchTeaching'
-        #
-        # elif task == 'TouchTeaching':
-        #     if n_trials >= 50:
-        #         task = 'StageTraining_RatB_V1'
-        #         stage = float(1)
-        #         substage = float(1)
-        #
-        # elif 'StageTraining' in task:
-        #     ############################ FUNTIONS ############################
-        #     def func(x):
-        #         if x.last_valid_index() is None:
-        #             return None
-        #         else:
-        #             return x[x.last_valid_index()]
-        #
-        #     def variable_calc(variable, initial, final):
-        #         "calculates the average between initial and final values of a changing variable"
-        #         try:
-        #             init = df[variable].iloc[10]
-        #             fin = df[variable].iloc[-1]
-        #         except:  # very short session, pick previous session value
-        #             try:
-        #                 previous = df_last2.loc[df_last2['session'] < last_session].copy()
-        #                 init = previous[variable].iloc[10]
-        #                 fin = previous[variable].iloc[-1]
-        #             except:  # 2 very short sessions pick the easiest value
-        #                 init = initial
-        #                 fin = final
-        #         average = (init + fin) / 2
-        #         return (average, init)
-        #
-        #     ############################ SMALL PARSING ############################
-        #
-        #     #number of trials
-        #     if n_trials < 15:
-        #         if my_subject not in settings.INACTIVE_SUBJECTS:
-        #             telegram_bot.alarm_few_trials(n_trials, my_subject)
-        #
-        #     # get first and last responses
-        #     sort = df['response_x'].astype(str).str.split(',', expand=True) # separate reponses in columns
-        #     df['first_resp'] = sort[0].astype(float)                        # select first reponses
-        #     df['last_resp'] = sort.apply(func, axis=1).astype(float)        # select last reponses
-        #     # useful columns
-        #     df['first_error'] = df['first_resp'] - df['x']  # error calculation
-        #     df['last_error'] = df['last_resp'] - df['x']
-        #     df['first_correct_bool'] = np.where(df['correct_th'] >= df['first_error'].abs(), 1, 0)  # correct bool calc
-        #     df['last_correct_bool'] = np.where(df['correct_th'] >= df['last_error'].abs(), 1, 0)
-        #     df.loc[(df.trial_result == 'miss', ['first_correct_bool', 'last_correct_bool'])] = np.nan  # misses correction
-        #
-        #     # last 3
-        #     sort_last3 = df_last3['response_x'].astype(str).str.split(',', expand=True)
-        #     df_last3['first_resp'] = sort_last3[0].astype(float)
-        #     df_last3['last_resp'] = sort_last3.apply(func, axis=1).astype(float)
-        #     df_last3['first_error'] = df_last3['first_resp'] - df_last3['x']
-        #     df_last3['last_error'] = df_last3['last_resp'] - df_last3['x']
-        #     df_last3['first_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['first_error'].abs(), 1, 0)
-        #     df_last3['last_correct_bool'] = np.where(df_last3['correct_th'] >= df_last3['last_error'].abs(), 1, 0)
-        #
-        #     # last 5
-        #     sort_last5 = df_last5['response_x'].astype(str).str.split(',', expand=True)
-        #     df_last5['first_resp'] = sort_last5[0].astype(float)
-        #     df_last5['last_resp'] = sort_last5.apply(func, axis=1).astype(float)
-        #     df_last5['first_error'] = df_last5['first_resp'] - df_last5['x']
-        #     df_last5['last_error'] = df_last5['last_resp'] - df_last5['x']
-        #     df_last5['last_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['last_error'].abs(), 1, 0)
-        #     df_last5['first_correct_bool'] = np.where(df_last5['correct_th'] >= df_last5['first_error'].abs(), 1, 0)
-        #
-        #     # last substages lists
-        #     last3_stages = df_last3.stage.unique()
-        #     last2_substages = df_last2.substage.unique()
-        #     last3_substages = df_last3.substage.unique()
-        #     last5_substages = df_last5.substage.unique()
-        #     last14_substages = df_last14.substage.unique()
-        #
-        #     # accuracies calc
-        #     first_poke_acc = df.first_correct_bool.mean()
-        #     last_poke_acc = df.last_correct_bool.mean()
-        #     first3_poke_acc = df_last3.first_correct_bool.mean()
-        #     last3_poke_acc = df_last3.last_correct_bool.mean()
-        #     first5_poke_acc = df_last5.first_correct_bool.mean()
-        #     last5_poke_acc = df_last5.last_correct_bool.mean()
-        #
-        #     #subdataframes:
-        #     vg_df = df.loc[df['trial_type'] == 'VG']
-        #     ds_df = df.loc[((df['trial_type'] == 'DS') | (df['trial_type'] == 'DSc1') | (df['trial_type'] == 'DSc2'))]
-        #     dm_df = df.loc[((df['trial_type'] == 'DM') | (df['trial_type'] == 'DMc1'))]
-        #     dl_df = df.loc[((df['trial_type'] == 'DL'))]
-        #
-        #     ############ STAGE 1 ############
-        #     #Here last5_substages chanegd to last2_substages for the criteria to be 2 sessions rather than 5.
-        #     if stage == 3:
-        #         # Count the total number of trials where stage == 3
-        #         last_row = df.iloc[-1]  # Get the last row of the DataFrame
-        #         trial_counter = last_row['trial_counter']
-        #         # Check if the total trials exceed or equal 4000
-        #         if trial_counter >= 4000:
-        #             task = "Probability_Training_BB_Size"
-        #             stage = 1
-        #             substage = 0
-        #             message = (f"Total trials in Stage 3 reached {trial_counter}. Moving to Probability task.")
-        #             trial_counter = 0
-        #             print(message)
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #                 telegram_bot.alarm_completed_criteria(task, my_subject)
-        #             except:
-        #                 print("Telegram message not sent")
-        #                 pass
-        #     elif stage == 1:
-        #         if substage == 1:
-        #             if last3_poke_acc >= 0.8 and len(last2_substages) == 1 and n_trials > 60:  # next substage
-        #                 substage += 1
-        #             # elif n_trials <= 15 and len(last5_substages) == 1:  # go to Touchteaching
-        #             #     task = 'TouchTeaching'
-        #             #     stage -= 1
-        #             #     substage -= 1
-        #         elif substage == 2:
-        #             stim_pos_acc = vg_df.groupby('x')['first_correct_bool'].mean() # accuracy by stimulus in VG trials
-        #             stim_pos_acc.to_list()
-        #             if all(i >= 0.7 for i in stim_pos_acc) and len(last2_substages) == 1 and n_trials > 60 and first3_poke_acc >0.65:  # next substage
-        #                 substage += 1
-        #             elif first_poke_acc <= 0.33 and len(last3_substages) == 1:  # lower substage
-        #                 substage -= 1
-        #         elif substage == 3:
-        #             acc_ds = ds_df['first_correct_bool'].mean() # accuracy in delay short
-        #             if acc_ds >= 0.55 and len(last2_substages) == 1 and n_trials > 60 and first3_poke_acc >0.7:  # next stage
-        #                 stage += 1
-        #                 substage = float(1)
-        #                 stim_dur_ds = 0.45
-        #             elif first_poke_acc < 0.35 and len(last3_substages) == 1 :  # lower substage
-        #                 substage -= 1
-        #
-        #     ############ STAGE 2 ############
-        #     elif stage == 2:
-        #         # Calculate subdataframes for the last 55 trials with the same substage
-        #         #last_trials = 55  # Define the number of trials to consider
-        #         last_trials = 55  # Define the number of trials to consider
-        #         df_last_trials = df.tail(last_trials)  # Get the last `last_trials` rows of the dataframe
-        #
-        #         # Check if all the trials in the last 55 rows have the same substage
-        #         if df_last_trials['substage'].nunique() == 1:
-        #             # Proceed with the last 55 trials
-        #             message = (
-        #                 f"All {last_trials} trials have the same substage: {df_last_trials['substage'].iloc[0]}"
-        #             )
-        #             print(message)
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #         else:
-        #             # Filter to include only trials from the last substage
-        #             last_substage = df_last_trials['substage'].iloc[-1]  # Identify the last substage
-        #             df_last_trials = df_last_trials[df_last_trials['substage'] == last_substage]
-        #             message = (
-        #                 f"The last {last_trials} trials have different substages. "
-        #                 f"Filtering to include only substage {last_substage}."
-        #             )
-        #             print(message)
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #
-        #         # Check if stim_dur was modified in the last 55 trials
-        #         recent_stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[0] == df_last_trials['stim_dur_ds'].iloc[-1]
-        #         recent_stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[0] == df_last_trials['stim_dur_dm'].iloc[-1]
-        #         recent_stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[0] == df_last_trials['stim_dur_dl'].iloc[-1]
-        #
-        #         # Subdataframes for each trial type
-        #         ds_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DS', 'DSc1', 'DSc2'])]
-        #         dm_df = df_last_trials.loc[df_last_trials['trial_type'].isin(['DM', 'DMc1'])]
-        #         dl_df = df_last_trials.loc[df_last_trials['trial_type'] == 'DL']
-        #
-        #         stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
-        #         stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
-        #         stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
-        #
-        #         if recent_stim_dur_ds == True and recent_stim_dur_dm == True and recent_stim_dur_dl == True:
-        #             message = (
-        #                 f"Stimulus duration are same in last {last_trials} trials: "
-        #                 f"stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}."
-        #             )
-        #             print(message)
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #             next_stage = False
-        #
-        #             if substage == 1:
-        #                 max_stim_dur = 0.45
-        #                 #average, initial = variable_calc('stim_dur_ds', max_stim_dur, max_stim_dur)
-        #                 initial = df_last_trials['stim_dur_ds'].iloc[-1]
-        #                 acc = ds_df['first_correct_bool'].mean()
-        #                 acc_up = 0.6
-        #                 change = 0.15
-        #             elif substage ==2:
-        #                 max_stim_dur = 0.4
-        #                 #average, initial = variable_calc('stim_dur_dm', max_stim_dur, max_stim_dur)
-        #                 initial = df_last_trials['stim_dur_dm'].iloc[-1]
-        #                 acc = (dm_df['first_correct_bool'].mean() + ds_df['first_correct_bool'].mean())/2
-        #                 acc_up = 0.55
-        #                 change = 0.15
-        #             elif substage ==3:
-        #                 max_stim_dur = 0.35
-        #                 #average, initial = variable_calc('stim_dur_dl', max_stim_dur, max_stim_dur)
-        #                 initial = df_last_trials['stim_dur_dl'].iloc[-1]
-        #                 acc = (dl_df['first_correct_bool'].mean() + dm_df['first_correct_bool'].mean()) / 2
-        #                 acc_up = 0.5
-        #                 change = 0.15
-        #             # Check if accuracy is sufficient for advancement
-        #             if acc > acc_up and len(df_last_trials) == last_trials:
-        #                 if initial >= change:
-        #                     stim_dur = initial - change
-        #                     message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration from {initial} to {stim_dur}."
-        #                     print(message)
-        #                     try:
-        #                         telegram_bot.alarm_finish_session(message, my_subject)
-        #                     except:
-        #                         print('Telegram message not sent')
-        #                         pass
-        #                 else:
-        #                     stim_dur = 0
-        #                     next_stage = True  # Advance to next substage if duration is already minimal
-        #                     message = f"Accuracy {acc:.2f} meets criteria. Adjusting stimulus duration from {initial} to {stim_dur}."
-        #                     print(message)
-        #                     try:
-        #                         telegram_bot.alarm_finish_session(message, my_subject)
-        #                     except:
-        #                         print('Telegram message not sent')
-        #                         pass
-        #             else:
-        #                 stim_dur = initial
-        #                 message = f"Accuracy {acc:.2f} does not meet criteria. Keeping stimulus duration the same: {stim_dur}."
-        #                 print(message)
-        #                 try:
-        #                     telegram_bot.alarm_finish_session(message, my_subject)
-        #                 except:
-        #                     print('Telegram message not sent')
-        #                     pass
-        #             if substage == 1:  # stage 2 remain now in substage 1 ds 0
-        #                 stim_dur_ds = stim_dur
-        #                 if next_stage == True:
-        #                     print("Advancing to Stage 2.2")
-        #                     substage += 1
-        #                     stim_dur_ds = 0
-        #                     stim_dur_dm = 0.4
-        #             elif substage == 2:
-        #                 stim_dur_dm = stim_dur
-        #                 if next_stage == True:
-        #                     print("Advancing to Stage 2.3")
-        #                     substage += 1
-        #                     stim_dur_dm = 0
-        #                     stim_dur_dl = 0.35
-        #             elif substage == 3:
-        #                 stim_dur_dl = stim_dur
-        #                 if next_stage == True:
-        #                     print("Advancing to Stage 3.1")
-        #                     #if len(last14_substages) == 1:
-        #                     stage += 1
-        #                     substage = float(1)
-        #                     stim_dur_dl = 0
-        #                     message = 'WM: Advancing to Stage 3.1'
-        #                     try:
-        #                         telegram_bot.alarm_completed_criteria(task, my_subject)
-        #                         telegram_bot.alarm_finish_session(message, my_subject)
-        #                     except:
-        #                         print('Telegram message not sent')
-        #                         pass
-        #
-        #             #Ensure that stim_duration is below 0:
-        #             stim_dur_ds = max(stim_dur_ds, 0)
-        #             stim_dur_dm = max(stim_dur_dm, 0)
-        #             stim_dur_dl = max(stim_dur_dl, 0)
-        #         else:
-        #             print("Stimulus duration has already been modified recently. Skipping further adjustment.")
-        #             # Assign the last row's stim_dur values to skip further adjustment
-        #             stim_dur_ds = df_last_trials['stim_dur_ds'].iloc[-1]
-        #             stim_dur_dm = df_last_trials['stim_dur_dm'].iloc[-1]
-        #             stim_dur_dl = df_last_trials['stim_dur_dl'].iloc[-1]
-        #             message = (
-        #                 f"Retaining stimulus durations: "
-        #                 f"stim_dur_ds={stim_dur_ds}, stim_dur_dm={stim_dur_dm}, stim_dur_dl={stim_dur_dl}."
-        #             )
-        #             print(message)
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-
+        pass  #Working Memmory section removed
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        trial_criteria = 20
-        accuracy_criteria = 0.85
-        accuracy_moveback_criteria = 0.4
-
-        if my_subject == 'm2':
-            trial_criteria = 3
-            accuracy_criteria = 0.5
-            accuracy_moveback_criteria = 0.4
-
-        # First: Identify the last session and second-to-last session and seven sessions:
-        unique_sessions = sorted(df['session'].unique(), reverse=True)  # Get unique sessions, sorted newest first
-        last_session = unique_sessions[0]  # The most recent session
-        second_last_session = unique_sessions[1] if len(unique_sessions) > 1 else None
-        third_last_session = unique_sessions[2] if len(unique_sessions) > 2 else None
-        last_7_sessions = unique_sessions[:7] if len(unique_sessions) >= 7 else []
-
-        # Second: Filter the DataFrame to include only the last two sessions/three sessions/seven sessions
-        df_last2 = df.loc[df['session'].isin([last_session, second_last_session])].copy()  # Last two sessions
-        df_last_session = df.loc[df['session'] == last_session].copy()  # Only last session
-        df_last3 = df.loc[df['session'].isin([last_session, second_last_session, third_last_session])].copy()  # Last three sessions
-        # df_last7 = df[df['session'].isin([last_session, second_last_session, third_last_session, fourth_last_session,
-        #                                   fifth_last_session, sixth_last_session,seventh_last_session])].copy()     #Last seven sessions
-        df_last7 = df[df['session'].isin(last_7_sessions)].copy()
-
-
-        # Third: Get the number of trials in the last session and second-to-last session (if exists)
-        n_trials_last = df_last_session.trial.max()  # Trials in the last session
-        if second_last_session is not None:
-            df_second_last_session = df_last2[df_last2['session'] == second_last_session].copy()
-            n_trials_second_last = df_second_last_session.trial.max()
-        else:
-            n_trials_second_last = 0
-
-        if third_last_session is not None:
-            df_third_last_session = df_last3[df_last3['session'] == third_last_session].copy()
-
-        #Telegram message for low number of trials.
-        if n_trials_last < 15:
-            if my_subject not in settings.INACTIVE_SUBJECTS:
-                telegram_bot.alarm_few_trials(n_trials_last, my_subject)
-
-
-        # Fourth: Calculate accuracy for the last session and second last session (if exists)
-        correct_trials_last = df_last_session[df_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-        valid_trials_last = df_last_session[df_last_session['trial_result'] != 'miss'].shape[0]
-        message = f"Valid trials in session: {valid_trials_last}"
-        print(f'{message}')
-        try:
-            telegram_bot.alarm_finish_session(message, my_subject)
-        except:
-            print('Telegram message not sent')
-            pass
-        accuracy_last = correct_trials_last / valid_trials_last if valid_trials_last > 0 else 0
-        message = f"Accuracy in session: {accuracy_last * 100:.2f}%"
-        print(f'{message}')
-        try:
-            telegram_bot.alarm_finish_session(message, my_subject)
-        except:
-            print('Telegram message not sent')
-            pass
-
-        # Calculate accuracy for the second-to-last session (if exists)
-        if second_last_session is not None:
-            correct_trials_second_last = df_second_last_session[df_second_last_session['trial_result'].isin(['correct', 'correct_first'])].shape[
-            0]
-            valid_trials_second_last = df_second_last_session[df_second_last_session['trial_result'] != 'miss'].shape[0]
-            message = f"Valid trials in previous session: {valid_trials_second_last}"
-            print(f'{message}')
-            try:
-                telegram_bot.alarm_finish_session(message, my_subject)
-            except:
-                print('Telegram message not sent')
-                pass
-            accuracy_second_last = correct_trials_second_last / valid_trials_second_last if valid_trials_second_last > 0 else 0
-            message = f"Accuracy in previous session: {accuracy_second_last * 100:.2f}%"
-            print(f'{message}')
-            try:
-                telegram_bot.alarm_finish_session(message, my_subject)
-            except:
-                print('Telegram message not sent')
-                pass
-        else:
-            valid_trials_second_last = 0
-            accuracy_second_last = 0
-            print("No previous session available.")
-
-        # Fifth: Check if the last session and second-to-last session are in different tasks
-        last_session_task = df_last_session['task'].iloc[0]  # Stage in the last session
-        second_last_session_task = df_second_last_session['task'].iloc[0] if second_last_session is not None else None
-        third_last_session_task = df_third_last_session['task'].iloc[0] if third_last_session is not None else None
-
-        # Sixth: Check if the last session and second-to-last session are in different stages
-        last_session_stage = df_last_session['stage'].iloc[0]  # Stage in the last session
-        second_last_session_stage = df_second_last_session['stage'].iloc[0] if second_last_session is not None else None
-        third_last_session_stage = df_third_last_session['stage'].iloc[0] if third_last_session is not None else None
-
-        # Seventh: Check if the last session and second-to-last session are in different substages
-        last_session_substage = df_last_session['substage'].iloc[0]  # Substage in the last session
-        second_last_session_substage = df_second_last_session['substage'].iloc[0] if second_last_session is not None else None
-        third_last_session_substage = df_third_last_session['substage'].iloc[0] if third_last_session is not None else None
-
-        # Eight: Check if the last session and second-to-last session are in different substages_bias for bias breaking in extra training only:
-        last_session_substage_bias = df_last_session['substage_bias'].iloc[0]  # Substage for bias breaking in the last session
-        second_last_session_substage_bias = df_second_last_session['substage_bias'].iloc[0] if second_last_session is not None else None
-        third_last_session_substage_bias = df_third_last_session['substage_bias'].iloc[0] if third_last_session is not None else None
-
-        # Condition for shifting them to normal task after demotivation, moves them after three sessions in demotivation task.
-        if task == 'Probability_Training_BB_Demotivation':
-            # Ensure the last three sessions were all 'Probability_Training_Demotivation'
-            last_three_sessions_tasks = df_last3['task'].unique()
-            if len(df_last3.session.unique()) >= 3 and len(last_three_sessions_tasks) == 1 and last_three_sessions_tasks[0] == 'Probability_Training_BB_Demotivation':
-                task = 'Probability_Training_BB_Size'
-                print("Moved from demotivation task to normal task")
-
-        elif 'Probability_Extra_Training_Bias' in task:
-            if last_session_task == second_last_session_task:
-                if last_session_stage == second_last_session_stage:
-                    if last_session_substage == second_last_session_substage:
-                        if last_session_substage_bias == 1 and second_last_session_substage_bias == 1:
-                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                                valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                substage_bias = 2
-                                message = f'Advancing from substage_bias 1 to substage_bias 2'
-                                print(f'{message}')
-                                try:
-                                    telegram_bot.alarm_finish_session(message, my_subject)
-                                except:
-                                    print('Telegram message not sent')
-                                    pass
-                        elif last_session_substage_bias == 2 and second_last_session_substage_bias == 2:
-                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                                valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                substage_bias = 3
-                                message = f'Advancing from substage_bias 2 to substage_bias 3'
-                                print(f'{message}')
-                                try:
-                                    telegram_bot.alarm_finish_session(message, my_subject)
-                                except:
-                                    print('Telegram message not sent')
-                                    pass
-                        elif last_session_substage_bias == 3 and second_last_session_substage_bias == 3:
-                                if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                                    valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                    # Increment substage until it reaches 2
-                                    while substage < 2:
-                                        substage += 1
-                                        message = f'Advancing to substage {substage}'
-                                        print(f'{message}')
-                                        try:
-                                            telegram_bot.alarm_finish_session(message, my_subject)
-                                        except:
-                                            print('Telegram message not sent')
-                                            pass
-
-                                    # When substage reaches 2, update task, substage_bias, and substage
-                                    if substage == 2:
-                                        if 'Probability_Extra_Training_Bias_Left_Correction' in task:
-                                            task = "Probability_Extra_Training_Bias_Left"
-                                            substage_bias = 3
-                                            substage = 2
-                                            message = f'Substage is now 2, task changed to {task}, substage_bias reset to 3'
-                                            print(f'{message}')
-                                            try:
-                                                telegram_bot.alarm_finish_session(message, my_subject)
-                                                telegram_bot.alarm_completed_criteria(task, my_subject)
-                                            except:
-                                                print('Telegram message not sent')
-                                                pass
-                                        else:
-                                            task = "Probability_Extra_Training"
-                                            substage_bias = 0
-                                            substage = 3
-                                            message = f'Substage is now 3, task changed to {task}, substage_bias reset to 0'
-                                            print(f'{message}')
-                                            try:
-                                                telegram_bot.alarm_finish_session(message, my_subject)
-                                                telegram_bot.alarm_completed_criteria(task, my_subject)
-                                            except:
-                                                print('Telegram message not sent')
-                                                pass
-
-            # Check for move-back criteria using the function
-            if len(unique_sessions) >= 7:
-                # Check if all 7 sessions have the same task, stage, and substage
-                if (df_last7['task'].nunique() == 1 and
-                        df_last7['stage'].nunique() == 1 and
-                        df_last7['substage'].nunique() == 1):
-                    # Evaluate move-back criteria
-                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
-                    )
-                # Apply move-back logic if all seven sessions fail the criteria:
-                if low_trial_count == 7 or low_accuracy_count == 7:
-                    print("Move-back criteria met. Moving back one substage.")
-                    substage_bias = max(substage_bias - 1, 1)  # Ensure stage doesn't go below 1
-                    message = f"PI: Subject moved back one stage due to low performance. substage_bias: {substage_bias}"
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print(f"Telegram message not sent: {e}")
-
-
-        elif 'Probability_Training_Bias' in task:
-            if last_session_task == second_last_session_task:
-                if last_session_stage == second_last_session_stage:
-                    if last_session_substage == 1 and second_last_session_substage == 1:
-                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                                valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                substage = 2
-                                message = 'PI: Advancing from substage 1 to substage 2'
-                                print(f'{message}')
-                                try:
-                                    ttelegram_bot.alarm_finish_session(message, my_subject)
-                                except:
-                                    print('Telegram message not sent')
-                                    pass
-                    elif last_session_substage == 2 and second_last_session_substage == 2:
-                            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                                valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                                task = 'Probability_Training_BB_Size'
-                                substage = 0
-                                message = 'PI: Advancing from substage 2 to normal task'
-                                print(f'{message}')
-                                try:
-                                    telegram_bot.alarm_finish_session(message, my_subject)
-                                    telegram_bot.alarm_completed_criteria(task, my_subject)
-                                except:
-                                    print('Telegram message not sent')
-                                    pass
-
-            # Check for move-back criteria using the function
-            if len(unique_sessions) >= 7:
-                # Check if all 7 sessions have the same task, stage, and substage
-                if (df_last7['task'].nunique() == 1 and
-                        df_last7['stage'].nunique() == 1 and
-                        df_last7['substage'].nunique() == 1):
-                    # Evaluate move-back criteria
-                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
-                    )
-                # Apply move-back logic if all seven sessions fail the criteria:
-                if low_trial_count == 7 or low_accuracy_count == 7:
-                    print("Move-back criteria met. Moving back one substage.")
-                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
-                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print(f"Telegram message not sent: {e}")
-
-
-        elif task == 'Probability_Extra_Training':
-            if last_session_task == second_last_session_task:
-                if last_session_stage == 1 and second_last_session_stage == 1:
-                    if last_session_substage == 1 and second_last_session_substage == 1:
-                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.1 to stage 1.2')
-                            stage = 1
-                            substage = 2
-                            message = 'PI: Advancing from stage 1 to stage 2'
-                            print(f'{message}')
-                            try:
-                                telegram_bot.alarm_finish_session(message, my_subject)
-                            except:
-                                print('Telegram message not sent')
-                                pass
-                    elif last_session_substage == 2 and second_last_session_substage == 2:
-                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.2 to 1.3')
-                            stage = 1
-                            substage = 3
-                            message = 'PI: Advancing from stage 1 to stage 2'
-                            print(f'{message}')
-                            try:
-                                telegram_bot.alarm_finish_session(message, my_subject)
-                            except:
-                                print('Telegram message not sent')
-                                pass
-                    elif last_session_substage == 3 and second_last_session_substage == 3:
-                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.3 to 1.4')
-                            stage = 1
-                            substage = 4
-                            message = 'PI: Advancing from stage 1 to stage 2'
-                            print(f'{message}')
-                            try:
-                                telegram_bot.alarm_finish_session(message, my_subject)
-                            except:
-                                print('Telegram message not sent')
-                                pass
-                    elif last_session_substage == 4 and second_last_session_substage == 4:
-                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            print(f'Advancing from stage 1.4 to 1.5')
-                            stage = 1
-                            substage = 5
-                            message = 'PI: Advancing from stage 1 to stage 2'
-                            print(f'{message}')
-                            try:
-                                telegram_bot.alarm_finish_session(message, my_subject)
-                            except:
-                                print('Telegram message not sent')
-                                pass
-                    elif last_session_substage == 5 and second_last_session_substage == 5:
-                        if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                            task = 'Probability_Training_BB_Size'
-                            stage = 2
-                            substage = 0
-                            message = 'PI: Advancing to Probability_Training_BB_Size to stage 2'
-                            print(f'{message}')
-                            try:
-                                telegram_bot.alarm_finish_session(message, my_subject)
-                                telegram_bot.alarm_completed_criteria(task, my_subject)
-                            except:
-                                print('Telegram message not sent')
-                                pass
-
-            if len(unique_sessions) >= 7:
-                # Check if all 7 sessions have the same task, stage, and substage
-                if (df_last7['task'].nunique() == 1 and
-                        df_last7['stage'].nunique() == 1 and
-                        df_last7['substage'].nunique() == 1):
-                    # Evaluate move-back criteria
-                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
-                    )
-                # Apply move-back logic if all seven sessions fail the criteria:
-                if low_trial_count == 7 or low_accuracy_count == 7:
-                    print("Move-back criteria met. Moving back one substage.")
-                    substage = max(substage - 1, 1)  # Ensure stage doesn't go below 1
-                    message = f"PI: Subject moved back one stage due to low performance. Substage: {substage}"
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except Exception as e:
-                        print(f"Telegram message not sent: {e}")
-
-        elif 'Big' in task:
-            # Check stage-specific conditions for advancement
-            if last_session_task == second_last_session_task:
-                # Stage 1 -> Stage 2 check
-                if last_session_stage == 1 and second_last_session_stage == 1:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        stage = 2
-                        message = 'PI: Advancing from stage 1 to stage 2'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                # Stage 2 -> Stage 3 check
-                elif last_session_stage == 2 and second_last_session_stage == 2:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        stage = 3
-                        message = 'PI: Advancing from stage 2 to stage 3'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                elif last_session_stage == 3 and second_last_session_stage == 3:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        message = 'PI: Advancing from stage 3 to Normal Script'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                        # Stage 3 -> Normal Script
-                        stage = 1
-                        task = 'Probability_Training_BB_Size'
-
-
-        elif 'Probability_Training_BB_Size' in task:
-            # Check stage-specific conditions for advancement
-            if last_session_task == second_last_session_task:
-                # Stage 1 -> Stage 2 check
-                if last_session_stage == 1 and second_last_session_stage == 1:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        stage = 2
-                        message = 'PI: Advancing from stage 1 to stage 2'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                # Stage 2 -> Stage 3 check
-                elif last_session_stage == 2 and second_last_session_stage == 2:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        stage = 3
-                        message = 'PI: Advancing from stage 2 to stage 3'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                elif last_session_stage == 3 and second_last_session_stage == 3:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (
-                            valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        stage = 4
-                        message = 'PI: Advancing from stage 3 to stage 4'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                # Stage 3 -> Weber's Law
-                elif last_session_stage == 4 and second_last_session_stage == 4:
-                    if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria) and (valid_trials_second_last >= trial_criteria and accuracy_second_last >= accuracy_criteria):
-                        message = 'PI: Advance from stage 3 to Webers Law with accuracy in both sessions'
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_completed_criteria(task, my_subject)
-                        except:
-                            print('Telegram message not sent')
-                            pass
-                        stage = 4
-                        task = 'Probability_WebersLaw_Pre'
-                        block = 12  # This is the number of trials one conditions will remain for
-                        conditions = []  # Takes the conditions from select task file.
-                        completed_conditions = []  # To store completed conditions
-                        current_condition = 0  # To track the current condition in progress
-                        repetition = 2  # To store how many times the conditions needs to repeat.
-                        current_repetition = 0  # To store how many times the condition has repeated.
-                        trial_counter = 0  # Track the number of trials for the current condition
-                        # Image output stims:
-                        stim_trial = 0
-                        stim_trials = []
-                        stim_trial_counter = 0
-
-            # Check for move-back criteria using the function
-            if len(unique_sessions) >= 7:
-                # Check if all 7 sessions have the same task, stage, and substage
-                if (df_last7['task'].nunique() == 1 and
-                        df_last7['stage'].nunique() == 1 and
-                        df_last7['substage'].nunique() == 1):
-                    # Evaluate move-back criteria
-                    low_trial_count, low_accuracy_count = calculate_move_back_criteria(
-                        df_last7, last_7_sessions, trial_criteria, accuracy_moveback_criteria
-                    )
-                # Apply move-back logic if all seven sessions fail the criteria:
-                if low_trial_count == 7 or low_accuracy_count == 7:
-                    # Apply move-back logic if all three sessions fail the criteria but track if the discrimination a doesnt go back to indication after 2 times.
-                        if stage == 2:
-                            moved_back_counter += 1
-
-                        if stage == 2 and moved_back_counter >= 2:
-                            task = 'Probability_Extra_Training'
-                            stage = 1
-                            substage = 1
-                            substage_bias = 0
-                            message = f"PI: Subject moved to extra training due to repeated move-backs. Stage: {stage}. Task: {task}."
-                        else:
-                            stage = max(stage - 1, 1)  # Ensure stage doesn't go below 1
-                            message = f"PI: Subject moved back one stage due to low performance. Stage: {stage}"
-
-                        print(f'{message}')
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                        except Exception as e:
-                            print(f"Telegram message not sent: {e}")
-
+        if 'Probability_Training_BB_Size' in task:
+            if task_number == 3:
+                message = 'PI: Advance from stage 3 to Webers Law Pre Test'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+                stage = 4
+                task = 'Probability_WebersLaw_Pre'
+                block = 12  # This is the number of trials one conditions will remain for
+                conditions = []  # Takes the conditions from select task file.
+                completed_conditions = []  # To store completed conditions
+                current_condition = 0  # To track the current condition in progress
+                repetition = 2  # To store how many times the conditions needs to repeat.
+                current_repetition = 0  # To store how many times the condition has repeated.
+                trial_counter = 0  # Track the number of trials for the current condition
+                # Image output stims:
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
 
         elif 'Probability_WebersLaw' in task:
-            last_row = df.iloc[-1]  # Get the last row of the DataFrame
             # Assign each value from the last row to the variables:
             stage = last_row['stage']
             block = last_row['block']
@@ -907,9 +163,6 @@ def select_task(df, subject):
             stim_trial = last_row['stim_trial']
             stim_trials = last_row['stim_trials']
             stim_trial_counter = last_row['stim_trial_counter']
-
-            # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
-            df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
             if stage == 5:
                 block = 0
@@ -985,8 +238,6 @@ def select_task(df, subject):
                         pass
 
         elif 'Probability_WL_Training' in task:
-            last_row = df.iloc[-1]  # Get the last row of the DataFrame
-
             # Assign each value from the last row to the variables:
             stage = last_row['stage']
             ror = last_row['ror']
@@ -1191,118 +442,101 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
-        elif 'Probability_Turtle_Training' in task:
-            trial_criteria = 30
-            accuracy_criteria = 0.80
-            trial_end_criteria = 3000
-
-            if my_subject == 'm2':
-                trial_criteria = 3
-                accuracy_criteria = 0.7
-                trial_end_criteria = 10
-
-            last_row = df.iloc[-1]  # Get the last row of the DataFrame
-            trial_counter = last_row['trial_counter']
-
-            if trial_counter >= trial_end_criteria:
-                stage = 7
-                message = f"{trial_end_criteria} trials completed in substage {substage}. Task ended."
-                print(f'{message}')
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                    telegram_bot.alarm_completed_criteria(task, my_subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
-
-            if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria):
-                # Move to the next stage up to stage 3
-                if substage < 3:
-                    substage += 1
-                    trial_counter = 0
-                    message = (f"Moving to stage {substage} due to 80% accuracy in a session of {valid_trials_last} trials.")
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
-                else:
-                    stage = 7
-                    #task = 'Probability_Turtle_Test'
-                    message = (f"Last substage {substage} completed, Training complete")
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
-            else:
-                message = ("Criteria for moving to the next stage not met.")
-                print(f'{message}')
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
+        # elif 'Probability_Turtle_Training' in task:
+        #     trial_criteria = 30
+        #     accuracy_criteria = 0.80
+        #     trial_end_criteria = 3000
+        #
+        #     if my_subject == 'm2':
+        #         trial_criteria = 3
+        #         accuracy_criteria = 0.7
+        #         trial_end_criteria = 10
+        #
+        #     trial_counter = last_row['trial_counter']
+        #
+        #     if trial_counter >= trial_end_criteria:
+        #         stage = 7
+        #         message = f"{trial_end_criteria} trials completed in substage {substage}. Task ended."
+        #         print(f'{message}')
+        #         try:
+        #             telegram_bot.alarm_finish_session(message, my_subject)
+        #             telegram_bot.alarm_completed_criteria(task, my_subject)
+        #         except:
+        #             print('Telegram message not sent')
+        #             pass
+        #
+        #     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria):
+        #         # Move to the next stage up to stage 3
+        #         if substage < 3:
+        #             substage += 1
+        #             trial_counter = 0
+        #             message = (f"Moving to stage {substage} due to 80% accuracy in a session of {valid_trials_last} trials.")
+        #             print(f'{message}')
+        #             try:
+        #                 telegram_bot.alarm_finish_session(message, my_subject)
+        #             except:
+        #                 print('Telegram message not sent')
+        #                 pass
+        #         else:
+        #             stage = 7
+        #             #task = 'Probability_Turtle_Test'
+        #             message = (f"Last substage {substage} completed, Training complete")
+        #             print(f'{message}')
+        #             try:
+        #                 telegram_bot.alarm_finish_session(message, my_subject)
+        #                 telegram_bot.alarm_completed_criteria(task, my_subject)
+        #             except:
+        #                 print('Telegram message not sent')
+        #                 pass
+        #     else:
+        #         message = ("Criteria for moving to the next stage not met.")
+        #         print(f'{message}')
+        #         try:
+        #             telegram_bot.alarm_finish_session(message, my_subject)
+        #         except:
+        #             print('Telegram message not sent')
+        #             pass
 
     elif task == 'Water_Filler':
         print("rat drank water")
-        # # variables by default
-        # stage = 5
-        # substage = 0
-        # choice = 0
-        # wait_seconds = 3600 * settings.TIME_TO_ENTER  # wait a minimum of x hours before allowed to start the new session)
-        # stim_dur_ds = 0
-        # stim_dur_dm = 0
-        # stim_dur_dl = 0
-        # # Weber's Law:
-        # block = 0
-        # conditions = []  # Takes the conditions from task file after first session.
-        # completed_conditions = []  # To store completed conditions
-        # current_condition = 0  # To track the current condition in progress
-        # repetition = 0
-        # current_repetition = 0  # To store how many times the condition has repeated.
-        # trial_counter = 0  # Track the number of trials for the current condition.
-        # # Image output stims:
-        # stim_trial = 0
-        # stim_trials = []
-        # stim_trial_counter = 0
 
     if my_subject == 'm2':
         wait_seconds = 1
 
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter
+    # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
+    df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
-def str_append(my_str: str, value: str) -> str:
-    """Simulate appending a value to a string representation of a list."""
-    my_str = my_str.strip()  # Ensure no leading/trailing spaces
-    if my_str == "[]" or not my_str:  # If empty list, add value directly
-        return f"[{value}]"
-    return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
+    #all of these are written in subjects.csv:
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change
 
-
-def str_pop(my_str: str) -> tuple[str, str]:
-    """Simulate popping the first value from a string representation of a list."""
-    my_str = my_str.strip()  # Ensure no leading/trailing spaces
-    if my_str == "[]" or not my_str:  # Handle empty list
-        raise ValueError("Cannot pop from an empty list")
-
-    # Remove the brackets and split by commas
-    parts = my_str[1:-1].split(", ")
-    popped_value = parts.pop(0)  # Remove the first element
-    new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
-    return new_str, popped_value
-
-# Convert ror and completed_ror back to lists
-# Convert ror and completed_ror back to lists
-def str_to_list(my_str: str) -> list:
-    """Convert a string representation of a list back to a Python list."""
-    my_str = my_str.strip()  # Ensure no leading/trailing spaces
-    if my_str == "[]" or not my_str:
-        return []  # Return an empty list if the string is empty or '[]'
-    return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+# def str_append(my_str: str, value: str) -> str:
+#     """Simulate appending a value to a string representation of a list."""
+#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
+#     if my_str == "[]" or not my_str:  # If empty list, add value directly
+#         return f"[{value}]"
+#     return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
+#
+#
+# def str_pop(my_str: str) -> tuple[str, str]:
+#     """Simulate popping the first value from a string representation of a list."""
+#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
+#     if my_str == "[]" or not my_str:  # Handle empty list
+#         raise ValueError("Cannot pop from an empty list")
+#
+#     # Remove the brackets and split by commas
+#     parts = my_str[1:-1].split(", ")
+#     popped_value = parts.pop(0)  # Remove the first element
+#     new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
+#     return new_str, popped_value
+#
+# # Convert ror and completed_ror back to lists
+# # Convert ror and completed_ror back to lists
+# def str_to_list(my_str: str) -> list:
+#     """Convert a string representation of a list back to a Python list."""
+#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
+#     if my_str == "[]" or not my_str:
+#         return []  # Return an empty list if the string is empty or '[]'
+#     return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
 
 
 # def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
@@ -1337,59 +571,59 @@ def str_to_list(my_str: str) -> list:
 #             low_accuracy_count += 1
 #     return low_trial_count, low_accuracy_count
 
-def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_moveback_criteria):
-    """
-    Calculate low trial count and low accuracy count for given sessions.
-
-    Args:
-        df_last7 (pd.DataFrame): DataFrame containing data for the last seven sessions.
-        sessions (list): List of session identifiers to evaluate.
-        trial_criteria (int): Minimum required trials per session.
-        accuracy_moveback_criteria (float): Minimum required accuracy per session.
-
-    Returns:
-        tuple: (low_trial_count, low_accuracy_count)
-            - low_trial_count (int): Number of sessions below the trial criteria.
-            - low_accuracy_count (int): Number of sessions below the accuracy criteria.
-    """
-    low_trial_count = 0
-    low_accuracy_count = 0
-    for session in sessions:
-        session_data = df_last7[df_last7['session'] == session]
-        # Calculate trial count and accuracy
-        trial_count = session_data['trial'].max()
-        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
-            0]
-        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
-        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
-        # Check criteria
-        if trial_count < trial_criteria:
-            low_trial_count += 1
-        if accuracy < accuracy_moveback_criteria:
-            low_accuracy_count += 1
-    return low_trial_count, low_accuracy_count
-
-
-def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_criteria, accuracy_forward_criteria):
-    """
-    Calculate high trial count and high accuracy count for given sessions.
-
-    Args:
-        df_last2 (pd.DataFrame): DataFrame containing data for the last two sessions.
-        sessions (list): List of session identifiers to evaluate.
-        trial_count (int): Trial count for the sessions.
-        trial_criteria (int): Minimum required trials per session.
-        accuracy_forward_criteria (float): Minimum required accuracy per session.
-
-    Returns:
-        bool: True if the subject meets the move forward criteria, False otherwise.
-    """
-    for session in sessions:
-        session_data = df_last2[df_last2['session'] == session]
-        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
-        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
-        # Check criteria
-        if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
-            return False  # If either condition is not met in any session, do not move forward
-    return True  # Move forward if all sessions meet the criteria
+# def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_moveback_criteria):
+#     """
+#     Calculate low trial count and low accuracy count for given sessions.
+#
+#     Args:
+#         df_last7 (pd.DataFrame): DataFrame containing data for the last seven sessions.
+#         sessions (list): List of session identifiers to evaluate.
+#         trial_criteria (int): Minimum required trials per session.
+#         accuracy_moveback_criteria (float): Minimum required accuracy per session.
+#
+#     Returns:
+#         tuple: (low_trial_count, low_accuracy_count)
+#             - low_trial_count (int): Number of sessions below the trial criteria.
+#             - low_accuracy_count (int): Number of sessions below the accuracy criteria.
+#     """
+#     low_trial_count = 0
+#     low_accuracy_count = 0
+#     for session in sessions:
+#         session_data = df_last7[df_last7['session'] == session]
+#         # Calculate trial count and accuracy
+#         trial_count = session_data['trial'].max()
+#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
+#             0]
+#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+#         # Check criteria
+#         if trial_count < trial_criteria:
+#             low_trial_count += 1
+#         if accuracy < accuracy_moveback_criteria:
+#             low_accuracy_count += 1
+#     return low_trial_count, low_accuracy_count
+#
+#
+# def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_criteria, accuracy_forward_criteria):
+#     """
+#     Calculate high trial count and high accuracy count for given sessions.
+#
+#     Args:
+#         df_last2 (pd.DataFrame): DataFrame containing data for the last two sessions.
+#         sessions (list): List of session identifiers to evaluate.
+#         trial_count (int): Trial count for the sessions.
+#         trial_criteria (int): Minimum required trials per session.
+#         accuracy_forward_criteria (float): Minimum required accuracy per session.
+#
+#     Returns:
+#         bool: True if the subject meets the move forward criteria, False otherwise.
+#     """
+#     for session in sessions:
+#         session_data = df_last2[df_last2['session'] == session]
+#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+#         # Check criteria
+#         if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
+#             return False  # If either condition is not met in any session, do not move forward
+#     return True  # Move forward if all sessions meet the criteria

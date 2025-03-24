@@ -535,7 +535,7 @@ class Probability_WL_Training_Acc(Task):
         print("Current_ror", self.current_ror)
         print("Previous_ror", self.previous_ror)
 
-        # Stimulus generation logic: every 20 trials the stimulus CONDITIONS will be regenerated
+        # Stimulus generation logic: every 40 trials the stimulus CONDITIONS will be regenerated
         if self.current_ror != self.previous_ror or not self.conditions or self.condition_trial_counter % self.block_wlt == 0:
             self.last_condition_trial = self.conditions[
                 self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else 0
