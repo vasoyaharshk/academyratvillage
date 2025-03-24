@@ -86,8 +86,6 @@ class Probability_Extra_Training_Acc(Task):
 
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
-        self.last_forward_stage = 0
-        self.last_backward_stage = 0
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320 # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5 # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
@@ -103,13 +101,17 @@ class Probability_Extra_Training_Acc(Task):
         self.total_trials = 0  # Total number of trials in that ROR irrespective of conditions
         self.block_correct_count = 0  # Tracks the number of corrects in the block
         self.block_valid_count = 0  ##Tracks the number of valid trials in the block
-        self.moved_back_counter = 0 # number of times they have been moved back
+
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
 
         self.stage_forward_change = 0 # they've met criterion to move forward to next stage
         self.stage_backward_change = 0 # they've met poor performance criterion to move back a stage
+        self.last_forward_stage = 0     #This is important for the moved_back_counter. Stores the last valaue for the forward stage change
+        self.last_backward_stage = 0       ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
+        self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It needs to
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -160,17 +162,13 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
-            self.last_forward_stage = self.stage  # Save current stage BEFORE incrementing
+            self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
-
-
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
-            print("Task: ", self.task)
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-
             if self.stage == 6:
                 self.task_number = 2
                 self.tired = True
@@ -179,21 +177,22 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
-            self.stage = max(self.stage - 1, 1)  # Ensure stage doesn't go below 1
-            self.last_backward_stage = self.stage  # Save current stage AFTER incrementing
-
-            #Move back counter edit here:
-            if self.stage == self.last_forward_stage:
-                self.moved_back_counter+=1
+            new_stage = max(self.stage - 1, 1)
+            if new_stage == self.last_forward_stage:
+                if self.last_backward_stage == new_stage:
+                    self.moved_back_counter += 1
+                else:
+                    self.moved_back_counter = 1
+                    self.last_backward_stage = new_stage
             else:
-                self.moved_back_counter = 0
-
+                self.moved_back_counter = 1
+                self.last_backward_stage = new_stage
+            self.stage = new_stage
             message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except:
-                print('Telegram message not sent')
-                pass
+                print("Telegram message not sent")
 
 
         ### Randomizing the stimulus positions for both the images:
