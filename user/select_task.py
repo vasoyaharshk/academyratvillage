@@ -499,121 +499,121 @@ def select_task(df, subject):
     #all of these are written in subjects.csv:
     return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage
 
-# def str_append(my_str: str, value: str) -> str:
-#     """Simulate appending a value to a string representation of a list."""
-#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
-#     if my_str == "[]" or not my_str:  # If empty list, add value directly
-#         return f"[{value}]"
-#     return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
-#
-#
-# def str_pop(my_str: str) -> tuple[str, str]:
-#     """Simulate popping the first value from a string representation of a list."""
-#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
-#     if my_str == "[]" or not my_str:  # Handle empty list
-#         raise ValueError("Cannot pop from an empty list")
-#
-#     # Remove the brackets and split by commas
-#     parts = my_str[1:-1].split(", ")
-#     popped_value = parts.pop(0)  # Remove the first element
-#     new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
-#     return new_str, popped_value
-#
-# # Convert ror and completed_ror back to lists
-# # Convert ror and completed_ror back to lists
-# def str_to_list(my_str: str) -> list:
-#     """Convert a string representation of a list back to a Python list."""
-#     my_str = my_str.strip()  # Ensure no leading/trailing spaces
-#     if my_str == "[]" or not my_str:
-#         return []  # Return an empty list if the string is empty or '[]'
-#     return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+def str_append(my_str: str, value: str) -> str:
+    """Simulate appending a value to a string representation of a list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:  # If empty list, add value directly
+        return f"[{value}]"
+    return my_str[:-1] + f", {value}]"  # Insert value before the closing bracket
 
 
-# def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
-#     """
-#     Calculate low trial count and low accuracy count for given sessions.
-#
-#     Args:
-#         df_last3 (pd.DataFrame): DataFrame containing data for the last three sessions.
-#         sessions (list): List of session identifiers to evaluate.
-#         trial_criteria (int): Minimum required trials per session.
-#         accuracy_moveback_criteria (float): Minimum required accuracy per session.
-#
-#     Returns:
-#         tuple: (low_trial_count, low_accuracy_count)
-#             - low_trial_count (int): Number of sessions below the trial criteria.
-#             - low_accuracy_count (int): Number of sessions below the accuracy criteria.
-#     """
-#     low_trial_count = 0
-#     low_accuracy_count = 0
-#     for session in sessions:
-#         session_data = df_last3[df_last3['session'] == session]
-#         # Calculate trial count and accuracy
-#         trial_count = session_data['trial'].max()
-#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
-#             0]
-#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
-#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
-#         # Check criteria
-#         if trial_count < trial_criteria:
-#             low_trial_count += 1
-#         if accuracy < accuracy_moveback_criteria:
-#             low_accuracy_count += 1
-#     return low_trial_count, low_accuracy_count
+def str_pop(my_str: str) -> tuple[str, str]:
+    """Simulate popping the first value from a string representation of a list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:  # Handle empty list
+        raise ValueError("Cannot pop from an empty list")
 
-# def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_moveback_criteria):
-#     """
-#     Calculate low trial count and low accuracy count for given sessions.
-#
-#     Args:
-#         df_last7 (pd.DataFrame): DataFrame containing data for the last seven sessions.
-#         sessions (list): List of session identifiers to evaluate.
-#         trial_criteria (int): Minimum required trials per session.
-#         accuracy_moveback_criteria (float): Minimum required accuracy per session.
-#
-#     Returns:
-#         tuple: (low_trial_count, low_accuracy_count)
-#             - low_trial_count (int): Number of sessions below the trial criteria.
-#             - low_accuracy_count (int): Number of sessions below the accuracy criteria.
-#     """
-#     low_trial_count = 0
-#     low_accuracy_count = 0
-#     for session in sessions:
-#         session_data = df_last7[df_last7['session'] == session]
-#         # Calculate trial count and accuracy
-#         trial_count = session_data['trial'].max()
-#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
-#             0]
-#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
-#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
-#         # Check criteria
-#         if trial_count < trial_criteria:
-#             low_trial_count += 1
-#         if accuracy < accuracy_moveback_criteria:
-#             low_accuracy_count += 1
-#     return low_trial_count, low_accuracy_count
-#
-#
-# def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_criteria, accuracy_forward_criteria):
-#     """
-#     Calculate high trial count and high accuracy count for given sessions.
-#
-#     Args:
-#         df_last2 (pd.DataFrame): DataFrame containing data for the last two sessions.
-#         sessions (list): List of session identifiers to evaluate.
-#         trial_count (int): Trial count for the sessions.
-#         trial_criteria (int): Minimum required trials per session.
-#         accuracy_forward_criteria (float): Minimum required accuracy per session.
-#
-#     Returns:
-#         bool: True if the subject meets the move forward criteria, False otherwise.
-#     """
-#     for session in sessions:
-#         session_data = df_last2[df_last2['session'] == session]
-#         correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-#         valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
-#         accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
-#         # Check criteria
-#         if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
-#             return False  # If either condition is not met in any session, do not move forward
-#     return True  # Move forward if all sessions meet the criteria
+    # Remove the brackets and split by commas
+    parts = my_str[1:-1].split(", ")
+    popped_value = parts.pop(0)  # Remove the first element
+    new_str = f"[{', '.join(parts)}]"  # Reconstruct the string
+    return new_str, popped_value
+
+# Convert ror and completed_ror back to lists
+# Convert ror and completed_ror back to lists
+def str_to_list(my_str: str) -> list:
+    """Convert a string representation of a list back to a Python list."""
+    my_str = my_str.strip()  # Ensure no leading/trailing spaces
+    if my_str == "[]" or not my_str:
+        return []  # Return an empty list if the string is empty or '[]'
+    return [float(x) if '.' in x else int(x) for x in my_str[1:-1].split(", ")]
+
+
+def calculate_move_back_criteria(df_last3, sessions, trial_criteria, accuracy_moveback_criteria):
+    """
+    Calculate low trial count and low accuracy count for given sessions.
+
+    Args:
+        df_last3 (pd.DataFrame): DataFrame containing data for the last three sessions.
+        sessions (list): List of session identifiers to evaluate.
+        trial_criteria (int): Minimum required trials per session.
+        accuracy_moveback_criteria (float): Minimum required accuracy per session.
+
+    Returns:
+        tuple: (low_trial_count, low_accuracy_count)
+            - low_trial_count (int): Number of sessions below the trial criteria.
+            - low_accuracy_count (int): Number of sessions below the accuracy criteria.
+    """
+    low_trial_count = 0
+    low_accuracy_count = 0
+    for session in sessions:
+        session_data = df_last3[df_last3['session'] == session]
+        # Calculate trial count and accuracy
+        trial_count = session_data['trial'].max()
+        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
+            0]
+        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+        # Check criteria
+        if trial_count < trial_criteria:
+            low_trial_count += 1
+        if accuracy < accuracy_moveback_criteria:
+            low_accuracy_count += 1
+    return low_trial_count, low_accuracy_count
+
+def calculate_move_back_criteria(df_last7, sessions, trial_criteria, accuracy_moveback_criteria):
+    """
+    Calculate low trial count and low accuracy count for given sessions.
+
+    Args:
+        df_last7 (pd.DataFrame): DataFrame containing data for the last seven sessions.
+        sessions (list): List of session identifiers to evaluate.
+        trial_criteria (int): Minimum required trials per session.
+        accuracy_moveback_criteria (float): Minimum required accuracy per session.
+
+    Returns:
+        tuple: (low_trial_count, low_accuracy_count)
+            - low_trial_count (int): Number of sessions below the trial criteria.
+            - low_accuracy_count (int): Number of sessions below the accuracy criteria.
+    """
+    low_trial_count = 0
+    low_accuracy_count = 0
+    for session in sessions:
+        session_data = df_last7[df_last7['session'] == session]
+        # Calculate trial count and accuracy
+        trial_count = session_data['trial'].max()
+        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[
+            0]
+        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+        # Check criteria
+        if trial_count < trial_criteria:
+            low_trial_count += 1
+        if accuracy < accuracy_moveback_criteria:
+            low_accuracy_count += 1
+    return low_trial_count, low_accuracy_count
+
+
+def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_criteria, accuracy_forward_criteria):
+    """
+    Calculate high trial count and high accuracy count for given sessions.
+
+    Args:
+        df_last2 (pd.DataFrame): DataFrame containing data for the last two sessions.
+        sessions (list): List of session identifiers to evaluate.
+        trial_count (int): Trial count for the sessions.
+        trial_criteria (int): Minimum required trials per session.
+        accuracy_forward_criteria (float): Minimum required accuracy per session.
+
+    Returns:
+        bool: True if the subject meets the move forward criteria, False otherwise.
+    """
+    for session in sessions:
+        session_data = df_last2[df_last2['session'] == session]
+        correct_trials = session_data[session_data['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+        valid_trials = session_data[session_data['trial_result'] != 'miss'].shape[0]
+        accuracy = correct_trials / valid_trials if valid_trials > 0 else 0
+        # Check criteria
+        if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
+            return False  # If either condition is not met in any session, do not move forward
+    return True  # Move forward if all sessions meet the criteria
