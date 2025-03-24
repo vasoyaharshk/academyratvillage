@@ -4,6 +4,7 @@ from academy.utils import utils
 from user import settings
 import random
 import numpy as np
+from academy import telegram_bot
 
 class Probability_Extra_Training_Acc(Task):
     def __init__(self):
@@ -231,16 +232,34 @@ class Probability_Extra_Training_Acc(Task):
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
-            self.stage = max(self.stage + 1, 6)
+            self.stage_forward_change = 0
+            self.stage += 1
+
+            message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
+            print("Task: ", self.task)
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except Exception as e:
+                print(f"Telegram message not sent. Error: {e}")
+
             if self.stage == 6:
                 self.task_number = 2
                 self.tired = True
 
+
         if self.stage_backward_change == 1:
             self.total_trials = 0
+            self.stage_backward_change = 0
             self.stage = max(self.stage - 1, 1)  # Ensure stage doesn't go below 1
             self.moved_back_counter+=1
-            self.stage_backward_change = 0
+
+            message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except:
+                print('Telegram message not sent')
+                pass
+
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
@@ -267,6 +286,7 @@ class Probability_Extra_Training_Acc(Task):
 
         if self.stage == 1:  # We have only one stimuli in stage 1
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
+            self.image_display = 0
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = None  # No incorrect area in stage 1
@@ -276,6 +296,7 @@ class Probability_Extra_Training_Acc(Task):
                 self.x_incorrecth = None  # No incorrect area in stage 1
                 #print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
         else:  # We have two stimuli after stage 1 with correct and incorrect areas
+            self.image_display = 3
             if self.stim_trial == 51:
                 self.x_correcth = self.x_correcth_pos[0]
                 self.x_incorrecth = self.x_correcth_pos[1]
@@ -425,6 +446,7 @@ class Probability_Extra_Training_Acc(Task):
     def after_trial(self):
         if self.task_number == 1:
             self.total_trials += 1  # remove this
+            self.block_trial_counter += 1  # For counting the blocks
 
             if self.bias_breaking == 0:
                 self.stim_trial_counter += 1
@@ -502,6 +524,14 @@ class Probability_Extra_Training_Acc(Task):
             if self.total_trials >= self.trial_end_criteria:
                 self.stage_backward_change = 1
 
+            #Assign in pass what to do when the rat is moved back more than 5 times.
+            if self.moved_back_counter > self.max_move_backs:
+                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
             # Side Bias Breaking formula:
 
@@ -537,7 +567,7 @@ class Probability_Extra_Training_Acc(Task):
             # Append the response to the array:
             #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
             self.response_x_array.append(self.response_x_bias)
-            print(f"Responses so far: {self.response_x_array}")
+            #print(f"Responses so far: {self.response_x_array}")
 
             #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
