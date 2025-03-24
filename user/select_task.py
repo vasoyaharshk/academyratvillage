@@ -19,129 +19,91 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
-    # def get_val_from_df_or_default(column_name, default_val):
-    #     if column_name in df.columns:
-    #         val = last_row[column_name]
-    #         if pd.isna(val):
-    #             return default_val
-    #         return val
-    #     return default_val
-    #
-    #
-    # stage = get_val_from_df_or_default('stage', 0)
-    # substage = get_val_from_df_or_default('substage', 0)
-    # substage_bias = get_val_from_df_or_default('substage_bias', 0)
-    # choice = get_val_from_df_or_default('choice', 0)
-
-    # stim_dur_ds = get_val_from_df_or_default('stim_dur_ds', 0)
-    # stim_dur_dm = get_val_from_df_or_default('stim_dur_dm', 0)
-    # stim_dur_dl = get_val_from_df_or_default('stim_dur_dl', 0)
-    # block = get_val_from_df_or_default('block', 0)
-    # conditions = get_val_from_df_or_default('conditions', [])
-    # completed_conditions = get_val_from_df_or_default('completed_conditions', [])
-    # current_condition = get_val_from_df_or_default('current_condition', 0)
-    # repetition = get_val_from_df_or_default('repetition', 0)
-    # current_repetition = get_val_from_df_or_default('current_repetition', 0)
-    # trial_counter = get_val_from_df_or_default('trial_counter', 0)
-    # stim_trial = get_val_from_df_or_default('stim_trial', 0)
-    # stim_trials = get_val_from_df_or_default('stim_trials', [])
-    # stim_trial_counter = get_val_from_df_or_default('stim_trial_counter', 0)
-    #
-    # ror = get_val_from_df_or_default('ror', [])
-    # completed_ror = get_val_from_df_or_default('completed_ror', [])
-    # current_ror = get_val_from_df_or_default('current_ror', 0.0)
-    # trial_counter_ror = get_val_from_df_or_default('trial_counter_ror', 0)
-    #
-    # block_size = get_val_from_df_or_default('block_size', 0)
-    # block_trial_counter = get_val_from_df_or_default('block_trial_counter', 0)
-    # block_accuracy = get_val_from_df_or_default('block_accuracy', 0.0)
-    # block_number = get_val_from_df_or_default('block_number', 0)
-    # ror_change = get_val_from_df_or_default('ror_change', 0)
-    # block_change = get_val_from_df_or_default('block_change', 0)
-    # last_stim_trial = get_val_from_df_or_default('last_stim_trial', 0)
-    # last_condition_trial = get_val_from_df_or_default('last_condition_trial', 0)
-    # total_trials = get_val_from_df_or_default('total_trials', 0)
-    # block_correct_count = get_val_from_df_or_default('block_correct_count', 0)
-    # block_valid_count = get_val_from_df_or_default('block_valid_count', 0)
-    # condition_trial_counter = get_val_from_df_or_default('condition_trial_counter', 0)
-    # low_trial_count = get_val_from_df_or_default('low_trial_count', 0)
-    # low_accuracy_count = get_val_from_df_or_default('low_accuracy_count', 0)
-    # stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
-    # stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
-
-    variable_defaults = {
-        'stage': 0,
-        'substage': 0,
-        'substage_bias': 0,
-        'choice': 0,
-        'stim_dur_ds': 0,
-        'stim_dur_dm': 0,
-        'stim_dur_dl': 0,
-        'block': 0,
-        'conditions': [],
-        'completed_conditions': [],
-        'current_condition': 0,
-        'repetition': 0,
-        'current_repetition': 0,
-        'trial_counter': 0,
-        'stim_trial': 0,
-        'stim_trials': [],
-        'stim_trial_counter': 0,
-        'ror': [],
-        'completed_ror': [],
-        'current_ror': 0.0,
-        'trial_counter_ror': 0,
-        'block_size': 0,
-        'block_trial_counter': 0,
-        'block_accuracy': 0.0,
-        'block_number': 0,
-        'ror_change': 0,
-        'block_change': 0,
-        'last_stim_trial': 0,
-        'last_condition_trial': 0,
-        'total_trials': 0,
-        'block_correct_count': 0,
-        'block_valid_count': 0,
-        'condition_trial_counter': 0,
-        'low_trial_count': 0,
-        'low_accuracy_count': 0,
-        'stage_forward_change': 0,
-        'stage_backward_change': 0,
-        'task_number': 0,
-    }
-
-    def get_val(column_name, default_val):
+    def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
             val = last_row[column_name]
-            return val if pd.notna(val) else default_val
+            if pd.isna(val):
+                return default_val
+            return val
         return default_val
 
-    # Create a SimpleNamespace for all session variables
-    vars_ns = SimpleNamespace()
 
-    # Assign default or recovered values
-    for var_name, default in variable_defaults.items():
-        setattr(vars_ns, var_name, get_val(var_name, default))
+    task_number = get_val_from_df_or_default('task_number', 0)
+    stage = get_val_from_df_or_default('stage', 0)
+    substage = get_val_from_df_or_default('substage', 0)
+    substage_bias = get_val_from_df_or_default('substage_bias', 0)
+    choice = get_val_from_df_or_default('choice', 0)
 
-    # Add all other last_row variables (those not in variable_defaults)
-    for key, val in last_row.items():
-        if key not in variable_defaults:
-            setattr(vars_ns, key, val)
+    stim_dur_ds = get_val_from_df_or_default('stim_dur_ds', 0)
+    stim_dur_dm = get_val_from_df_or_default('stim_dur_dm', 0)
+    stim_dur_dl = get_val_from_df_or_default('stim_dur_dl', 0)
+    block = get_val_from_df_or_default('block', 0)
+    conditions = get_val_from_df_or_default('conditions', [])
+    completed_conditions = get_val_from_df_or_default('completed_conditions', [])
+    current_condition = get_val_from_df_or_default('current_condition', 0)
+    repetition = get_val_from_df_or_default('repetition', 0)
+    current_repetition = get_val_from_df_or_default('current_repetition', 0)
+    trial_counter = get_val_from_df_or_default('trial_counter', 0)
+    stim_trial = get_val_from_df_or_default('stim_trial', 0)
+    stim_trials = get_val_from_df_or_default('stim_trials', [])
+    stim_trial_counter = get_val_from_df_or_default('stim_trial_counter', 0)
 
-    print("stage_backward_change: ", vars_ns.stage_backward_change)      #Check if the variable is in df and defaults
-    print("stim_dur_ds: ", vars_ns.stim_dur_ds)      #Check if the variable is not in df but in defaults
-    print("max_move_backs: ", vars_ns.max_move_backs)  #Check if the variable is in df but not in defaults
+    ror = get_val_from_df_or_default('ror', [])
+    completed_ror = get_val_from_df_or_default('completed_ror', [])
+    current_ror = get_val_from_df_or_default('current_ror', 0.0)
+    trial_counter_ror = get_val_from_df_or_default('trial_counter_ror', 0)
 
-    #Takes the last row values of each column and assigns them to variables of the same name:
-    #locals().update(last_row.to_dict())
+    block_size = get_val_from_df_or_default('block_size', 0)
+    block_trial_counter = get_val_from_df_or_default('block_trial_counter', 0)
+    block_accuracy = get_val_from_df_or_default('block_accuracy', 0.0)
+    block_number = get_val_from_df_or_default('block_number', 0)
+    ror_change = get_val_from_df_or_default('ror_change', 0)
+    block_change = get_val_from_df_or_default('block_change', 0)
+    last_stim_trial = get_val_from_df_or_default('last_stim_trial', 0)
+    last_condition_trial = get_val_from_df_or_default('last_condition_trial', 0)
+    total_trials = get_val_from_df_or_default('total_trials', 0)
+    block_correct_count = get_val_from_df_or_default('block_correct_count', 0)
+    block_valid_count = get_val_from_df_or_default('block_valid_count', 0)
+    condition_trial_counter = get_val_from_df_or_default('condition_trial_counter', 0)
+    stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
+    stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
+    moved_back_counter = get_val_from_df_or_default('moved_back_counter', 0)
+    max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
+
+    #Danger, only use this when the variables are in df but not in defaulted above
+    # for key, val in last_row.items():
+    #     if key not in variable_defaults:
+    #         if isinstance(val, float) and pd.isna(val):
+    #             val = None
+    #         exec(f"{key} = {repr(val)}")
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
         pass  #Working Memmory section removed
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
+        if 'Probability_Extra_Training_Acc' in task:
+            if moved_back_counter > max_move_backs:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if task_number == 2:
+                message = 'Advance from Etra training to Core training'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+                task = 'Probability_Training_BB_Size'
+                stage = 1
+
         if 'Probability_Training_BB_Size' in task:
-            if moved_back_counter > 5:
+            if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
