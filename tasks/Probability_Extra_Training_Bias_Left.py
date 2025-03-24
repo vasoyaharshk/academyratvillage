@@ -4,6 +4,7 @@ from academy.utils import utils
 from user import settings
 import random
 import numpy as np
+from academy import telegram_bot
 
 class Probability_Extra_Training_Bias_Left(Task):
     def __init__(self):
@@ -439,6 +440,7 @@ class Probability_Extra_Training_Bias_Left(Task):
         self.register_value('accuracy', self.accuracy)
         self.register_value('bias_breaking', self.bias_breaking)
         self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)

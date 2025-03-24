@@ -86,7 +86,8 @@ class Probability_Extra_Training_Acc(Task):
 
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
-
+        self.last_forward_stage = 0
+        self.last_backward_stage = 0
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320 # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5 # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
@@ -159,7 +160,9 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.last_forward_stage = self.stage  # Save current stage BEFORE incrementing
             self.stage += 1
+
 
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
             print("Task: ", self.task)
@@ -177,7 +180,13 @@ class Probability_Extra_Training_Acc(Task):
             self.total_trials = 0
             self.stage_backward_change = 0
             self.stage = max(self.stage - 1, 1)  # Ensure stage doesn't go below 1
-            self.moved_back_counter+=1
+            self.last_backward_stage = self.stage  # Save current stage AFTER incrementing
+
+            #Move back counter edit here:
+            if self.stage == self.last_forward_stage:
+                self.moved_back_counter+=1
+            else:
+                self.moved_back_counter = 0
 
             message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
             try:
@@ -603,3 +612,6 @@ class Probability_Extra_Training_Acc(Task):
         #Trial Information:
         self.register_value('trial_length', self.trial_length)
         self.register_value('trial_result', self.trial_result)
+
+        self.register_value('last_forward_stage', self.last_forward_stage)
+        self.register_value('last_backward_stage', self.last_backward_stage)

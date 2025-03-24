@@ -668,6 +668,8 @@ def go_to_state(num):
         utils.subject.stage_forward_change = int(utils.subject.stage_forward_change)  #Cast to int
         utils.subject.stage_backward_change = int(utils.subject.stage_backward_change)  #Cast to int
         utils.subject.task_number = int(utils.subject.task_number)  #Cast to int
+        utils.subject.last_forward_stage = int(utils.subject.last_forward_stage)  #Cast to int
+        utils.subject.last_backward_stage = int(utils.subject.last_backward_stage)  #Cast to int
 
 
 
@@ -710,6 +712,8 @@ def go_to_state(num):
         utils.task.stage_forward_change = utils.subject.stage_forward_change
         utils.task.stage_backward_change = utils.subject.stage_backward_change
         utils.task.task_number = utils.subject.task_number
+        utils.task.last_forward_stage = utils.subject.last_forward_stage
+        utils.task.last_backward_stage = utils.subject.last_backward_stage
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
