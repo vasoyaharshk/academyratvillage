@@ -214,7 +214,6 @@ class Probability_Extra_Training_Acc(Task):
             self.bias_breaking = 0
             self.accuracy = 0
             # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
-            self.block_wlt = self.block_size  # This is for presenting equal number of trial types every x trials.
 
         print('Bias Breaking: ', self.bias_breaking)
         # print('stim_trials: ', self.stim_trials)
@@ -244,8 +243,8 @@ class Probability_Extra_Training_Acc(Task):
         # Choose x positions:
         self.stim = [51, 52]  # These are the functions being called. 51 is for the correct answer is on the left and 52 is when the correct answer is on the right
 
-        if self.stim_trial_counter % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-            # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
+        if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+            # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
             self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
             self.stim_trials = self.generate_random_trials(self.last_stim_trial)
             # print(f"Stimulus trials after first attempt: {self.stim_trials}")
