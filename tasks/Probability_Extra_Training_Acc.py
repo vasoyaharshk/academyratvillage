@@ -207,8 +207,11 @@ class Probability_Extra_Training_Acc(Task):
         print("Block Trial Counter: ", self.block_trial_counter)
         print("Block Accuracy: ", self.block_accuracy)
         print("Block Number: ", self.block_number)
+        print("Task Number: ", self.task_number)
+        print("Stage Number: ", self.stage)
         print("Block Change: ", self.block_change)
-        print("Stage Change: ", self.stage_forward_change, self.stage_backward_change)
+        print("Stage Change Forward: ", self.stage_forward_change)
+        print("Stage Change Backward: ", self.stage_backward_change)
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -287,7 +290,7 @@ class Probability_Extra_Training_Acc(Task):
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 2:
+        if self.task_number == 1:
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -414,10 +417,13 @@ class Probability_Extra_Training_Acc(Task):
                 output_actions=[])
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            self.trial_length = 0.1
+            self.trial_result = None
+            self.last_stim_trial = 0
 
 
     def after_trial(self):
-        if self.task_number == 2:
+        if self.task_number == 1:
             self.total_trials += 1  # remove this
 
             if self.bias_breaking == 0:

@@ -806,7 +806,7 @@ def function51():  # When the blue jar is on left
     global last_function_called, image_path
     last_function_called = 51  # Track that function31 was called
 
-    substage = utils.task.substage
+    stage = utils.task.stage
     left_images = []
     try:
         # Get all the images based on the stages
@@ -862,7 +862,7 @@ def function52():  # When the blue jar is on right
     global last_function_called, image_path
     last_function_called = 52  # Track that function31 was called
 
-    substage = utils.task.substage
+    stage = utils.task.stage
     right_images = []
     try:
         # Get all the images based on the stages
