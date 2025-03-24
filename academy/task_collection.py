@@ -71,6 +71,8 @@ class Task(object):
         self.stage_backward_change = 0
         self.stage_forward_change = 0
         self.task_number = 0
+        self.last_forward_stage = 0
+        self.last_backward_stage = 0
 
 
         self.checksum = None
