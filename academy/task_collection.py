@@ -70,6 +70,7 @@ class Task(object):
         self.condition_trial_counter = 0   ##Tracks the number of trials in the randomised condition block
         self.stage_backward_change = 0
         self.stage_forward_change = 0
+        self.task_number = 0
 
 
         self.checksum = None

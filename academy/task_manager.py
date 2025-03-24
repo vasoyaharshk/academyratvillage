@@ -60,7 +60,7 @@ class TaskManager:
             self.df_all = self.df_all.apply(pd.to_numeric, args=('ignore', ))
 
 
-            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change  = select_task.select_task(self.df_all, self.subject)
+            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number  = select_task.select_task(self.df_all, self.subject)
 
             if weight:
                 utils.subjects.add_new_item({'task': task,
@@ -103,6 +103,7 @@ class TaskManager:
                                              'condition_trial_counter': condition_trial_counter,
                                              'stage_backward_change': stage_backward_change,
                                              'stage_forward_change': stage_forward_change,
+                                             'task_number': task_number,
                                              }, item=self.subject)
 
             else:
@@ -144,6 +145,7 @@ class TaskManager:
                                              'condition_trial_counter': condition_trial_counter,
                                              'stage_backward_change': stage_backward_change,
                                              'stage_forward_change': stage_forward_change,
+                                             'task_number': task_number,
                                              }, item=self.subject)
         else:
             pass

@@ -667,6 +667,7 @@ def go_to_state(num):
         utils.subject.condition_trial_counter = int(utils.subject.condition_trial_counter)  #Cast to int
         utils.subject.stage_forward_change = int(utils.subject.stage_forward_change)  #Cast to int
         utils.subject.stage_backward_change = int(utils.subject.stage_backward_change)  #Cast to int
+        utils.subject.task_number = int(utils.subject.task_number)  #Cast to int
 
 
 
@@ -708,6 +709,7 @@ def go_to_state(num):
         utils.task.condition_trial_counter = utils.subject.condition_trial_counter
         utils.task.stage_forward_change = utils.subject.stage_forward_change
         utils.task.stage_backward_change = utils.subject.stage_backward_change
+        utils.task.task_number = utils.subject.task_number
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

@@ -107,6 +107,7 @@ def select_task(df, subject):
         'low_accuracy_count': 0,
         'stage_forward_change': 0,
         'stage_backward_change': 0,
+        'task_number': 0,
     }
 
     def get_val(column_name, default_val):
@@ -528,7 +529,7 @@ def select_task(df, subject):
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number
 
 # def str_append(my_str: str, value: str) -> str:
 #     """Simulate appending a value to a string representation of a list."""
