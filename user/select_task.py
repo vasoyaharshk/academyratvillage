@@ -127,8 +127,16 @@ def select_task(df, subject):
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
         if 'Probability_Training_BB_Size' in task:
+            if moved_back_counter > 5:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA.
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
             if task_number == 3:
-                message = 'PI: Advance from stage 3 to Webers Law Pre Test'
+                message = 'PI: Advance from Core training to Webers Law Pre Test'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
                     telegram_bot.alarm_completed_criteria(task, my_subject)
