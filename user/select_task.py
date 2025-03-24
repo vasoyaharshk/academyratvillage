@@ -33,7 +33,6 @@ def select_task(df, subject):
     substage = get_val_from_df_or_default('substage', 0)
     substage_bias = get_val_from_df_or_default('substage_bias', 0)
     choice = get_val_from_df_or_default('choice', 0)
-
     stim_dur_ds = get_val_from_df_or_default('stim_dur_ds', 0)
     stim_dur_dm = get_val_from_df_or_default('stim_dur_dm', 0)
     stim_dur_dl = get_val_from_df_or_default('stim_dur_dl', 0)
@@ -47,12 +46,10 @@ def select_task(df, subject):
     stim_trial = get_val_from_df_or_default('stim_trial', 0)
     stim_trials = get_val_from_df_or_default('stim_trials', [])
     stim_trial_counter = get_val_from_df_or_default('stim_trial_counter', 0)
-
     ror = get_val_from_df_or_default('ror', [])
     completed_ror = get_val_from_df_or_default('completed_ror', [])
     current_ror = get_val_from_df_or_default('current_ror', 0.0)
     trial_counter_ror = get_val_from_df_or_default('trial_counter_ror', 0)
-
     block_size = get_val_from_df_or_default('block_size', 0)
     block_trial_counter = get_val_from_df_or_default('block_trial_counter', 0)
     block_accuracy = get_val_from_df_or_default('block_accuracy', 0.0)
@@ -70,7 +67,7 @@ def select_task(df, subject):
     moved_back_counter = get_val_from_df_or_default('moved_back_counter', 0)
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
 
-    #Danger, only use this when the variables are in df but not in defaulted above
+    #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():
     #     if key not in variable_defaults:
     #         if isinstance(val, float) and pd.isna(val):
@@ -79,7 +76,7 @@ def select_task(df, subject):
 
     # Check if task does not contain the word 'Probability'
     if 'Probability' not in task:  #Excludes all the task without the word Probability
-        pass  #Working Memmory section removed
+        pass  #Working Memory section removed
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
         if 'Probability_Extra_Training_Acc' in task:
@@ -92,6 +89,11 @@ def select_task(df, subject):
                     pass
 
             if task_number == 2:
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
+                block_number = 0
+
                 message = 'Advance from Etra training to Core training'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -112,6 +114,8 @@ def select_task(df, subject):
                     pass
 
             if task_number == 3:
+                block_number = 0
+
                 message = 'PI: Advance from Core training to Webers Law Pre Test'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -119,6 +123,7 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
+
                 stage = 4
                 task = 'Probability_WebersLaw_Pre'
                 block = 12  # This is the number of trials one conditions will remain for
