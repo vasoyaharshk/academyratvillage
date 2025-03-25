@@ -57,7 +57,6 @@ class Probability_Extra_Training_Acc(Task):
         # counters for trials:
         self.valid_counter = 0
         self.tired_counter = 0
-        self.touch_outside = 0
         self.reward_drunk = 0
         #self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
         self.accwindow = [0]
@@ -80,7 +79,7 @@ class Probability_Extra_Training_Acc(Task):
         self.sameside = None             # To track which side is being triggered
         self.side_bias_trigger = 5      #After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch_outside condition
+        self.status = None              #Stores the Touch outside condition
         self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
 
@@ -501,7 +500,6 @@ class Probability_Extra_Training_Acc(Task):
                     return  # Handle this case if needed
 
             # Append the response to the array:
-            #if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
             self.response_x_array.append(self.response_x_bias)
             #print(f"Responses so far: {self.response_x_array}")
 
@@ -562,7 +560,6 @@ class Probability_Extra_Training_Acc(Task):
         # Counters
         self.register_value('valid_counter', self.valid_counter)
         self.register_value('tired_counter', self.tired_counter)
-        self.register_value('touch_outside', self.touch_outside)
         self.register_value('reward_drunk', self.reward_drunk)
         # self.register_value('running_window', self.running_window)  # Uncomment if used
         self.register_value('accwindow', self.accwindow)
