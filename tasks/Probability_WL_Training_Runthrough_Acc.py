@@ -728,7 +728,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             print(f"Checking accuracy for ROR: {self.current_ror}, Allowed Conditions: {self.allowed_conditions}")
             
             if self.trial_condition in self.allowed_conditions:
-                self.block_trial_counter += 1      #For counting the blocks
+                #self.block_trial_counter += 1      #For counting the blocks
                 self.trial_counter_ror += 1  #for the total trials in that ROR
 
             ##### COUNT MISSES:
@@ -742,6 +742,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.valid_counter += 1
                 if self.trial_condition in self.allowed_conditions:
                     self.block_valid_count += 1
+                    self.block_trial_counter += 1
                     self.success = 0
                     print('Acc Valid_count: ', self.block_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
@@ -757,6 +758,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 if self.trial_condition in self.allowed_conditions:
                     self.block_correct_count += 1
                     self.block_valid_count += 1
+                    self.block_trial_counter += 1
                     self.success = 1
                     print('Acc Correct_count: ', self.block_correct_count)
                     print('Acc Valid_count: ', self.block_valid_count)
