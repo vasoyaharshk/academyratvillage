@@ -838,8 +838,8 @@ def function51():  # When the blue jar is on left
         if not left_images:
             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
 
-        # Choose a random image from the left_images list
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+        # Choose a random image from the left_images list.
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))     #This needs to be balanced
 
         image_jar_left.image = random_image_path_left
         image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
