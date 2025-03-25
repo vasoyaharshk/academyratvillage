@@ -58,8 +58,6 @@ class Probability_Extra_Training_Acc(Task):
         self.valid_counter = 0
         self.tired_counter = 0
         self.reward_drunk = 0
-        #self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
-        self.accwindow = [0]
         self.correct_count = 0
         self.accuracy = 0
 
@@ -383,7 +381,6 @@ class Probability_Extra_Training_Acc(Task):
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-                self.accwindow = self.accwindow[1:] + [0]
                 self.trial_result = 'miss'
 
             ##### COUNT PUNISH
@@ -394,14 +391,12 @@ class Probability_Extra_Training_Acc(Task):
                 self.success = 0
                 self.block_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
-                self.accwindow = self.accwindow[1:] + [0]
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.accwindow = self.accwindow[1:] + [1]
                 self.correct_count += 1
                 #print('Correct_count: ', self.correct_count)
                 self.block_correct_count += 1
@@ -438,7 +433,6 @@ class Probability_Extra_Training_Acc(Task):
                 self.tired_counter = 0
 
             # Accuracy for running trials:
-            #self.accuracy = sum(self.accwindow) / len(self.accwindow)
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Check accuracy for every block of 40 trials
@@ -562,7 +556,6 @@ class Probability_Extra_Training_Acc(Task):
         self.register_value('tired_counter', self.tired_counter)
         self.register_value('reward_drunk', self.reward_drunk)
         # self.register_value('running_window', self.running_window)  # Uncomment if used
-        self.register_value('accwindow', self.accwindow)
         self.register_value('correct_count', self.correct_count)
         self.register_value('accuracy', self.accuracy)
 
