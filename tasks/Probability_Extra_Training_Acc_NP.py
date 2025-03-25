@@ -6,7 +6,7 @@ import random
 import numpy as np
 from academy import telegram_bot
 
-class Probability_Extra_Training_Acc(Task):
+class Probability_Extra_Training_Acc_NP(Task):
     def __init__(self):
         super().__init__()
 
@@ -43,10 +43,10 @@ class Probability_Extra_Training_Acc(Task):
         self.tired = False
         self.task_number = 1
         self.stage = 1
-        self.substage = 1
+        self.substage = 0
         self.substage_bias = 0 # 1 = 90:10, 2 = 75:25, 3 = 50:50
         self.response_duration = 60
-        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
+        self.image_display = 1        #Number of seconds the image will display after correct and incorrect
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
@@ -87,12 +87,12 @@ class Probability_Extra_Training_Acc(Task):
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 320 # Move back criteria. Badly named - this is task end criteria.
+        self.trial_end_criteria = 6 # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5 # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
-        self.block_size = 40  # Every 40 blocks the criteria will be tested.
+        self.block_size = 4  # Every 40 blocks the criteria will be tested.
         self.block_trial_counter = 0  # Counter for block
         self.block_accuracy = 0.0  # Accuracy for that 40 trial block
         self.block_number = 1
@@ -110,11 +110,11 @@ class Probability_Extra_Training_Acc(Task):
         self.stage_backward_change = 0 # they've met poor performance criterion to move back a stage
         self.last_forward_stage = 0     #This is important for the moved_back_counter. Stores the last valaue for the forward stage change
         self.last_backward_stage = 0       ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
-        self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It needs to
+        self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It resets everytime a new stage is moved back from.
 
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'substage', 'duration_max','task_number']
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -132,16 +132,8 @@ class Probability_Extra_Training_Acc(Task):
         return trials
 
     def main_loop(self):
-        ### Randomizing the stimulus positions for both the images:
         print('')
-        print("Block Trial Counter: ", self.block_trial_counter)
-        print("Block Accuracy: ", self.block_accuracy)
-        print("Block Number: ", self.block_number)
-        print("Task Number: ", self.task_number)
-        print("Stage Number: ", self.stage)
-        print("Block Change: ", self.block_change)
-        print("Stage Change Forward: ", self.stage_forward_change)
-        print("Stage Change Backward: ", self.stage_backward_change)
+        ### Randomizing the stimulus positions for both the images:
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -177,8 +169,10 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
-            self.block_trial_counter = 0
-            print("XXXX",self.block_trial_counter)
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
             new_stage = max(self.stage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
@@ -252,7 +246,7 @@ class Probability_Extra_Training_Acc(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                    state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Starts task and displays stimuli instanly
 
@@ -268,7 +262,7 @@ class Probability_Extra_Training_Acc(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                     output_actions=[])
 
             self.sma.add_state(
@@ -281,7 +275,7 @@ class Probability_Extra_Training_Acc(Task):
             self.sma.add_state(
                 state_name='Fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -317,7 +311,7 @@ class Probability_Extra_Training_Acc(Task):
             self.sma.add_state(
                 state_name='Flip_screen_reward',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+                state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
             # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -354,7 +348,7 @@ class Probability_Extra_Training_Acc(Task):
             self.sma.add_state(
                 state_name='Flip_screen_no_reward',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+                state_change_conditions={Bpod.Events.Tup: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                                 (Bpod.OutputChannels.SoftCode, 40)])
             # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
@@ -362,7 +356,7 @@ class Probability_Extra_Training_Acc(Task):
             self.sma.add_state(
                 state_name='No_Touch',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                                 (Bpod.OutputChannels.SoftCode, 37)])
             # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -382,7 +376,7 @@ class Probability_Extra_Training_Acc(Task):
     def after_trial(self):
         if self.task_number == 1:
             self.total_trials += 1  # remove this
-            self.block_trial_counter += 1  # For counting the blocks
+            #self.block_trial_counter += 1  # For counting the blocks
 
             if self.bias_breaking == 0:
                 self.stim_trial_counter += 1
@@ -398,6 +392,7 @@ class Probability_Extra_Training_Acc(Task):
                 self.valid_counter += 1
                 self.block_valid_count += 1
                 self.success = 0
+                self.block_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
 
@@ -411,6 +406,7 @@ class Probability_Extra_Training_Acc(Task):
                 #print('Correct_count: ', self.correct_count)
                 self.block_correct_count += 1
                 self.block_valid_count += 1
+                self.block_trial_counter += 1
                 self.success = 1
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -469,6 +465,9 @@ class Probability_Extra_Training_Acc(Task):
                     print('Telegram message not sent')
                     pass
 
+            if self.stage > self.last_backward_stage + 1:
+                self.moved_back_counter = 0
+
             # Side Bias Breaking formula:
 
             # Calculate bias accuracy for the last five trials without using accuracy window
@@ -523,9 +522,20 @@ class Probability_Extra_Training_Acc(Task):
                     print('Bias breaking active, side:', self.sameside)
 
                 self.response_x_array = []      #Clearing the array
+
+            print("Block Trial Counter: ", self.block_trial_counter)
+            print("Block Accuracy: ", self.block_accuracy)
+            print("Block Number: ", self.block_number)
+            print("Block Size: ", self.block_size)
+            print("Task Number: ", self.task_number)
+            print("Stage Number: ", self.stage)
+            print("Block Change: ", self.block_change)
+            print("Stage Change Forward: ", self.stage_forward_change)
+            print("Stage Change Backward: ", self.stage_backward_change)
+            print("Moved Back Counter: ", self.moved_back_counter)
+
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
-
 
         ############ REGISTER VALUES ################
         # Task-related
