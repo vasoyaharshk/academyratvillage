@@ -1,0 +1,23 @@
+from psychopy import visual, core, event
+
+# Create a PsychoPy window
+window = visual.Window(size=(800, 600), units="pix", fullscr=False)
+
+# Load the video
+video = visual.MovieStim3(win=window, filename="example.mp4", loop=False)
+
+# Set video to the first frame (0 seconds)
+video.seek(0)  # Jumps to the first frame without playing
+video.draw()   # Draw the first frame
+window.flip()  # Display it
+
+# Wait for user to press 'space' to start
+event.waitKeys(keyList=['space'])
+
+# Play video normally
+while video.status != visual.FINISHED:
+    video.draw()
+    window.flip()
+
+window.close()
+core.quit()
