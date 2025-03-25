@@ -7,6 +7,7 @@ import random
 import numpy as np
 import os
 import re
+from academy import telegram_bot
 
 class Probability_WL_Training_Runthrough_Acc(Task):
     def __init__(self):
@@ -809,6 +810,15 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 self.tired = True
                 print("Stage is 4. All RORs completed. Task Ended.")
 
+
+            if self.trial_counter_ror % 216 == 0:
+                message = f"URGENT PI: {self.subject} has completed {self.trial_counter_ror} trials in ROR {self.current_ror} in {self.task}. CHECK DATA"
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
             # SIDE BIAS BREAKING FORMULA FROM HERE:
 

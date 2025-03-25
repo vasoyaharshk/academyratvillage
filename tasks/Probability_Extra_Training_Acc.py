@@ -43,7 +43,7 @@ class Probability_Extra_Training_Acc(Task):
         self.tired = False
         self.task_number = 1
         self.stage = 1
-        self.substage = 1
+        self.substage = 0
         self.substage_bias = 0 # 1 = 90:10, 2 = 75:25, 3 = 50:50
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
@@ -134,14 +134,7 @@ class Probability_Extra_Training_Acc(Task):
     def main_loop(self):
         ### Randomizing the stimulus positions for both the images:
         print('')
-        print("Block Trial Counter: ", self.block_trial_counter)
-        print("Block Accuracy: ", self.block_accuracy)
-        print("Block Number: ", self.block_number)
-        print("Task Number: ", self.task_number)
-        print("Stage Number: ", self.stage)
-        print("Block Change: ", self.block_change)
-        print("Stage Change Forward: ", self.stage_forward_change)
-        print("Stage Change Backward: ", self.stage_backward_change)
+        ### Randomizing the stimulus positions for both the images:
 
         if self.current_trial == 0:
             self.bias_breaking = 0
@@ -177,6 +170,10 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
             new_stage = max(self.stage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
@@ -380,7 +377,7 @@ class Probability_Extra_Training_Acc(Task):
     def after_trial(self):
         if self.task_number == 1:
             self.total_trials += 1  # remove this
-            self.block_trial_counter += 1  # For counting the blocks
+            # self.block_trial_counter += 1  # For counting the blocks
 
             if self.bias_breaking == 0:
                 self.stim_trial_counter += 1
@@ -396,6 +393,7 @@ class Probability_Extra_Training_Acc(Task):
                 self.valid_counter += 1
                 self.block_valid_count += 1
                 self.success = 0
+                self.block_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
                 self.accwindow = self.accwindow[1:] + [0]
 
@@ -409,6 +407,7 @@ class Probability_Extra_Training_Acc(Task):
                 #print('Correct_count: ', self.correct_count)
                 self.block_correct_count += 1
                 self.block_valid_count += 1
+                self.block_trial_counter += 1
                 self.success = 1
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -467,6 +466,9 @@ class Probability_Extra_Training_Acc(Task):
                     print('Telegram message not sent')
                     pass
 
+            if self.stage > self.last_backward_stage + 1:
+                self.moved_back_counter = 0
+
             # Side Bias Breaking formula:
 
             # Calculate bias accuracy for the last five trials without using accuracy window
@@ -521,6 +523,18 @@ class Probability_Extra_Training_Acc(Task):
                     print('Bias breaking active, side:', self.sameside)
 
                 self.response_x_array = []      #Clearing the array
+
+            print("Block Trial Counter: ", self.block_trial_counter)
+            print("Block Accuracy: ", self.block_accuracy)
+            print("Block Number: ", self.block_number)
+            print("Block Size: ", self.block_size)
+            print("Task Number: ", self.task_number)
+            print("Stage Number: ", self.stage)
+            print("Block Change: ", self.block_change)
+            print("Stage Change Forward: ", self.stage_forward_change)
+            print("Stage Change Backward: ", self.stage_backward_change)
+            print("Moved Back Counter: ", self.moved_back_counter)
+
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
