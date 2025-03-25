@@ -29,83 +29,95 @@ class Probability_Training_BB_Size_Acc(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-        #Non-used variables so that stage training works:
-        self.stim_dur_ds = 0
-        self.stim_dur_dm = 0
-        self.stim_dur_dl = 0
-        self.choices = 0
-        self.substage = 0
-        self.substage_bias = 0
+        # ==============================
+        # Tracked Variables
+        # ==============================
+        # Needed in Each Task:
+        self.stage = 0  # Current stage within the task
+        self.substage = 0  # Current substage within the stage
+        self.substage_bias = 0  # Side bias stage for substage behavior
+        self.wait_seconds = 0  # Time to wait before stimulus or response (in seconds)
+        self.task_number = 0  # Each task has a unique number. See RV script guide.
 
-        # Variables for the task:
-        self.duration_max = 3000
-        self.duration_min = 2100
-        self.duration_tired = 1800
-        self.trials_tired = 5
-        self.tired = False
-        self.task_number = 2
-        self.stage = 1
-        self.response_duration = 60
-        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
-        # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
+        # Needed to create blocks of 40 trials for criterion to be assessed on:
+        self.block_size = 0  # The number of trials in a block
+        self.block_trial_counter = 0  # Trial count within the current block
+        self.block_accuracy = 0.0  # Accuracy in the current block
+        self.block_number = 0  # Sequential block number
+        self.ror_change = 0  # If it is 1, ROR will change on the next trial.
+        self.block_change = 0  # If it is 1, a new block will start on the next trial
+        self.total_trials = 0  # Total trials across the task.
+        self.block_correct_count = 0  # Number of correct responses in the block
+        self.block_valid_count = 0  # Number of valid (non-missed) trials in the block
+        self.condition_trial_counter = 0  # Counter for randomising conditions
+        self.last_forward_stage = 0  # The stage moved forward from after a forward change
+        self.last_backward_stage = 0  # The stage moved backward to after the last backward change
+        self.moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+        self.stage_forward_change = 0  # Whether stage move forward on the next trial
+        self.stage_backward_change = 0  # Whether stage move backward on the next trial
 
-        # accuracy limits for changing something later on:
-        #self.acc_up = 0.85
-        #self.acc_down = 0.4
+        # Left Right Function Randomisation variables:
+        self.stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+        self.stim_trials = []  # List of correct stimulus function randomised.
+        self.stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+        self.last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-        # pumps
-        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
-        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 2.0  # Normal water delivery of 25ul multiplied by this
-        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
+        # ==============================
+        # Untracked Variables
+        # ==============================
+        # Task specific:
+        self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
+        self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
+        self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
 
-        # counters for trials:
-        self.valid_counter = 0
-        self.tired_counter = 0
-        self.touch_outside = 0
-        self.reward_drunk = 0
-        #self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
-        self.accwindow = [0]
-        self.correct_count = 0
-        self.accuracy = 0
+        # Trial Specific:
+        self.duration_max = 3000  # Maximum duration of the task. 50 mins
+        self.duration_min = 2100  # Minimum duration of the task. 35 mins.
+        self.duration_tired = 1800  # Duration for the door to open (30 mins) if the animal is inactive. Less than 5 trials.
+        self.trials_tired = 5  # if they do 5 trials of long duration (more than 45 seconds), the door will open after 30 mins rather than 35
+        self.tired = False  # The door 2 opens whenever this is true. Used to end the task.
+        self.response_duration = 60  # The response time after the last photogate has been crossed in secs.
+        self.image_display = 3  # Number of seconds the image will display after correct and incorrect
+
+        # Pump:
+        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
+        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
+        self.valve_factor_c = 2.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
+
+        # Counters for trials:
+        self.valid_counter = 0  # Counter for valid counts in a session
+        self.tired_counter = 0  # Counter for longer duration trials (more than 45 secs) in a session
+        self.reward_drunk = 0  # Amount of water drunk in the session
+        self.correct_count = 0  # Counter for correct counts in a session
+        self.accuracy = 0  # Accuracy of the session
+        self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
 
         # Image output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
+        self.stim = [0]  # Lists which defines both the functions for left and right.
 
         # Correcth location and size:
-        self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
-        self.y_correcth = 110
-        self.width = 100    # Stimulus width in mm. Original size for jar is 70mm.
-        self.height = 190   # Stimulus height in mm. Original size for jar is 110mm.
-        self.image_path_function = None
-        self.image_displayed = None
-        self.image_directory = None
+        self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
+        self.y_correcth = 110  # Vertical Coordinates for left and right for Jars
+        self.width = 160  # Stimulus width in mm. Original size for jar is 120mm.
+        self.height = 235  # Stimulus height in mm. Original size for jar is 110mm.
+        self.image_path_function = None  # Full Path for the image displayed
+        self.image_displayed = None  # The image which is displayed
+        self.image_directory = None  # The directory of the image displayed
 
-        self.moved_back_counter = 0 # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
+        # Bias breaking variables:
+        self.bias_breaking = 0  # If subject chooses same side for 5 trials in a row, bias breaking becomes 1
+        self.response_x_array = []  # Stores responses for x till 5 values
+        self.sameside_counter = 0  # Counts number of times on same side
+        self.sameside = None  # To track which side is being triggered for bias breaking
+        self.side_bias_trigger = 5  # After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8  # Side_bias triggers if accuracy is below this for the last 5 trials
+        self.status = None  # Stores the Touch_outside condition
+        self.biased_consecutive_corrects_counter = 0  # This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3  # This is the number of corrects the rat needs to do to end bias breaking
+        self.bias_accuracy_trials = []  # List that holds the last five success or failures.
+        self.bias_accuracy = 0  # Accuracy of the last five trials.
 
-        #Bias breaking variables:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        #Required for Weber's law:
-        self.block = 0  # This is the number of trials at which randomisation will be given again.
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # # Image output stims:
-        # self.stim_trial = 0
-        # self.stim_trials = []
-        self.stim_trial_counter = 0
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -731,30 +743,75 @@ class Probability_Training_BB_Size_Acc(Task):
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
         ############ REGISTER VALUES ################
+        self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
         self.register_value('substage_bias', self.substage_bias)
+        self.register_value('wait_seconds', self.wait_seconds)
+        self.register_value('task_number', self.task_number)
+        self.register_value('block_size', self.block_size)
+        self.register_value('block_trial_counter', self.block_trial_counter)
+        self.register_value('block_accuracy', self.block_accuracy)
+        self.register_value('block_number', self.block_number)
+        self.register_value('ror_change', self.ror_change)
+        self.register_value('block_change', self.block_change)
+        self.register_value('total_trials', self.total_trials)
+        self.register_value('block_correct_count', self.block_correct_count)
+        self.register_value('block_valid_count', self.block_valid_count)
+        self.register_value('condition_trial_counter', self.condition_trial_counter)
+        self.register_value('last_forward_stage', self.last_forward_stage)
+        self.register_value('last_backward_stage', self.last_backward_stage)
+        self.register_value('moved_back_counter', self.moved_back_counter)
+        self.register_value('stage_forward_change', self.stage_forward_change)
+        self.register_value('stage_backward_change', self.stage_backward_change)
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
+        self.register_value('last_stim_trial', self.last_stim_trial)
+        self.register_value('accuracy_criteria', self.accuracy_criteria)
+        self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('max_move_backs', self.max_move_backs)
+        self.register_value('duration_max', self.duration_max)
+        self.register_value('duration_min', self.duration_min)
+        self.register_value('duration_tired', self.duration_tired)
+        self.register_value('trials_tired', self.trials_tired)
+        self.register_value('tired', self.tired)
+        self.register_value('response_duration', self.response_duration)
+        self.register_value('image_display', self.image_display)
+        self.register_value('valve_time', self.valve_time)
+        self.register_value('valve_reward', self.valve_reward)
+        self.register_value('valve_factor_c', self.valve_factor_c)
+        self.register_value('valve_factor_i', self.valve_factor_i)
+        self.register_value('valid_counter', self.valid_counter)
+        self.register_value('tired_counter', self.tired_counter)
+        self.register_value('reward_drunk', self.reward_drunk)
+        self.register_value('correct_count', self.correct_count)
+        self.register_value('accuracy', self.accuracy)
+        self.register_value('success', self.success)
+        self.register_value('stim', self.stim)
+        self.register_value('x_correcth_pos', self.x_correcth_pos)
         self.register_value('y', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
+        self.register_value('image_path_function', self.image_path_function)
+        self.register_value('image_displayed', self.image_displayed)
+        self.register_value('image_directory', self.image_directory)
+        self.register_value('bias_breaking', self.bias_breaking)
+        self.register_value('response_x_array', self.response_x_array)
+        self.register_value('sameside_counter', self.sameside_counter)
+        self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger', self.side_bias_trigger)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('status', self.status)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
+        self.register_value('bias_accuracy', self.bias_accuracy)
+        #Not Initialised but registered:
         self.register_value('correct_th', self.x_correcth)
         self.register_value('incorrect_th', self.x_incorrecth)
         self.register_value('response_x', self.response_x)
         self.register_value('response_y', self.response_y)
-        self.register_value('response_duration', self.response_duration)
         self.register_value('trial_length', self.trial_length)
-        self.register_value('task_number', self.task_number)
-        self.register_value('stage', self.stage)
         self.register_value('trial_result', self.trial_result)
-        self.register_value('reward_drunk', self.reward_drunk)
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('bias_breaking', self.bias_breaking)
-        self.register_value('sameside', self.sameside)
-        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
-        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
-        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
-        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
-        self.register_value('block_size', self.block_size)
-        self.register_value('moved_back_counter', self.moved_back_counter)
-        #Weber's Law:
-        self.register_value('image_displayed', self.image_displayed)
-        self.register_value('image_directory', self.image_directory)
+
+
