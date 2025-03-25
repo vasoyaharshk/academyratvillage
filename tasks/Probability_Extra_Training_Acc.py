@@ -368,7 +368,7 @@ class Probability_Extra_Training_Acc(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
