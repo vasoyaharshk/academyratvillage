@@ -296,7 +296,7 @@ class Probability_Handracking(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Starts task and displays stimuli instanly
 
@@ -312,7 +312,7 @@ class Probability_Handracking(Task):
             self.sma.add_state(
                 state_name='Start_task',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                 output_actions=[])
 
         self.sma.add_state(
@@ -325,7 +325,7 @@ class Probability_Handracking(Task):
         self.sma.add_state(
             state_name='Fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port5In: 'Start_Video'},
+            state_change_conditions={Bpod.Events.Tup: 'Start_Video'},
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
         # Does Nothing. Make it close door 3 later when Duncan has fixed it. Change the number in Port5In to select which photogate
 
@@ -375,7 +375,7 @@ class Probability_Handracking(Task):
         self.sma.add_state(
             state_name='Flip_screen_reward',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
         # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 

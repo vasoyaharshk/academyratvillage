@@ -115,3 +115,10 @@ self.biased_consecutive_corrects_counter = 0    #This is the counter for countin
 self.biased_consecutive_corrects = 3    #This is the number of corrects the rat needs to do to end bias breaking
 self.bias_accuracy_trials = []  #List that holds the last five success or failures.
 self.bias_accuracy = 0  #Accuracy of the last five trials.
+
+# ===============================================
+# Untracked Variables used for Side Bias Scripts:
+# ===============================================
+self.probabilities = [] #The probability for left and right in extra training in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
+self.probabilities_size = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
+self.probabilities_side  = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
