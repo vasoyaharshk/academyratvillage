@@ -13,22 +13,23 @@ from types import SimpleNamespace
 # df is the session dataframe for the subject
 
 
-def select_task(df, subject):
-    task = subject.task
-    wait_seconds = 3600 * settings.TIME_TO_ENTER
+def select_task(df, subject): # takes the last session csv that an animal did (df) and subject is the whole subject.csv file
+    # subject. means it's referring to subjects.csv, and df. is referring to the most recent dataframe for that subject
+    task = subject.task # assigning the task from the subject.csv to a variable called task
+    wait_seconds = 3600 * settings.TIME_TO_ENTER # intersession interval - defined here bc because it's the same for all tasks
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
-    my_subject = df.subject.iloc[0]
+    my_subject = df.subject.iloc[0] # goes to the subject csv and takes the information rfom subject collumn, in the first cell
 
-    def get_val_from_df_or_default(column_name, default_val):
-        if column_name in df.columns:
-            val = last_row[column_name]
-            if pd.isna(val):
-                return default_val
-            return val
-        return default_val
+    def get_val_from_df_or_default(column_name, default_val): # creating a function. In parentheses are the parameters of the function. When you call the function, you’ll pass values into these parameters.
+        if column_name in df.columns: # checks if the column exists in the df
+            val = last_row[column_name] # Retrieves the value from the last row of the column
+            if pd.isna(val): # Checks if the retrieved value is NaN (Not a Number)
+                return default_val # If the value is NaN, return the default value
+            return val # If the value is not NaN, return the retrieved value
+        return default_val # If the column doesn't exist in the DataFrame, return the default value
 
-
-    task_number = get_val_from_df_or_default('task_number', 0)
+    # The following lines call the get_val_from_df_or_default function to get specific values from the DataFrame
+    task_number = get_val_from_df_or_default('task_number', 0) # This looks for the 'task_number' column in the DataFrame df. If the column is found and contains a value, it will return that value. If the value is missing (NaN) or the column doesn't exist, it will return 0.
     stage = get_val_from_df_or_default('stage', 0)
     substage = get_val_from_df_or_default('substage', 0)
     substage_bias = get_val_from_df_or_default('substage_bias', 0)
@@ -80,7 +81,7 @@ def select_task(df, subject):
     if 'Probability' not in task:  #Excludes all the task without the word Probability
         pass  #Working Memory section removed
 
-    elif 'Probability' in task:     #Includes all the task without the word Probability
+    elif 'Probability' in task:     #Includes all the tasks with the word Probability
         if 'Probability_Extra_Training_Acc' in task:
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
