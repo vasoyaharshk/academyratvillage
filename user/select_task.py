@@ -263,15 +263,6 @@ def select_task(df, subject):
                 print('Telegram message not sent')
                 pass
 
-            if trial_counter_ror >= 216:
-                message = f"URGENT PI: ROR {current_ror} and Block {block_number} for subject {my_subject}. Total Trials are {trial_counter_ror}"
-                print(f'{message}')
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
-
 
             if task == "Probability_WL_Training_Acc":
                 if stage == 4: # when Probability_WL_Training_Acc is complete, it changes stage to 4
