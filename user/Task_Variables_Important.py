@@ -5,7 +5,6 @@
 self.stage = 0  # Current stage within the task
 self.substage = 0  # Current substage within the stage
 self.substage_bias = 0  # Side bias stage for substage behavior
-self.wait_seconds = 0  # Time to wait before stimulus or response (in seconds)
 self.task_number = 0  # Each task has a unique number. See RV script guide.
 
 #Working Memory only:
@@ -52,6 +51,8 @@ self.stim_trials = []  # List of correct stimulus function randomised.
 self.stim_trial_counter = 0  #It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
 self.last_stim_trial = 0  #the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
+#Only defined in select_task:
+self.wait_seconds = 0  # Time between two sessions.
 # ==============================
 # Untracked Variables
 # ==============================
@@ -82,6 +83,7 @@ self.reward_drunk = 0   #Amount of water drunk in the session
 self.correct_count = 0  #Counter for correct counts in a session
 self.accuracy = 0   #Accuracy of the session
 self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
+self.status = None  #Stores the Touch_outside condition
 
 # Image output stims:
 self.stim = [0]  # Lists which defines both the functions for left and right.
@@ -109,7 +111,6 @@ self.sameside_counter = 0   #Counts number of times on same side
 self.sameside = None    # To track which side is being triggered for bias breaking
 self.side_bias_trigger = 5  #After how many trials does side_bias trigger
 self.side_bias_trigger_acc = 0.8    #Side_bias triggers if accuracy is below this for the last 5 trials
-self.status = None  #Stores the Touch_outside condition
 self.biased_consecutive_corrects_counter = 0    #This is the counter for counting the number of corrects when bias breaking is active
 self.biased_consecutive_corrects = 3    #This is the number of corrects the rat needs to do to end bias breaking
 self.bias_accuracy_trials = []  #List that holds the last five success or failures.

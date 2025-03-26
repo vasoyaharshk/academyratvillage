@@ -33,14 +33,13 @@ class Probability_Training_BB_Size_Acc(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.stage = 0  # Current stage within the task
+        self.stage = 1  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
-        self.wait_seconds = 0  # Time to wait before stimulus or response (in seconds)
-        self.task_number = 0  # Each task has a unique number. See RV script guide.
+        self.task_number = 2  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 0  # The number of trials in a block
+        self.block_size = 40  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -92,6 +91,7 @@ class Probability_Training_BB_Size_Acc(Task):
         self.correct_count = 0  # Counter for correct counts in a session
         self.accuracy = 0  # Accuracy of the session
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
+        self.status = None  # Stores the Touch_outside condition
 
         # Image output stims:
         self.stim = [0]  # Lists which defines both the functions for left and right.
@@ -99,8 +99,8 @@ class Probability_Training_BB_Size_Acc(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
         self.y_correcth = 110  # Vertical Coordinates for left and right for Jars
-        self.width = 160  # Stimulus width in mm. Original size for jar is 120mm.
-        self.height = 235  # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 100  # Stimulus width in mm. Original size for jar is 120mm.
+        self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
         self.image_path_function = None  # Full Path for the image displayed
         self.image_displayed = None  # The image which is displayed
         self.image_directory = None  # The directory of the image displayed
@@ -112,7 +112,6 @@ class Probability_Training_BB_Size_Acc(Task):
         self.sameside = None  # To track which side is being triggered for bias breaking
         self.side_bias_trigger = 5  # After how many trials does side_bias trigger
         self.side_bias_trigger_acc = 0.8  # Side_bias triggers if accuracy is below this for the last 5 trials
-        self.status = None  # Stores the Touch_outside condition
         self.biased_consecutive_corrects_counter = 0  # This is the counter for counting the number of corrects when bias breaking is active
         self.biased_consecutive_corrects = 3  # This is the number of corrects the rat needs to do to end bias breaking
         self.bias_accuracy_trials = []  # List that holds the last five success or failures.
