@@ -39,7 +39,7 @@ class Probability_Training_BB_Size_Acc(Task):
         self.task_number = 2  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 40  # The number of trials in a block
+        self.block_size = 4  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -66,7 +66,7 @@ class Probability_Training_BB_Size_Acc(Task):
         # ==============================
         # Task specific:
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
+        self.trial_end_criteria = 6  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
 
         # Trial Specific:
@@ -302,13 +302,14 @@ class Probability_Training_BB_Size_Acc(Task):
                     f"No images found in {image_folder} for stage {stage}, position {position}, size {size}, and spacer {spacer}.")
 
             image_path = os.path.join(image_folder, random.choice(images))
-            print(f'Stage: {stage}')
+            print(f'Stage in function: {stage}')
             print(f'Correct answer on {position}, {size}, {spacer} jar: {image_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
         return image_path
 
     def main_loop(self):
+        print('')
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
@@ -335,10 +336,9 @@ class Probability_Training_BB_Size_Acc(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 6:
-                self.task_number = 2
+            if self.stage == 5:
+                self.task_number = 3
                 self.tired = True
-
 
         if self.stage_backward_change == 1:
             self.total_trials = 0
@@ -371,70 +371,75 @@ class Probability_Training_BB_Size_Acc(Task):
         else:
             self.stim = [101, 102, 103, 104]
 
-        # Stimulus generation logic
-        if self.stage == 4:
-            if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-                # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
+        if self.task_number == 2:
+            # Stimulus generation logic
+            if self.stage == 4:
+                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+                    self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                     self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.stim_trial_counter = 0
-        else:
-            if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-                # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.stim_trial_counter = 0
+            else:
+                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+                    self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                     self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.stim_trial_counter = 0
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.stim_trial_counter = 0
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.stim_trial_counter]
-        else:
-            self.stim_trial = self.last_stim_trial
-            print('last_stim_trial', self.last_stim_trial)
+            if self.bias_breaking == 0:
+                self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            else:
+                self.stim_trial = self.last_stim_trial
+                print('last_stim_trial', self.last_stim_trial)
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial in [101, 103, 105, 107]:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial in [102, 104, 106, 108]:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial in [101, 103, 105, 107]:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial in [102, 104, 106, 108]:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            if self.stage == 1:  # We have only one stimuli in stage 1
+                self.image_display = 0
+                # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
+                if self.stim_trial in [101, 103, 105, 107]:
+                    self.x_correcth = self.x_correcth_pos[0]
+                    self.x_incorrecth = None  # No incorrect area in stage 1
+                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+                elif self.stim_trial in [102, 104, 106, 108]:
+                    self.x_correcth = self.x_correcth_pos[1]
+                    self.x_incorrecth = None  # No incorrect area in stage 1
+                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+            else:  # We have two stimuli after stage 1 with correct and incorrect areas
+                self.image_display = 3
+                if self.stim_trial in [101, 103, 105, 107]:
+                    self.x_correcth = self.x_correcth_pos[0]
+                    self.x_incorrecth = self.x_correcth_pos[1]
+                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+                elif self.stim_trial in [102, 104, 106, 108]:
+                    self.x_correcth = self.x_correcth_pos[1]
+                    self.x_incorrecth = self.x_correcth_pos[0]
+                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+            self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+            print("image_path_function: ", self.image_path_function)
 
-        directory, filename = os.path.split(self.image_path_function)
-        self.image_displayed = filename
-        self.image_directory = directory
+            directory, filename = os.path.split(self.image_path_function)
+            self.image_displayed = filename
+            self.image_directory = directory
 
-        print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter', self.stim_trial_counter)
+            print('Stimulus trial: ', self.stim_trial)
+            print('Stimulus Trial Counter', self.stim_trial_counter)
+            print('Stage before Bpod', self.stage)
 
         ############ STATE MACHINE ################
         #First trial:
@@ -443,7 +448,7 @@ class Probability_Training_BB_Size_Acc(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                    state_change_conditions={Bpod.Events.Tup: 'Real_start'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Starts task and displays stimuli instanly
 
@@ -459,7 +464,7 @@ class Probability_Training_BB_Size_Acc(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                     output_actions=[])
 
             self.sma.add_state(
@@ -472,7 +477,7 @@ class Probability_Training_BB_Size_Acc(Task):
             self.sma.add_state(
                 state_name='Fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
             # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
@@ -493,7 +498,7 @@ class Probability_Training_BB_Size_Acc(Task):
             self.sma.add_state(
                 state_name='Correct_image_display',
                 state_timer=self.image_display,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+                state_change_conditions={Bpod.Events.Tup: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
             # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
@@ -507,7 +512,7 @@ class Probability_Training_BB_Size_Acc(Task):
             self.sma.add_state(
                 state_name='Flip_screen_reward',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+                state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
             # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -542,14 +547,14 @@ class Probability_Training_BB_Size_Acc(Task):
             self.sma.add_state(
                 state_name='Flip_screen_no_reward',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+                state_change_conditions={Bpod.Events.Tup: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 40)])
             # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
             self.sma.add_state(
                 state_name='No_Touch',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                state_change_conditions={Bpod.Events.Tup: 'Exit', Bpod.Events.Port2In: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                                 (Bpod.OutputChannels.SoftCode, 37)])
             # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
@@ -576,7 +581,6 @@ class Probability_Training_BB_Size_Acc(Task):
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-                self.accwindow = self.accwindow[1:] + [0]
                 self.trial_result = 'miss'
 
             ##### COUNT PUNISH
@@ -587,14 +591,12 @@ class Probability_Training_BB_Size_Acc(Task):
                 self.success = 0
                 self.block_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
-                self.accwindow = self.accwindow[1:] + [0]
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.accwindow = self.accwindow[1:] + [1]
                 self.correct_count += 1
                 #print('Correct_count: ', self.correct_count)
                 self.block_correct_count += 1
@@ -658,6 +660,18 @@ class Probability_Training_BB_Size_Acc(Task):
 
             if self.stage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
+
+            print("After trial changes: ")
+            print("Block Trial Counter: ", self.block_trial_counter)
+            print("Block Accuracy: ", self.block_accuracy)
+            print("Block Number: ", self.block_number)
+            #print("Block Size: ", self.block_size)
+            #print("Task Number: ", self.task_number)
+            print("Stage Number after trial: ", self.stage)
+            print("Block Change: ", self.block_change)
+            print("Stage Change Forward: ", self.stage_forward_change)
+            print("Stage Change Backward: ", self.stage_backward_change)
+            print("Moved Back Counter: ", self.moved_back_counter)
 
             # Side Bias Breaking formula:
 
@@ -727,17 +741,6 @@ class Probability_Training_BB_Size_Acc(Task):
 
                     self.response_x_array = []      #Clearing the array
 
-            print("Block Trial Counter: ", self.block_trial_counter)
-            print("Block Accuracy: ", self.block_accuracy)
-            print("Block Number: ", self.block_number)
-            print("Block Size: ", self.block_size)
-            print("Task Number: ", self.task_number)
-            print("Stage Number: ", self.stage)
-            print("Block Change: ", self.block_change)
-            print("Stage Change Forward: ", self.stage_forward_change)
-            print("Stage Change Backward: ", self.stage_backward_change)
-            print("Moved Back Counter: ", self.moved_back_counter)
-
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
@@ -745,7 +748,6 @@ class Probability_Training_BB_Size_Acc(Task):
         self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
         self.register_value('substage_bias', self.substage_bias)
-        self.register_value('wait_seconds', self.wait_seconds)
         self.register_value('task_number', self.task_number)
         self.register_value('block_size', self.block_size)
         self.register_value('block_trial_counter', self.block_trial_counter)

@@ -32,6 +32,7 @@ image_path = None  # Global variable to store the image path
 
 def update_image_path_size_position(correct=True):
     global image_path
+    image_path = utils.task.image_path_function
     if image_path and "both" in image_path:
         #print(f"Original image path: {image_path}")
         directory, filename = os.path.split(image_path)
@@ -1034,7 +1035,7 @@ def function63():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Correct image path: {image_path_replaced}")
+            print(f"Correct image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1071,7 +1072,7 @@ def function64():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Incorrect image path: {image_path_replaced}")
+            print(f"Incorrect image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1492,7 +1493,7 @@ def loop86(timing):
 # Functions for Probability Inference Tasks for different stages where the correct answer is left, for new discrimination
 #101 to 104 without spacers:
 def function101():  # When the correct stimuli is on left and small
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 101  # Track that function101 was called
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1503,7 +1504,7 @@ def loop101(timing):
     window.flip()
 
 def function102():  # When the correct stimuli is on right and small
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 102  # Track that function102 was called
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1514,7 +1515,7 @@ def loop102(timing):
     window.flip()
 
 def function103():  # When the correct stimuli is on left and big
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 103  # Track that function103 was called
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1525,7 +1526,7 @@ def loop103(timing):
     window.flip()
 
 def function104():  # When the correct stimuli is on right and big
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 104  # Track that function104 was called
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1537,7 +1538,7 @@ def loop104(timing):
 
 #105 to 108 are for
 def function105():  # When the correct stimuli is on left, small, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 105
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1548,7 +1549,7 @@ def loop105(timing):
     window.flip()
 
 def function106():  # When the correct stimuli is on right, small, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 106
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1559,7 +1560,7 @@ def loop106(timing):
     window.flip()
 
 def function107():  # When the correct stimuli is on left, big, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 107
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1570,7 +1571,7 @@ def loop107(timing):
     window.flip()
 
 def function108():  # When the correct stimuli is on right, big, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 108
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
