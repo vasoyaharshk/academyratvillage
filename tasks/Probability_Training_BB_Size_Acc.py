@@ -67,7 +67,7 @@ class Probability_Training_BB_Size_Acc(Task):
         # ==============================
         # Task specific:
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 7  # Move back criteria. Badly named - this is task end criteria.
+        self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.probabilities_size = [0.5, 0.5]
         self.probabilities_side = [0.5, 0.5]
@@ -512,6 +512,7 @@ class Probability_Training_BB_Size_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.stim_trial_counter = 0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
@@ -534,6 +535,7 @@ class Probability_Training_BB_Size_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.stim_trial_counter = 0
             new_stage = max(self.stage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
@@ -565,29 +567,29 @@ class Probability_Training_BB_Size_Acc(Task):
                     # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                     self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                     self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
-                    self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.stim_trial_counter = 0
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.stim_trial_counter = 0
             else:
                 if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                     # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                     self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                     self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
-                    self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.stim_trial_counter = 0
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.stim_trial_counter = 0
 
             if self.bias_breaking == 0:
                 self.stim_trial = self.stim_trials[self.stim_trial_counter]
@@ -769,7 +771,6 @@ class Probability_Training_BB_Size_Acc(Task):
         if self.task_number == 2:
             if self.bias_breaking == 0:
                 self.stim_trial_counter += 1
-
                 self.total_trials += 1  # remove this
                 # self.block_trial_counter += 1  # For counting the blocks
 
@@ -859,8 +860,8 @@ class Probability_Training_BB_Size_Acc(Task):
             print("Block Trial Counter: ", self.block_trial_counter)
             print("Block Accuracy: ", self.block_accuracy)
             print("Block Number: ", self.block_number)
-            #print("Block Size: ", self.block_size)
-            #print("Task Number: ", self.task_number)
+            print("Block Size: ", self.block_size)
+            print("Task Number: ", self.task_number)
             print("Stage Number after trial: ", self.stage)
             print("Block Change: ", self.block_change)
             print("Stage Change Forward: ", self.stage_forward_change)
