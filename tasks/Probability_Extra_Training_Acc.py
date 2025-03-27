@@ -419,6 +419,7 @@ class Probability_Extra_Training_Acc(Task):
                     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
                     if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
                         self.bias_breaking = 0  # End bias breaking
+                        self.stim_trial_counter = 0
                         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
