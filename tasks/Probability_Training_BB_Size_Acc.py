@@ -123,7 +123,7 @@ class Probability_Training_BB_Size_Acc(Task):
 
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'substage', 'duration_max', 'task_number']
 
     # def generate_random_trials_position_size(self, last_trial=None):
     #     """
@@ -617,12 +617,13 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.x_incorrecth = self.x_correcth_pos[0]
                     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-            self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
-            print("image_path_function: ", self.image_path_function)
+            if self.task_number == 2:
+                self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+                print("image_path_function: ", self.image_path_function)
 
-            directory, filename = os.path.split(self.image_path_function)
-            self.image_displayed = filename
-            self.image_directory = directory
+                directory, filename = os.path.split(self.image_path_function)
+                self.image_displayed = filename
+                self.image_directory = directory
 
             print('Stimulus trial: ', self.stim_trial)
             print('Stimulus Trial Counter', self.stim_trial_counter)
@@ -756,6 +757,12 @@ class Probability_Training_BB_Size_Acc(Task):
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
+            self.x_correcth = None
+            self.x_incorrecth = None
+            self.response_x = None
+            self.response_y = None
+            self.trial_length = None
+            self.trial_result = None
 
 
     def after_trial(self):
