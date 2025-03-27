@@ -148,6 +148,7 @@ class Probability_Extra_Training_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.stim_trial_counter = 0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
@@ -171,6 +172,7 @@ class Probability_Extra_Training_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.stim_trial_counter = 0
             new_stage = max(self.stage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
