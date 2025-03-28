@@ -45,12 +45,12 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
-WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
-WIN_RESOLUTION = [1280, 1024]
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI-3'   # <-- TO CHANGE
+WIN_SIZE = [400, 230]  # in mm. 410 and 250 is for touchscreen
+WIN_RESOLUTION = [1366, 768]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images.
-SCREEN_NUMBER = 0
+CENTRE_SCREEN = [640, 384]          #This variable points to the centre of the screen. Essential for displaying images.
+SCREEN_NUMBER = 1
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.4
@@ -154,8 +154,8 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002317343440"  # <-- TO CHANGE
+TELEGRAM_TOKEN = "7832706508:AAHhiAbtmZKhyzWVsqju2-vD4eLMhlJi9NQ"  # <-- TO CHANGE
+TELEGRAM_CHAT = "-980096306"  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
     'Harsh': '5842767043',
     'Donna': '6811118356',

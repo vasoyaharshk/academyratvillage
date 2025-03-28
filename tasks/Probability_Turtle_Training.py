@@ -113,13 +113,13 @@ class Probability_Turtle_Training(Task):
 
             # Define image folder based on substage
             if substage == 0:
-                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
+                image_folder = '/home/ratvillage02/academy/stimuli/turtle_style/6_turtle_style/0_pre_training'
             elif substage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/1_training'
+                image_folder = '/home/ratvillage02/academy/stimuli/turtle_style/6_turtle_style/1_training'
             elif substage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/2_training'
+                image_folder = '/home/ratvillage02/academy/stimuli/turtle_style/6_turtle_style/2_training'
             elif substage == 3:
-                image_folder = '/home/ratvillage01/academy/stimuli/turtle_style/6_turtle_style/3_training'
+                image_folder = '/home/ratvillage02/academy/stimuli/turtle_style/6_turtle_style/3_training'
             else:
                 raise ValueError(f"Invalid substage value: {substage}.")
 
