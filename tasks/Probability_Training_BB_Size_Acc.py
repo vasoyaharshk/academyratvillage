@@ -123,7 +123,7 @@ class Probability_Training_BB_Size_Acc(Task):
 
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max', 'task_number']
+        self.gui_input = ['stage', 'substage', 'duration_max', 'task_number', 'block_size']
 
     # def generate_random_trials_position_size(self, last_trial=None):
     #     """
