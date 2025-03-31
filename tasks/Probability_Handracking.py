@@ -82,7 +82,7 @@ class Probability_Handracking(Task):
         self.random_block = 40
         self.random_counter = 0
         self.video_stim_play = 0
-        self.video_length = 3
+        self.video_length = 60
         self.response_image = 0
 
         self.moved_back_counter = 0  # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
