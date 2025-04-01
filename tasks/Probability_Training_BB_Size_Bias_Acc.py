@@ -144,141 +144,144 @@ class Probability_Training_BB_Size_Bias_Acc(Task):
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
 
-    def generate_random_trials_position_size(self, last_trial=None):
-        """
-        This function generates a sequence of trials ensuring the following constraints:
-        1. No more than two consecutive trials should have the same size ('small' or 'big').
-        2. No more than two consecutive trials should have the same position ('left' or 'right').
-        3. The first trial of the new block must also follow these constraints relative to the last trial of the previous block.
-        """
-        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
+    def generate_random_trials_position_size_bias(self, last_trial=None):
+        print(f"Starting generate_random_trials_position_size_bias with last_trial: {last_trial}")
 
-        def generate_trials():
-            all_trials = self.stim * 100  # Ensure enough trials to randomize from
-            random.shuffle(all_trials)
-            trials = []
-            max_attempts = 10000
-            attempts = 0
+        def get_size(trial):
+            return 'small' if trial in [101, 102] else 'big'
 
-            def get_size(trial):
-                return 'small' if trial in [101, 102] else 'big'
+        def get_position(trial):
+            return 'left' if trial in [101, 103] else 'right'
 
-            def get_position(trial):
-                return 'left' if trial in [101, 103] else 'right'
+        n = self.block_size
 
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                return (get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])) and (get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-                    trials[-2]))
+        size_n = {
+            'small': round(self.probabilities_size[0] * n),
+            'big': n - round(self.probabilities_size[0] * n)
+        }
+        side_n = {
+            'left': round(self.probabilities_side[0] * n),
+            'right': n - round(self.probabilities_side[0] * n)
+        }
 
-            first_trial_selected = False
-            while len(trials) < self.block_size:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * 100
-                    random.shuffle(all_trials)
-                candidate = all_trials.pop(0)
-                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
-                            last_trial):
-                        continue
-                    first_trial_selected = True
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
-                else:
-                    all_trials.append(candidate)
-            print("Generated trials:", trials)
-            return trials
+        code_features = {
+            101: ('small', 'left'),
+            102: ('small', 'right'),
+            103: ('big', 'left'),
+            104: ('big', 'right'),
+        }
 
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
-            else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generate_random_trials_ror1: {e}")
-            return None
+        counts = {'small': 0, 'big': 0, 'left': 0, 'right': 0}
+        trials = []
+        pool = [101, 102, 103, 104] * 10
+        random.shuffle(pool)
 
-    def generate_random_trials_position_size_spacers(self, last_trial=None):
-        """
-        This function generates a sequence of trials ensuring the following constraints:
-        1. No more than two consecutive trials should have the same size ('small' or 'big').
-        2. No more than two consecutive trials should have the same position ('left' or 'right').
-        3. No more than two consecutive trials should have the spacer.
-        4. The first trial of the new block must also follow these three constraints relative to the last trial of the previous block.
-        """
-        print(f"Function failed to generate trials with last_trial: {last_trial}")
+        for code in pool:
+            s, p = code_features[code]
 
-        def generate_trials():
-            all_trials = self.stim * 100
-            random.shuffle(all_trials)
-            trials = []
-            max_attempts = 10000
-            attempts = 0
+            if counts[s] >= size_n[s]: continue
+            if counts[p] >= side_n[p]: continue
 
-            def get_size(trial):
-                return 'small' if trial in [101, 102, 105, 106] else 'big'
+            if self.probabilities_size == [0.5, 0.5] and len(trials) >= 2:
+                if get_size(trials[-1]) == get_size(trials[-2]) == s:
+                    continue
+            if self.probabilities_side == [0.5, 0.5] and len(trials) >= 2:
+                if get_position(trials[-1]) == get_position(trials[-2]) == p:
+                    continue
 
-            def get_position(trial):
-                return 'left' if trial in [101, 103, 105, 107] else 'right'
+            trials.append(code)
+            counts[s] += 1
+            counts[p] += 1
+            if len(trials) == n:
+                break
 
-            def get_spacer(trial):
-                return 'spacer' if trial in [105, 106, 107, 108] else 'no spacer'
+        random.shuffle(trials)
 
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                return (
-                        (get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])) and
-                        (get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-                            trials[-2])) and
-                        (get_spacer(candidate) != get_spacer(trials[-1]) or get_spacer(candidate) != get_spacer(
-                            trials[-2]))
-                )
+        if last_trial is not None:
+            while (get_size(trials[0]) == get_size(last_trial) or
+                   get_position(trials[0]) == get_position(last_trial)):
+                random.shuffle(trials)
 
-            first_trial_selected = False
-            while len(trials) < self.block_size:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * 100
-                    random.shuffle(all_trials)
-                candidate = all_trials.pop(0)
-                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if (
-                            get_size(candidate) == get_size(last_trial) or
-                            get_position(candidate) == get_position(last_trial) or
-                            get_spacer(candidate) == get_spacer(last_trial)
-                    ):
-                        continue
-                    first_trial_selected = True
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
-                else:
-                    all_trials.append(candidate)
-            print("Generated trials:", trials)
-            return trials
+        print("Generated trials:", trials)
+        return trials
 
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
-            else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generating trial stims: {e}")
-            return None
+    def generate_random_trials_position_size_spacers_bias(self, last_trial=None):
+        print(f"Starting generate_random_trials_position_size_spacers with last_trial: {last_trial}")
+
+        def get_size(trial):
+            return 'small' if trial in [101, 102, 105, 106] else 'big'
+
+        def get_position(trial):
+            return 'left' if trial in [101, 103, 105, 107] else 'right'
+
+        def get_spacer(trial):
+            return 'spacer' if trial in [105, 106, 107, 108] else 'no_spacer'
+
+        n = self.block_size
+
+        size_n = {
+            'small': round(self.probabilities_size[0] * n),
+            'big': n - round(self.probabilities_size[0] * n)
+        }
+        side_n = {
+            'left': round(self.probabilities_side[0] * n),
+            'right': n - round(self.probabilities_side[0] * n)
+        }
+        spacer_n = {
+            'spacer': round(self.probabilities_spacer[0] * n),
+            'no_spacer': n - round(self.probabilities_spacer[0] * n)
+        }
+
+        code_features = {
+            101: ('small', 'left', 'no_spacer'),
+            102: ('small', 'right', 'no_spacer'),
+            103: ('big', 'left', 'no_spacer'),
+            104: ('big', 'right', 'no_spacer'),
+            105: ('small', 'left', 'spacer'),
+            106: ('small', 'right', 'spacer'),
+            107: ('big', 'left', 'spacer'),
+            108: ('big', 'right', 'spacer')
+        }
+
+        counts = {'small': 0, 'big': 0, 'left': 0, 'right': 0, 'spacer': 0, 'no_spacer': 0}
+        trials = []
+        pool = [101, 102, 103, 104, 105, 106, 107, 108] * 10
+        random.shuffle(pool)
+
+        for code in pool:
+            s, p, sp = code_features[code]
+
+            if counts[s] >= size_n[s]: continue
+            if counts[p] >= side_n[p]: continue
+            if counts[sp] >= spacer_n[sp]: continue
+
+            if self.probabilities_size == [0.5, 0.5] and len(trials) >= 2:
+                if get_size(trials[-1]) == get_size(trials[-2]) == s:
+                    continue
+            if self.probabilities_side == [0.5, 0.5] and len(trials) >= 2:
+                if get_position(trials[-1]) == get_position(trials[-2]) == p:
+                    continue
+            if self.probabilities_spacer == [0.5, 0.5] and len(trials) >= 2:
+                if get_spacer(trials[-1]) == get_spacer(trials[-2]) == sp:
+                    continue
+
+            trials.append(code)
+            counts[s] += 1
+            counts[p] += 1
+            counts[sp] += 1
+            if len(trials) == n:
+                break
+
+        random.shuffle(trials)
+
+        if last_trial is not None:
+            while (get_size(trials[0]) == get_size(last_trial) or
+                   get_position(trials[0]) == get_position(last_trial) or
+                   get_spacer(trials[0]) == get_spacer(last_trial)):
+                random.shuffle(trials)
+
+        print("Generated trials:", trials)
+        return trials
 
     def get_stim_image_path(self, stim_trial, stage):
         image_path = None
@@ -400,11 +403,11 @@ class Probability_Training_BB_Size_Bias_Acc(Task):
                 if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
                     # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                     self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                    self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
+                    self.stim_trials = self.generate_random_trials_position_size_spacers_bias(self.last_stim_trial)
                     print(f"Stimulus trials after first attempt: {self.stim_trials}")
                     while self.stim_trials is None:
                         print("Retrying to generate stimulus trials...")
-                        self.stim_trials = self.generate_random_trials_position_size_spacers(self.last_stim_trial)
+                        self.stim_trials = self.generate_random_trials_position_size_spacers_bias(self.last_stim_trial)
                         if self.stim_trials is None:
                             print("generate_random_trials returned None. Retrying...")
                         else:
@@ -414,11 +417,11 @@ class Probability_Training_BB_Size_Bias_Acc(Task):
                 if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                     # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                     self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                    self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
+                    self.stim_trials = self.generate_random_trials_position_size_bias(self.last_stim_trial)
                     print(f"Stimulus trials after first attempt: {self.stim_trials}")
                     while self.stim_trials is None:
                         print("Retrying to generate stimulus trials...")
-                        self.stim_trials = self.generate_random_trials_position_size(self.last_stim_trial)
+                        self.stim_trials = self.generate_random_trials_position_size_bias(self.last_stim_trial)
                         if self.stim_trials is None:
                             print("generate_random_trials returned None. Retrying...")
                         else:
