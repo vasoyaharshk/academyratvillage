@@ -254,7 +254,6 @@ class Probability_Handracking(Task):
                 self.task_number = 5
                 self.tired = True
 
-
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
@@ -286,19 +285,7 @@ class Probability_Handracking(Task):
         self.stim = [61, 62] #For images
         if self.task_number == 4:
             if self.stage == 1:
-                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                    last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                    self.stim_trials = self.generate_random_trials(last_trial)
-                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                    while self.stim_trials is None:
-                        print("Retrying to generate stimulus trials...")
-                        self.stim_trials = self.generate_random_trials(last_trial)
-                        if self.stim_trials is None:
-                            print("generate_random_trials returned None. Retrying...")
-                        else:
-                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                    self.stim_trial_counter = 0 #Program for images here
+                pass #Randomisation for images here images here
             else:
                 # Stimulus generation logic
                 if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
@@ -771,3 +758,12 @@ class Probability_Handracking(Task):
 
         self.register_value('last_forward_stage', self.last_forward_stage)
         self.register_value('last_backward_stage', self.last_backward_stage)
+
+        #Videos:
+        self.register_value('video_display', self.video_display)
+        self.register_value('video_stim_play', self.video_stim_play)
+        self.register_value('video_length', self.video_length)
+        self.register_value('response_image', self.response_image)
+        self.register_value('video_path_function', self.video_path_function)
+        self.register_value('video_displayed', self.video_displayed)
+        self.register_value('video_directory', self.video_directory)
