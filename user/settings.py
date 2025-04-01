@@ -45,12 +45,12 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
+XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-3'   # <-- TO CHANGE
 WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
 CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images.
-SCREEN_NUMBER = 0
+SCREEN_NUMBER = 3
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.4
