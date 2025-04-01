@@ -144,9 +144,9 @@ class Probability_Handracking(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
             elif stage == 3:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/'
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
             # Get relevant videos based on position
@@ -170,7 +170,7 @@ class Probability_Handracking(Task):
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
         """
         image_path = None
-        image_folder = f'/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+        image_folder = f'/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
 
         try:
             if stim_trial == 61:
