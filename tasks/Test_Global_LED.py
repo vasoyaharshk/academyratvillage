@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
 
-class zTest_Global_LED(Task):
+class Test_Global_LED(Task):
 
     def __init__(self):
         super().__init__()
@@ -21,8 +21,8 @@ class zTest_Global_LED(Task):
         self.sma.add_state(
             state_name='LED_ON',
             state_timer=600,
-            state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 4), (Bpod.OutputChannels.LED, 6)]
+            state_change_conditions={Bpod.Events.PA4_Port1In: 'exit'},
+            output_actions=[(Bpod.OutputChannels.LED, 1)]
         )
 
     def after_trial(self):
