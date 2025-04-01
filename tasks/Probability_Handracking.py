@@ -218,9 +218,13 @@ class Probability_Handracking(Task):
         return image_path
 
     def main_loop(self):
-        ### Randomizing the stimulus positions for both the images:
         print('')
         ### Randomizing the stimulus positions for both the images:
+
+        if self.current_trial == 0:
+            self.bias_breaking = 0
+            self.accuracy = 0
+            self.stim_trial_counter = 0
 
         self.total_trials += 1  # remove this
         # self.block_trial_counter += 1  # For counting the blocks
