@@ -286,7 +286,19 @@ class Probability_Handracking(Task):
         self.stim = [61, 62] #For images
         if self.task_number == 4:
             if self.stage == 1:
-                pass #Program for images here
+                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+                    last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
+                    self.stim_trials = self.generate_random_trials(last_trial)
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials(last_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.stim_trial_counter = 0 #Program for images here
             else:
                 # Stimulus generation logic
                 if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
@@ -309,7 +321,7 @@ class Probability_Handracking(Task):
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
 
-            self.stim_trial = 61
+            self.stim_trial = 61  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
 
             if self.stage == 1:  # We have only one stimuli in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
