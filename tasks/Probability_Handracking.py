@@ -289,9 +289,9 @@ class Probability_Handracking(Task):
                 pass #Program for images here
             else:
                 # Stimulus generation logic
-                if self.random_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                     # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                    last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
+                    last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                     self.stim_trials = self.generate_random_trials(last_trial)
                     print(f"Stimulus trials after first attempt: {self.stim_trials}")
                     while self.stim_trials is None:
@@ -301,10 +301,10 @@ class Probability_Handracking(Task):
                             print("generate_random_trials returned None. Retrying...")
                         else:
                             print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                    self.random_counter = 0
+                    self.stim_trial_counter = 0
 
             if self.bias_breaking == 0:
-                self.stim_trial = self.stim_trials[self.random_counter]
+                self.stim_trial = self.stim_trials[self.stim_trial_counter]
             else:
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
@@ -341,7 +341,7 @@ class Probability_Handracking(Task):
                     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                           self.x_incorrecth)
 
-            print('random counter: ', self.random_counter)
+            print('random counter: ', self.stim_trial_counter)
             print('stim_trial: ', self.stim_trial)
             print('video_stim_play: ', self.video_stim_play)
             print('response_image: ', self.response_image)
@@ -509,36 +509,48 @@ class Probability_Handracking(Task):
             self.trial_length = None
             self.trial_result = None
 
+
     def after_trial(self):
-        if self.task_number == 4:
+        if self.task_number == 1:
+            self.total_trials += 1  # remove this
+            # self.block_trial_counter += 1  # For counting the blocks
+
             if self.bias_breaking == 0:
-                self.random_counter += 1
+                self.stim_trial_counter += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-                self.accwindow = self.accwindow[1:] + [0]
                 self.trial_result = 'miss'
 
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
-                self.accwindow = self.accwindow[1:] + [0]
+                self.block_valid_count += 1
+                self.success = 0
+                self.block_trial_counter += 1
+                print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.accwindow = self.accwindow[1:] + [1]
                 self.correct_count += 1
-                print('Correct_count: ', self.correct_count)
+                #print('Correct_count: ', self.correct_count)
+                self.block_correct_count += 1
+                self.block_valid_count += 1
+                self.block_trial_counter += 1
+                self.success = 1
+                print('Acc Correct_count: ', self.block_correct_count)
+                print('Acc Valid_count: ', self.block_valid_count)
 
                 # Check if side bias is active and if the current trial was correct
                 if self.bias_breaking == 1:  # Side bias active
                     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
+                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
                         self.bias_breaking = 0  # End bias breaking
+                        self.stim_trial_counter = 0
                         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
@@ -547,7 +559,7 @@ class Probability_Handracking(Task):
                 self.status = 'Touch_Outside'
 
             # End-trial calculations
-            # self.last_x = self.x
+            #self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
 
@@ -561,10 +573,46 @@ class Probability_Handracking(Task):
                 self.tired_counter = 0
 
             # Accuracy for running trials:
-            # self.accuracy = sum(self.accwindow) / len(self.accwindow)
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
+            # Check accuracy for every block of 40 trials
+            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            print("Block Accuracy: ", self.block_accuracy)
+
+            # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
+            if self.block_trial_counter == self.block_size:
+                self.block_change = 1
+                if self.block_accuracy >= self.accuracy_criteria:
+                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                else:
+                    print("Accuracy criteria not met.")
+
+            if self.total_trials >= self.trial_end_criteria:
+                self.stage_backward_change = 1
+
+            #Assign in pass what to do when the rat is moved back more than 5 times.
+            if self.moved_back_counter > self.max_move_backs:
+                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if self.stage > self.last_backward_stage + 1:
+                self.moved_back_counter = 0
+
             # Side Bias Breaking formula:
+
+            # Calculate bias accuracy for the last five trials without using accuracy window
+            self.bias_accuracy_trials.append(self.success)  # Append current trial success (0 or 1)
+            if len(self.bias_accuracy_trials) > self.side_bias_trigger:
+                self.bias_accuracy_trials.pop(0)  # Keep only the last 5 trials
+
+            self.bias_accuracy = sum(self.bias_accuracy_trials) / len(self.bias_accuracy_trials) if self.bias_accuracy_trials else 0
+
+            print(f"Bias Accuracy (last 5 trials): {self.bias_accuracy}")
+
             self.last_stim_trial = self.stim_trial
 
             try:
@@ -582,22 +630,18 @@ class Probability_Handracking(Task):
                     self.response_x_bias = response_x_list[-1]
                     print(f"Using last value from response_x array: {self.response_x_bias}")
                 except Exception as e:
-                    # print(f"Failed to process response_x as array. Error: {e}")
+                    #print(f"Failed to process response_x as array. Error: {e}")
                     return  # Handle this case if needed
 
             # Append the response to the array:
-            # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
             self.response_x_array.append(self.response_x_bias)
-            print(f"Responses so far: {self.response_x_array}")
-            print(f"Conditions: {self.conditions}")
+            #print(f"Responses so far: {self.response_x_array}")
 
-            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
-                all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
-                all_right_side = all(
-                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
-
+                all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
+                all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
 
                 if all_left_side:
                     self.sameside = 'left'
@@ -610,52 +654,108 @@ class Probability_Handracking(Task):
                     self.last_stim_trial = random.choice([111])  # Ensure the new stim is on the left
                     print('Bias breaking active, side:', self.sameside)
 
-                self.response_x_array = []  # Clearing the array
+                self.response_x_array = []      #Clearing the array
+
+            print("Block Trial Counter: ", self.block_trial_counter)
+            print("Block Accuracy: ", self.block_accuracy)
+            print("Block Number: ", self.block_number)
+            print("Block Size: ", self.block_size)
+            print("Task Number: ", self.task_number)
+            print("Stage Number: ", self.stage)
+            print("Block Change: ", self.block_change)
+            print("Stage Change Forward: ", self.stage_forward_change)
+            print("Stage Change Backward: ", self.stage_backward_change)
+            print("Moved Back Counter: ", self.moved_back_counter)
+
         else:
             print(
                 "Task 4 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
 
         ############ REGISTER VALUES ################
-        self.register_value('stim_dur_ds', self.stim_dur_ds)
-        self.register_value('stim_dur_dm', self.stim_dur_dm)
-        self.register_value('stim_dur_dl', self.stim_dur_dl)
-        self.register_value('choices', self.choices)
+        # Task-related
+        self.register_value('duration_max', self.duration_max)
+        self.register_value('duration_min', self.duration_min)
+        self.register_value('duration_tired', self.duration_tired)
+        self.register_value('trials_tired', self.trials_tired)
+        self.register_value('tired', self.tired)
+        self.register_value('task_number', self.task_number)
+        self.register_value('stage', self.stage)
         self.register_value('substage', self.substage)
         self.register_value('substage_bias', self.substage_bias)
-        self.register_value('y', self.y_correcth)
+        self.register_value('response_duration', self.response_duration)
+        self.register_value('image_display', self.image_display)
+
+        # Pumps
+        self.register_value('valve_time', self.valve_time)
+        self.register_value('valve_reward', self.valve_reward)
+        self.register_value('valve_factor_c', self.valve_factor_c)
+        # self.register_value('valve_factor_i', self.valve_factor_i)  # Uncomment if used
+
+        # Counters
+        self.register_value('valid_counter', self.valid_counter)
+        self.register_value('tired_counter', self.tired_counter)
+        self.register_value('reward_drunk', self.reward_drunk)
+        # self.register_value('running_window', self.running_window)  # Uncomment if used
+        self.register_value('correct_count', self.correct_count)
+        self.register_value('accuracy', self.accuracy)
+
+        # Stimulus-related
+        self.register_value('stim', self.stim)
+        self.register_value('x_correcth_pos', self.x_correcth_pos)
+        self.register_value('y_correcth', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
+
+        # Bias-breaking
+        self.register_value('bias_breaking', self.bias_breaking)
+        self.register_value('response_x_array', self.response_x_array)
+        self.register_value('sameside_counter', self.sameside_counter)
+        self.register_value('sameside', self.sameside)
+        self.register_value('side_bias_trigger', self.side_bias_trigger)
+        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
+        self.register_value('status', self.status)
+        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
+        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
+        self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
+        self.register_value('bias_accuracy', self.bias_accuracy)
+
+        # Criteria
+        self.register_value('accuracy_criteria', self.accuracy_criteria)
+        self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('max_move_backs', self.max_move_backs)
+
+        # Trial/block tracking
+        self.register_value('success', self.success)
+        self.register_value('block_size', self.block_size)
+        self.register_value('block_trial_counter', self.block_trial_counter)
+        self.register_value('block_accuracy', self.block_accuracy)
+        self.register_value('block_number', self.block_number)
+        self.register_value('block_change', self.block_change)
+        self.register_value('last_stim_trial', self.last_stim_trial)
+        self.register_value('total_trials', self.total_trials)
+        self.register_value('block_correct_count', self.block_correct_count)
+        self.register_value('block_valid_count', self.block_valid_count)
+
+        # Stimulus trial control
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
+
+        # Stage changes
+        self.register_value('stage_forward_change', self.stage_forward_change)
+        self.register_value('stage_backward_change', self.stage_backward_change)
+        self.register_value('moved_back_counter', self.moved_back_counter)
+
+        #Corecth location:
         self.register_value('correct_th', self.x_correcth)
         self.register_value('incorrect_th', self.x_incorrecth)
         self.register_value('response_x', self.response_x)
         self.register_value('response_y', self.response_y)
-        self.register_value('response_duration', self.response_duration)
+
+        #Trial Information:
         self.register_value('trial_length', self.trial_length)
-        self.register_value('task_number', self.task_number)
-        self.register_value('stage', self.stage)
         self.register_value('trial_result', self.trial_result)
-        self.register_value('reward_drunk', self.reward_drunk)
-        self.register_value('accuracy', self.accuracy)
-        self.register_value('bias_breaking', self.bias_breaking)
-        self.register_value('sameside', self.sameside)
-        self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
-        self.register_value('side_bias_trigger_trial', self.side_bias_trigger)
-        self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
-        self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
-        self.register_value('random_counter', self.random_counter)
-        self.register_value('block_size', self.block_size)
-        self.register_value('moved_back_counter', self.moved_back_counter)
-        # Weber's Law:
-        self.register_value('block', self.block)
-        self.register_value('conditions', self.conditions)
-        self.register_value('completed_conditions', self.completed_conditions)
-        self.register_value('current_condition', self.current_condition)
-        self.register_value('repetition', self.repetition)
-        self.register_value('current_repetition', self.current_repetition)
-        self.register_value('trial_counter', self.trial_counter)
-        self.register_value('stim_trial', self.stim_trial)
-        self.register_value('stim_trials', self.stim_trials)
-        self.register_value('stim_trial_counter', self.stim_trial_counter)
-        self.register_value('video_displayed', self.video_displayed)
-        self.register_value('video_directory', self.video_directory)
+
+        self.register_value('last_forward_stage', self.last_forward_stage)
+        self.register_value('last_backward_stage', self.last_backward_stage)
