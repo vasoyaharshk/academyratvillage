@@ -81,7 +81,7 @@ def select_task(df, subject):
         pass  #Working Memory section removed
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        if 'Probability_Extra_Training_Acc' in task:
+        if task == 'Probability_Extra_Training_Acc':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -97,7 +97,7 @@ def select_task(df, subject):
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 4  # The number of trials in a block
+                block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
                 block_number = 0  # Sequential block number
@@ -128,6 +128,26 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
+        if 'Probability_Extra_Training_Bias' in task:
+            if moved_back_counter > max_move_backs:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if task_number == 1:
+                task = 'Probability_Extra_Training_Acc'
+                substage_bias = 0
+                message = 'Advance from Etra training Bias breaking to normal training'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
         if 'Probability_Training_BB_Size_Acc' in task:
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
@@ -143,7 +163,7 @@ def select_task(df, subject):
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 4  # The number of trials in a block
+                block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
                 block_number = 0  # Sequential block number
