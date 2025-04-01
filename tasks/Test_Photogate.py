@@ -26,8 +26,10 @@ class Test_Photogate(Task):
                                      'Port2In': 'Cross_corridor',
                                      'Port3In': 'Cross_corridor',
                                      'Port4In': 'Cross_corridor',
-                                     'Port5In': 'Cross_corridor',
-                                     'Port6In': 'Cross_corridor',
+                                     'PA1_Port1In': 'Cross_corridor',
+                                     'PA1_Port2In': 'Cross_corridor',
+                                     'PA1_Port3In': 'Cross_corridor',
+                                     'PA1_Port4In': 'Cross_corridor',
                                      Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
@@ -38,10 +40,12 @@ class Test_Photogate(Task):
                                      'Port2Out': 'Waiting',
                                      'Port3Out': 'Waiting',
                                      'Port4Out': 'Waiting',
-                                     'Port5Out': 'Waiting',
-                                     'Port6Out': 'Waiting',
-                                    Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 6)])
+                                     'PA1_Port1Out': 'Waiting',
+                                     'PA1_Port2Out': 'Waiting',
+                                     'PA1_Port3Out': 'Waiting',
+                                     'PA1_Port4Out': 'Waiting',
+                                     Bpod.Events.Tup: 'exit'},
+            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 2)])
 
     def after_trial(self):
         self.register_value('animal_crossed', self.animal_crossed)

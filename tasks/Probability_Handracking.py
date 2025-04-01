@@ -6,7 +6,7 @@ import random
 import numpy as np
 import os
 import re
-
+from academy import telegram_bot
 
 class Probability_Handracking(Task):
     def __init__(self):
@@ -17,7 +17,7 @@ class Probability_Handracking(Task):
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
         Stage 2 - Starts from open hands and then closes as rat approaches.
-        Stage 3 -
+        Stage 3 - Jar Videos
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -28,88 +28,106 @@ class Probability_Handracking(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-        # Non-used variables so that stage training works:
-        self.stim_dur_ds = 0
-        self.stim_dur_dm = 0
-        self.stim_dur_dl = 0
-        self.choices = 0
-        self.substage = 0
-        self.substage_bias = 0
+        # ==============================
+        # Tracked Variables
+        # ==============================
+        # Needed in Each Task:
+        self.stage = 1  # Current stage within the task
+        self.substage = 0  # Current substage within the stage
+        self.substage_bias = 0  # Side bias stage for substage behavior
+        self.task_number = 4  # Each task has a unique number. See RV script guide.
 
-        # Variables for the task:
-        self.duration_max = 3000
-        self.duration_min = 2100
-        self.duration_tired = 1800
-        self.trials_tired = 5
-        self.tired = False
-        self.task_number = 5
-        self.stage = 2
-        self.response_duration = 60
+        # Needed to create blocks of 40 trials for criterion to be assessed on:
+        self.block_size = 40  # The number of trials in a block
+        self.block_trial_counter = 0  # Trial count within the current block
+        self.block_accuracy = 0.0  # Accuracy in the current block
+        self.block_number = 0  # Sequential block number
+        self.ror_change = 0  # If it is 1, ROR will change on the next trial.
+        self.block_change = 0  # If it is 1, a new block will start on the next trial
+        self.total_trials = 0  # Total trials across the task.
+        self.block_correct_count = 0  # Number of correct responses in the block
+        self.block_valid_count = 0  # Number of valid (non-missed) trials in the block
+        self.condition_trial_counter = 0  # Counter for randomising conditions
+        self.last_forward_stage = 0  # The stage moved forward from after a forward change
+        self.last_backward_stage = 0  # The stage moved backward to after the last backward change
+        self.moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+        self.stage_forward_change = 0  # Whether stage move forward on the next trial
+        self.stage_backward_change = 0  # Whether stage move backward on the next trial
+
+        # Left Right Function Randomisation variables:
+        self.stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+        self.stim_trials = []  # List of correct stimulus function randomised.
+        self.stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+        self.last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+        # ==============================
+        # Untracked Variables
+        # ==============================
+        # Task specific:
+        self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
+        self.trial_end_criteria = 6  # Move back criteria. Badly named - this is task end criteria.
+        self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
+        self.probabilities = []  # The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
+
+        # Trial Specific:
+        self.duration_max = 3000  # Maximum duration of the task. 50 mins
+        self.duration_min = 2100  # Minimum duration of the task. 35 mins.
+        self.duration_tired = 1800  # Duration for the door to open (30 mins) if the animal is inactive. Less than 5 trials.
+        self.trials_tired = 5  # if they do 5 trials of long duration (more than 45 seconds), the door will open after 30 mins rather than 35
+        self.tired = False  # The door 2 opens whenever this is true. Used to end the task.
+        self.response_duration = 60  # The response time after the last photogate has been crossed in secs.
+        self.image_display = 3  # Number of seconds the image will display after correct and incorrect
+
+        # Pump:
+        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
+        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
+        self.valve_factor_c = 2.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
+
+        # Counters for trials:
+        self.valid_counter = 0  # Counter for valid counts in a session
+        self.tired_counter = 0  # Counter for longer duration trials (more than 45 secs) in a session
+        self.reward_drunk = 0  # Amount of water drunk in the session
+        self.correct_count = 0  # Counter for correct counts in a session
+        self.accuracy = 0  # Accuracy of the session
+        self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
+        self.status = None  # Stores the Touch_outside condition
+
+        # Image output stims:
+        self.stim = [0]  # Lists which defines both the functions for left and right.
+
+        # Correcth location and size:
+        self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
+        self.y_correcth = 110  # Vertical Coordinates for left and right for Jars
+        self.width = 100  # Stimulus width in mm. Original size for jar is 120mm.
+        self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
+        self.image_path_function = None  # Full Path for the image displayed
+        self.image_displayed = None  # The image which is displayed
+        self.image_directory = None  # The directory of the image displayed
+
+        # Bias breaking variables:
+        self.bias_breaking = 0  # If subject chooses same side for 5 trials in a row, bias breaking becomes 1
+        self.response_x_array = []  # Stores responses for x till 5 values
+        self.sameside_counter = 0  # Counts number of times on same side
+        self.sameside = None  # To track which side is being triggered for bias breaking
+        self.side_bias_trigger = 5  # After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8  # Side_bias triggers if accuracy is below this for the last 5 trials
+        self.biased_consecutive_corrects_counter = 0  # This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3  # This is the number of corrects the rat needs to do to end bias breaking
+        self.bias_accuracy_trials = []  # List that holds the last five success or failures.
+        self.bias_accuracy = 0  # Accuracy of the last five trials.
+
+        #For Videos:
+        # Video parameters:
         self.video_display = 3  # Number of seconds the video will display after correct and incorrect
-        # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
+        self.video_stim_play = 0    #The function that plays the video
+        self.video_length = 60      #Length of the video till what it is played
+        self.response_image = 0     #Not used yet. This was a function that can display the first frame of the video but it is not used now.
 
-        # accuracy limits for changing something later on:
-        # self.acc_up = 0.85
-        # self.acc_down = 0.4
-
-        # pumps
-        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
-        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 2  # Normal water delivery of 25ul multiplied by this
-        # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
-
-        # counters for trials:
-        self.valid_counter = 0
-        self.tired_counter = 0
-        self.touch_outside = 0
-        self.reward_drunk = 0
-        # self.running_window = 10  # This is the number of trials the accuracy is measured by. It will take accuracy for every 10 trials.
-        self.accwindow = [0]
-        self.correct_count = 0
-        self.accuracy = 0
-
-        # video output stims:
-        self.stim = [0]  # Calls function 25 to display Blue 1.png and function 26 to display Blue 2.png respectively.
-
-        # Correcth location:
-        self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
-        self.y_correcth = 110
-        self.width = 100  # Stimulus width in mm. Original jar is 70mm.
-        self.height = 190  # Stimulus height in mm. Original jar is 110mm.
+        # Video output paths:
         self.video_path_function = None
         self.video_displayed = None
         self.video_directory = None
-        self.random_block = 40
-        self.random_counter = 0
-        self.video_stim_play = 0
-        self.video_length = 60
-        self.response_image = 0
-
-        self.moved_back_counter = 0  # TO TRACK HOW MANY TIMES DOES THE RAT MOVE FROM DISCRIMINATION A TO INDICATION.
-
-        # Bias breaking variables:
-        self.bias_breaking = 0  # If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []  # Stores responses for x till 3 values
-        self.sameside_counter = 0  # Counts number of times on same side
-        self.sameside = None  # To track which side is being triggered
-        self.side_bias_trigger = 5  # After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
-        self.status = None  # Stores the Touch_outside condition
-        self.biased_consecutive_corrects_counter = 0  # This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3  ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        # Required for Weber's law:
-        self.block = 0  # This is the number of trials at which randomisation will be given again.
-        self.conditions = []  # Takes the conditions from select task file.
-        self.completed_conditions = []  # To store completed conditions
-        self.current_condition = 0  # To track the current condition in progress
-        self.repetition = 0
-        self.current_repetition = 0  # To store how many times the condition has repeated.
-        self.trial_counter = 0  # Track the number of trials for the current condition
-        # # video output stims:
-        # self.stim_trial = 0
-        # self.stim_trials = []
-        self.stim_trial_counter = 0
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -118,7 +136,7 @@ class Probability_Handracking(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < self.random_block:
+        while len(trials) < self.block_size:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -200,338 +218,402 @@ class Probability_Handracking(Task):
         return image_path
 
     def main_loop(self):
+        ### Randomizing the stimulus positions for both the images:
         print('')
-        print('Trial: ' + str(self.current_trial))
-        print('Stage:', self.stage)
-        print('Accuracy: ', self.accuracy)
-        print('Stim_Trial: ', self.stim_trial)
-        print('random_counter: ', self.random_counter)
+        ### Randomizing the stimulus positions for both the images:
 
-        if self.current_trial == 0:
-            self.bias_breaking = 0
-            self.accuracy = 0
-            self.random_counter = 0
+        self.total_trials += 1  # remove this
+        # self.block_trial_counter += 1  # For counting the blocks
+
+        if self.bias_breaking == 0:
+            self.stim_trial_counter += 1
 
         print('Bias Breaking: ', self.bias_breaking)
+        # print('stim_trials: ', self.stim_trials)
+
+        if self.block_change == 1:
+            self.block_number += 1
+            self.block_change = 0
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
+            self.stim_trial_counter = 0
+
+        if self.stage_forward_change == 1:
+            self.total_trials = 0
+            self.stage_forward_change = 0
+            self.last_forward_stage = self.stage  # Save current BEFORE increasing
+            self.stage += 1
+            message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except Exception as e:
+                print(f"Telegram message not sent. Error: {e}")
+            if self.stage == 4:
+                self.task_number = 5
+                self.tired = True
+
+
+        if self.stage_backward_change == 1:
+            self.total_trials = 0
+            self.stage_backward_change = 0
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
+            self.stim_trial_counter = 0
+            new_stage = max(self.stage - 1, 1)
+            if new_stage == self.last_forward_stage:
+                if self.last_backward_stage == new_stage:
+                    self.moved_back_counter += 1
+                else:
+                    self.moved_back_counter = 1
+                    self.last_backward_stage = new_stage
+            else:
+                self.moved_back_counter = 1
+                self.last_backward_stage = new_stage
+            self.stage = new_stage
+            message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except:
+                print("Telegram message not sent")
 
         ### Randomizing the stimulus positions for both the videos:
         # Choose x positions:
         #self.stim = [111, 112] for video
         self.stim = [61, 62] #For images
-
-        if self.stage == 1:
-            pass #Program for images here
-        else:
-            # Stimulus generation logic
-            if self.random_counter % self.random_block == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-                # If not the first random_block, pass the last stimulus of the previous random_block to avoid repetition
-                last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
-                self.stim_trials = self.generate_random_trials(last_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    print("Retrying to generate stimulus trials...")
+        if self.task_number == 4:
+            if self.stage == 1:
+                pass #Program for images here
+            else:
+                # Stimulus generation logic
+                if self.random_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
+                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+                    last_trial = self.stim_trials[self.random_counter - 1] if self.random_counter > 0 else None
                     self.stim_trials = self.generate_random_trials(last_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.random_counter = 0
+                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                    while self.stim_trials is None:
+                        print("Retrying to generate stimulus trials...")
+                        self.stim_trials = self.generate_random_trials(last_trial)
+                        if self.stim_trials is None:
+                            print("generate_random_trials returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                    self.random_counter = 0
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.random_counter]
-        else:
-            self.stim_trial = self.last_stim_trial
-            print('last_stim_trial', self.last_stim_trial)
+            if self.bias_breaking == 0:
+                self.stim_trial = self.stim_trials[self.random_counter]
+            else:
+                self.stim_trial = self.last_stim_trial
+                print('last_stim_trial', self.last_stim_trial)
 
-        self.stim_trial = 61
+            self.stim_trial = 61
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-            if self.stim_trial in [61]:
-                self.video_stim_play = 111
-                self.response_image = 117
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial in [62]:
-                self.video_stim_play = 112
-                self.response_image = 118
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            if self.stim_trial in [61]:
-                self.video_stim_play = 111
-                self.response_image = 117
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                      self.x_incorrecth)
-            elif self.stim_trial in [62]:
-                self.video_stim_play = 112
-                self.response_image = 118
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                      self.x_incorrecth)
+            if self.stage == 1:  # We have only one stimuli in stage 1
+                # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
+                if self.stim_trial in [61]:
+                    self.video_stim_play = 111
+                    self.response_image = 117
+                    self.x_correcth = self.x_correcth_pos[0]
+                    self.x_incorrecth = None  # No incorrect area in stage 1
+                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+                elif self.stim_trial in [62]:
+                    self.video_stim_play = 112
+                    self.response_image = 118
+                    self.x_correcth = self.x_correcth_pos[1]
+                    self.x_incorrecth = None  # No incorrect area in stage 1
+                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+            else:  # We have two stimuli after stage 1 with correct and incorrect areas
+                if self.stim_trial in [61]:
+                    self.video_stim_play = 111
+                    self.response_image = 117
+                    self.x_correcth = self.x_correcth_pos[0]
+                    self.x_incorrecth = self.x_correcth_pos[1]
+                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                          self.x_incorrecth)
+                elif self.stim_trial in [62]:
+                    self.video_stim_play = 112
+                    self.response_image = 118
+                    self.x_correcth = self.x_correcth_pos[1]
+                    self.x_incorrecth = self.x_correcth_pos[0]
+                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                          self.x_incorrecth)
 
-        print('random counter: ', self.random_counter)
-        print('stim_trial: ', self.stim_trial)
-        print('video_stim_play: ', self.video_stim_play)
-        print('response_image: ', self.response_image)
+            print('random counter: ', self.random_counter)
+            print('stim_trial: ', self.stim_trial)
+            print('video_stim_play: ', self.video_stim_play)
+            print('response_image: ', self.response_image)
 
-        self.image_path_function = self.get_stim_image_path(self.stim_trial)
-        self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage)
+            self.image_path_function = self.get_stim_image_path(self.stim_trial)
+            self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage)
 
-        directory, filename = os.path.split(self.video_path_function)
-        self.video_displayed = filename
-        self.video_directory = directory
+            directory, filename = os.path.split(self.video_path_function)
+            self.video_displayed = filename
+            self.video_directory = directory
 
-        print("image_path_function: ", self.image_path_function)
-        print("video_path_function: ", self.video_path_function)
+            print("image_path_function: ", self.image_path_function)
+            print("video_path_function: ", self.video_path_function)
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.current_trial == 0:
-            self.sma.add_state(
-                state_name='Start_task',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-            # Starts task and displays stimuli instanly
+        if self.task_number == 4:
+            if self.current_trial == 0:
+                self.sma.add_state(
+                    state_name='Start_task',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Real_start'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                # Starts task and displays stimuli instanly
+
+                self.sma.add_state(
+                    state_name='Real_start',
+                    state_timer=self.valve_time * 2,
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
+                # Closes corridor door 2 and delivers initial 50ul water.
+
+            # Other Trials:
+            else:
+                self.sma.add_state(
+                    state_name='Start_task',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                    output_actions=[])
 
             self.sma.add_state(
-                state_name='Real_start',
-                state_timer=self.valve_time * 2,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
-            # Closes corridor door 2 and delivers initial 50ul water.
-
-        # Other Trials:
-        else:
-            self.sma.add_state(
-                state_name='Start_task',
+                state_name='Wait_for_fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                 output_actions=[])
+            # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
-        self.sma.add_state(
-            state_name='Wait_for_fixation',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-            output_actions=[])
-        # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+            self.sma.add_state(
+                state_name='Fixation',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Start_Video'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+            # Does Nothing. Make it close door 3 later when Duncan has fixed it. Change the number in Port5In to select which photogate
 
-        self.sma.add_state(
-            state_name='Fixation',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Start_Video'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-        # Does Nothing. Make it close door 3 later when Duncan has fixed it. Change the number in Port5In to select which photogate
+            self.sma.add_state(
+                state_name='Start_Video',
+                state_timer=self.video_length,
+                state_change_conditions={Bpod.Events.Tup: 'Response_window_image'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, self.video_stim_play)])
+            # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
-        self.sma.add_state(
-            state_name='Start_Video',
-            state_timer=self.video_length,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window_image'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, self.video_stim_play)])
-        # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
+            self.sma.add_state(
+                state_name='Response_window_image',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                output_actions=[])
+                #output_actions=[(Bpod.OutputChannels.SoftCode, self.response_image)])
 
-        self.sma.add_state(
-            state_name='Response_window_image',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-            output_actions=[])
-            #output_actions=[(Bpod.OutputChannels.SoftCode, self.response_image)])
+            self.sma.add_state(
+                state_name='Response_window',
+                state_timer=self.response_duration,
+                state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
+                                         Bpod.Events.Tup: 'No_Touch'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
+            # Starts to read the touchscreen with one touch processing
 
-        self.sma.add_state(
-            state_name='Response_window',
-            state_timer=self.response_duration,
-            state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
-                                     Bpod.Events.Tup: 'No_Touch'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
-        # Starts to read the touchscreen with one touch processing
+            self.sma.add_state(
+                state_name='Correct',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Correct_video_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+            # Turns on Water port LED and plays correct sound
 
-        self.sma.add_state(
-            state_name='Correct',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_video_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
-        # Turns on Water port LED and plays correct sound
+            self.sma.add_state(
+                state_name='Correct_video_display',
+                state_timer=self.video_display,
+                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 113)])
+            # Turns on Water port LED and plays correct sound and displays correct stimuli for video_display (3 seconds)
 
-        self.sma.add_state(
-            state_name='Correct_video_display',
-            state_timer=self.video_display,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 113)])
-        # Turns on Water port LED and plays correct sound and displays correct stimuli for video_display (3 seconds)
+            self.sma.add_state(
+                state_name='Correct_reward',
+                state_timer=self.valve_time * self.valve_factor_c,
+                state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
+            # Delivers Water and stops the reward sound and flips the screen
 
-        self.sma.add_state(
-            state_name='Correct_reward',
-            state_timer=self.valve_time * self.valve_factor_c,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-        # Delivers Water and stops the reward sound and flips the screen
+            self.sma.add_state(
+                state_name='Flip_screen_reward',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
+            # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
-        self.sma.add_state(
-            state_name='Flip_screen_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Correct_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+            self.sma.add_state(
+                state_name='Touch_Outside',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                output_actions=[])
+            # Goes back to response window in case of touch outside the two jar areas
 
-        self.sma.add_state(
-            state_name='Touch_Outside',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-            output_actions=[])
-        # Goes back to response window in case of touch outside the two jar areas
+            self.sma.add_state(
+                state_name='Punish',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Punish_video_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 39)])
+            # Turns on Global LED and water port LED on
 
-        self.sma.add_state(
-            state_name='Punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Punish_video_display'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 39)])
-        # Turns on Global LED and water port LED on
+            self.sma.add_state(
+                state_name='Punish_video_display',
+                state_timer=self.video_display,
+                state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 114)])
+            # Turns on Global LED and water port LED on, and displays incorrect stimuli for video_display (3 seconds) nad plays punish sound for 1 second.
 
-        self.sma.add_state(
-            state_name='Punish_video_display',
-            state_timer=self.video_display,
-            state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 114)])
-        # Turns on Global LED and water port LED on, and displays incorrect stimuli for video_display (3 seconds) nad plays punish sound for 1 second.
+            self.sma.add_state(
+                state_name='After_punish',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+            # Flips the screen after water port poked in.
 
-        self.sma.add_state(
-            state_name='After_punish',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
-        # Flips the screen after water port poked in.
+            self.sma.add_state(
+                state_name='Flip_screen_no_reward',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 40)])
+            # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
-        self.sma.add_state(
-            state_name='Flip_screen_no_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 40)])
-        # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+            self.sma.add_state(
+                state_name='No_Touch',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 37)])
+            # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
 
-        self.sma.add_state(
-            state_name='No_Touch',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                            (Bpod.OutputChannels.SoftCode, 37)])
-        # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
-
-        self.sma.add_state(
-            state_name='Exit',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[])
+            self.sma.add_state(
+                state_name='Exit',
+                state_timer=0,
+                state_change_conditions={Bpod.Events.Tup: 'exit'},
+                output_actions=[])
+        else:
+            print("Task 4 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            self.trial_length = 0.1
+            self.trial_result = None
+            self.last_stim_trial = 0
+            self.x_correcth = None
+            self.x_incorrecth = None
+            self.response_x = None
+            self.response_y = None
+            self.trial_length = None
+            self.trial_result = None
 
     def after_trial(self):
-        if self.bias_breaking == 0:
-            self.random_counter += 1
+        if self.task_number == 4:
+            if self.bias_breaking == 0:
+                self.random_counter += 1
 
-        ##### COUNT MISSES:
-        if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
-            self.accwindow = self.accwindow[1:] + [0]
-            self.trial_result = 'miss'
+            ##### COUNT MISSES:
+            if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
+                self.accwindow = self.accwindow[1:] + [0]
+                self.trial_result = 'miss'
 
-        ##### COUNT PUNISH
-        elif self.current_trial_states['Punish'][0][0] > 0:
-            self.trial_result = 'incorrect'
-            self.valid_counter += 1
-            self.accwindow = self.accwindow[1:] + [0]
+            ##### COUNT PUNISH
+            elif self.current_trial_states['Punish'][0][0] > 0:
+                self.trial_result = 'incorrect'
+                self.valid_counter += 1
+                self.accwindow = self.accwindow[1:] + [0]
 
-        ##### COUNT CORRECTS FIRST POKE
-        elif self.current_trial_states['Correct'][0][0] > 0:
-            self.trial_result = 'correct'
-            self.valid_counter += 1
-            self.reward_drunk += self.valve_reward * self.valve_factor_c
-            self.accwindow = self.accwindow[1:] + [1]
-            self.correct_count += 1
-            print('Correct_count: ', self.correct_count)
+            ##### COUNT CORRECTS FIRST POKE
+            elif self.current_trial_states['Correct'][0][0] > 0:
+                self.trial_result = 'correct'
+                self.valid_counter += 1
+                self.reward_drunk += self.valve_reward * self.valve_factor_c
+                self.accwindow = self.accwindow[1:] + [1]
+                self.correct_count += 1
+                print('Correct_count: ', self.correct_count)
 
-            # Check if side bias is active and if the current trial was correct
-            if self.bias_breaking == 1:  # Side bias active
-                self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
-                    self.bias_breaking = 0  # End bias breaking
-                    self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
+                # Check if side bias is active and if the current trial was correct
+                if self.bias_breaking == 1:  # Side bias active
+                    self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
+                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
+                        self.bias_breaking = 0  # End bias breaking
+                        self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
 
 
-        # ##### COUNT Touches outside the jar areas :
-        elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-            self.status = 'Touch_Outside'
+            # ##### COUNT Touches outside the jar areas :
+            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
+                self.status = 'Touch_Outside'
 
-        # End-trial calculations
-        # self.last_x = self.x
-        self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
-        print('Trial length: ' + str(self.trial_length))
+            # End-trial calculations
+            # self.last_x = self.x
+            self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
+            print('Trial length: ' + str(self.trial_length))
 
-        ### Long trials
-        if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
-            self.tired_counter += 1
-            if self.tired_counter > 2:
-                self.tired = True
-                print('Finishing task: subject tired')
-        else:  # reset the counter
-            self.tired_counter = 0
+            ### Long trials
+            if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
+                self.tired_counter += 1
+                if self.tired_counter > 2:
+                    self.tired = True
+                    print('Finishing task: subject tired')
+            else:  # reset the counter
+                self.tired_counter = 0
 
-        # Accuracy for running trials:
-        # self.accuracy = sum(self.accwindow) / len(self.accwindow)
-        self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+            # Accuracy for running trials:
+            # self.accuracy = sum(self.accwindow) / len(self.accwindow)
+            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
-        # Side Bias Breaking formula:
-        self.last_stim_trial = self.stim_trial
+            # Side Bias Breaking formula:
+            self.last_stim_trial = self.stim_trial
 
-        try:
-            # Try converting response_x directly to a float
-            self.response_x_bias = float(self.response_x)
-        except ValueError:
-            print(f"No response_x value or response other: {self.response_x}")
-
-            # Split the string by commas and convert it to a list of floats
             try:
-                # First, check if the response_x is a string and split it
-                response_x_list = [float(x) for x in self.response_x.split(",")]
+                # Try converting response_x directly to a float
+                self.response_x_bias = float(self.response_x)
+            except ValueError:
+                print(f"No response_x value or response other: {self.response_x}")
 
-                # Use the last element of the list as response_x_bias
-                self.response_x_bias = response_x_list[-1]
-                print(f"Using last value from response_x array: {self.response_x_bias}")
-            except Exception as e:
-                # print(f"Failed to process response_x as array. Error: {e}")
-                return  # Handle this case if needed
+                # Split the string by commas and convert it to a list of floats
+                try:
+                    # First, check if the response_x is a string and split it
+                    response_x_list = [float(x) for x in self.response_x.split(",")]
 
-        # Append the response to the array:
-        # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
-        self.response_x_array.append(self.response_x_bias)
-        print(f"Responses so far: {self.response_x_array}")
-        print(f"Conditions: {self.conditions}")
+                    # Use the last element of the list as response_x_bias
+                    self.response_x_bias = response_x_list[-1]
+                    print(f"Using last value from response_x array: {self.response_x_bias}")
+                except Exception as e:
+                    # print(f"Failed to process response_x as array. Error: {e}")
+                    return  # Handle this case if needed
 
-        # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
-        if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
-            # Check if all responses fall into one of the two defined categories
-            all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
-            all_right_side = all(
-                231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
+            # Append the response to the array:
+            # if self.status != 'Touch_Outside':  #Do not append responses in case of touches outside the area
+            self.response_x_array.append(self.response_x_bias)
+            print(f"Responses so far: {self.response_x_array}")
+            print(f"Conditions: {self.conditions}")
+
+            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
+                # Check if all responses fall into one of the two defined categories
+                all_left_side = all(45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+                all_right_side = all(
+                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
 
 
-            if all_left_side:
-                self.sameside = 'left'
-                self.bias_breaking = 1
-                print('Bias breaking active, side:', self.sameside)
-                self.last_stim_trial = random.choice([112])  # Ensure the new stim is on the right
-            elif all_right_side:
-                self.sameside = 'right'
-                self.bias_breaking = 1
-                self.last_stim_trial = random.choice([111])  # Ensure the new stim is on the left
-                print('Bias breaking active, side:', self.sameside)
+                if all_left_side:
+                    self.sameside = 'left'
+                    self.bias_breaking = 1
+                    print('Bias breaking active, side:', self.sameside)
+                    self.last_stim_trial = random.choice([112])  # Ensure the new stim is on the right
+                elif all_right_side:
+                    self.sameside = 'right'
+                    self.bias_breaking = 1
+                    self.last_stim_trial = random.choice([111])  # Ensure the new stim is on the left
+                    print('Bias breaking active, side:', self.sameside)
 
-            self.response_x_array = []  # Clearing the array
+                self.response_x_array = []  # Clearing the array
+        else:
+            print(
+                "Task 4 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
 
 
         ############ REGISTER VALUES ################
@@ -562,7 +644,7 @@ class Probability_Handracking(Task):
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('random_counter', self.random_counter)
-        self.register_value('random_block', self.random_block)
+        self.register_value('block_size', self.block_size)
         self.register_value('moved_back_counter', self.moved_back_counter)
         # Weber's Law:
         self.register_value('block', self.block)
