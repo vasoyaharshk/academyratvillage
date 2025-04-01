@@ -7,7 +7,7 @@ import numpy as np
 from academy import telegram_bot
 
 
-class Probability_Extra_Training_Bias_Left_Acc(Task):
+class Probability_Extra_Training_Bias_Right_Acc(Task):
     def __init__(self):
         super().__init__()
 
