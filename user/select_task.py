@@ -128,7 +128,7 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        if 'Probability_Extra_Training_Bias' in task:
+        elif 'Probability_Extra_Training_Bias' in task:
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -148,7 +148,7 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        if 'Probability_Training_BB_Size_Acc' in task:
+        elif task == 'Probability_Training_BB_Size_Acc':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -203,6 +203,26 @@ def select_task(df, subject):
                 stim_trial = 0
                 stim_trials = []
                 stim_trial_counter = 0
+
+        elif 'Probability_Training_BB_Size_Bias' in task:
+            if moved_back_counter > max_move_backs:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if task_number == 1:
+                task = 'Probability_Training_BB_Size_Acc'
+                substage_bias = 0
+                message = 'Advance from Core training Bias breaking to normal training'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
         elif 'Probability_WebersLaw' in task:
             # Assign each value from the last row to the variables:
