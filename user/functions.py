@@ -1756,3 +1756,101 @@ def loop115(timing):
 #         window.flip()
 #     else:
 #         window.flip()
+
+# Functions from 201 on wards for the audiorats:
+def function201(): # touchteaching substage 1 - 'stimulus' is entire screen
+    square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+
+    cont = float(utils.task.contrast)
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    print('Stimulus Shown')
+
+def loop201(timing):
+    square.draw()
+    window.flip()
+
+def function202():  # touchteaching substage 1 - 'stimulus' is entire screen
+    square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+
+    cont = float(utils.task.contrast)
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    print('Stimulus Shown')
+
+def loop202(timing):
+    square.draw()
+    window.flip()
+
+def function203():  # touchteaching substage 1 - 'stimulus' is entire screen
+    square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+
+    cont = float(utils.task.contrast)
+    square.fillColor = [cont, cont, cont]
+    square.lineColor = [cont, cont, cont]
+    print('Stimulus Shown')
+
+def loop203(timing):
+    square.draw()
+    window.flip()
+
+def function204():  # touchteaching substage 1 - 'stimulus' is entire screen
+    width = utils.task.width * settings.PIXELS_PER_MM
+    height = utils.task.height * settings.PIXELS_PER_MM
+    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+    x_incorrect = utils.task.x_incorrecth
+    y = utils.task.y_correcth * settings.PIXELS_PER_MM
+
+    if x_incorrect is None:
+        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+    else:
+        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, x_incorrect, y, width,
+                                                    height)
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win 1')
+    # print('x_correct in functions: ', x_correct)
+    # print('x_incorrect in functions: ', x_incorrect)
+
+def loop204(timing):
+
+
+def function205():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop205(timing):
+
+
+def function206():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop206(timing):
+
+
+def function207():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop207(timing):
+
+
+def function208():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop208(timing):
+
+
+def function209():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop209(timing):
+
+
+def function210():  # touchteaching substage 1 - 'stimulus' is entire screen
+
+
+def loop210(timing):
