@@ -134,7 +134,7 @@ def loop2(timing):
     window.flip()
 
 
-# draw a 3 temporal white rectangles (fot touchteaching)  with task.x, task.y, task.width and task.stim_duration
+# draw 3 temporal white rectangles (fot touchteaching)  with task.x, task.y, task.width and task.stim_duration. Only used in touchteaching
 def function3():
     square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
