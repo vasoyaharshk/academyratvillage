@@ -194,7 +194,8 @@ def function5():
 
 
 def function9():
-    soundStream.stop(soundVec1)  #14Khz sound played
+    if isinstance(soundStream, SoundR):
+        soundStream.stop(soundVec1)  #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -203,7 +204,8 @@ def function9():
 
 # camera correct and delete screen
 def function11():
-    soundStream.play(soundVec1)     #14Khz sound played
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec1)     #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -224,7 +226,8 @@ def loop12(timing):
 
 # camera incorrect
 def function13():
-    soundStream.play(soundVec2)     #4Khz sound played
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec2)     #4Khz sound played
 
     cam2.put_state("Incorrect")
     cam3.put_state("Incorrect")
@@ -232,7 +235,8 @@ def function13():
 
 
 def function14():
-    soundStream.play(soundVec3)  # 4Khz sound played
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)  # 4Khz sound played
 
     cam2.put_state("Punish")
     cam3.put_state("Punish")
@@ -279,7 +283,8 @@ def loop15(timing):
 
 # camera empty and delete screen
 def function17():
-    soundStream.stop(soundVec1)
+    if isinstance(soundStream, SoundR):
+        soundStream.stop(soundVec1)
 
     cam2.put_state("")
     cam3.put_state("")
@@ -289,7 +294,8 @@ def loop17(timing):
 
 
 def function18():
-    soundStream.stop(soundVec3)
+    if isinstance(soundStream, SoundR):
+        soundStream.stop(soundVec3)
     print("Punish Sound Stopped")
 
 
@@ -510,7 +516,8 @@ def loop35(timing):
 def function36():
     global last_function_called
 
-    soundStream.play(soundVec3)
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -558,7 +565,8 @@ def loop37(timing):
 
 #Correct without image display:
 def function38():
-    soundStream.play(soundVec1)
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec1)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -955,7 +963,8 @@ def loop55(timing):
 def function56():
     global last_function_called
 
-    soundStream.play(soundVec3)
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1058,7 +1067,8 @@ def loop63(timing):
 def function64():
     global last_function_called
 
-    soundStream.play(soundVec3)
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1657,7 +1667,8 @@ def loop113(timing):
 def function114():
     global last_function_called
 
-    soundStream.play(soundVec3)
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1824,8 +1835,9 @@ def function204():  # touchteaching substage 1 - 'stimulus' is entire screen
     # print('x_incorrect in functions: ', x_incorrect)
 
 #From function 210 onwards, cognitive bias:
-def function211():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec4)
+def function211():  # Tone pair 1, negative reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec4)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1842,8 +1854,9 @@ def loop211(timing):
     square2.draw()
     window.flip()
 
-def function212():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec5)
+def function212():  # Tone pair 1, positive reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec5)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1861,8 +1874,9 @@ def loop212(timing):
     square2.draw()
     window.flip()
 
-def function213():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec6)
+def function213():  # Tone pair 2, negative reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec6)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1880,8 +1894,9 @@ def loop213(timing):
     square2.draw()
     window.flip()
 
-def function214():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec7)
+def function214():  # Tone pair 2, positive reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec7)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1899,8 +1914,9 @@ def loop214(timing):
     square2.draw()
     window.flip()
 
-def function215():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec8)
+def function215():  # Tone pair 3, negative reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec8)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1918,8 +1934,9 @@ def loop215(timing):
     square2.draw()
     window.flip()
 
-def function216():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec9)
+def function216():  # Tone pair 3, positive reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec9)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1937,8 +1954,9 @@ def loop216(timing):
     square2.draw()
     window.flip()
 
-def function217():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec10)
+def function217():  # Tone pair 4, negative reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec10)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1956,8 +1974,9 @@ def loop217(timing):
     square2.draw()
     window.flip()
 
-def function218():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec11)
+def function218():  # Tone pair 4, positive reinforcement
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec11)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1975,46 +1994,9 @@ def loop218(timing):
     square2.draw()
     window.flip()
 
-def function219():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec12)
-
-    square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-    print('Stimulus Shown')
-
-    square2.pos = (
-    int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-    square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-    print('Stimulus Shown')
-
-def loop219(timing):
-    square.draw()
-    square2.draw()
-    window.flip()
-
-def function220():  # touchteaching substage 1 - 'stimulus' is entire screen
-    soundStream.play(soundVec13)
-
-    square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-    print('Stimulus Shown')
-
-    square2.pos = (
-    int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-    square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-    print('Stimulus Shown')
-
-def loop220(timing):
-    square.draw()
-    square2.draw()
-    window.flip()
-
-def function221():  #White noise, TBD
-    soundStream.play(soundVec14)
+def function219():  #White noise, TBD
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec14)
 
 
 

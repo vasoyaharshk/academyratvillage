@@ -12,20 +12,14 @@ class Cognitive_Bias(Task):
         super().__init__()
 
         self.info = """
-        This task displays the image of the jars which are touchable. This script is for the extra training if rats are struggling to discriminate between stimuli.
+        This task trains rats on 4 tone pairs for the cognitive bias tasks. 
 
         ########   TASK INFO   ########
         Task Numbers:
-        1: Extra training
-        2: Urn Training
-        3: Weber's Law Test and Training
+        4
 
         Stages:
-        Extra Training 1: a single blue peg - either on left or right, like Indication
-        Extra Training 2: a single blue peg vs a single yellow peg - side counterbalanced
-        Extra Training 3: two blue pegs vs two yellow pegs - side counterbalanced
-        Extra Training 4: 5 blue pegs vs 5 yellow pegs - side counterbalanced
-        Extra Training 5: 10 blue pegs vs 10 yellow pegs - side counterbalanced
+        TBD
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -65,7 +59,7 @@ class Cognitive_Bias(Task):
         # Image output stims:
         self.stim = [0]  # defines if correct side is left or right
         self.x_correct_square = 0
-        self.x_incorrect_square = o
+        self.x_incorrect_square = 0
         self.y = 110
 
 

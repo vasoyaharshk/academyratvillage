@@ -138,11 +138,11 @@ try:
     soundVec8 = pureToneGen(0.4, 12000, 1)  # 4000  #Punish sound plays only for 1 second
     soundVec9 = pureToneGen(0.4, 16000, 1)  # 4000  #Punish sound plays only for 1 second
 
-    soundVec12 = pureToneGen(0.4, 20000, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec13 = pureToneGen(0.4, 25000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec10 = pureToneGen(0.4, 20000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec11 = pureToneGen(0.4, 25000, 1)  # 4000  #Punish sound plays only for 1 second
 
     #Whitenoise:
-    soundVec14 = whiteNoiseGen(1.0, 2000, 25000, 1, FsOut=44800, Fn=1000)
+    soundVec12 = whiteNoiseGen(1.0, 2000, 25000, 1, FsOut=44800, Fn=1000)
 
 except:
     print("______")
