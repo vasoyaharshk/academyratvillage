@@ -16,7 +16,7 @@ class Probability_Handtracking(Task):
         This task is for Bastos and Taylor for Probabilistic Inference training and test.
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
-        Stage 2 - Starts from open hands and then closes as rat approaches.
+        Stage 2 - Videos - starts from open hands and then closes as rat approaches.
         Stage 3 - Jar Videos
 
                 ########   PORTS INFO   ########
@@ -32,7 +32,7 @@ class Probability_Handtracking(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.stage = 1  # Current stage within the task
+        self.stage = 2  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
         self.task_number = 4  # Each task has a unique number. See RV script guide.
@@ -185,12 +185,11 @@ class Probability_Handtracking(Task):
 
         return video_path
 
-    def get_stim_image_path(self, stim_trial):
+    def get_stim_image_path(self, stim_trial, stage):
         """
-        Determines whether stim_trial is 61 or 62, retrieves the corresponding image path, and returns it.
+        Determines whether stim_trial is 61 or 62, retrieves the corresponding image path based on the stage, and returns it.
         """
         image_path = None
-        image_folder = f'/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
 
         try:
             if stim_trial == 61:
@@ -198,20 +197,29 @@ class Probability_Handtracking(Task):
             elif stim_trial == 62:
                 position = 'right'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 71 or 72.")
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 61 or 62.")
 
-                # Get relevant images
+            # Define image folder based on stage
+            if stage == 1:
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stag_1_image_single_peg'
+            elif stage == 2:
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+            elif stage == 3:
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_images'
+            else:
+                raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
+
+            # Get relevant images based on position
             images = [f for f in os.listdir(image_folder) if
                       os.path.isfile(os.path.join(image_folder, f)) and
                       (position in f.lower() and 'both' in f.lower() and 'open' in f.lower())]
 
             if not images:
-                raise ValueError(
-                    f"No images found in {image_folder} for and position {position}.")
+                raise ValueError(f"No images found in {image_folder} for position {position}.")
 
             # Choose a random image
             image_path = os.path.join(image_folder, random.choice(images))
-
+            print(f'Stage: {stage}')
             print(f'Image Correct answer on {position}: {image_path}')
 
         except Exception as e:
@@ -305,7 +313,7 @@ class Probability_Handtracking(Task):
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
 
-            self.stim_trial = 61  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
+            #self.stim_trial = 61  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
 
             if self.stage == 1:  # We have only one stimuli in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
@@ -342,12 +350,12 @@ class Probability_Handtracking(Task):
             print('video_stim_play: ', self.video_stim_play)
             print('response_image: ', self.response_image)
 
-            self.image_path_function = self.get_stim_image_path(self.stim_trial)
+            self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
 
             if self.stage == 2:
                 self.video_length = 3
             if self.stage == 3:
-                self.video_length = 0
+                self.video_length = 3
 
             if self.stage != 1:
                 self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage)
@@ -366,9 +374,9 @@ class Probability_Handtracking(Task):
                 if self.current_trial == 0:
                     self.sma.add_state(
                         state_name='Start_task',
-                        state_timer=0,
+                        state_timer=0, # the timer is set to 0 meaning it will immediately proceed to the next state when photogate at port 2 has been crossed
                         state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)]) # displays the still image of the first frame of the video
                     # Starts task and displays stimuli instanly
 
                     self.sma.add_state(
