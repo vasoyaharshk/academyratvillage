@@ -504,7 +504,7 @@ class Probability_Handtracking(Task):
                         state_timer=0,
                         state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                         output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-                    # Starts task and displays stimuli instanly
+                    # Starts task and displays stimuli instantly
 
                     self.sma.add_state(
                         state_name='Real_start',
