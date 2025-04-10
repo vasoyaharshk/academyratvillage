@@ -1014,7 +1014,7 @@ def loop61(timing):
 
 
 ## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
-def function62():  # When the correct answer is on left
+def function62():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 62
 
@@ -1598,10 +1598,12 @@ def loop108(timing):
 # Function 111: Display the first frame of Left Video (without playing)
 def function111():
     global last_function_called
-    last_function_called = 111
+    last_function_called = 111 # This tells Python you're using a global variable named 'last_function_called' (meaning it exists outside this function and can be accessed or changed anywhere in your program).
     print("111. video starts")
 
-    video_left.setMovie(utils.task.video_path_function)
+    video_left.setMovie(utils.task.video_path_function) # This sets the movie that will play on the 'left video screen'.
+    # It's choosing the movie file based on the path stored in 'utils.task.video_path_function'.
+
     video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
     print(f"Assigned left video: {utils.task.video_path_function}")
 
@@ -1609,20 +1611,34 @@ def loop111(timing):
     video_left.draw()  # Show the first frame
     window.flip()
 
-
 # Function 112: Display the first frame of Right Video (without playing)
 def function112():
     global last_function_called
     last_function_called = 112
-    print("111. video starts")
+    print("112. video starts")
 
-    video_left.setMovie(utils.task.video_path_function)
-    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-    print(f"Assigned left video: {utils.task.video_path_function}")
+    video_right.setMovie(utils.task.video_path_function)
+    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    print(f"Assigned right video: {utils.task.video_path_function}")
 
 def loop112(timing):
-    video_left.draw()  # Show the first frame
+    video_right.draw()
     window.flip()
+
+# Delet above and replace with this if it doesn't work
+# Function 112: Display the first frame of Right Video (without playing)
+# def function112():
+#     global last_function_called
+#     last_function_called = 112
+#     print("111. video starts")
+#
+#     video_left.setMovie(utils.task.video_path_function)
+#     video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+#     print(f"Assigned left video: {utils.task.video_path_function}")
+#
+# def loop112(timing):
+#     video_left.draw()  # Show the first frame
+#     window.flip()
 
 
 

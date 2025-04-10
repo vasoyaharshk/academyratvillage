@@ -12,6 +12,7 @@ class Probability_Handtracking(Task):
     def __init__(self):
         super().__init__()
 
+        self.image_name = None # Initialize image_name # NEW
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test.
         Stages:
@@ -38,7 +39,7 @@ class Probability_Handtracking(Task):
         self.task_number = 4  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 40  # The number of trials in a block
+        self.block_size = 2  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -59,6 +60,10 @@ class Probability_Handtracking(Task):
         self.stim_trials = []  # List of correct stimulus function randomised.
         self.stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
         self.last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+        # to show an equal number of each image (left 1-5 and right 1-5)
+        self.image_counter = 0  # NEW: Initialize the counter
+        self.image_history = []  # Initialize the history list
 
         # ==============================
         # Untracked Variables
@@ -149,47 +154,14 @@ class Probability_Handtracking(Task):
                 trials.append(candidate)
         return trials
 
-    def get_stim_video_path(self, stim_trial, stage):
-        """
-        Determines whether stim_trial is 111, 112, retrieves the corresponding video path, and returns it.
-        """
-        video_path = None
 
-        try:
-            if stim_trial == 111:
-                position = 'left'
-            elif stim_trial == 112:
-                position = 'right'
-            else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
-            # Define video folder based on stage
-            if stage == 2:
-                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            elif stage == 3:
-                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/'
-            else:
-                raise ValueError(f"Invalid stage value: {stage}.")
-            # Get relevant videos based on position
-            videos = [f for f in os.listdir(video_folder) if
-                      os.path.isfile(os.path.join(video_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower())]
-            if not videos:
-                raise ValueError(
-                    f"No videos found in {video_folder} for stage {stage}, position {position}.")
-            # Choose a random video
-            video_path = os.path.join(video_folder, random.choice(videos))
-            print(f'Stage: {utils.task.stage}')
-            print(f'Video Correct answer on {position} {video_path}')
-        except Exception as e:
-            print(f"Error occurred: {e}")
-
-        return video_path
 
     def get_stim_image_path(self, stim_trial, stage):
         """
         Determines whether stim_trial is 61 or 62, retrieves the corresponding image path based on the stage, and returns it.
         """
         image_path = None
+        image_name = None # NEW
 
         try:
             if stim_trial == 61:
@@ -217,15 +189,103 @@ class Probability_Handtracking(Task):
             if not images:
                 raise ValueError(f"No images found in {image_folder} for position {position}.")
 
-            # Choose a random image
-            image_path = os.path.join(image_folder, random.choice(images))
+
+          ### NEW Ensure no image is displayed more than twice in a row
+            while True:
+                image_path = os.path.join(image_folder, images[self.image_counter % len(images)]) # NEW
+                image_name = os.path.splitext(os.path.basename(image_path))[0]
+                if self.image_history.count(image_name) < 2:  # NEW
+                   break
+                self.image_counter += 1  # NEW
+
+            self.image_counter += 1  # NEW
+            self.image_history.append(image_name)  # NEW
+            if len(self.image_history) > 2:   # NEW
+                self.image_history.pop(0)  # NEW
+
+            print(f'XXXXX{image_name}')
             print(f'Stage: {stage}')
             print(f'Image Correct answer on {position}: {image_path}')
 
         except Exception as e:
+             print(f"Error occurred: {e}")
+
+        return image_path, image_name  # EDITED
+
+            #     # Choose a random image
+        #     image_path = os.path.join(image_folder, random.choice(images))
+        #     image_name = os.path.splitext(os.path.basename(image_path))[0]
+        #     print(f'XXXXX{image_name}')
+        #     print(f'Stage: {stage}')
+        #     print(f'Image Correct answer on {position}: {image_path}')
+        #
+        # except Exception as e:
+        #     print(f"Error occurred: {e}")
+        #
+        # return image_path, image_name # EDITED
+
+    def get_stim_video_path(self, stim_trial, stage, image_name):
+        """
+        Determines whether stim_trial is 111, 112, retrieves the corresponding video path, and returns it.
+        """
+        video_path = None
+
+        try:
+            if stim_trial == 111:
+                position = 'left'
+            elif stim_trial == 112:
+                position = 'right'
+            else:
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
+            # Define video folder based on stage
+            if stage == 2:
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+            elif stage == 3:
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/'
+            else:
+                raise ValueError(f"Invalid stage value: {stage}.")
+            # Get relevant videos based on position
+            videos = [f for f in os.listdir(video_folder) if
+                      os.path.isfile(os.path.join(video_folder, f)) and
+                      (position in f.lower() and 'both' in f.lower())]
+            if not videos:
+                raise ValueError(
+                    f"No videos found in {video_folder} for stage {stage}, position {position}.")
+
+            # Choose a video that matches with the image left or right, and 1-5
+
+            ## All new from here
+            def filter_videos(videos, keyword, number):
+                 return [video for video in videos if keyword in video and str(number) in video]
+
+            if "left" in image_name:
+                 keyword = "left"
+            elif "right" in image_name:
+                 keyword = "right"
+            else:
+                 keyword = ""
+            number = next((num for num in range(1, 7) if str(num) in image_name), None)
+
+            # Filter videos based on keyword and number
+            filtered_videos = filter_videos(videos, keyword, number)
+            print(f"The filtered video{filtered_videos}")
+            # Choose a random video from the filtered list
+
+            # Choose a random video from the filtered list
+            if filtered_videos:
+                 video_path = os.path.join(video_folder, random.choice(filtered_videos))
+                 print(f"The selected video path: {video_path}")
+            else:
+             print("No matching video found.")
+            ## to here
+
+            #video_path = os.path.join(video_folder, random.choice(videos)) # here is where it picks a random video
+            print(f'Stage: {utils.task.stage}')
+            print(f'Video Correct answer on {position} {video_path}')
+        except Exception as e:
             print(f"Error occurred: {e}")
 
-        return image_path
+        return video_path
 
     def main_loop(self):
         print('')
@@ -291,7 +351,7 @@ class Probability_Handtracking(Task):
         # Choose x positions:
         #self.stim = [111, 112] for video
 
-        ### IMAGES
+        ### IMAGE Randomisation
         self.stim = [61, 62] # function 61 is image where the left hand is correct and 62 is where right is correct
         if self.task_number == 4:
             # Stimulus generation logic
@@ -319,10 +379,10 @@ class Probability_Handtracking(Task):
 
 
             ### VIDEOS
-            if self.stage == 1:  # We have only one stimuli in stage 1
+            if self.stage == 1:  # We have only one stimulus in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
                 if self.stim_trial in [61]: # if image is left correct
-                    self.video_stim_play = 111
+                    self.video_stim_play = 111 # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]  # No incorrect area in stage 1
@@ -333,17 +393,18 @@ class Probability_Handtracking(Task):
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]  # No incorrect area in stage 1
                     print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+
             ### For stage 2 onwards
             else:  # We have two stimuli after stage 1 with correct and incorrect areas
                 if self.stim_trial in [61]: # if image is left correct
-                    self.video_stim_play = 111
+                    self.video_stim_play = 111 # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]
                     print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                           self.x_incorrecth)
                 elif self.stim_trial in [62]: # if image is right correct
-                    self.video_stim_play = 112
+                    self.video_stim_play = 112 # should display videos with correct on right
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]
@@ -355,17 +416,25 @@ class Probability_Handtracking(Task):
             print('video_stim_play: ', self.video_stim_play)
             print('response_image: ', self.response_image)
 
-            self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+            self.image_path_function,self.image_name=self.get_stim_image_path(self.stim_trial,self.stage)
+            #self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
 
             if self.stage == 2:
-                self.video_length = 3
+                self.video_length = 1
             if self.stage == 3:
-                self.video_length = 3
+                self.video_length = 2
 
             if self.stage != 1:
-                self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage)
+                # Figure out the full path to the video we want to play.
+                # This uses some kind of function (self.get_stim_video_path, probably defined earlier in your code) that takes in which video to play and what stage we're in.
+                self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage, self.image_name)
+                # Split that full video path into two parts:
+                # - 'directory' is where the video is stored on your computer.
+                # - 'filename' is just the name of the video file itself (without the folder path).
                 directory, filename = os.path.split(self.video_path_function)
+                # Save the name of the video file for later use or reference.
                 self.video_displayed = filename
+                # Save the directory (location) where the video file lives.
                 self.video_directory = directory
 
             print("image_path_function: ", self.image_path_function)
@@ -502,6 +571,8 @@ class Probability_Handtracking(Task):
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'exit'},
                     output_actions=[])
+
+            ### STAGE 2 ONWARDS
             else: #For stage 2 involving videos
                 if self.current_trial == 0:     #This is a separate statement for the first trial as we need it to also close door 2
                     self.sma.add_state(
@@ -531,10 +602,10 @@ class Probability_Handtracking(Task):
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                     output_actions=[])
-                # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+
 
                 self.sma.add_state(
-                    state_name='Fixation',
+                    state_name='Fixation', # displays image
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port5In: 'Start_Video'}, # This starts the video when they cross photogate port 5 is crossed .
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
