@@ -39,7 +39,7 @@ class Probability_Handtracking(Task):
         self.task_number = 4  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 2  # The number of trials in a block
+        self.block_size = 40  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -203,7 +203,6 @@ class Probability_Handtracking(Task):
             if len(self.image_history) > 2:   # NEW
                 self.image_history.pop(0)  # NEW
 
-            print(f'XXXXX{image_name}')
             print(f'Stage: {stage}')
             print(f'Image Correct answer on {position}: {image_path}')
 
@@ -253,8 +252,6 @@ class Probability_Handtracking(Task):
                     f"No videos found in {video_folder} for stage {stage}, position {position}.")
 
             # Choose a video that matches with the image left or right, and 1-5
-
-            ## All new from here
             def filter_videos(videos, keyword, number):
                  return [video for video in videos if keyword in video and str(number) in video]
 
@@ -268,19 +265,15 @@ class Probability_Handtracking(Task):
 
             # Filter videos based on keyword and number
             filtered_videos = filter_videos(videos, keyword, number)
-            print(f"The filtered video{filtered_videos}")
-            # Choose a random video from the filtered list
 
             # Choose a random video from the filtered list
             if filtered_videos:
                  video_path = os.path.join(video_folder, random.choice(filtered_videos))
-                 print(f"The selected video path: {video_path}")
             else:
              print("No matching video found.")
             ## to here
 
             #video_path = os.path.join(video_folder, random.choice(videos)) # here is where it picks a random video
-            print(f'Stage: {utils.task.stage}')
             print(f'Video Correct answer on {position} {video_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -359,7 +352,7 @@ class Probability_Handtracking(Task):
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                 last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                 self.stim_trials = self.generate_random_trials(last_trial)
-                print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                #print(f"Stimulus trials after first attempt: {self.stim_trials}")
                 while self.stim_trials is None:
                     print("Retrying to generate stimulus trials...")
                     self.stim_trials = self.generate_random_trials(last_trial)
@@ -386,13 +379,13 @@ class Probability_Handtracking(Task):
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]  # No incorrect area in stage 1
-                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+                    #print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
                 elif self.stim_trial in [62]: # if image is right correct
                     self.video_stim_play = 112
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]  # No incorrect area in stage 1
-                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+                    #print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
 
             ### For stage 2 onwards
             else:  # We have two stimuli after stage 1 with correct and incorrect areas
@@ -401,20 +394,20 @@ class Probability_Handtracking(Task):
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]
-                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                          self.x_incorrecth)
+                    #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                          #self.x_incorrecth)
                 elif self.stim_trial in [62]: # if image is right correct
                     self.video_stim_play = 112 # should display videos with correct on right
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]
-                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                          self.x_incorrecth)
+                    #print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                          #self.x_incorrecth)
 
-            print('randomisation counter: ', self.stim_trial_counter)
-            print('stim_trial: ', self.stim_trial)
-            print('video_stim_play: ', self.video_stim_play)
-            print('response_image: ', self.response_image)
+            #print('randomisation counter: ', self.stim_trial_counter)
+            #print('stim_trial: ', self.stim_trial)
+            #print('video_stim_play: ', self.video_stim_play)
+            #print('response_image: ', self.response_image)
 
             self.image_path_function,self.image_name=self.get_stim_image_path(self.stim_trial,self.stage)
             #self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
@@ -437,8 +430,8 @@ class Probability_Handtracking(Task):
                 # Save the directory (location) where the video file lives.
                 self.video_directory = directory
 
-            print("image_path_function: ", self.image_path_function)
-            print("video_path_function: ", self.video_path_function)
+            #print("image_path_function: ", self.image_path_function)
+            #print("video_path_function: ", self.video_path_function)
 
         ############ STATE MACHINE ################
         # First trial:
@@ -864,20 +857,20 @@ class Probability_Handtracking(Task):
                     self.sameside = 'left'
                     self.bias_breaking = 1
                     print('Bias breaking active, side:', self.sameside)
-                    self.last_stim_trial = random.choice([112])  # Ensure the new stim is on the right
+                    self.last_stim_trial = random.choice([62])  # Ensure the new stim is on the right
                 elif all_right_side:
                     self.sameside = 'right'
                     self.bias_breaking = 1
-                    self.last_stim_trial = random.choice([111])  # Ensure the new stim is on the left
+                    self.last_stim_trial = random.choice([61])  # Ensure the new stim is on the left
                     print('Bias breaking active, side:', self.sameside)
 
                 self.response_x_array = []      #Clearing the array
 
             print("Block Trial Counter: ", self.block_trial_counter)
-            print("Block Accuracy: ", self.block_accuracy)
+            #print("Block Accuracy: ", self.block_accuracy)
             print("Block Number: ", self.block_number)
             print("Block Size: ", self.block_size)
-            print("Task Number: ", self.task_number)
+            #print("Task Number: ", self.task_number)
             print("Stage Number: ", self.stage)
             print("Block Change: ", self.block_change)
             print("Stage Change Forward: ", self.stage_forward_change)
@@ -984,3 +977,4 @@ class Probability_Handtracking(Task):
         self.register_value('video_path_function', self.video_path_function)
         self.register_value('video_displayed', self.video_displayed)
         self.register_value('video_directory', self.video_directory)
+        self.register_value('image_number', self.image_name)
