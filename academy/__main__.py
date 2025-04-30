@@ -747,7 +747,7 @@ def go_to_state(num):
             utils.subject_trapped = False
             arduino.close_door1()
         arduino.open_door2()
-        utils.log_cam(utils.subject.name, "XXXXX. Opening door2, subject can leave", "ACTION")
+        utils.log_cam(utils.subject.name, "Opening door2, subject can leave", "ACTION")
         utils.log("Academy", "Go to state 3", "ACTION")
 
     elif num == 4:  # after min_time, data not saved, animal back
