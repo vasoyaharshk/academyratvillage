@@ -452,6 +452,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         print("ROR Change: ", self.ror_change)
         print("Total Trials: ", self.total_trials)
 
+
         #print('Trial: ' + str(self.current_trial))
         #print('Total Accuracy for the session: ', self.accuracy)
         #print('stim_trial: ', self.stim_trial)
