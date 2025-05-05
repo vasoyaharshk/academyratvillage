@@ -283,7 +283,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    #task = 'Probability_Bastos_Taylor'
+                    task = 'Probability_Handtracking'
                     # Weber's Law:
                     stage = 1
                     ror = []
@@ -378,7 +378,6 @@ def select_task(df, subject):
                     condition_trial_counter = 0
                     conditions = []
 
-
                     message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
                     print(f'{message}')
                     try:
@@ -407,8 +406,9 @@ def select_task(df, subject):
                     substage = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
+                    condition_trial_counter = 0
 
-                    #task = 'Probability_WebersLaw_Post'
+                    task = 'Probability_WebersLaw_Post'
                     stage = 4
                     block = 12  # This is the number of trials one conditions will remain for
                     conditions = []  # Takes the conditions from select task file.
@@ -421,6 +421,7 @@ def select_task(df, subject):
                     stim_trial = 0
                     stim_trials = []
                     stim_trial_counter = 0
+
 
                     message = f"PI: Probability_WL_Training_Runthrough complete, Moving to Post Training."
                     print(f'{message}')
