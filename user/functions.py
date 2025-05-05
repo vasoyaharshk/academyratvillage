@@ -55,6 +55,22 @@ def update_image_path_position(correct=True):
         return image_path.replace("both", "correct" if correct else "incorrect")
     return None
 
+def update_image_path_size_position_wl(correct=True):
+    global image_path
+    if image_path and "both" in image_path:
+        #print(f"Original image path: {image_path}")
+        directory, filename = os.path.split(image_path)
+        if correct:
+            filename = re.sub(r'_[^_]+_[^_]+\.png$', '.png', filename)
+        else:
+            filename = re.sub(r'\d+c_', '', filename)
+            filename = re.sub(r'_\d+(?=\.png)', '', filename)
+        filename = filename.replace("both", "correct" if correct else "incorrect")
+        image_path_replaced = os.path.join(directory, filename)
+        #print(f"Modified image path: {image_path_replaced}")
+        return image_path_replaced
+    return None
+
 # draw a temporary white rectangle  with task.x, task.y, task.width and task.stim_duration
 def function1():
     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
@@ -1498,6 +1514,80 @@ def function86():
 def loop86(timing):
     image_jar_right.draw()
     window.flip()
+
+
+#Display camera correct, play correct sound and display correct stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW.
+def function87():
+    global last_function_called
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+
+    stage = utils.task.stage
+    if stage != 1:
+        image_path_replaced = update_image_path_size_position_wl(correct=True)
+        if image_path_replaced:
+            if last_function_called in LEFT_FUNCTIONS:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = settings.CENTRE_SCREEN
+            elif last_function_called in RIGHT_FUNCTIONS:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = settings.CENTRE_SCREEN
+            #print(f"Correct image path: {image_path_replaced}")
+        else:
+            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
+
+
+def loop87(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.draw()
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
+
+
+def function88():
+    global last_function_called
+
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec3)
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+    stage = utils.task.stage
+    if stage != 1:
+        image_path_replaced = update_image_path_size_position_wl(correct=False)
+        if image_path_replaced:
+            if last_function_called in LEFT_FUNCTIONS:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = settings.CENTRE_SCREEN
+            elif last_function_called in RIGHT_FUNCTIONS:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = settings.CENTRE_SCREEN
+            #print(f"Incorrect image path: {image_path_replaced}")
+        else:
+            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
+
+
+def loop88(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.draw()
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
 
 
 
