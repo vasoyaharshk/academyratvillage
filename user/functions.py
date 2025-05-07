@@ -210,8 +210,8 @@ def function5():
 
 
 def function9():
-    if isinstance(soundStream, SoundR):
-        soundStream.stop(soundVec1)  #14Khz sound played
+    #if isinstance(soundStream, SoundR):
+    soundStream.stop(soundVec1)  #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -220,8 +220,8 @@ def function9():
 
 # camera correct and delete screen
 def function11():
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec1)     #14Khz sound played
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec1)     #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -242,8 +242,8 @@ def loop12(timing):
 
 # camera incorrect
 def function13():
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec2)     #4Khz sound played
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec2)     #4Khz sound played
 
     cam2.put_state("Incorrect")
     cam3.put_state("Incorrect")
@@ -251,8 +251,8 @@ def function13():
 
 
 def function14():
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)  # 4Khz sound played
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)  # 4Khz sound played
 
     cam2.put_state("Punish")
     cam3.put_state("Punish")
@@ -299,8 +299,8 @@ def loop15(timing):
 
 # camera empty and delete screen
 def function17():
-    if isinstance(soundStream, SoundR):
-        soundStream.stop(soundVec1)
+    #if isinstance(soundStream, SoundR):
+    soundStream.stop(soundVec1)
 
     cam2.put_state("")
     cam3.put_state("")
@@ -310,8 +310,8 @@ def loop17(timing):
 
 
 def function18():
-    if isinstance(soundStream, SoundR):
-        soundStream.stop(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.stop(soundVec3)
     print("Punish Sound Stopped")
 
 
@@ -532,8 +532,9 @@ def loop35(timing):
 def function36():
     global last_function_called
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -581,8 +582,9 @@ def loop37(timing):
 
 #Correct without image display:
 def function38():
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec1)
+    #if isinstance(soundStream, SoundR):
+
+    soundStream.play(soundVec1)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -979,8 +981,9 @@ def loop55(timing):
 def function56():
     global last_function_called
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1083,8 +1086,9 @@ def loop63(timing):
 def function64():
     global last_function_called
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1555,8 +1559,9 @@ def loop87(timing):
 def function88():
     global last_function_called
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1759,8 +1764,9 @@ def loop113(timing):
 def function114():
     global last_function_called
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
