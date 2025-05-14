@@ -35,82 +35,77 @@ class SoundR:
 
 
     def play(self, soundVec):
-        sd.play(soundVec)
+        #sd.play(soundVec, samplerate=44100)
+        sd.play(soundVec, samplerate=44100)
 
-    def stop(self, soundVec):
-       sd.stop()
-
-    @staticmethod
-    def _create_sound_vec(v1, v2):
-        sound = np.array([v1, v2])  # left and right channel
-        return np.ascontiguousarray(sound.T, dtype=np.float32)
+    def stop(self):
+        sd.stop()
 
 
+def db_to_amplitude(db, reference_db=100):
+    """Convert dB SPL to linear amplitude (RMS-based)"""
+    return 10 ** ((db - reference_db) / 20)
 
-def pureToneGen(amp, freq, toneDuration, FsOut=44800):
-    """Generates a given parameters pure tone vector. Generates a sine wave (pure tone) as a NumPy array.
-    FsOut is the sound quality (sampling rate), 44800 Hz is the CD quality. 192000 is Ultra-high quality:
-    """
-    if type(amp) is float and type(freq) is int:
-        # Create a time vector from 0 to duration, sampled at FsOut
-        tvec = np.linspace(0, toneDuration, toneDuration * FsOut)
-        # Generate a sine wave with the given amplitude and frequency
+
+def apply_cosine_ramp(sound, ramp_duration=0.01, FsOut=44100):
+    """Apply 10 ms cosine on/off ramps to avoid clicks"""
+    ramp_len = int(FsOut * ramp_duration)
+    ramp = 0.5 * (1 - np.cos(np.pi * np.arange(ramp_len) / ramp_len))
+
+    sound[:ramp_len] *= ramp
+    sound[-ramp_len:] *= ramp[::-1]
+    return sound
+
+
+def pureToneGen(amp, freq, toneDuration, FsOut=44100):
+    """Generate sine wave tone with cosine ramp gating"""
+    if isinstance(amp, float) and isinstance(freq, (int, float)):
+        tvec = np.linspace(0, toneDuration, int(toneDuration * FsOut), endpoint=False)
         s1 = amp * np.sin(2 * np.pi * freq * tvec)
-        return s1
+        return apply_cosine_ramp(s1, ramp_duration=0.01, FsOut=FsOut).astype(np.float32)
     else:
-        raise ValueError('pureToneGen needs (float, int) as arguments')
+        raise ValueError('pureToneGen needs (float, float, float) as arguments')
 
 
+def generate_reward_sound(frequency=8000.0, duration=1.0, db=70, FsOut=44100):
+    """Generate reward tone with specified frequency (Hz), duration (s), and volume (dB SPL)"""
+    amp = db_to_amplitude(db)
+    return pureToneGen(amp=amp, freq=frequency, toneDuration=duration, FsOut=FsOut)
 
-def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
-    """whiteNoiseGen(amp, band_fs_bot, band_fs_top):
-    beware this is not actually whitenoise
-    amp: float, amplitude
-    band_fs_bot: int, bottom freq of the band
-    band_fs_top: int, top freq
-    duration: secs
-    FsOut: SoundCard samplingrate to use (192k, 96k, 48k...)
-    Fn: filter len, def 10k
-    *** if this takes too long try shortening Fn or using a lower FsOut ***
-    adding some values here. Not meant to change them usually.
-    randgen: np.random.RandomState instance to sample from
 
-    returns: sound vector (np.array)
-    """
+def play_reward_sound(frequency=8000.0, duration=1.0, db=70):
+    """Play a reward tone sound"""
+    if isinstance(soundStream, SoundR):
+        sound_vec = generate_reward_sound(frequency, duration, db)
+        soundStream.play(sound_vec)
 
-    mean = 0
-    std = 1
+
+def whiteNoiseGen(db, band_fs_bot, band_fs_top, duration, FsOut=44100, Fn=1000, randgen=None):
+    """Generate band-pass filtered white noise with 70 dB SPL and cosine ramp"""
     if randgen is None:
         randgen = np.random
+    if not (isinstance(band_fs_bot, int) and isinstance(band_fs_top, int) and band_fs_bot < band_fs_top):
+        raise ValueError('band_fs_bot must be < band_fs_top and both must be int')
 
-    if type(amp) is float and isinstance(band_fs_top, int) and isinstance(band_fs_bot, int) and band_fs_bot < band_fs_top:
+    amp = db_to_amplitude(db)
+    noise_len = int(FsOut * (duration + 1))
+    raw_noise = randgen.normal(0, 1, size=noise_len)
+    band = firwin(Fn, [band_fs_bot / (FsOut * 0.5), band_fs_top / (FsOut * 0.5)], pass_zero=False)
+    band_noise = lfilter(band, 1, raw_noise)
 
-        band_fs = [band_fs_bot, band_fs_top]
-        white_noise = amp * randgen.normal(mean, std, size=int(FsOut * (duration + 1)))
-        band_pass = firwin(Fn, [band_fs[0] / (FsOut * 0.5), band_fs[1] / (FsOut * 0.5)], pass_zero=False)
-        band_noise = lfilter(band_pass, 1, white_noise)
-        s1 = band_noise[FsOut:int(FsOut * (duration + 1))]
-        return s1  # use np.zeros(s1.size) to get equal-size empty vec.
-    else:
-        raise ValueError('whiteNoiseGen needs (float, int, int, num,) as arguments')
-
-
+    s1 = band_noise[FsOut:int(FsOut * (duration + 1))]  # Remove 1 sec ramp-up
+    s1 *= amp / np.sqrt(np.mean(s1**2))  # Normalize to target RMS
+    return apply_cosine_ramp(s1[:int(FsOut * duration)], ramp_duration=0.01, FsOut=FsOut).astype(np.float32)
 
 
 class FakeSoundR:
-
     def __init__(self):
         self.name = 'fake'
-    def playSound(self):
-        pass
-    def stopSound(self):
-        pass
-    def load(self, v1=None, v2=None):
-        pass
-    def finalStop(self):
+
+    def play(self, *args, **kwargs):
         pass
 
-    def play(self):
+    def stop(self):
         pass
 
 
@@ -121,36 +116,6 @@ class FakeSoundVec:
 
 try:
     soundStream = SoundR()
-    #soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44800, Fn=1000)
-    #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
-
-    soundVec1 = pureToneGen(0.4, 8000, 1800) #14000
-    soundVec2 = pureToneGen(0.4, 4000, 1) #4000  #Incorrect sound
-    soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
-
-    #Sounds for Cognitive Bias Test: 10 sounds.
-    soundVec4 = pureToneGen(0.4, 2000, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec5 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
-
-    soundVec6 = pureToneGen(0.4, 6000, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec7 = pureToneGen(0.4, 9000, 1)  # 4000  #Punish sound plays only for 1 second
-
-    soundVec8 = pureToneGen(0.4, 12000, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec9 = pureToneGen(0.4, 16000, 1)  # 4000  #Punish sound plays only for 1 second
-
-    soundVec10 = pureToneGen(0.4, 20000, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec11 = pureToneGen(0.4, 25000, 1)  # 4000  #Punish sound plays only for 1 second
-
-    #Whitenoise:
-    soundVec12 = whiteNoiseGen(1.0, 2000, 25000, 1, FsOut=44800, Fn=1000)
-
 except:
-    print("______")
-    print("ERROR SOUND")
-    print("_______")
+    print("______\nERROR SOUND\n_______")
     soundStream = FakeSoundR()
-    soundVec1 = FakeSoundVec()
-    soundVec2 = FakeSoundVec()
-    soundVec3 = FakeSoundVec()
-
-

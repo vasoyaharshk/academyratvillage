@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class StageTraining_RatB_V1_50(Task):
+class zStageTraining_RatB_V1_50(Task):
 
     def __init__(self):
         super().__init__()

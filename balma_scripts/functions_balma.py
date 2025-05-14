@@ -3,7 +3,7 @@ from academy.utils import utils
 from academy.camera import cam3
 from academy.touch import touch
 from user.psychopy_elements import window, square, square2, square3
-from user.sound_elements import soundStream, soundVec
+from user.sound_elements_old import soundStream, soundVec
 import traceback
 
 # when softcode n is called, function n runs once
