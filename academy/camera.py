@@ -272,17 +272,6 @@ class Video(Process):
                         if self.cam_number == 2:
                             #print("camera2 active")
                             self.path_video = os.path.join(
-                                self.path, self.name_video + "_lickport.avi"
-                            )
-                            self.path_npz = os.path.join(
-                                self.path, self.name_video + "_lickport.npz"
-                            )
-                            self.path_csv = os.path.join(
-                                self.path, self.name_video + "_lickport.csv"
-                            )
-                        elif self.cam_number == 3:
-                            #print("camera3 active")
-                            self.path_video = os.path.join(
                                 self.path, self.name_video + "_screen.avi"
                             )
                             self.path_npz = os.path.join(
@@ -290,6 +279,17 @@ class Video(Process):
                             )
                             self.path_csv = os.path.join(
                                 self.path, self.name_video + "_screen.csv"
+                            )
+                        elif self.cam_number == 3:
+                            #print("camera3 active")
+                            self.path_video = os.path.join(
+                                self.path, self.name_video + "_lickport.avi"
+                            )
+                            self.path_npz = os.path.join(
+                                self.path, self.name_video + "_lickport.npz"
+                            )
+                            self.path_csv = os.path.join(
+                                self.path, self.name_video + "_lickport.csv"
                             )
                         self.out_video = cv2.VideoWriter(
                             self.path_video,
@@ -330,14 +330,14 @@ class Video(Process):
                     path = os.path.join(self.path, name_video.split("_")[0])
                     if self.cam_number == 2:
                         self.title = name_video
-                        self.path_video = os.path.join(path, name_video + "_lickport.avi")
-                        self.path_npz = os.path.join(path, name_video + "_lickport.npz")
-                        self.path_csv = os.path.join(path, name_video + "_lickport.csv")
-                    else:
-                        self.title = name_video
                         self.path_video = os.path.join(path, name_video + "_screen.avi")
                         self.path_npz = os.path.join(path, name_video + "_screen.npz")
                         self.path_csv = os.path.join(path, name_video + "_screen.csv")
+                    else:
+                        self.title = name_video
+                        self.path_video = os.path.join(path, name_video + "_lickport.avi")
+                        self.path_npz = os.path.join(path, name_video + "_lickport.npz")
+                        self.path_csv = os.path.join(path, name_video + "_lickport.csv")
                     self.out_video = cv2.VideoWriter(
                         self.path_video,
                         self.fourcc_out,

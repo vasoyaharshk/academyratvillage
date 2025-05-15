@@ -19,11 +19,11 @@
 // always 90 degrees from open to close
 
 // academy1
-#define ANGLEOPEN1 65
-#define ANGLECLOSE1 109
-#define ANGLEOPEN2 160
+#define ANGLEOPEN1 190
+#define ANGLECLOSE1 160
+#define ANGLEOPEN2 30
 #define ANGLECLOSE2 90
-#define ANGLESEMICLOSE2 55 //Harsh: what is this?
+#define ANGLESEMICLOSE2 1 //Harsh: what is this?
 
 
 
