@@ -116,3 +116,18 @@ video_placeholder = "/home/ratvillage01/academy/stimuli/bastos_taylor/placeholde
 # Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
 video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=(1280, 720), units='pix')
 video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=(1280, 720), units='pix')
+
+
+image_jar_left_sized = visual.ImageStim(
+    win=window,
+    image=None,
+    size=(1280, 720),  # Match the same padded video size
+    units='pix'
+)
+
+image_jar_right_sized = visual.ImageStim(
+    win=window,
+    image=None,
+    size=(1280, 720),
+    units='pix'
+)

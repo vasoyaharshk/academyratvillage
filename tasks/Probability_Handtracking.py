@@ -158,22 +158,22 @@ class Probability_Handtracking(Task):
 
     def get_stim_image_path(self, stim_trial, stage):
         """
-        Determines whether stim_trial is 61 or 62, retrieves the corresponding image path based on the stage, and returns it.
+        Determines whether stim_trial is 121 or 122, retrieves the corresponding image path based on the stage, and returns it.
         """
         image_path = None
         image_name = None # NEW
 
         try:
-            if stim_trial == 61:
+            if stim_trial == 121:
                 position = 'left'
-            elif stim_trial == 62:
+            elif stim_trial == 122:
                 position = 'right'
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 61 or 62.")
+                raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 121 or 122.")
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stag_1_image_single_peg'
+                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
             elif stage == 3:
@@ -345,7 +345,7 @@ class Probability_Handtracking(Task):
         #self.stim = [111, 112] for video
 
         ### IMAGE Randomisation
-        self.stim = [61, 62] # function 61 is image where the left hand is correct and 62 is where right is correct
+        self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
         if self.task_number == 4:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
@@ -368,19 +368,19 @@ class Probability_Handtracking(Task):
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
 
-            #self.stim_trial = 61  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
+            #self.stim_trial = 121  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
 
 
             ### VIDEOS
             if self.stage == 1:  # We have only one stimulus in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-                if self.stim_trial in [61]: # if image is left correct
+                if self.stim_trial in [121]: # if image is left correct
                     self.video_stim_play = 111 # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]  # No incorrect area in stage 1
                     #print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-                elif self.stim_trial in [62]: # if image is right correct
+                elif self.stim_trial in [122]: # if image is right correct
                     self.video_stim_play = 112
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
@@ -389,14 +389,14 @@ class Probability_Handtracking(Task):
 
             ### For stage 2 onwards
             else:  # We have two stimuli after stage 1 with correct and incorrect areas
-                if self.stim_trial in [61]: # if image is left correct
+                if self.stim_trial in [121]: # if image is left correct
                     self.video_stim_play = 111 # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]
                     #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
                           #self.x_incorrecth)
-                elif self.stim_trial in [62]: # if image is right correct
+                elif self.stim_trial in [122]: # if image is right correct
                     self.video_stim_play = 112 # should display videos with correct on right
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
@@ -857,11 +857,11 @@ class Probability_Handtracking(Task):
                     self.sameside = 'left'
                     self.bias_breaking = 1
                     print('Bias breaking active, side:', self.sameside)
-                    self.last_stim_trial = random.choice([62])  # Ensure the new stim is on the right
+                    self.last_stim_trial = random.choice([122])  # Ensure the new stim is on the right
                 elif all_right_side:
                     self.sameside = 'right'
                     self.bias_breaking = 1
-                    self.last_stim_trial = random.choice([61])  # Ensure the new stim is on the left
+                    self.last_stim_trial = random.choice([121])  # Ensure the new stim is on the left
                     print('Bias breaking active, side:', self.sameside)
 
                 self.response_x_array = []      #Clearing the array

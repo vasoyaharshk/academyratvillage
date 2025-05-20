@@ -1822,6 +1822,38 @@ def loop115(timing):
     window.flip()
 
 
+#Stage 1:
+def function121():  # When the correct answer is on left
+    global last_function_called, image_path
+    last_function_called = 121
+
+    image_path = utils.task.image_path_function
+
+    image_jar_left_sized.image = image_path
+    image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop121(timing):
+    image_jar_left_sized.draw()
+    window.flip()
+
+
+
+## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
+def function122():  # When the correct answer is on right
+    global last_function_called, image_path
+    last_function_called = 122
+
+    image_path = utils.task.image_path_function
+
+    image_jar_right_sized.image = image_path
+    image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop122(timing):
+    image_jar_right_sized.draw()
+    window.flip()
+
+
+
 # Function 116: Play the Right Video from 6.5 Seconds
 # def function116():
 #     global last_function_called
