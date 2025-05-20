@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking(Task):
+class Probability_Handtracking_Gloves(Task):
     def __init__(self):
         super().__init__()
 

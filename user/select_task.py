@@ -283,7 +283,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    task = 'Probability_Handtracking'
+                    task = 'Probability_Handtracking_Gloves'
                     # Weber's Law:
                     stage = 1
                     ror = []
@@ -303,7 +303,7 @@ def select_task(df, subject):
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
 
-                    message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Handtracking'
+                    message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Probability_Handtracking_Gloves'
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -522,7 +522,7 @@ def str_append(my_str: str, value: str) -> str:
 def str_pop(my_str: str) -> tuple[str, str]:
     """Simulate popping the first value from a string representation of a list."""
     my_str = my_str.strip()  # Ensure no leading/trailing spaces
-    if my_str == "[]" or not my_str:  # Handle empty list
+    if my_str == "[]" or not my_str:  #
         raise ValueError("Cannot pop from an empty list")
 
     # Remove the brackets and split by commas
