@@ -43,19 +43,30 @@ BPOD_BEHAVIOR_PORTS_ENABLED = [True, True, True, True, True, True, False, False]
 BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, False]  # ports that deliver water
 
 
-# touchscreen
+# touchscreen:
+#For RV 1:
+XINPUT = 'xinput map-to-output 27 DP-3-3-1'     #For RV 1 in laptop
+SCREEN_NUMBER = 3                   #For rat village 1
+WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen. For RV 1.
+WIN_RESOLUTION = [1280, 1024]        #For rat village 1
+CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images. For RV 1
+
+#For RV 2:
+#XINPUT = 'xinput map-to-output 13 DP-3-2'       #For RV 2 in laptop
+#SCREEN_NUMBER = 2                  #For rat village 2
+#WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen. For RV 2
+#WIN_RESOLUTION = [1280, 720]        #For rat village 2
+#CENTRE_SCREEN = [640, 360]          #This variable points to the cecalntre of the screen. Essential for displaying images. For RV 2
+
+#General:
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-3-3'   # <-- TO CHANGE
-WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
-WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images.
-SCREEN_NUMBER = 3
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.4
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
+
 
 
 # mouse detection
