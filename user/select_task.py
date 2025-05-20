@@ -290,6 +290,7 @@ def select_task(df, subject):
                     completed_ror = []
                     current_ror = 0.0
                     trial_counter_ror = 0
+                    trial_counter = 0
 
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
@@ -297,11 +298,20 @@ def select_task(df, subject):
                     block_number = 1
                     ror_change = 0
                     block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
                     last_stim_trial = 0
                     last_condition_trial = 0
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    task_number = 4
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
 
                     message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Probability_Handtracking_Gloves'
                     print(f'{message}')
