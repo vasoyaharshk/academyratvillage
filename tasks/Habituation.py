@@ -1,7 +1,7 @@
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
-
+from academy import telegram_bot
 
 class Habituation(Task):
 
@@ -39,6 +39,15 @@ class Habituation(Task):
         pass
 
     def main_loop(self):
+
+        message = f"Habituation started"
+        print(f'{message}')
+        try:
+            telegram_bot.alarm_finish_session(message, self.subject)
+        except:
+            print('Telegram message not sent')
+            pass
+
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',

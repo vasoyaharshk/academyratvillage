@@ -104,9 +104,9 @@ white_screen = visual.Rect(win=window,
                            pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
 
-image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
-
-image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
+# image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
+#
+# image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
 
 circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
 
@@ -114,5 +114,20 @@ circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], 
 video_placeholder = "/home/ratvillage02/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
 # Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
-video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=window.size, units='pix')
-video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=window.size, units='pix')
+video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=(1280, 720), units='pix')
+video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=(1280, 720), units='pix')
+
+
+image_jar_left = visual.ImageStim(
+    win=window,
+    image=None,
+    size=(1280, 720),  # Match the same padded video size
+    units='pix'
+)
+
+image_jar_right = visual.ImageStim(
+    win=window,
+    image=None,
+    size=(1280, 720),
+    units='pix'
+)
