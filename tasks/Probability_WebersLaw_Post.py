@@ -44,6 +44,9 @@ class Probability_WebersLaw_Post(Task):
         self.response_duration = 60
         self.image_display = 3        #Number of seconds the image will display after correct and incorrect
         # self.punish_intro = 0.6     #If they do 60% correct trials prvious 10 trials, punish is introduced (40Khz tone, negatively associated) where they do not get any water
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
 
         # accuracy limits for changing something later on:
         #self.acc_up = 0.85
@@ -427,7 +430,7 @@ class Probability_WebersLaw_Post(Task):
                 state_name='Correct_image_display',
                 state_timer=self.image_display,
                 state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 63)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 87)])
             # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
             self.sma.add_state(
@@ -462,7 +465,7 @@ class Probability_WebersLaw_Post(Task):
                 state_name='Punish_image_display',
                 state_timer=self.image_display,
                 state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 64)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 88)])
             # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
             self.sma.add_state(

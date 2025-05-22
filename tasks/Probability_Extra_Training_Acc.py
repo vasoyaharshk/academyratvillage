@@ -538,6 +538,15 @@ class Probability_Extra_Training_Acc(Task):
 
         else:
             print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            self.trial_length = 0.1
+            self.trial_result = None
+            self.last_stim_trial = 0
+            self.x_correcth = None
+            self.x_incorrecth = None
+            self.response_x = None
+            self.response_y = None
+            self.trial_length = None
+            self.trial_result = None
 
 
         ############ REGISTER VALUES ################

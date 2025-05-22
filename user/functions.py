@@ -4,7 +4,8 @@ from academy.camera import cam2, cam3
 from academy.touch import touch
 from user.psychopy_elements import *
 #from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
-from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
+from user.sound_elements_version1 import soundStream, soundVec1, soundVec2, soundVec3
+#from user.sound_elements_version2 import *
 import random
 import os
 import re
@@ -32,6 +33,7 @@ image_path = None  # Global variable to store the image path
 
 def update_image_path_size_position(correct=True):
     global image_path
+    image_path = utils.task.image_path_function
     if image_path and "both" in image_path:
         #print(f"Original image path: {image_path}")
         directory, filename = os.path.split(image_path)
@@ -51,6 +53,22 @@ def update_image_path_position(correct=True):
     global image_path
     if image_path and "both" in image_path:
         return image_path.replace("both", "correct" if correct else "incorrect")
+    return None
+
+def update_image_path_size_position_wl(correct=True):
+    global image_path
+    if image_path and "both" in image_path:
+        #print(f"Original image path: {image_path}")
+        directory, filename = os.path.split(image_path)
+        if correct:
+            filename = re.sub(r'_[^_]+_[^_]+\.png$', '.png', filename)
+        else:
+            filename = re.sub(r'\d+c_', '', filename)
+            filename = re.sub(r'_\d+(?=\.png)', '', filename)
+        filename = filename.replace("both", "correct" if correct else "incorrect")
+        image_path_replaced = os.path.join(directory, filename)
+        #print(f"Modified image path: {image_path_replaced}")
+        return image_path_replaced
     return None
 
 # draw a temporary white rectangle  with task.x, task.y, task.width and task.stim_duration
@@ -192,6 +210,7 @@ def function5():
 
 
 def function9():
+    #if isinstance(soundStream, SoundR):
     soundStream.stop(soundVec1)  #14Khz sound played
 
     cam2.put_state("Correct")
@@ -201,6 +220,7 @@ def function9():
 
 # camera correct and delete screen
 def function11():
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec1)     #14Khz sound played
 
     cam2.put_state("Correct")
@@ -222,6 +242,7 @@ def loop12(timing):
 
 # camera incorrect
 def function13():
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec2)     #4Khz sound played
 
     cam2.put_state("Incorrect")
@@ -230,6 +251,7 @@ def function13():
 
 
 def function14():
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec3)  # 4Khz sound played
 
     cam2.put_state("Punish")
@@ -277,6 +299,7 @@ def loop15(timing):
 
 # camera empty and delete screen
 def function17():
+    #if isinstance(soundStream, SoundR):
     soundStream.stop(soundVec1)
 
     cam2.put_state("")
@@ -287,6 +310,7 @@ def loop17(timing):
 
 
 def function18():
+    #if isinstance(soundStream, SoundR):
     soundStream.stop(soundVec3)
     print("Punish Sound Stopped")
 
@@ -508,7 +532,9 @@ def loop35(timing):
 def function36():
     global last_function_called
 
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -556,6 +582,8 @@ def loop37(timing):
 
 #Correct without image display:
 def function38():
+    #if isinstance(soundStream, SoundR):
+
     soundStream.play(soundVec1)
 
     cam2.put_state("Correct")
@@ -838,8 +866,8 @@ def function51():  # When the blue jar is on left
         if not left_images:
             raise ValueError(f"No images found in {image_folder} for stage {stage}.")
 
-        # Choose a random image from the left_images list
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))
+        # Choose a random image from the left_images list.
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))     #This needs to be balanced
 
         image_jar_left.image = random_image_path_left
         image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
@@ -953,7 +981,9 @@ def loop55(timing):
 def function56():
     global last_function_called
 
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1003,7 +1033,7 @@ def loop61(timing):
 
 
 ## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
-def function62():  # When the correct answer is on left
+def function62():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 62
 
@@ -1034,7 +1064,7 @@ def function63():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Correct image path: {image_path_replaced}")
+            print(f"Correct image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1056,7 +1086,9 @@ def loop63(timing):
 def function64():
     global last_function_called
 
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1071,7 +1103,7 @@ def function64():
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Incorrect image path: {image_path_replaced}")
+            print(f"Incorrect image path: {image_path_replaced}")
         else:
             print("Warning: image_path is None or could not be processed. No image will be updated.")
 
@@ -1488,11 +1520,86 @@ def loop86(timing):
     window.flip()
 
 
+#Display camera correct, play correct sound and display correct stimuli FOR PROBABILISTIC INFERENCE TASK AND WEBER'S LAW.
+def function87():
+    global last_function_called
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+
+    stage = utils.task.stage
+    if stage != 1:
+        image_path_replaced = update_image_path_size_position_wl(correct=True)
+        if image_path_replaced:
+            if last_function_called in LEFT_FUNCTIONS:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = settings.CENTRE_SCREEN
+            elif last_function_called in RIGHT_FUNCTIONS:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = settings.CENTRE_SCREEN
+            #print(f"Correct image path: {image_path_replaced}")
+        else:
+            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
+
+
+def loop87(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.draw()
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
+
+
+def function88():
+    global last_function_called
+
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+    stage = utils.task.stage
+    if stage != 1:
+        image_path_replaced = update_image_path_size_position_wl(correct=False)
+        if image_path_replaced:
+            if last_function_called in LEFT_FUNCTIONS:
+                image_jar_left.image = image_path_replaced
+                image_jar_left.pos = settings.CENTRE_SCREEN
+            elif last_function_called in RIGHT_FUNCTIONS:
+                image_jar_right.image = image_path_replaced
+                image_jar_right.pos = settings.CENTRE_SCREEN
+            #print(f"Incorrect image path: {image_path_replaced}")
+        else:
+            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
+
+
+def loop88(timing):
+    global last_function_called
+
+    stage = utils.task.stage
+    if stage != 1:
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.draw()
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.draw()
+        window.flip()
+    else:
+        window.flip()
+
+
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is left, for new discrimination
 #101 to 104 without spacers:
 def function101():  # When the correct stimuli is on left and small
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 101  # Track that function101 was called
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1503,7 +1610,7 @@ def loop101(timing):
     window.flip()
 
 def function102():  # When the correct stimuli is on right and small
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 102  # Track that function102 was called
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1514,7 +1621,7 @@ def loop102(timing):
     window.flip()
 
 def function103():  # When the correct stimuli is on left and big
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 103  # Track that function103 was called
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1525,7 +1632,7 @@ def loop103(timing):
     window.flip()
 
 def function104():  # When the correct stimuli is on right and big
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 104  # Track that function104 was called
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1537,7 +1644,7 @@ def loop104(timing):
 
 #105 to 108 are for
 def function105():  # When the correct stimuli is on left, small, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 105
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1548,7 +1655,7 @@ def loop105(timing):
     window.flip()
 
 def function106():  # When the correct stimuli is on right, small, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 106
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1559,7 +1666,7 @@ def loop106(timing):
     window.flip()
 
 def function107():  # When the correct stimuli is on left, big, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 107
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
@@ -1570,7 +1677,7 @@ def loop107(timing):
     window.flip()
 
 def function108():  # When the correct stimuli is on right, big, with spacer
-    global last_function_called, image_path
+    global last_function_called
     last_function_called = 108
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
@@ -1586,10 +1693,12 @@ def loop108(timing):
 # Function 111: Display the first frame of Left Video (without playing)
 def function111():
     global last_function_called
-    last_function_called = 111
+    last_function_called = 111 # This tells Python you're using a global variable named 'last_function_called' (meaning it exists outside this function and can be accessed or changed anywhere in your program).
     print("111. video starts")
 
-    video_left.setMovie(utils.task.video_path_function)
+    video_left.setMovie(utils.task.video_path_function) # This sets the movie that will play on the 'left video screen'.
+    # It's choosing the movie file based on the path stored in 'utils.task.video_path_function'.
+
     video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
     print(f"Assigned left video: {utils.task.video_path_function}")
 
@@ -1602,14 +1711,14 @@ def loop111(timing):
 def function112():
     global last_function_called
     last_function_called = 112
-    print("111. video starts")
+    print("112. video starts")
 
-    video_left.setMovie(utils.task.video_path_function)
-    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-    print(f"Assigned left video: {utils.task.video_path_function}")
+    video_right.setMovie(utils.task.video_path_function)
+    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    print(f"Assigned right video: {utils.task.video_path_function}")
 
 def loop112(timing):
-    video_left.draw()  # Show the first frame
+    video_right.draw()
     window.flip()
 
 
@@ -1624,7 +1733,10 @@ def function113():
     video_path = utils.task.video_path_function
 
     stage = utils.task.stage
-    video_path_replaced = video_path.replace("both", "correct")
+    #video_path_replaced = video_path.replace("both", "correct")
+    video_path_replaced = video_path.replace("both", "correct").replace("close", "open")
+    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
+
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
@@ -1652,7 +1764,9 @@ def loop113(timing):
 def function114():
     global last_function_called
 
+    #if isinstance(soundStream, SoundR):
     soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
@@ -1660,7 +1774,8 @@ def function114():
     video_path = utils.task.video_path_function
 
     stage = utils.task.stage
-    video_path_replaced = video_path.replace("both", "correct")
+    video_path_replaced = video_path.replace("both", "incorrect").replace("close", "open")
+    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
@@ -1705,6 +1820,38 @@ def function115():
 def loop115(timing):
     image_jar_left.draw()  # Display the first frame as an image
     window.flip()
+
+
+#Stage 1:
+def function121():  # When the correct answer is on left
+    global last_function_called, image_path
+    last_function_called = 121
+
+    image_path = utils.task.image_path_function
+
+    image_jar_left_sized.image = image_path
+    image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop121(timing):
+    image_jar_left_sized.draw()
+    window.flip()
+
+
+
+## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
+def function122():  # When the correct answer is on right
+    global last_function_called, image_path
+    last_function_called = 122
+
+    image_path = utils.task.image_path_function
+
+    image_jar_right_sized.image = image_path
+    image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+def loop122(timing):
+    image_jar_right_sized.draw()
+    window.flip()
+
 
 
 # Function 116: Play the Right Video from 6.5 Seconds
@@ -1756,3 +1903,7 @@ def loop115(timing):
 #         window.flip()
 #     else:
 #         window.flip()
+
+
+
+#name calling:

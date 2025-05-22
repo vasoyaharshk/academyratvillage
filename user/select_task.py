@@ -81,7 +81,7 @@ def select_task(df, subject):
         pass  #Working Memory section removed
 
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        if 'Probability_Extra_Training_Acc' in task:
+        if task == 'Probability_Extra_Training_Acc':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -97,7 +97,7 @@ def select_task(df, subject):
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 4  # The number of trials in a block
+                block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
                 block_number = 0  # Sequential block number
@@ -128,7 +128,27 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        if 'Probability_Training_BB_Size_Acc' in task:
+        elif 'Probability_Extra_Training_Bias' in task:
+            if moved_back_counter > max_move_backs:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if task_number == 1:
+                task = 'Probability_Extra_Training_Acc'
+                substage_bias = 0
+                message = 'Advance from Etra training Bias breaking to normal training'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+        elif task == 'Probability_Training_BB_Size_Acc':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -143,7 +163,7 @@ def select_task(df, subject):
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 4  # The number of trials in a block
+                block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
                 block_number = 0  # Sequential block number
@@ -183,6 +203,26 @@ def select_task(df, subject):
                 stim_trial = 0
                 stim_trials = []
                 stim_trial_counter = 0
+
+        elif 'Probability_Training_BB_Size_Bias' in task:
+            if moved_back_counter > max_move_backs:
+                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            if task_number == 1:
+                task = 'Probability_Training_BB_Size_Acc'
+                substage_bias = 0
+                message = 'Advance from Core training Bias breaking to normal training'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
         elif 'Probability_WebersLaw' in task:
             # Assign each value from the last row to the variables:
@@ -243,27 +283,37 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    #task = 'Probability_Bastos_Taylor'
+                    task = 'Probability_Handtracking_Gloves'
                     # Weber's Law:
                     stage = 1
                     ror = []
                     completed_ror = []
                     current_ror = 0.0
                     trial_counter_ror = 0
+                    trial_counter = 0
 
-                    block_size = 0  # Every 40 blocks the criteria will be tested.
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 0
+                    block_number = 1
                     ror_change = 0
                     block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
                     last_stim_trial = 0
                     last_condition_trial = 0
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    task_number = 4
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
 
-                    message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Handtracking'
+                    message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Probability_Handtracking_Gloves'
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -338,7 +388,6 @@ def select_task(df, subject):
                     condition_trial_counter = 0
                     conditions = []
 
-
                     message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
                     print(f'{message}')
                     try:
@@ -367,8 +416,9 @@ def select_task(df, subject):
                     substage = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
+                    condition_trial_counter = 0
 
-                    #task = 'Probability_WebersLaw_Post'
+                    task = 'Probability_WebersLaw_Post'
                     stage = 4
                     block = 12  # This is the number of trials one conditions will remain for
                     conditions = []  # Takes the conditions from select task file.
@@ -381,6 +431,7 @@ def select_task(df, subject):
                     stim_trial = 0
                     stim_trials = []
                     stim_trial_counter = 0
+
 
                     message = f"PI: Probability_WL_Training_Runthrough complete, Moving to Post Training."
                     print(f'{message}')
@@ -481,7 +532,7 @@ def str_append(my_str: str, value: str) -> str:
 def str_pop(my_str: str) -> tuple[str, str]:
     """Simulate popping the first value from a string representation of a list."""
     my_str = my_str.strip()  # Ensure no leading/trailing spaces
-    if my_str == "[]" or not my_str:  # Handle empty list
+    if my_str == "[]" or not my_str:  #
         raise ValueError("Cannot pop from an empty list")
 
     # Remove the brackets and split by commas
