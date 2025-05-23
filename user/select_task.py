@@ -19,6 +19,22 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
+    #Reward Frequencies assigned again after the task:
+    # Map each rat to its centre frequency
+    reward_frequency_map = {
+        'chandler': 250.0,
+        'felix': 290.0,
+        'fergus': 336.4,
+        'geralt': 390.2,
+        'joey': 452.7,
+        'ross': 525.1,
+        'innes': 609.1,
+        'pol': 706.6,
+    }
+
+    # Assign frequency based on subject
+    reward_frequency = reward_frequency_map.get(my_subject)
+
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
             val = last_row[column_name]
@@ -525,7 +541,7 @@ def select_task(df, subject):
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

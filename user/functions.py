@@ -2049,19 +2049,19 @@ def loop122(timing):
 
 #Name calling:
 def function220():
-    freq = getattr(utils.task, 'reward_freq', 8000.0)
+    freq = getattr(utils.task, 'reward_frequency', 10.0)
     db = getattr(utils.task, 'reward_db', 70)
     play_reward_sound(frequency=freq, db=db)
+
     cam2.put_state("Correct")
     cam3.put_state("Correct")
     print(f"Reward Sound played at {freq} Hz and {db} dB")
 
 
 def function221():
-    global last_function_called
+    play_incorrect_sound()
 
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")

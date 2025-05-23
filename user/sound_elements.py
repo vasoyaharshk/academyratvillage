@@ -2,6 +2,9 @@ from multiprocessing import Process, Value
 import sounddevice as sd
 import numpy as np
 import time
+from user import settings
+
+
 
 from scipy.signal import firwin, lfilter  # filters
 
@@ -73,11 +76,20 @@ def generate_reward_sound(frequency=8000.0, duration=1.0, db=70, FsOut=44100):
     return pureToneGen(amp=amp, freq=frequency, toneDuration=duration, FsOut=FsOut)
 
 
-def play_reward_sound(frequency=8000.0, duration=1.0, db=70):
+def play_reward_sound(frequency=1.0, duration=1.0, db=70.0):
     """Play a reward tone sound"""
-    if isinstance(soundStream, SoundR):
-        sound_vec = generate_reward_sound(frequency, duration, db)
-        soundStream.play(sound_vec)
+    #if isinstance(soundStream, SoundR):
+    sound_vec = generate_reward_sound(frequency, duration, db)
+    soundStream.play(sound_vec)
+
+
+def play_incorrect_sound(duration=1.0):
+    """Play a punish tone sound taken from settings"""
+    #if isinstance(soundStream, SoundR):
+    frequency = settings.INCORRECT_FREQ
+    db = settings.INCORRECT_DB
+    sound_vec = generate_reward_sound(frequency=frequency, duration=duration, db=db)
+    soundStream.play(sound_vec)
 
 
 def whiteNoiseGen(db, band_fs_bot, band_fs_top, duration, FsOut=44100, Fn=1000, randgen=None):

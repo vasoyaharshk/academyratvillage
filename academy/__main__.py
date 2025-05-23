@@ -670,6 +670,8 @@ def go_to_state(num):
         utils.subject.task_number = int(utils.subject.task_number)  #Cast to int
         utils.subject.last_forward_stage = int(utils.subject.last_forward_stage)  #Cast to int
         utils.subject.last_backward_stage = int(utils.subject.last_backward_stage)  #Cast to int
+        utils.subject.reward_frequency = float(utils.subject.reward_frequency)  #Cast to float
+        utils.subject.reward_db = float(utils.subject.reward_db)  #Cast to float
 
 
 
@@ -714,6 +716,8 @@ def go_to_state(num):
         utils.task.task_number = utils.subject.task_number
         utils.task.last_forward_stage = utils.subject.last_forward_stage
         utils.task.last_backward_stage = utils.subject.last_backward_stage
+        utils.task.reward_frequency = utils.subject.reward_frequency
+        utils.task.reward_db = utils.subject.reward_db
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
