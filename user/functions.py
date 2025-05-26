@@ -2134,8 +2134,8 @@ def function220():
     #Play reaward sound based on the rat:
     freq = getattr(utils.task, 'reward_frequency', 10.0)
     db = getattr(utils.task, 'reward_db', 70)
-    dur = getattr(utils.task, 'reward_duration', 1)
-    play_reward_sound(frequency=freq, db=db, duration = dur)
+    #dur = getattr(utils.task, 'reward_duration', 1)
+    play_reward_sound(frequency=freq, db=db)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")

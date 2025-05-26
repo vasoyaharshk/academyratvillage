@@ -19,6 +19,9 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
+    #Assign reward decibels: Needs to be a dictionary if different for each individual.
+    reward_db = 70.0
+
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
@@ -47,37 +50,34 @@ def select_task(df, subject):
             print('Telegram message not sent')
         raise ValueError(message)
 
+    # #Reward duration assigned again after the task:
+    # # Map each rat to its duration
+    # reward_duration_map = {
+    #     'chandler': 1.0,
+    #     'felix': 2.0,
+    #     'fergus': 1.0,
+    #     'geralt': 2.0,
+    #     'joey': 1.0,
+    #     'ross': 2.0,
+    #     'innes': 1.0,
+    #     'pol': 2.0,
+    # }
+    #
+    # # Assign duration based on subject
+    # reward_duration = reward_duration_map.get(my_subject)
+    #
+    # # Double check the value for duration from the above table
+    # reward_duration_subjects = subject.reward_duration
+    # if reward_duration_subjects == reward_duration:
+    #     print("the reward duration match")
+    # else:
+    #     message = f"Reward duration mismatch for subject '{my_subject}'"
+    #     try:
+    #         telegram_bot.alarm_finish_session(message, my_subject)
+    #     except:
+    #         print('Telegram message not sent')
+    #     raise ValueError(message)
 
-    #Reward duration assigned again after the task:
-    # Map each rat to its duration
-    reward_duration_map = {
-        'chandler': 1.0,
-        'felix': 2.0,
-        'fergus': 1.0,
-        'geralt': 2.0,
-        'joey': 1.0,
-        'ross': 2.0,
-        'innes': 1.0,
-        'pol': 2.0,
-    }
-
-    # Assign duration based on subject
-    reward_duration = reward_duration_map.get(my_subject)
-
-    # Double check the value for duration from the above table
-    reward_duration_subjects = subject.reward_duration
-    if reward_duration_subjects == reward_duration:
-        print("the reward duration match")
-    else:
-        message = f"Reward duration mismatch for subject '{my_subject}'"
-        try:
-            telegram_bot.alarm_finish_session(message, my_subject)
-        except:
-            print('Telegram message not sent')
-        raise ValueError(message)
-
-    #Assign reward decibels: Needs to be a dictionary if different for each individual.
-    reward_db = 70.0
 
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
