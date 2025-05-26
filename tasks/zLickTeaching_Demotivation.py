@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
-class zLickTeaching_Demotivation(Task):
+class LickTeaching_Demotivation(Task):
 
     def __init__(self):
         super().__init__()

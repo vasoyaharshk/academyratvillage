@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
-class zLickTeaching(Task):
+class LickTeaching(Task):
 
     def __init__(self):
         super().__init__()
@@ -26,8 +26,6 @@ class zLickTeaching(Task):
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
-        
-        
         """
 
 
@@ -36,8 +34,8 @@ class zLickTeaching(Task):
 
     def init_variables(self):
         # general
-        self.duration_min = 1200  # 20 mins
-        self.duration_max = 1260 #21 mins
+        self.duration_max = 3000
+        self.duration_min = 2100
         self.stage = 0
         self.substage = 0
 
@@ -57,11 +55,11 @@ class zLickTeaching(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
 
-        # FLOADING AVOIDANCE
-        if self.miss_acc_counter > 30:  #Balma inititally set it to 5 but changed it to 30 becuase repeating the sound was an issue.
-            floading = 'Wait_for_reward'
+        # flooding AVOIDANCE
+        if self.miss_acc_counter > 30:
+            flooding = 'Wait_for_reward'
         else:
-            floading = 'Automatic_reward'
+            flooding = 'Automatic_reward'
 
         if self.current_trial == 0:
             self.sma.add_state(
@@ -86,7 +84,7 @@ class zLickTeaching(Task):
         self.sma.add_state(
             state_name='Fixation',  # if animal licks during fixation, this is started again.
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: floading},
+            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: flooding},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
@@ -100,7 +98,7 @@ class zLickTeaching(Task):
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
-                            (Bpod.OutputChannels.SoftCode, 11)])
+                            (Bpod.OutputChannels.SoftCode, 220)])
             # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(

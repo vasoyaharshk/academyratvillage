@@ -47,6 +47,35 @@ def select_task(df, subject):
             print('Telegram message not sent')
         raise ValueError(message)
 
+
+    #Reward duration assigned again after the task:
+    # Map each rat to its duration
+    reward_duration_map = {
+        'chandler': 1.0,
+        'felix': 2.0,
+        'fergus': 1.0,
+        'geralt': 2.0,
+        'joey': 1.0,
+        'ross': 2.0,
+        'innes': 1.0,
+        'pol': 2.0,
+    }
+
+    # Assign duration based on subject
+    reward_duration = reward_duration_map.get(my_subject)
+
+    # Double check the value for duration from the above table
+    reward_duration_subjects = subject.reward_duration
+    if reward_duration_subjects == reward_duration:
+        print("the reward duration match")
+    else:
+        message = f"Reward duration mismatch for subject '{my_subject}'"
+        try:
+            telegram_bot.alarm_finish_session(message, my_subject)
+        except:
+            print('Telegram message not sent')
+        raise ValueError(message)
+
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
 
@@ -593,7 +622,7 @@ def select_task(df, subject):
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

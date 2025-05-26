@@ -75,6 +75,7 @@ class Task(object):
         self.last_backward_stage = 0
         self.reward_frequency = 0
         self.reward_db = 0
+        self.reward_duration = 0
 
 
         self.checksum = None
