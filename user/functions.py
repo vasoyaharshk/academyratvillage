@@ -1735,7 +1735,7 @@ def function113():
     stage = utils.task.stage
     #video_path_replaced = video_path.replace("both", "correct")
     video_path_replaced = video_path.replace("both", "correct").replace("close", "open")
-    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
+    video_path_replaced = re.sub(r'_\d+(?=\.mp4$)', '', video_path_replaced)
 
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
@@ -1775,7 +1775,8 @@ def function114():
 
     stage = utils.task.stage
     video_path_replaced = video_path.replace("both", "incorrect").replace("close", "open")
-    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
+    video_path_replaced = re.sub(r'_\d+(?=\.mp4$)', '', video_path_replaced)
+
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
@@ -1904,6 +1905,246 @@ def loop122(timing):
 #     else:
 #         window.flip()
 
+# Functions from 201 on wards for the audiorats:
+# def function201(): # touchteaching substage 1 - 'stimulus' is entire screen
+#     square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#
+#     cont = float(utils.task.contrast)
+#     square.fillColor = [cont, cont, cont]
+#     square.lineColor = [cont, cont, cont]
+#     print('Stimulus Shown')
+#
+# def loop201(timing):
+#     square.draw()
+#     window.flip()
+#
+# def function202():  # touchteaching substage 1 - 'stimulus' is entire screen
+#     square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#
+#     cont = float(utils.task.contrast)
+#     square.fillColor = [cont, cont, cont]
+#     square.lineColor = [cont, cont, cont]
+#     print('Stimulus Shown')
+#
+# def loop202(timing):
+#     square.draw()
+#     window.flip()
+#
+# def function203():  # touchteaching substage 1 - 'stimulus' is entire screen
+#     square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#
+#     cont = float(utils.task.contrast)
+#     square.fillColor = [cont, cont, cont]
+#     square.lineColor = [cont, cont, cont]
+#     print('Stimulus Shown')
+#
+# def loop203(timing):
+#     square.draw()
+#     window.flip()
+#
+# def function204():  # touchteaching substage 1 - 'stimulus' is entire screen
+#     width = utils.task.width * settings.PIXELS_PER_MM
+#     height = utils.task.height * settings.PIXELS_PER_MM
+#     x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
+#     x_incorrect = utils.task.x_incorrecth
+#     y = utils.task.y_correcth * settings.PIXELS_PER_MM
+#
+#     if x_incorrect is None:
+#         touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+#     else:
+#         x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
+#         touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, x_incorrect, y, width,
+#                                                     height)
+#
+#     cam2.put_state("Resp Win")
+#     cam3.put_state("Resp Win")
+#     print('Resp Win 1')
+#     # print('x_correct in functions: ', x_correct)
+#     # print('x_incorrect in functions: ', x_incorrect)
+#
+# #From function 210 onwards, cognitive bias:
+# def function211():  # Tone pair 1, negative reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec4)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop211(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function212():  # Tone pair 1, positive reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec5)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop212(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function213():  # Tone pair 2, negative reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec6)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop213(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function214():  # Tone pair 2, positive reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec7)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop214(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function215():  # Tone pair 3, negative reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec8)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop215(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function216():  # Tone pair 3, positive reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec9)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop216(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function217():  # Tone pair 4, negative reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec10)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop217(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function218():  # Tone pair 4, positive reinforcement
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec11)
+#
+#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+#     square2.pos = (
+#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
+#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
+#     print('Stimulus Shown')
+#
+# def loop218(timing):
+#     square.draw()
+#     square2.draw()
+#     window.flip()
+#
+# def function219():  #White noise, TBD
+#     if isinstance(soundStream, SoundR):
+#         soundStream.play(soundVec14)
 
 
-#name calling:
+#Name calling:
+def function220():
+    #Play reaward sound based on the rat:
+    freq = getattr(utils.task, 'reward_frequency', 10.0)
+    db = getattr(utils.task, 'reward_db', 70)
+    play_reward_sound(frequency=freq, db=db)
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    print(f"Reward Sound played at {freq} Hz and {db} dB")
+
+
+def function221():
+    play_incorrect_sound()
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")

@@ -8,14 +8,14 @@ class Test_Sound_Task(Task):
         super().__init__()
 
         # SOUND PARAMETERS (used by functions.py softcode logic)
-        self.reward_freq = 6000.0     # Hz, float allowed
-        self.reward_db = 70           # dB SPL
+        #self.reward_freq = 6000.0     # Hz, float allowed
+        #self.reward_db = 70           # dB SPL
 
     def configure_gui(self):
-        self.gui_input = ['reward_freq', 'reward_db']
+        self.gui_input = []
 
     def main_loop(self):
-        print(f"Reward tone: {self.reward_freq} Hz, {self.reward_db} dB")
+        print(f"Reward tone: {self.reward_frequency} Hz, {self.reward_db} dB")
 
         self.sma.add_state(
             state_name='Wait_for_Poke',
@@ -40,4 +40,4 @@ class Test_Sound_Task(Task):
 
     def after_trial(self):
         print(f"Trial {self.current_trial + 1} completed.")
-        print(f"Reward Frequency: {self.reward_freq} Hz")
+        print(f"Reward Frequency: {self.reward_frequency} Hz")

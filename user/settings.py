@@ -188,3 +188,8 @@ INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save da
 TESTING = False  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
+
+
+#RV 2 Sound:
+INCORRECT_FREQ = 1368.5
+INCORRECT_DB = 70.0

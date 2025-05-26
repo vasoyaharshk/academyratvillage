@@ -124,9 +124,25 @@ try:
     #soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44800, Fn=1000)
     #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
 
-    soundVec1 = pureToneGen(0.4, 14000, 1800) #14000
+    soundVec1 = pureToneGen(0.4, 8000, 1800) #14000
     soundVec2 = pureToneGen(0.4, 4000, 1) #4000  #Incorrect sound
     soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
+
+    #Sounds for Cognitive Bias Test: 10 sounds.
+    soundVec4 = pureToneGen(0.4, 2000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec5 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
+
+    soundVec6 = pureToneGen(0.4, 6000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec7 = pureToneGen(0.4, 9000, 1)  # 4000  #Punish sound plays only for 1 second
+
+    soundVec8 = pureToneGen(0.4, 12000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec9 = pureToneGen(0.4, 16000, 1)  # 4000  #Punish sound plays only for 1 second
+
+    soundVec10 = pureToneGen(0.4, 20000, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec11 = pureToneGen(0.4, 25000, 1)  # 4000  #Punish sound plays only for 1 second
+
+    #Whitenoise:
+    soundVec12 = whiteNoiseGen(1.0, 2000, 25000, 1, FsOut=44800, Fn=1000)
 
 except:
     print("______")
