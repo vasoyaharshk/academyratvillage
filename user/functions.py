@@ -2049,6 +2049,7 @@ def loop122(timing):
 
 #Name calling:
 def function220():
+    #Play reaward sound based on the rat:
     freq = getattr(utils.task, 'reward_frequency', 10.0)
     db = getattr(utils.task, 'reward_db', 70)
     play_reward_sound(frequency=freq, db=db)
@@ -2060,7 +2061,6 @@ def function220():
 
 def function221():
     play_incorrect_sound()
-
 
     cam2.put_state("Punish")
     cam3.put_state("Punish")

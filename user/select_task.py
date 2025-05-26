@@ -35,6 +35,9 @@ def select_task(df, subject):
     # Assign frequency based on subject
     reward_frequency = reward_frequency_map.get(my_subject)
 
+    #Assign reward decibels: Needs to be a dictionary if different for each individual.
+    reward_db = 70.0
+
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
             val = last_row[column_name]
@@ -42,7 +45,6 @@ def select_task(df, subject):
                 return default_val
             return val
         return default_val
-
 
     task_number = get_val_from_df_or_default('task_number', 0)
     stage = get_val_from_df_or_default('stage', 0)
@@ -541,7 +543,7 @@ def select_task(df, subject):
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
