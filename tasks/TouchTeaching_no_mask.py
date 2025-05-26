@@ -7,7 +7,7 @@ from user import settings
 import random
 
 
-class TouchTeaching_no_mask_V1(Task):
+class TouchTeaching_no_mask(Task):
 
     def __init__(self):
         super().__init__()
@@ -18,6 +18,11 @@ class TouchTeaching_no_mask_V1(Task):
         Animals crossing the end of the corridor trigger the stimulus presentation in all holes and response window onset. 
         Screen touches during response window deliver reward.
         Stimulus low contrast to not scare animals
+        
+        Stages:
+        Stage 1: A big white rectangle covering the whole screen
+        Stage 2: A smaller rectangle at the bottom half of the screen.
+        Stage 3: 
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
