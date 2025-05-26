@@ -1735,7 +1735,7 @@ def function113():
     stage = utils.task.stage
     #video_path_replaced = video_path.replace("both", "correct")
     video_path_replaced = video_path.replace("both", "correct").replace("close", "open")
-    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
+    video_path_replaced = re.sub(r'_\d+(?=\.mp4$)', '', video_path_replaced)
 
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
@@ -1775,7 +1775,8 @@ def function114():
 
     stage = utils.task.stage
     video_path_replaced = video_path.replace("both", "incorrect").replace("close", "open")
-    video_path_replaced = re.sub(r'_\d+$', '', video_path_replaced)
+    video_path_replaced = re.sub(r'_\d+(?=\.mp4$)', '', video_path_replaced)
+
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
