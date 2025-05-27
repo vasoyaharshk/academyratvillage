@@ -96,9 +96,10 @@ class TouchTeaching_no_mask(Task):
 
         if self.stage == 1:
             self.stim = 201
-            self.x_correcth_pos = 640  # 640 = center of the screen. Screen width is 401mmm
-            self.y_correcth_pos = 512  # 640 = center of the screen. Screen height is 250mmm
-            self.width = settings.WIN_SIZE[0] * 2
+            self.x_correcth_pos = 200  # 640 = center of the screen. Screen width is 401mmm
+            self.y_correcth_pos = 112  # 640 = center of the screen. Screen height is 250mmm
+            self.width = 400
+            self.height = 230
         elif self.stage == 2:
             self.stim = 202
             self.x_correcth_pos = random.randint(65, 325)  # Screen width is 401mmm
