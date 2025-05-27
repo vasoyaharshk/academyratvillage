@@ -2135,6 +2135,9 @@ def function220():
     cam3.put_state("Correct")
     print(f"Reward Sound played at {freq} Hz and {db} dB")
 
+def loop220(timing):
+    window.flip()
+
 #New Incorrect sound function: Replace function  with this.
 def function221():
     play_incorrect_sound()
@@ -2142,6 +2145,9 @@ def function221():
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
+
+def loop221(timing):
+    window.flip()
 
 #To stop the sound and flip the screen: Replace function 17 with this.
 def function222():

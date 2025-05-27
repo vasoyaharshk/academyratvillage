@@ -152,21 +152,20 @@ class TouchTeaching_no_mask(Task):
             state_name='Response_window',
             state_timer=self.response_duration + 10,
             state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode3': 'Miss', Bpod.Events.Tup: 'Miss'},
-            output_actions=[
-                (Bpod.OutputChannels.SoftCode, 204)])  # function 204 defines the active touch area of our stims
+            output_actions=[(Bpod.OutputChannels.SoftCode, 204)])  # function 204 defines the active touch area of our stims
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
         # waterLED and RWsound remain ON until poke
 
         self.sma.add_state(
             state_name='Correct_first_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 222)])
 
         self.sma.add_state(
             state_name='Miss',
@@ -180,7 +179,7 @@ class TouchTeaching_no_mask(Task):
             state_name='Miss_reward',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 222)])
 
         self.sma.add_state(
             state_name='Exit',
