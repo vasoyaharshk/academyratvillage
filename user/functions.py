@@ -5,7 +5,7 @@ from academy.touch import touch
 from user.psychopy_elements import *
 #from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
 from user.sound_elements import *
-#from user.sound_elements_version2 import *
+#from user.sound_elements_version1 import *
 import random
 import os
 import re
@@ -1906,8 +1906,8 @@ def loop122(timing):
 #         window.flip()
 
 # Functions from 201 on wards for the audiorats:
-def function201(): # touchteaching substage 1 - 'stimulus' is entire screen
-    square.pos = (int(utils.task.x * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+def function201(): # touchteaching stage 1 - 'stimulus' is entire screen
+    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
@@ -1919,8 +1919,8 @@ def loop201(timing):
     square.draw()
     window.flip()
 
-def function202():  # touchteaching substage 1 - 'stimulus' is entire screen
-    square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+def function202():  # touchteaching stage 2 - 'stimulus' is smaller
+    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
@@ -1932,8 +1932,8 @@ def loop202(timing):
     square.draw()
     window.flip()
 
-def function203():  # touchteaching substage 1 - 'stimulus' is entire screen
-    square.pos = (int(utils.task.x[0] * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
+def function203():  # touchteaching stage 3 - 'stimulus' is smallest
+    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
@@ -1945,19 +1945,13 @@ def loop203(timing):
     square.draw()
     window.flip()
 
-def function204():  # touchteaching substage 1 - 'stimulus' is entire screen
+def function204(): #Touchteaching read touchscreen
     width = utils.task.width * settings.PIXELS_PER_MM
     height = utils.task.height * settings.PIXELS_PER_MM
-    x_correct = utils.task.x_correcth * settings.PIXELS_PER_MM
-    x_incorrect = utils.task.x_incorrecth
-    y = utils.task.y_correcth * settings.PIXELS_PER_MM
+    x_correct = utils.task.x_correcth_pos * settings.PIXELS_PER_MM
+    y = utils.task.y_correcth_pos * settings.PIXELS_PER_MM
 
-    if x_incorrect is None:
-        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
-    else:
-        x_incorrect = utils.task.x_incorrecth * settings.PIXELS_PER_MM
-        touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, x_incorrect, y, width,
-                                                    height)
+    touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -2134,8 +2128,8 @@ def function220():
     #Play reaward sound based on the rat:
     freq = getattr(utils.task, 'reward_frequency', 10.0)
     db = getattr(utils.task, 'reward_db', 70)
-    #dur = getattr(utils.task, 'reward_duration', 1)
-    play_reward_sound(frequency=freq, db=db)
+    dur = 1800
+    play_reward_sound(frequency=freq, db=db, duration = dur)
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -2148,3 +2142,13 @@ def function221():
     cam2.put_state("Punish")
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
+
+#To stop the sound and flip the screen: Replace function 17 with this.
+def function222():
+    soundStream.stop()
+
+    cam2.put_state("")
+    cam3.put_state("")
+
+def loop222(timing):
+    window.flip()

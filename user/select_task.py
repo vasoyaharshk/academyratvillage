@@ -19,6 +19,9 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
+    if my_subject == 'm3':
+        wait_seconds = 1
+
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
 
@@ -33,6 +36,7 @@ def select_task(df, subject):
         'ross': 525.1,
         'innes': 609.1,
         'pol': 706.6,
+        'm3': 100.0,
     }
 
     # Assign frequency based on subject
@@ -48,7 +52,6 @@ def select_task(df, subject):
             telegram_bot.alarm_finish_session(message, my_subject)
         except:
             print('Telegram message not sent')
-        raise ValueError(message)
 
     # #Reward duration assigned again after the task:
     # # Map each rat to its duration
@@ -143,17 +146,17 @@ def select_task(df, subject):
         df_last5 = df.loc[df['session'] > last_session - 5].copy()  # last five sessions
         df_last3 = df.loc[df['session'] > last_session - 3].copy()  # last three sessions
         df_last2 = df.loc[df['session'] > last_session - 2].copy()  # last two sessions
-        #df = df.loc[df['session'] == last_session].copy()           # last session
+        df_last1 = df.loc[df['session'] == last_session].copy()           # last session
         # VERY IMPORTANT, THE ABOVE LINE IS COMMENTED OUT BECAUSE WE WANT THE DF TO REMAIN THE SUBJECT'S ALL SESSIONS INSTEAD OF JUST LAST AS
         # WE WANT TO GET LAST 55 TRIALS FOR THE CRITERIA CHANGED.
 
         # number of trials
-        n_trials = df.trial.max()  # number of trials in current session
+        n_trials = df_last1.trial.max()  # number of trials in current session
         n_trials_prev = df_last2.groupby('session')['trial'].max().values[0]  # number of trials in previous session
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
-            if len(df_last2.session.unique())>=3: # Pass after 2 sessions
+            if len(df_last3.session.unique())>=3: # Pass after 2 sessions
                 task = 'LickTeaching'
 
         elif task == 'LickTeaching':
@@ -614,9 +617,6 @@ def select_task(df, subject):
 
     elif task == 'Water_Filler':
         print("rat drank water")
-
-    if my_subject == 'm2':
-        wait_seconds = 1
 
     # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()

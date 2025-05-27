@@ -38,17 +38,16 @@ class TouchTeaching_no_mask(Task):
         # general
         self.duration_min = 1800  # 30 mins   # minimum session duration
         self.duration_max = 2100  # 35 mins   # max
-        self.stage = 0
+        self.stage = 1
         self.substage = 0
         self.response_duration = 120  # 2 min
         self.stim_duration = self.response_duration
 
         # screen details
-        self.x_correcth_pos = []  # screen width is 401mmm. For Stage 2, x position is randomised, below
-        self.y_correcth = 0  # screen height is 250mmm (randomise this??)
+        self.x_correcth_pos = 0  # screen width is 401mmm. For Stage 2, x position is randomised, below
+        self.y_correcth_pos = 0  # screen height is 250mmm (randomise this??)
         self.width = 0
         self.height = 0
-        self.x_correcth = settings.WIN_SIZE[0] * 2  # can touch anywhere when it's a normal trial
         self.x_incorrecth = 0  # Incorrecth coordinate
         self.contrast = 0.4  # contrast of the stim. 0 black, 1 gray, 2 white. Default 40%
 
@@ -56,7 +55,7 @@ class TouchTeaching_no_mask(Task):
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
         self.valve_factor_c = 2.0  # More reward for correct. 2.0 = 50uL
-        # self.valve_factor_i = 0.5 #Less reward for misses
+        #self.valve_factor_i = 0.0 #Less reward for misses
 
         # counters
         self.reward_drunk = 0  # how many uLs they have received in the session
@@ -89,7 +88,7 @@ class TouchTeaching_no_mask(Task):
         self.stim = [0]
 
     def configure_gui(self):  # Variables that appear in the GUI
-        pass
+        self.gui_input = ['stage']
 
     def main_loop(self):
         print('')
@@ -97,19 +96,19 @@ class TouchTeaching_no_mask(Task):
 
         if self.stage == 1:
             self.stim = 201
-            self.x_correcth = [640]  # 640 = center of the screen. Screen width is 401mmm
-            self.y_correcth = 512  # 640 = center of the screen. Screen height is 250mmm
+            self.x_correcth_pos = 640  # 640 = center of the screen. Screen width is 401mmm
+            self.y_correcth_pos = 512  # 640 = center of the screen. Screen height is 250mmm
             self.width = settings.WIN_SIZE[0] * 2
         elif self.stage == 2:
             self.stim = 202
-            self.x_correcth = random.randint(65, 325)  # Screen width is 401mmm
-            self.y_correcth = 110  # 640 = center of the screen. Screen height is 250mmm
+            self.x_correcth_pos = random.randint(65, 325)  # Screen width is 401mmm
+            self.y_correcth_pos = 110  # 640 = center of the screen. Screen height is 250mmm
             self.width = 125
             self.height = 125
         elif self.stage == 3:
             self.stim = 203
-            self.x_correcth = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
-            self.y_correcth = random.randint(43,82)  # 640 = center of the screen. Screen height is 250mmm. We minus 10 on each end to account for mask
+            self.x_correcth_pos = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
+            self.y_correcth_pos = random.randint(43,82)  # 640 = center of the screen. Screen height is 250mmm. We minus 10 on each end to account for mask
             self.width = 65
             self.height = 65
 
@@ -142,7 +141,7 @@ class TouchTeaching_no_mask(Task):
             output_actions=[])
 
         self.sma.add_state(
-            state_name='Stimulus_Display',  #
+            state_name='Stimulus_Display',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Response_window'},  # starts the response window
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim)])  #
@@ -178,7 +177,7 @@ class TouchTeaching_no_mask(Task):
 
         self.sma.add_state(
             state_name='Miss_reward',
-            state_timer=self.valve_time * self.valve_factor_i,
+            state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
 
@@ -189,16 +188,21 @@ class TouchTeaching_no_mask(Task):
             output_actions=[])
 
     def after_trial(self):
-
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0:  # Missed trial
             self.register_value('trial_result', 'miss')
-            self.reward_drunk += self.valve_reward * self.valve_factor_i
         else:
-            self.register_value('trial_result', 'correct_first')  # Correct trial
+            self.register_value('trial_result', 'correct')  # Correct trial
             self.reward_drunk += self.valve_reward * self.valve_factor_c
 
-        # Relevant prints
+
+        ############ REGISTER VALUES ################
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('response_x', self.response_x)
         self.register_value('response_y', self.response_y)
+        self.register_value('x_correcth_pos', self.x_correcth_pos)
+        self.register_value('y_correcth_pos', self.y_correcth_pos)
+
+        #Trial Information:
+        self.register_value('trial_length', self.trial_length)
+        self.register_value('trial_result', self.trial_result)

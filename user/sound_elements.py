@@ -6,7 +6,7 @@ from user import settings
 from scipy.signal import firwin, lfilter
 
 # Constants
-DEFAULT_FS = 44100               # Default audio sample rate (samples per second), standard for high-quality sound
+DEFAULT_FS = 48000               # Default audio sample rate (samples per second), standard for high-quality sound. Our speaker only works at 48000
 DEFAULT_RAMP_DURATION = 0.01     # Duration (in seconds) of the cosine ramp used to avoid audio clicks (e.g. 10 ms fade-in/out)
 REFERENCE_DB = 100               # Reference decibel level for converting dB SPL to linear amplitude
 DEFAULT_FN = 1000                # Filter order (number of taps) for FIR band-pass filter used in white noise generation
@@ -16,7 +16,9 @@ DEFAULT_FN = 1000                # Filter order (number of taps) for FIR band-pa
 class SoundR:
     def __init__(self):
         self.device = self.detect_device() or 1
+        self.fs = 48000  # Known-safe fallback for USB DACs
         sd.default.device = self.device
+        sd.default.samplerate = self.fs
 
     def detect_device(self):
         for idx, dev in enumerate(sd.query_devices()):
@@ -27,7 +29,8 @@ class SoundR:
         return None
 
     def play(self, sound_vec):
-        sd.play(sound_vec, samplerate=DEFAULT_FS)
+        # Explicitly pass device + sample rate for safety
+        sd.play(sound_vec, samplerate=self.fs, device=self.device)
 
     def stop(self):
         sd.stop()
@@ -67,14 +70,23 @@ def generate_reward_sound(frequency=10.0, duration=1.0, db=70, FsOut=DEFAULT_FS)
 
 
 def play_reward_sound(frequency=10.0, duration=1.0, db=70):
-    sound_vec = generate_reward_sound(frequency, duration, db)
+    print(sd.query_devices(1, 'output'))  # Optional: inspect device
+    sound_vec = generate_reward_sound(frequency, duration, db, FsOut=soundStream.fs)
+
+    # Print expected hardware+driver output latency
+    info = sd.query_devices(soundStream.device, 'output')
+    print("Expected latency (output):", info['default_high_output_latency'])
+
+    # Measure time to call sd.play
+    t = time.time()
     soundStream.play(sound_vec)
+    print("Time to call soundStream.play():", time.time() - t)
 
 
 def play_incorrect_sound(duration=1.0):
     freq = settings.INCORRECT_FREQ
     db = settings.INCORRECT_DB
-    sound_vec = generate_reward_sound(frequency=freq, duration=duration, db=db)
+    sound_vec = generate_reward_sound(freq, duration, db, FsOut=soundStream.fs)
     soundStream.play(sound_vec)
 
 

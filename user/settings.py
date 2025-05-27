@@ -49,21 +49,21 @@ XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI-3'   # <--
 WIN_SIZE = [400, 230]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 720]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, 384]          #This variable points to the centre of the screen. Essential for displaying images.
+CENTRE_SCREEN = [640, 360]          #This variable points to the centre of the screen. Essential for displaying images.
 SCREEN_NUMBER = 1
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
-PIXELS_PER_MM = 3.4
+PIXELS_PER_MM = 3.2
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 
 
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 5000  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 1400  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
+ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
 SEVERALMICE = 14000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.

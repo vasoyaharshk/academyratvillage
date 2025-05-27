@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
 
-class Test_Water_Pump(Task):
+class zTest_Water_Pump(Task):
 
     def __init__(self):
         super().__init__()

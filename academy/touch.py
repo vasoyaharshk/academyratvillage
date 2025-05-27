@@ -194,12 +194,14 @@ class Touch:
             xpsy_incorrect1 = abs(x_incorrect1)
             xpsy_incorrect2 = abs(x_incorrect2)
 
-            ypsy = 750  # y is now set to 770
-            #ypsy = abs(y)  # y is now set to 770
+            #ypsy = 750  # y is now set to 770
+            ypsy = abs(y)  # y is now set to 770
 
             #print('Touch: ', answer)
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
-            ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            #ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            ytouch = self.win_resolution[1] - (answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+
             #ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1])) - yz
             #print('X2: ', xtouch, 'Y2: ', ytouch)
             #print('Touch: Correct: ', xpsy, 'Incorrect1: ', xpsy_incorrect1, 'Incorrect2: ', xpsy_incorrect2, 'Correcth: ', correct_th, 'Repoketh: ', repoke_th)

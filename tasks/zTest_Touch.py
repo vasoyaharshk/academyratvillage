@@ -4,7 +4,7 @@ from academy.utils import utils
 from user import settings
 
 
-class Test_Touch(Task):
+class zTest_Touch(Task):
 
     def __init__(self):
         super().__init__()

@@ -8,11 +8,11 @@ class Test_Sound_Task(Task):
         super().__init__()
 
         # SOUND PARAMETERS (used by functions.py softcode logic)
-        #self.reward_freq = 6000.0     # Hz, float allowed
-        #self.reward_db = 70           # dB SPL
+        self.reward_frequency = 6000.0     # Hz, float allowed
+        self.reward_db = 70           # dB SPL
 
     def configure_gui(self):
-        self.gui_input = []
+        self.gui_input = ['reward_frequency', 'reward_db']
 
     def main_loop(self):
         print(f"Reward tone: {self.reward_frequency} Hz, {self.reward_db} dB")
