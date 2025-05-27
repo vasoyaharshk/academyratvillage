@@ -2149,7 +2149,7 @@ def function221():
 def loop221(timing):
     window.flip()
 
-#To stop the sound and flip the screen: Replace function 17 with this.
+#To stop the sound and flip the screen: Replace function 17 with this. dont forget the loop
 def function222():
     soundStream.stop()
 
