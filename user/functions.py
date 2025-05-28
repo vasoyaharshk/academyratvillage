@@ -2126,7 +2126,7 @@ def function219():  #White noise, TBD
 #New Correct sound function: Replace function 11 with this.
 def function220():
     #Play reaward sound based on the rat:
-    freq = getattr(utils.task, 'reward_frequency', 10.0)
+    freq = getattr(utils.task, 'reward_frequency', 250.0)
     db = getattr(utils.task, 'reward_db', 70)
     dur = 1800
     play_reward_sound(frequency=freq, db=db, duration = dur)

@@ -8,7 +8,7 @@ from scipy.signal import firwin, lfilter
 # Constants
 DEFAULT_FS = 48000               # Default audio sample rate (samples per second), standard for high-quality sound. Our speaker only works at 48000
 DEFAULT_RAMP_DURATION = 0.01     # Duration (in seconds) of the cosine ramp used to avoid audio clicks (e.g. 10 ms fade-in/out)
-REFERENCE_DB = 100               # Reference decibel level for converting dB SPL to linear amplitude
+REFERENCE_DB = 85.8               # Reference decibel level for converting dB SPL to linear amplitude. This was measured with Harsh's phone inside the box.
 DEFAULT_FN = 1000                # Filter order (number of taps) for FIR band-pass filter used in white noise generation
 
 
@@ -71,14 +71,12 @@ def generate_reward_sound(frequency=10.0, duration=1.0, db=70, FsOut=DEFAULT_FS)
 
 def play_reward_sound(frequency=10.0, duration=1.0, db=70):
     print(sd.query_devices(1, 'output'))  # Optional: inspect device
-    sound_vec = generate_reward_sound(frequency, duration, db, FsOut=soundStream.fs)
-
-    # Print expected hardware+driver output latency
-    info = sd.query_devices(soundStream.device, 'output')
-    print("Expected latency (output):", info['default_high_output_latency'])
-
-    # Measure time to call sd.play
     t = time.time()
+    sound_vec = generate_reward_sound(frequency, duration, db, FsOut=soundStream.fs)
+    # Print expected hardware+driver output latency
+    # info = sd.query_devices(soundStream.device, 'output')
+    # print("Expected latency (output):", info['default_high_output_latency'])
+    # Measure time to call sd.play
     soundStream.play(sound_vec)
     print("Time to call soundStream.play():", time.time() - t)
 

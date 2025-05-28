@@ -87,6 +87,8 @@ class TouchTeaching_no_mask(Task):
         self.last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
         self.stim = [0]
 
+        self.trial_length = 0
+
     def configure_gui(self):  # Variables that appear in the GUI
         self.gui_input = ['stage']
 
@@ -194,6 +196,10 @@ class TouchTeaching_no_mask(Task):
         else:
             self.register_value('trial_result', 'correct')  # Correct trial
             self.reward_drunk += self.valve_reward * self.valve_factor_c
+
+
+        self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
+        # print('Trial length: ' + str(self.trial_length))
 
 
         ############ REGISTER VALUES ################
