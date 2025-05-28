@@ -43,19 +43,30 @@ BPOD_BEHAVIOR_PORTS_ENABLED = [True, True, True, True, True, True, False, False]
 BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, False]  # ports that deliver water
 
 
-# touchscreen
+# touchscreen:
+# #For RV 1:
+# XINPUT = 'xinput map-to-output 27 DP-3-3-1'     #For RV 1 in laptop
+# SCREEN_NUMBER = 3                   #For rat village 1
+# WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen. For RV 1.
+# WIN_RESOLUTION = [1280, 1024]        #For rat village 1
+# CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images. For RV 1
+
+# #For RV 2:
+XINPUT = 'xinput map-to-output 13 DP-3-2'       #For RV 2 in laptop
+SCREEN_NUMBER = 2                  #For rat village 2
+WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen. For RV 2
+WIN_RESOLUTION = [1280, 720]        #For rat village 2
+CENTRE_SCREEN = [640, 360]          #This variable points to the cecalntre of the screen. Essential for displaying images. For RV 2
+
+#General:
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI-3'   # <-- TO CHANGE
-WIN_SIZE = [400, 230]  # in mm. 410 and 250 is for touchscreen
-WIN_RESOLUTION = [1280, 720]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, 360]          #This variable points to the centre of the screen. Essential for displaying images.
-SCREEN_NUMBER = 1
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.2
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
+
 
 
 # mouse detection
@@ -153,12 +164,10 @@ CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "7993554392:AAGAEavqtwrbsQOLixDN3AHfGjZm7-Rri9w"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002605821629"  # <-- TO CHANGE
+TELEGRAM_TOKEN = ""  # <-- TO CHANGE
+TELEGRAM_CHAT = ""  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
+''
 }
 
 #AWS
@@ -185,7 +194,7 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
 
