@@ -70,7 +70,7 @@ def generate_reward_sound(frequency=10.0, duration=1.0, db=70, FsOut=DEFAULT_FS)
 
 
 def play_reward_sound(frequency=10.0, duration=1.0, db=70):
-    print(sd.query_devices(1, 'output'))  # Optional: inspect device
+    #print(sd.query_devices(1, 'output'))  # Optional: inspect device
     t = time.time()
     sound_vec = generate_reward_sound(frequency, duration, db, FsOut=soundStream.fs)
     # Print expected hardware+driver output latency

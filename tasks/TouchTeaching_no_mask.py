@@ -38,8 +38,6 @@ class TouchTeaching_no_mask(Task):
         # general
         self.duration_min = 1800  # 30 mins   # minimum session duration
         self.duration_max = 2100  # 35 mins   # max
-        self.stage = 1
-        self.substage = 0
         self.response_duration = 120  # 2 min
         self.stim_duration = self.response_duration
 
@@ -48,7 +46,7 @@ class TouchTeaching_no_mask(Task):
         self.y_correcth_pos = 0  # screen height is 250mmm (randomise this??)
         self.width = 0
         self.height = 0
-        self.x_incorrecth = 0  # Incorrecth coordinate
+        self.x_incorrecth = None  # Incorrecth coordinate
         self.contrast = 0.4  # contrast of the stim. 0 black, 1 gray, 2 white. Default 40%
 
         # pumps
@@ -61,7 +59,7 @@ class TouchTeaching_no_mask(Task):
         self.reward_drunk = 0  # how many uLs they have received in the session
 
         # Needed in Each Task:
-        self.stage = 0  # Current stage within the task
+        self.stage = 1  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         # self.task_number = 0  # Each task has a unique number. See RV script guide.
 
@@ -153,18 +151,18 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Response_window',
             state_timer=self.response_duration + 10,
-            state_change_conditions={'SoftCode1': 'Correct_first', 'SoftCode3': 'Miss', Bpod.Events.Tup: 'Miss'},
+            state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 204)])  # function 204 defines the active touch area of our stims
 
         self.sma.add_state(
-            state_name='Correct_first',
+            state_name='Correct',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
         # waterLED and RWsound remain ON until poke
 
         self.sma.add_state(
-            state_name='Correct_first_reward',
+            state_name='Correct_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 222)])
@@ -184,6 +182,13 @@ class TouchTeaching_no_mask(Task):
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 222)])
 
         self.sma.add_state(
+            state_name='Touch_Outside',
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+            output_actions=[])
+        # Goes back to response window in case of touch outside the two jar areas
+
+        self.sma.add_state(
             state_name='Exit',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
@@ -191,11 +196,10 @@ class TouchTeaching_no_mask(Task):
 
     def after_trial(self):
         # Trial Counter
-        if self.current_trial_states['Miss'][0][0] > 0:  # Missed trial
-            self.register_value('trial_result', 'miss')
-        else:
-            self.register_value('trial_result', 'correct')  # Correct trial
-            self.reward_drunk += self.valve_reward * self.valve_factor_c
+        if self.current_trial_states['Miss'][0][0] > 0:
+            self.trial_result = 'miss'
+        elif self.current_trial_states['Correct'][0][0] > 0:
+            self.trial_result = 'correct'
 
 
         self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
