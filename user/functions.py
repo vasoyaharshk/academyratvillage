@@ -1909,6 +1909,7 @@ def loop122(timing):
 def function201(): # touchteaching stage 1 - 'stimulus' is entire screen
     square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
     square.fillColor = [cont, cont, cont]
@@ -1922,6 +1923,7 @@ def loop201(timing):
 def function202():  # touchteaching stage 2 - 'stimulus' is smaller
     square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
     square.fillColor = [cont, cont, cont]
@@ -1935,6 +1937,7 @@ def loop202(timing):
 def function203():  # touchteaching stage 3 - 'stimulus' is smallest
     square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
+    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
 
     cont = float(utils.task.contrast)
     square.fillColor = [cont, cont, cont]
@@ -1946,8 +1949,8 @@ def loop203(timing):
     window.flip()
 
 def function204(): #Touchteaching read touchscreen
-    width = utils.task.width * settings.PIXELS_PER_MM
-    height = utils.task.height * settings.PIXELS_PER_MM
+    width = utils.task.width + 100 * settings.PIXELS_PER_MM
+    height = utils.task.height + 100 * settings.PIXELS_PER_MM
     x_correct = utils.task.x_correcth_pos * settings.PIXELS_PER_MM
     y = utils.task.y_correcth_pos * settings.PIXELS_PER_MM
 

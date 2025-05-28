@@ -102,10 +102,10 @@ class TouchTeaching_no_mask(Task):
             self.height = 230
         elif self.stage == 2:
             self.stim = 202
-            self.x_correcth_pos = random.randint(65, 325)  # Screen width is 401mmm
-            self.y_correcth_pos = 110  # 640 = center of the screen. Screen height is 250mmm
-            self.width = 125
-            self.height = 125
+            self.x_correcth_pos = random.randint(125, 275)
+            self.y_correcth_pos = 57
+            self.width = 62
+            self.height = 62
         elif self.stage == 3:
             self.stim = 203
             self.x_correcth_pos = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
