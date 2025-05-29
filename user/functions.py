@@ -1907,9 +1907,9 @@ def loop122(timing):
 
 # Functions from 201 on wards for the audiorats:
 def function201(): # touchteaching stage 1 - 'stimulus' is entire screen
-    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    square.pos = (int(utils.task.x_correcth_pos), int(utils.task.y_correcth_pos))
+    square.width = int(utils.task.width)
+    square.height = int(utils.task.height)
 
     cont = float(utils.task.contrast)
     square.fillColor = [cont, cont, cont]
@@ -1949,10 +1949,18 @@ def loop203(timing):
     window.flip()
 
 def function204(): #Touchteaching read touchscreen
-    width = utils.task.width + 100 * settings.PIXELS_PER_MM
-    height = utils.task.height + 100 * settings.PIXELS_PER_MM
-    x_correct = utils.task.x_correcth_pos * settings.PIXELS_PER_MM
-    y = utils.task.y_correcth_pos * settings.PIXELS_PER_MM
+    stage = utils.task.stage
+    if stage == 1:
+        print("Stage= ", stage)
+        width = utils.task.width
+        height = utils.task.height
+        x_correct = utils.task.x_correcth_pos
+        y = utils.task.y_correcth_pos
+    else:
+        width = utils.task.width + 100 * settings.PIXELS_PER_MM
+        height = utils.task.height + 100 * settings.PIXELS_PER_MM
+        x_correct = utils.task.x_correcth_pos * settings.PIXELS_PER_MM
+        y = utils.task.y_correcth_pos * settings.PIXELS_PER_MM
 
     touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
 
