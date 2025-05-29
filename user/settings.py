@@ -46,7 +46,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 # touchscreen
 #XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
 XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI-3'   # <-- TO CHANGE
-WIN_SIZE = [400, 230]  # in mm. 410 and 250 is for touchscreen
+WIN_SIZE = [400, 250]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 720]
 TOUCH_RESOLUTION = [4096, 4096]
 CENTRE_SCREEN = [640, 360]          #This variable points to the centre of the screen. Essential for displaying images.
@@ -100,10 +100,10 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [120, 200, 85, 220]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [120, 180, 220, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [180, 460, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [460, 620, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [105, 172, 80, 190]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [100, 172, 190, 300]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [172, 510, 260, 310]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_DOORS2_ZONE = [510, 620, 265, 300]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
