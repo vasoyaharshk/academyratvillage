@@ -29,8 +29,8 @@
 
 
 // scale
-#define CELL1 2
-#define CELL2 3
+#define CELL1 2   
+#define CELL2 3  
 #define CELLCALIBRATION 1062 // calibration factor for load cell => strongly dependent on your individual setup
 HX711 LoadCell;
 bool scaleOn = false;
