@@ -63,7 +63,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 NOMICECAGE = 5000  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
-ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
+ONEMOUSE = 3000# if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
 SEVERALMICE = 14000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
@@ -100,9 +100,9 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [105, 172, 80, 190]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [100, 172, 190, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [172, 510, 260, 310]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_CAGE_ZONE1 = [105, 172, 80, 230]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [105, 185, 230, 300]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [185, 510, 260, 310]   # <-- TO CHANGE left, right, top, down Harsh done
 CAM1_DOORS2_ZONE = [510, 620, 265, 300]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
@@ -166,7 +166,7 @@ OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
 TASK_TABLE = "task_times"  # <-- TO CHANGE
 
 # other
-BOX_NAME = 4                         # <-- TO CHANGE
+BOX_NAME = 2                         # <-- TO CHANGE
 
 DEFAULT_TRIALS_MIN = 0
 DEFAULT_DURATION_MIN = 0  # seconds
@@ -193,3 +193,5 @@ OVERDETECTIONS = 50000
 #RV 2 Sound:
 INCORRECT_FREQ = 1368.5
 INCORRECT_DB = 70.0
+
+ENABLE_EXIT_WEIGHING = False

@@ -249,33 +249,28 @@ def main_loop():
             screen_loop()
 
         elif utils.state == 3:  # 3 after min_time, data not saved, animal not back
-            if status == "w":
+            if settings.ENABLE_EXIT_WEIGHING and status == "w":
                 try:
                     new_time = time_utils.now_seconds()
                     weight.append((new_time, float(tag)))
                     weight = [value for value in weight if value[0] + 3 >= new_time]
                     list_weights = ",".join([str(item[1]) for item in weight])
-                    if (
-                        len(weight) == 5
-                        and cam1.area_doors2.value < settings.NOMICEDOOR2
-                        and cam1.area_doors1.value > settings.NOMICEDOOR2
-                    ):
+                    if (len(weight) == 5
+                            and cam1.area_doors2.value < settings.NOMICEDOOR2
+                            and cam1.area_doors1.value > settings.NOMICEDOOR2):
                         good_weight = weight[2][1]
                         utils.task.subject_weight = good_weight
-                        utils.log(
-                            utils.subject.name, "weight: " + str(good_weight), "ACTION"
-                        )
-                        utils.log(
-                            utils.subject.name,
-                            "list_of_weights: " + list_weights,
-                            "ACTION",
-                        )
+                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
+                        utils.log(utils.subject.name, "list_of_weights: " + list_weights, "ACTION",)
                         weight = []
-                        utils.change_to_state = (
-                            4  # after min_time, data not saved, animal back
-                        )
+                        utils.change_to_state = (4)
                 except:  # because an animal can be stuck and then we have measures of weight and rfid at the same time
                     pass
+            else:
+                utils.task.subject_weight = 0
+                if (cam1.area_doors2.value < settings.NOMICEDOOR2
+                        and cam1.area_doors1.value > settings.NOMICEDOOR2):
+                    utils.change_to_state = (4)
 
             screen_loop()
 
@@ -324,28 +319,29 @@ def main_loop():
                 last_time_scale = time_utils.now_seconds()
                 arduino.tare_scale()
 
-            elif status == "w":
+            if settings.ENABLE_EXIT_WEIGHING and status == "w":
                 new_time = time_utils.now_seconds()
                 weight.append((new_time, float(tag)))
                 weight = [value for value in weight if value[0] + 3 >= new_time]
                 list_weights = ",".join([str(item[1]) for item in weight])
-                if (
-                    len(weight) == 5
-                    and cam1.area_doors2.value < settings.NOMICEDOOR2
-                    and cam1.area_doors1.value > settings.NOMICEDOOR2
-                ):
+                if (len(weight) == 5 and cam1.area_doors2.value < settings.NOMICEDOOR2
+                        and cam1.area_doors1.value > settings.NOMICEDOOR2):
                     try:
                         good_weight = weight[2][1]
                         utils.task.subject_weight = good_weight
-                        utils.log(
-                            utils.subject.name, "weight: " + str(good_weight), "ACTION"
-                        )
-                        utils.log(
-                            utils.subject.name,
-                            "list_of_weights: " + list_weights,
-                            "ACTION",
-                        )
+                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
+                        utils.log(utils.subject.name,"list_of_weights: " + list_weights,"ACTION")
                         weight = []
+                        utils.log_cam(utils.subject.name, "Returning home", "ACTION")
+                    except:
+                        utils.log("Academy", "returning home after relaunch", "ACTION")
+                    arduino.move_doors_to_go_home()
+                    utils.change_to_state = 0  # waiting
+            else:
+                utils.task.subject_weight = 0
+                if (cam1.area_doors2.value < settings.NOMICEDOOR2
+                        and cam1.area_doors1.value > settings.NOMICEDOOR2):
+                    try:
                         utils.log_cam(utils.subject.name, "Returning home", "ACTION")
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")

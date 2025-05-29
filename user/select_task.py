@@ -53,6 +53,8 @@ def select_task(df, subject):
         except:
             print('Telegram message not sent')
 
+    reward_duration = 0 #Only change it when and if you need to for each rat different duration.
+
     # #Reward duration assigned again after the task:
     # # Map each rat to its duration
     # reward_duration_map = {

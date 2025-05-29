@@ -23,11 +23,13 @@ class Habituation(Task):
 
     def init_variables(self):
         # general
-        self.duration_min = 60
-        self.duration_max = 66
+        self.duration_min = 10
+        self.duration_max = 60
         self.tired = False
         self.stage = 0
         self.substage = 0
+        self.trial_length = 0
+        self.trial_result = 'correct'
 
         # pumps
         self.reward_drunk = 100  # deliver 100 ul water initially
@@ -76,4 +78,6 @@ class Habituation(Task):
 
     def after_trial(self):
         self.register_value('reward_drunk', self.reward_drunk)
+        self.register_value('trial_length', self.trial_length)
+        self.register_value('trial_result', self.trial_result)
 
