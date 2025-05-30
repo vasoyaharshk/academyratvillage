@@ -60,7 +60,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICECAGE = 5000  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 3000# if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
@@ -74,10 +74,10 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 25                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR1 = 40                                              # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR2 = 40                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 5                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 5                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR1 = 5                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR2 = 5                                               # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
