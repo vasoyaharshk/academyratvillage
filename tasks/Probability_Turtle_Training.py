@@ -32,8 +32,8 @@ class Probability_Turtle_Training(Task):
         """
 
         # Variables for the task:
-        self.duration_max = 3000                    #50 mins
-        self.duration_min = 2100                    #35 mins
+        self.duration_max = 11                    #50 mins
+        self.duration_min = 10                    #35 mins
         self.duration_tired = 1800                  #30 mins
         self.trials_tired = 5
         self.tired = False

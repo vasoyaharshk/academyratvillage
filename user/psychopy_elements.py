@@ -121,7 +121,7 @@ video_right = visual.MovieStim(win=window, filename=video_placeholder, loop=Fals
 image_jar_left_sized = visual.ImageStim(
     win=window,
     image=None,
-    size=(1280, 720),  # Match the same padded video size
+    size=(1280, 720),
     units='pix'
 )
 
