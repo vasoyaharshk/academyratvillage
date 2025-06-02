@@ -2169,3 +2169,15 @@ def function222():
 
 def loop222(timing):
     window.flip()
+
+#Test:
+def function400():
+    #if isinstance(soundStream, SoundR):
+    soundStream.play(soundVec4)     #14Khz sound played
+
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    print("Correct, Reward Sound played")
+
+def loop400(timing):
+    window.flip()

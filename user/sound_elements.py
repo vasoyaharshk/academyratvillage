@@ -128,6 +128,9 @@ try:
     soundVec2 = pureToneGen(0.4, 4000, 1) #4000  #Incorrect sound
     soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
 
+    soundVec4 = pureToneGen(0.4, 250, 1)  # 4000  #Punish sound plays only for 1 second
+    soundVec5 = pureToneGen(0.4, 500, 1)  # 4000  #Punish sound plays only for 1 second
+
 except:
     print("______")
     print("ERROR SOUND")
