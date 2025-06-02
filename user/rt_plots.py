@@ -117,13 +117,15 @@ def read_dataframes(init_time, final_time):
 
             missed_df2 = pd.DataFrame({'subject': name, 'date': miss_times})
 
-            missed_df = pd.concat([missed_df, missed_df2])
+            #missed_df = pd.concat([missed_df, missed_df2])
+            missed_df = pd.concat([df for df in [missed_df, missed_df2] if not df.empty])
 
 
             task_df2 = pd.DataFrame({'subject': name, 'start_task': start_times2, 'end_task': end_times2,
                                'task_name': task_name2, 'stage': stage2, 'substage': substage2})
 
-            task_df = pd.concat([task_df, task_df2])
+            #task_df = pd.concat([task_df, task_df2])
+            task_df = pd.concat([df for df in [task_df, task_df2] if not df.empty])
 
         weight_df['day'] = weight_df['date'] - timedelta(hours=8)
         weight_df['day'] = weight_df['day'].dt.normalize() + timedelta(hours=20)
@@ -209,8 +211,15 @@ def rt_plot(init_time, final_time):
             ax1.axvspan(days_at_20[i], days_at_8[i + 1], facecolor='lightgray', zorder=0)
         palette = sns.color_palette(colors, len(subject_names))
 
+        # df = weight_df[['day', 'subject', 'perc_weight']]
+        # df = df.groupby(['day', 'subject']).median()
+
         df = weight_df[['day', 'subject', 'perc_weight']]
-        df = df.groupby(['day', 'subject']).median()
+        df = df.groupby(['day', 'subject'], as_index=False).median()
+
+        # Adjust palette to match number of unique subjects
+        n_subjects = df['subject'].nunique()
+        palette = palette[:n_subjects]
 
         ax1.eventplot(days, color='black', linelengths=200, lineoffsets=100, linewidths=1)
         sns.lineplot(x='day', y='perc_weight', hue='subject', palette=palette, data=df, linewidth=1, ax=ax1)
@@ -236,11 +245,20 @@ def rt_plot(init_time, final_time):
     try:
         for i in range(len(days_at_8) - 1):
             ax2.axvspan(days_at_20[i], days_at_8[i + 1], facecolor='lightgray', zorder=0)
+            ax2.axvspan(days_at_20[i], days_at_8[i + 1], facecolor='lightgray', zorder=0)
+
+        # df = water_df[['day', 'subject', 'water']]
+        # df = df.groupby(['day', 'subject']).sum()
+        # df['water_ml'] = df['water'] / 1000
 
         df = water_df[['day', 'subject', 'water']]
-        df = df.groupby(['day', 'subject']).sum()
+        df = df.groupby(['day', 'subject'], as_index=False).sum()
         df['water_ml'] = df['water'] / 1000
+
         max_water = df.water_ml.max() + 0.5
+
+        n_subjects = df['subject'].nunique()
+        palette = palette[:n_subjects]
 
         ax2.eventplot(days, color='black', linelengths=max_water, lineoffsets=max_water / 2, linewidths=1)
         sns.lineplot(x='day', y='water_ml', hue='subject', palette=palette, data=df, ax=ax2)
