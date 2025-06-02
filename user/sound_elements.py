@@ -51,11 +51,14 @@ def pureToneGen(amp, freq, toneDuration, FsOut=44800):
     """Generates a given parameters pure tone vector. Generates a sine wave (pure tone) as a NumPy array.
     FsOut is the sound quality (sampling rate), 44800 Hz is the CD quality. 192000 is Ultra-high quality:
     """
+    t = time.time()
     if type(amp) is float and type(freq) is int:
         # Create a time vector from 0 to duration, sampled at FsOut
-        tvec = np.linspace(0, toneDuration, toneDuration * FsOut)
+        #tvec = np.linspace(0, toneDuration, toneDuration * FsOut
+        tvec = np.linspace(0, toneDuration, int(toneDuration * FsOut), endpoint=False)
         # Generate a sine wave with the given amplitude and frequency
         s1 = amp * np.sin(2 * np.pi * freq * tvec)
+        print("Time to call soundStream.play():", time.time() - t)
         return s1
     else:
         raise ValueError('pureToneGen needs (float, int) as arguments')
