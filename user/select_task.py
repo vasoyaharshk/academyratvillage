@@ -155,7 +155,7 @@ def select_task(df, subject):
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
-            if len(df_last3.session.unique())>=3: # Pass after 2 sessions
+            if len(df_last3.session.unique())>=300: # Pass after 2 sessions
                 task = 'LickTeaching'
 
         elif task == 'LickTeaching':

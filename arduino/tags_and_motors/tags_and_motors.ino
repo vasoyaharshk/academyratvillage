@@ -22,7 +22,7 @@
 #define ANGLEOPEN1 80
 #define ANGLECLOSE1 28
 #define ANGLEOPEN2 5
-#define ANGLECLOSE2 49
+#define ANGLECLOSE2 48.9
 #define ANGLESEMICLOSE2 1 //Harsh: what is this?
 
 
