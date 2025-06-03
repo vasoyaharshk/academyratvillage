@@ -2186,7 +2186,7 @@ def function223():
     freq = getattr(utils.task, 'reward_frequency', 250.0)
     dur = 1800
     amp = 0.4
-    vec = pureToneGen(amp, freq, dur)  # no int(freq)
+    vec = pureToneGen(amp, freq, dur)
     soundStream.play(vec)
 
 def loop223(timing):

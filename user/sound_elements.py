@@ -13,7 +13,7 @@ class SoundR:
             print(f"❌ Error in sound device detection: {e}")
             device = 1  # fallback device index
 
-        sd.default.device = device
+        sd.default.device = 'dx3'
 
     @staticmethod
     def list_devices():
@@ -22,14 +22,18 @@ class SoundR:
             print(f"{idx}: {dev['name']} | max_output_channels = {dev['max_output_channels']}")
 
     @staticmethod
+    # def getDevice():
+        # SoundR.list_devices()
+        # for idx, dev in enumerate(sd.query_devices()):
+        #     name = dev.get('name', '').lower()
+        #     max_out = dev.get('max_output_channels', 0)
+        #     if "dx3" in name and "analog" in name and max_out >= 2:
+        #         print(f"✅ External speaker found: {name} (index {idx})")
+        #         return idx
+        # raise RuntimeError("❌ DX3 Pro+ (Analog Output) not found in audio devices.")
+
     def getDevice():
-        for idx, dev in enumerate(sd.query_devices()):
-            name = dev.get('name', '')
-            max_out = dev.get('max_output_channels', 0)
-            if "DX3 Pro+" in name and max_out == 2:
-                print(f"✅ External speaker found: {name} (index {idx})")
-                return idx
-        raise RuntimeError("❌ External speaker containing 'DX3 Pro+' with 2 output channels not found.")
+        return 'dx3'
 
     def play(self, soundVec):
         sd.play(soundVec)
@@ -44,11 +48,11 @@ class SoundR:
 
 
 def pureToneGen(amp, freq, toneDuration, FsOut=44800):
-    if isinstance(amp, float) and isinstance(freq, int):
+    if isinstance(amp, float) and isinstance(freq, (float, int)):
         tvec = np.linspace(0, toneDuration, int(toneDuration * FsOut), endpoint=False)
         return amp * np.sin(2 * np.pi * freq * tvec)
     else:
-        raise ValueError('pureToneGen needs (float, int) as arguments')
+        raise ValueError('pureToneGen needs (float, float|int) as arguments')
 
 
 def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
@@ -89,16 +93,10 @@ class FakeSoundVec:
         self.name = 'fake'
 
 
-try:
-    soundStream = SoundR()
-    soundVec1 = pureToneGen(0.4, 14000, 1800)
-    soundVec2 = pureToneGen(0.4, 4000, 1)
-    soundVec3 = pureToneGen(0.4, 4000, 1)
+soundStream = SoundR()
+soundVec1 = pureToneGen(0.4, 14000, 1800)
+soundVec2 = pureToneGen(0.4, 4000, 1)
+soundVec3 = pureToneGen(0.4, 4000, 1)
 
-except Exception as e:
-    print("______\nERROR SOUND\n_______")
-    print(e)
-    soundStream = FakeSoundR()
-    soundVec1 = FakeSoundVec()
-    soundVec2 = FakeSoundVec()
-    soundVec3 = FakeSoundVec()
+soundVec4 = pureToneGen(1.0, 250.0, 1)
+soundVec5 = pureToneGen(0.4, 500.0, 1)

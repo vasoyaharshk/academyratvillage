@@ -51,7 +51,7 @@ class LickTeaching(Task):
         self.reward_frequency = 0  # this is changed by the task based on the rat's name
 
         self.reward_frequency_map = {
-            'chandler': 250.0,
+            'chand': 250.0,
             'felix': 290.0,
             'fergus': 336.4,
             'geralt': 390.2,
@@ -61,7 +61,6 @@ class LickTeaching(Task):
             'pol': 706.6,
             'm3': 100.0,
         }
-
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -144,16 +143,23 @@ class LickTeaching(Task):
 
 
     def after_trial(self):
+        # Frequency verification
+        expected = self.reward_frequency_map.get(self.subject, None)
+        actual = self.reward_frequency
 
+        if expected is None:
+            message = f"URGENT: No expected frequency set for '{self.subject}'"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except:
+                print('Telegram message not sent')
+        elif round(expected, 2) != round(actual, 2):
+            message = f"🚨 URGENT: Frequency mismatch for {self.subject} — expected {expected} Hz, got {actual} Hz"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except:
+                print('Telegram message not sent')
 
-        #Frequency Checks:
-        self.reward_frequency_map
-        message = (f"URGENT: {self.reward_frequency} for {self.subject}. is 0")
-        try:
-            telegram_bot.alarm_finish_session(message, self.subject)
-        except:
-            print('Telegram message not sent')
-            pass
 
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0: # Missed trial
