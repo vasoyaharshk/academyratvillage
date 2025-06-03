@@ -25,7 +25,7 @@ def select_task(df, subject):
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
-        'chandler': 250.0,
+        'chand': 250.0,
         'felix': 290.0,
         'fergus': 336.4,
         'geralt': 390.2,
