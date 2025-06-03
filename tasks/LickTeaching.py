@@ -1,6 +1,7 @@
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
+from academy import telegram_bot
 
 class LickTeaching(Task):
 
@@ -46,6 +47,20 @@ class LickTeaching(Task):
         # counters
         self.miss_acc_counter = 0
         self.reward_drunk = 0
+
+        self.reward_frequency = 0  # this is changed by the task based on the rat's name
+
+        self.reward_frequency_map = {
+            'chandler': 250.0,
+            'felix': 290.0,
+            'fergus': 336.4,
+            'geralt': 390.2,
+            'joey': 452.7,
+            'ross': 525.1,
+            'innes': 609.1,
+            'pol': 706.6,
+            'm3': 100.0,
+        }
 
 
     def configure_gui(self): # Variables that appear in the GUI
@@ -98,7 +113,7 @@ class LickTeaching(Task):
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
-                            (Bpod.OutputChannels.SoftCode, 220)])
+                            (Bpod.OutputChannels.SoftCode, 223)])
             # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(
@@ -130,6 +145,16 @@ class LickTeaching(Task):
 
     def after_trial(self):
 
+
+        #Frequency Checks:
+        self.reward_frequency_map
+        message = (f"URGENT: {self.reward_frequency} for {self.subject}. is 0")
+        try:
+            telegram_bot.alarm_finish_session(message, self.subject)
+        except:
+            print('Telegram message not sent')
+            pass
+
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0: # Missed trial
             self.register_value('trial_result', 'miss')
@@ -148,5 +173,6 @@ class LickTeaching(Task):
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('trial_result', 'correct_first')
+        self.register_value('reward_frequency', 'self.reward_frequency')
 
 

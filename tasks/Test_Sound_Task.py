@@ -31,7 +31,7 @@ class Test_Sound_Task(Task):
             state_name='Play_Reward_Tone',
             state_timer=5.0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 220)]
+            output_actions=[(Bpod.OutputChannels.SoftCode, 223)]
         )
 
         self.sma.add_state(

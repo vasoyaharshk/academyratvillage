@@ -2169,3 +2169,25 @@ def function222():
 
 def loop222(timing):
     window.flip()
+
+#Test:
+# def function223():
+#     soundStream.play(soundVec4)     #14Khz sound played
+#
+#     cam2.put_state("Correct")
+#     cam3.put_state("Correct")
+#     print("Correct, Reward Sound played")
+#
+# def loop223(timing):
+#     window.flip()
+#
+
+def function223():
+    freq = getattr(utils.task, 'reward_frequency', 250.0)
+    dur = 1800
+    amp = 0.4
+    vec = pureToneGen(amp, freq, dur)  # no int(freq)
+    soundStream.play(vec)
+
+def loop223(timing):
+    window.flip()

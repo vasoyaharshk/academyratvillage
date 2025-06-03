@@ -155,17 +155,37 @@ def select_task(df, subject):
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
-            if len(df_last3.session.unique())>=300: # Pass after 2 sessions
+            if len(df_last3.session.unique())>=3: # Pass after 3 sessions
                 task = 'LickTeaching'
+                message = 'Advance from Habituation to LickTeaching'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
         elif task == 'LickTeaching':
             wait_seconds = 3600 * 2
             if n_trials > 75:
                 task = 'TouchTeaching_no_mask'
                 stage = 1.0
+                message = 'Advance from Lickteaching to Touchteaching'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
         elif task == 'TouchTeaching_no_mask':
             if n_trials >= 75:
+                message = f"{my_subject} advance to next stage in Touchteaching from {stage}'"
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
                 if stage == 1:
                     stage = 2.0
                 elif stage == 2:
@@ -174,7 +194,6 @@ def select_task(df, subject):
                     task = 'Probability_Extra_Training_Acc'
                     stage = 1.0
                     task_number = 1
-
                     message = f"{my_subject} advance from early training to probability training with pegs'"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
