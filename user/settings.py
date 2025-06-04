@@ -127,6 +127,8 @@ CAM2_DOORS1_ZONE = [1, 2, 1, 2]
 CAM2_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 CAM2_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
 CAM2_FLOOR2_ZONE = [7, 8, 7, 8]
+CAM2_FLOOR_ON = False
+CAM2_TRACKING_POSITION = False
 
 CAM3_NUMBER = 3
 CAM3_NAME_VIDEO = "BB"
