@@ -2163,7 +2163,7 @@ def function220():
 
     task_freq = getattr(utils.task, "reward_frequency", None)
     if task_freq is not None and task_freq != freq:
-        message = f"FREQ MISMATCH for {rat}: tone = {freq} Hz, task = {task_freq} Hz"
+        message = f"URGENT FREQ MISMATCH for {rat}: tone = {freq} Hz, task = {task_freq} Hz"
         print(message)
         try:
             telegram_bot.alarm_finish_session(message, rat)
