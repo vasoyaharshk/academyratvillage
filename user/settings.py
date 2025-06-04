@@ -149,8 +149,8 @@ CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR2_ZONE = [7, 8, 7, 8]    # <-- TO CHANGE left, right, top, down
 CAM3_DOORS1_ZONE = [200, 500, 30, 270]
-CAM3_FLOOR_ON = True
-CAM3_TRACKING_POSITION = True
+CAM3_FLOOR_ON = False
+CAM3_TRACKING_POSITION = False
 
 # telegram
 TELEGRAM_TOKEN = "7993554392:AAGAEavqtwrbsQOLixDN3AHfGjZm7-Rri9w"  # <-- TO CHANGE
