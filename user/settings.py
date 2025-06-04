@@ -122,7 +122,7 @@ CAM2_STATES = {
 }
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
-CAM2_THRESHOLD = 70
+CAM2_THRESHOLD = 50
 CAM2_DOORS1_ZONE = [1, 2, 1, 2]
 CAM2_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 CAM2_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down

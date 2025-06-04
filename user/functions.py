@@ -2144,10 +2144,11 @@ def function220():
         soundStream.play(tone)
         message = f"Playing tone for '{rat}': freq = {freq} Hz"
         print(message)
-        try:
-            telegram_bot.alarm_finish_session(message, rat)
-        except:
-            print("Telegram message not sent.")
+        if utils.task.current_trial == 0:
+            try:
+                telegram_bot.alarm_finish_session(message, rat)
+            except:
+                print("Telegram message not sent.")
     else:
         message = f"No reward tone defined for subject: {rat}"
         print(message)
