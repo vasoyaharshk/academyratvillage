@@ -48,19 +48,19 @@ class LickTeaching(Task):
         self.miss_acc_counter = 0
         self.reward_drunk = 0
 
-        self.reward_frequency = 0  # this is changed by the task based on the rat's name
-
-        self.reward_frequency_map = {
-            'chand': 250.0,
-            'felix': 290.0,
-            'fergus': 336.4,
-            'geralt': 390.2,
-            'joey': 452.7,
-            'ross': 525.1,
-            'innes': 609.1,
-            'pol': 706.6,
-            'm3': 100.0,
-        }
+        # self.reward_frequency = 0  # this is changed by the task based on the rat's name
+        #
+        # self.reward_frequency_map = {
+        #     'chand': 250.0,
+        #     'felix': 290.0,
+        #     'fergus': 336.4,
+        #     'geralt': 390.2,
+        #     'joey': 452.7,
+        #     'ross': 525.1,
+        #     'innes': 609.1,
+        #     'pol': 706.6,
+        #     'm3': 100.0,
+        # }
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -144,21 +144,21 @@ class LickTeaching(Task):
 
     def after_trial(self):
         # Frequency verification
-        expected = self.reward_frequency_map.get(self.subject, None)
-        actual = self.reward_frequency
-
-        if expected is None:
-            message = f"URGENT: No expected frequency set for '{self.subject}'"
-            try:
-                telegram_bot.alarm_finish_session(message, self.subject)
-            except:
-                print('Telegram message not sent')
-        elif round(expected, 2) != round(actual, 2):
-            message = f"🚨 URGENT: Frequency mismatch for {self.subject} — expected {expected} Hz, got {actual} Hz"
-            try:
-                telegram_bot.alarm_finish_session(message, self.subject)
-            except:
-                print('Telegram message not sent')
+        # expected = self.reward_frequency_map.get(self.subject, None)
+        # actual = self.reward_frequency
+        #
+        # if expected is None:
+        #     message = f"URGENT: No expected frequency set for '{self.subject}'"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
+        # elif round(expected, 2) != round(actual, 2):
+        #     message = f"🚨 URGENT: Frequency mismatch for {self.subject} — expected {expected} Hz, got {actual} Hz"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
 
 
         # Trial Counter
@@ -179,6 +179,6 @@ class LickTeaching(Task):
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('trial_result', 'correct_first')
-        self.register_value('reward_frequency', 'self.reward_frequency')
+        # self.register_value('reward_frequency', 'self.reward_frequency')
 
 

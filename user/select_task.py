@@ -41,6 +41,7 @@ def select_task(df, subject):
 
     # Double check the value for frequency from the above table
     reward_frequency_subjects = subject.reward_frequency
+
     if reward_frequency_subjects == reward_frequency:
         print("the reward frequencies match")
     else:

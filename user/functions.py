@@ -2182,12 +2182,55 @@ def loop222(timing):
 #     window.flip()
 #
 
+# def function223():
+#     freq = getattr(utils.task, 'reward_frequency', 250.0)
+#     dur = 1800
+#     amp = 0.4
+#     vec = pureToneGen(amp, freq, dur)
+#     soundStream.play(vec)
+
+
 def function223():
-    freq = getattr(utils.task, 'reward_frequency', 250.0)
-    dur = 1800
-    amp = 0.4
-    vec = pureToneGen(amp, freq, dur)
-    soundStream.play(vec)
+    rat = utils.task.subject.lower()
+    tone = rat_tones.get(rat)
+    freq = reward_frequency_map.get(rat)
+
+    if tone is not None:
+        soundStream.play(tone)
+        message = f"Playing tone for '{rat}': freq = {freq} Hz, vec[:5] = {tone[:5]}"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
+    else:
+        message = f"No reward tone defined for subject: {rat}"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
+
+    reward_frequency_map = {
+        'chand': 250.0,
+        'felix': 290.0,
+        'fergus': 336.4,
+        'geralt': 390.2,
+        'joey': 452.7,
+        'ross': 525.1,
+        'innes': 609.1,
+        'pol': 706.6,
+        'm3': 100.0,
+    }
+
+    task_freq = getattr(utils.task, "reward_frequency", None)
+    if task_freq is not None and task_freq != freq:
+        message = f"FREQ MISMATCH for {rat}: tone = {freq} Hz, task = {task_freq} Hz"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
 
 def loop223(timing):
     window.flip()

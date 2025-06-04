@@ -74,10 +74,10 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 5                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 5                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR1 = 5                                              # <-- TO CHANGE Harsh-Done.
-THRESHOLD_NIGHT_DOOR2 = 5                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE1 = 85                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 85                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR1 = 90                                              # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_DOOR2 = 90                                              # <-- TO CHANGE Harsh-Done
 
 DURATION_TAG = 1  # seconds the rfid lecture is stored
 DURATION_TAGS = 10  # seconds tags are stored if there is a tag different than current animal can not enter
