@@ -9,7 +9,7 @@ from user.sound_elements import *
 import random
 import os
 import re
-
+from academy import telegram_bot
 
 #To avoid the video logs debugging prints. Comment this part if there is a need to debug:
 os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
@@ -2142,7 +2142,7 @@ def function220():
 
     if tone is not None:
         soundStream.play(tone)
-        message = f"Playing tone for '{rat}': freq = {freq} Hz, vec[:5] = {tone[:5]}"
+        message = f"Playing tone for '{rat}': freq = {freq} Hz"
         print(message)
         try:
             telegram_bot.alarm_finish_session(message, rat)

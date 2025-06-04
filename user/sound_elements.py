@@ -4,6 +4,9 @@ import numpy as np
 import time
 from scipy.signal import firwin, lfilter
 
+DEFAULT_FS = 44800
+DEFAULT_RAMP_DURATION = 0.01  # 10 ms
+REFERENCE_DB = 85.8           # Measured SPL reference
 
 class SoundR:
     def __init__(self):
@@ -54,6 +57,21 @@ def pureToneGen(amp, freq, toneDuration, FsOut=44800):
     else:
         raise ValueError('pureToneGen needs (float, float|int) as arguments')
 
+def db_to_amplitude(db, reference_db=REFERENCE_DB):
+    return 10 ** ((db - reference_db) / 20)
+
+def apply_cosine_ramp(sound, ramp_duration=DEFAULT_RAMP_DURATION, FsOut=DEFAULT_FS):
+    ramp_len = int(FsOut * ramp_duration)
+    ramp = 0.5 * (1 - np.cos(np.pi * np.arange(ramp_len) / ramp_len))
+    sound[:ramp_len] *= ramp
+    sound[-ramp_len:] *= ramp[::-1]
+    return sound
+
+def pureToneGen_dB(freq, duration, db=70, FsOut=DEFAULT_FS):
+    amp = db_to_amplitude(db)
+    tvec = np.linspace(0, duration, int(duration * FsOut), endpoint=False)
+    tone = amp * np.sin(2 * np.pi * freq * tvec)
+    return apply_cosine_ramp(tone, FsOut=FsOut).astype(np.float32)
 
 def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
     if randgen is None:
@@ -116,7 +134,7 @@ reward_frequency_map = {
 
 # Pre-generated tone vectors
 rat_tones = {
-    name: pureToneGen(0.4, freq, 1800) for name, freq in reward_frequency_map.items()
+    name: pureToneGen_dB(freq, 1.0, db=70) for name, freq in reward_frequency_map.items()
 }
 
 # rat_tones = {
