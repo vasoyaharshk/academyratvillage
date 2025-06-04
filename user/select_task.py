@@ -150,9 +150,9 @@ def select_task(df, subject):
         # VERY IMPORTANT, THE ABOVE LINE IS COMMENTED OUT BECAUSE WE WANT THE DF TO REMAIN THE SUBJECT'S ALL SESSIONS INSTEAD OF JUST LAST AS
         # WE WANT TO GET LAST 55 TRIALS FOR THE CRITERIA CHANGED.
 
-        # number of trials
-        n_trials = df_last1.trial.max()  # number of trials in current session
-        n_trials_prev = df_last2.groupby('session')['trial'].max().values[0]  # number of trials in previous session
+        # number of valid trials
+        n_trials = df_last1[df_last1.trial_result != 'miss'].trial.count()
+        n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
