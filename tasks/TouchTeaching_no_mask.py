@@ -104,14 +104,23 @@ class TouchTeaching_no_mask(Task):
             self.stim = 202
             self.x_correcth_pos = random.randint(125, 275)
             self.y_correcth_pos = 57
-            self.width = 62
-            self.height = 62
+            self.width = 60
+            self.height = 60
         elif self.stage == 3:
             self.stim = 203
             self.x_correcth_pos = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
             self.y_correcth_pos = random.randint(43,82)  # 640 = center of the screen. Screen height is 250mmm. We minus 10 on each end to account for mask
-            self.width = 65
-            self.height = 65
+            self.width = 30
+            self.height = 0
+
+        print("X: ", self.x_correcth_pos)
+        print("Y: ", self.y_correcth_pos)
+        print("Width: ", self.width)
+        print("Height: ", self.height)
+
+        self.stim = 223
+
+        print("stim: ", self.stim)
 
         if self.current_trial == 0:
             self.sma.add_state(
@@ -170,16 +179,10 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Miss',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
         # waterLED ON, global LED ON
-
-        self.sma.add_state(
-            state_name='Miss_reward',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 222)])
 
         self.sma.add_state(
             state_name='Touch_Outside',

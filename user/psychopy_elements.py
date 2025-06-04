@@ -51,6 +51,14 @@ square3 = visual.Rect(win=window,
                      fillColor= [0.2, 0.2, 0.2],
                      pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
+square4 = visual.Rect(win=window,
+                     height=settings.WIN_RESOLUTION[1],
+                     width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM),
+                     units='pix',
+                     lineColor= [0.2, 0.2, 0.2],
+                     fillColor= [0.2, 0.2, 0.2],
+                     pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
 border1 = visual.Rect(win=window,
                      height=settings.WIN_RESOLUTION[1],
                      width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM),
@@ -111,7 +119,7 @@ image_jar_right = visual.ImageStim(win=window, image=None)  # Image will be set 
 circle_correcth = Circle(win=window, radius=1, edges=128, lineColor=[1, 1, -1], fillColor=None)  # Green border, no fill
 
 # Use a placeholder video to avoid NoneType error. This is a dummy video
-video_placeholder = "/home/ratvillage02/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
+video_placeholder = "/home/harsh/academy/stimuli/bastos_taylor/placeholder_black_video.mp4"  # Ensure this file exists
 
 # Video Stimuli, sound disabled and filename given to placeholder but is taken from functions.py which takes it from the task.
 video_left = visual.MovieStim(win=window, filename=video_placeholder, loop=False, size=(1280, 720), units='pix')

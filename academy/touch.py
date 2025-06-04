@@ -299,25 +299,24 @@ class Touch:
             response = []
             print('No touch found')  # Debugging incorrect area touch
         else:
-            #print('x_correct in touch.py 2: ', x_correct)
-            #print('x_incorrect in touch.py 2: ', x_incorrect)
-            #print('y in touch.py2: ', y)
-            #print('width in touch.py2: ', width)
-            #print('height in touch.py2: ', height)
+            print('x_correct in touch.py 2: ', x_correct)
+            print('x_incorrect in touch.py 2: ', x_incorrect)
+            print('y in touch.py2: ', y)
+            print('width in touch.py2: ', width)
+            print('height in touch.py2: ', height)
 
             xpsy_correct = abs(x_correct)
             #ypsy = 750  # y is now set to 770
             ypsy = abs(y)  # y is now set to 770
 
             # Convert touch coordinates to the window coordinates
-            #print('Touch: ', answer)
+            print('Touch: ', answer)
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
-            #ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
-            ytouch = self.win_resolution[1] - (answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
+            ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
 
 
-            #print(f'Touch Coordinates: {answer}')  # Debugging raw touch coordinates
-            #print(f'Converted Touch (xtouch, ytouch): {xtouch}, {ytouch}')  # Debugging touch conversion
+            print(f'Touch Coordinates: {answer}')  # Debugging raw touch coordinates
+            print(f'Converted Touch (xtouch, ytouch): {xtouch}, {ytouch}')  # Debugging touch conversion
 
             # Define boundaries for the correct rectangular area:
             left_boundary_correct = (xpsy_correct - width / 2)
@@ -325,8 +324,8 @@ class Touch:
             top_boundary = (ypsy + height / 2)
             bottom_boundary = (ypsy - height / 2)
 
-            #print(f'Correct Area (x_correct, ypsy): {xpsy_correct}, {ypsy}')  # Debugging correct area
-            #print(f'Correct Boundaries (left, right, top, bottom): {left_boundary_correct}, {right_boundary_correct}, {top_boundary}, {bottom_boundary}')  # Debugging correct area boundaries
+            print(f'Correct Area (x_correct, ypsy): {xpsy_correct}, {ypsy}')  # Debugging correct area
+            print(f'Correct Boundaries (left, right, top, bottom): {left_boundary_correct}, {right_boundary_correct}, {top_boundary}, {bottom_boundary}')  # Debugging correct area boundaries
 
             # Check if the touch is within the correct area
             if left_boundary_correct <= xtouch <= right_boundary_correct and bottom_boundary <= ytouch <= top_boundary:
@@ -337,22 +336,22 @@ class Touch:
                 left_boundary_incorrect = (xpsy_incorrect - width / 2)
                 right_boundary_incorrect = (xpsy_incorrect + width / 2)
 
-                #print(f'Incorrect Area (x_incorrect): {xpsy_incorrect}')  # Debugging incorrect area
-                #print(f'Incorrect Boundaries (left, right): {left_boundary_incorrect}, {right_boundary_incorrect}')  # Debugging incorrect area boundaries
+                print(f'Incorrect Area (x_incorrect): {xpsy_incorrect}')  # Debugging incorrect area
+                print(f'Incorrect Boundaries (left, right): {left_boundary_incorrect}, {right_boundary_incorrect}')  # Debugging incorrect area boundaries
 
                 # Check if the touch is in the incorrect area:
                 if left_boundary_incorrect <= xtouch <= right_boundary_incorrect and bottom_boundary <= ytouch <= top_boundary:
-                    #print('Touch is in the incorrect area.')  # Debugging incorrect area touch
+                    print('Touch is in the incorrect area.')  # Debugging incorrect area touch
                     self.softcode.send(4)
                 else:
-                    #print('Touch is outside both areas. Waiting for valid touch...')  # Debugging outside area touch
+                    print('Touch is outside both areas. Waiting for valid touch...')  # Debugging outside area touch
                     self.softcode.send(3)
             else:
-                #print('Touch is outside both areas. Waiting for valid touch...')
+                print('Touch is outside both areas. Waiting for valid touch...')
                 self.softcode.send(3)
 
             response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
-            # print(f'Response (xtouch, ytouch in mm): {response}')  # Debugging response
+            print(f'Response (xtouch, ytouch in mm): {response}')  # Debugging response
         queues.responses.put(response)
 
 
