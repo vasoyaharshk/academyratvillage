@@ -77,9 +77,71 @@ def select_task(df, subject):
     #         exec(f"{key} = {repr(val)}")
 
     # Check if task does not contain the word 'Probability'
-    if 'Probability' not in task:  #Excludes all the task without the word Probability
-        pass  #Working Memory section removed
+    if 'Probability' not in task:  #Excludes all the task without the word Probability. Early Training Tasks.
+        #dataframes
+        last_session = df.session.max()
+        df_last14 = df.loc[df['session'] > last_session - 14].copy()  # last 14 sessions
+        df_last5 = df.loc[df['session'] > last_session - 5].copy()  # last five sessions
+        df_last3 = df.loc[df['session'] > last_session - 3].copy()  # last three sessions
+        df_last2 = df.loc[df['session'] > last_session - 2].copy()  # last two sessions
+        df_last1 = df.loc[df['session'] == last_session].copy()           # last session
+        # VERY IMPORTANT, THE ABOVE LINE IS COMMENTED OUT BECAUSE WE WANT THE DF TO REMAIN THE SUBJECT'S ALL SESSIONS INSTEAD OF JUST LAST AS
+        # WE WANT TO GET LAST 55 TRIALS FOR THE CRITERIA CHANGED.
 
+        # number of valid trials
+        n_trials = df_last1[df_last1.trial_result != 'miss'].trial.count()
+        n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
+
+        if task == 'Habituation':
+            wait_seconds = 3600 * 1
+            if len(df_last3.session.unique())>=3: # Pass after 3 sessions
+                task = 'LickTeaching'
+                message = 'Advance from Habituation to LickTeaching'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+        elif task == 'LickTeaching':
+            wait_seconds = 3600 * 2
+            if n_trials > 75:
+                task = 'TouchTeaching_no_mask'
+                stage = 1.0
+                message = 'Advance from Lickteaching to Touchteaching'
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+        elif task == 'TouchTeaching_no_mask':
+            if n_trials >= 75:
+                message = f"{my_subject} advance to next stage in Touchteaching from {stage}'"
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+                if stage == 1:
+                    stage = 2.0
+                elif stage == 2:
+                    stage = 3.0
+                elif stage == 3:
+                    task = 'Probability_Extra_Training_Acc'
+                    stage = 1.0
+                    task_number = 1
+                    message = f"{my_subject} advance from early training to probability training with pegs'"
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+
+    #Probability tasks start from here:
     elif 'Probability' in task:     #Includes all the task without the word Probability
         if task == 'Probability_Extra_Training_Acc':
             if moved_back_counter > max_move_backs:
@@ -512,11 +574,11 @@ def select_task(df, subject):
     elif task == 'Water_Filler':
         print("rat drank water")
 
-    if my_subject == 'm2':
-        wait_seconds = 1
-
     # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
     df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+
+    if my_subject == 'm2':
+        wait_seconds = 1
 
     #all of these are written in subjects.csv:
     return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage

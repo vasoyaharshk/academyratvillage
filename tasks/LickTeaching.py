@@ -1,6 +1,7 @@
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
+from academy import telegram_bot
 
 class LickTeaching(Task):
 
@@ -47,6 +48,19 @@ class LickTeaching(Task):
         self.miss_acc_counter = 0
         self.reward_drunk = 0
 
+        # self.reward_frequency = 0  # this is changed by the task based on the rat's name
+        #
+        # self.reward_frequency_map = {
+        #     'chand': 250.0,
+        #     'felix': 290.0,
+        #     'fergus': 336.4,
+        #     'geralt': 390.2,
+        #     'joey': 452.7,
+        #     'ross': 525.1,
+        #     'innes': 609.1,
+        #     'pol': 706.6,
+        #     'm3': 100.0,
+        # }
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -56,7 +70,7 @@ class LickTeaching(Task):
         print('Trial: ' + str(self.current_trial))
 
         # flooding AVOIDANCE
-        if self.miss_acc_counter > 30:
+        if self.miss_acc_counter > 300:
             flooding = 'Wait_for_reward'
         else:
             flooding = 'Automatic_reward'
@@ -98,7 +112,7 @@ class LickTeaching(Task):
             state_timer=self.valve_time,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
-                            (Bpod.OutputChannels.SoftCode, 223)])
+                            (Bpod.OutputChannels.SoftCode, 220)])
             # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(
@@ -112,7 +126,7 @@ class LickTeaching(Task):
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 8)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Miss',
@@ -124,11 +138,28 @@ class LickTeaching(Task):
             state_name='Exit',
             state_timer=10,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 17), (Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 222), (Bpod.OutputChannels.PWM6, 5)])
             # Wait 10 sec for the next automatic reward
 
 
     def after_trial(self):
+        # Frequency verification
+        # expected = self.reward_frequency_map.get(self.subject, None)
+        # actual = self.reward_frequency
+        #
+        # if expected is None:
+        #     message = f"URGENT: No expected frequency set for '{self.subject}'"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
+        # elif round(expected, 2) != round(actual, 2):
+        #     message = f"🚨 URGENT: Frequency mismatch for {self.subject} — expected {expected} Hz, got {actual} Hz"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
+
 
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0: # Missed trial
@@ -148,5 +179,6 @@ class LickTeaching(Task):
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('trial_result', 'correct_first')
+        # self.register_value('reward_frequency', 'self.reward_frequency')
 
 

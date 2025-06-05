@@ -49,7 +49,7 @@ class TaskManager:
             self.new_df.to_csv(clean_path, sep=';', header=True, index=False)
 
             try:
-                self.df_all = pd.read_csv(subject_path, sep=';')
+                self.df_all = pd.read_csv(subject_path, sep=';', low_memory=False)
                 self.new_df['session'] = [(int(self.df_all['session'].iloc[-1]) + 1)] * self.new_df.shape[0]
                 self.df_all = pd.concat([self.df_all, self.new_df], sort=True)
             except FileNotFoundError:

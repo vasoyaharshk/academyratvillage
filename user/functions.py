@@ -4,12 +4,12 @@ from academy.camera import cam2, cam3
 from academy.touch import touch
 from user.psychopy_elements import *
 #from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
-#from user.sound_elements import soundStream, soundVec1, soundVec2, soundVec3
 from user.sound_elements import *
+#from user.sound_elements_version1 import *
 import random
 import os
 import re
-
+from academy import telegram_bot
 
 #To avoid the video logs debugging prints. Comment this part if there is a need to debug:
 os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
@@ -2136,15 +2136,40 @@ def function219():  #White noise, TBD
 
 #New Correct sound function: Replace function 11 with this.
 def function220():
-    #Play reaward sound based on the rat:
-    freq = getattr(utils.task, 'reward_frequency', 250.0)
-    db = getattr(utils.task, 'reward_db', 70)
-    dur = 1800
-    play_reward_sound(frequency=freq, db=db, duration = dur)
+    rat = utils.task.subject.lower()
+    tone = rat_tones.get(rat)
+    freq = reward_frequency_map.get(rat)
+
+    if tone is not None:
+        soundStream.play(tone)
+        message = f"Playing tone for '{rat}': freq = {freq} Hz"
+        print(message)
+        if utils.task.current_trial == 0:
+            try:
+                telegram_bot.alarm_finish_session(message, rat)
+            except:
+                print("Telegram message not sent.")
+    else:
+        message = f"No reward tone defined for subject: {rat}"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
-    print(f"Reward Sound played at {freq} Hz and {db} dB")
+    print(f"Reward Sound played at {freq} Hz")
+
+    task_freq = getattr(utils.task, "reward_frequency", None)
+    if task_freq is not None and task_freq != freq:
+        message = f"URGENT FREQ MISMATCH for {rat}: tone = {freq} Hz, task = {task_freq} Hz"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
+
 
 def loop220(timing):
     window.flip()
@@ -2171,14 +2196,20 @@ def loop222(timing):
     window.flip()
 
 #Test:
-def function223():
-    #if isinstance(soundStream, SoundR):
-    print("!!! Function 223 triggered !!!")
-    soundStream.play(soundVec4)     #14Khz sound played
+# def function223():
+#     soundStream.play(soundVec4)     #14Khz sound played
+#
+#     cam2.put_state("Correct")
+#     cam3.put_state("Correct")
+#     print("Correct, Reward Sound played")
+#
+# def loop223(timing):
+#     window.flip()
+#
 
-    cam2.put_state("Correct")
-    cam3.put_state("Correct")
-    print("Correct, Reward Sound played")
-
-def loop223(timing):
-    window.flip()
+# def function223():
+#     freq = getattr(utils.task, 'reward_frequency', 250.0)
+#     dur = 1800
+#     amp = 0.4
+#     vec = pureToneGen(amp, freq, dur)
+#     soundStream.play(vec)
