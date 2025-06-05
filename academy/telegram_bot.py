@@ -11,6 +11,7 @@ from user import settings, rt_plots
 from academy import queues
 from academy.utils import utils
 from academy.camera import cam1, cam2, cam3
+from academy.arduino import arduino
 try:
     from user.rt_plots import fig
 except:
@@ -264,6 +265,19 @@ def cam(update, context):
     except:
         pass
 
+def open_door1(update, context):
+    try:
+        arduino.open_door1()
+        update.message.reply_text("Door 1 opened.")
+    except Exception as e:
+        update.message.reply_text(f"Failed to open Door 1: {e}")
+
+def open_door2(update, context):
+    try:
+        arduino.open_door2()
+        update.message.reply_text("Door 2 opened.")
+    except Exception as e:
+        update.message.reply_text(f"Failed to open Door 2: {e}")
 
 # def cam_1():
 #     streams = []
@@ -429,6 +443,9 @@ def telegram_thread():
     dp.add_handler(CommandHandler("cam", cam, pass_args=True))
     dp.add_handler(CommandHandler("report", report, pass_args=True))
     dp.add_handler(CommandHandler("cam_2", report, pass_args=True))
+
+    dp.add_handler(CommandHandler("door1", open_door1))
+    dp.add_handler(CommandHandler("door2", open_door2))
 
     updater.start_polling()
 

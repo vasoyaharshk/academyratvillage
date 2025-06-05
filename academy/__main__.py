@@ -255,21 +255,13 @@ def main_loop():
                     weight.append((new_time, float(tag)))
                     weight = [value for value in weight if value[0] + 3 >= new_time]
                     list_weights = ",".join([str(item[1]) for item in weight])
-                    if (
-                        len(weight) == 5
-                        and cam1.area_doors2.value < settings.NOMICEDOOR2
-                        and cam1.area_doors1.value > settings.NOMICEDOOR2
-                    ):
+                    if (len(weight) == 5
+                            and cam1.area_doors2.value < settings.NOMICEDOOR2
+                            and cam1.area_doors1.value > settings.NOMICEDOOR2):
                         good_weight = weight[2][1]
                         utils.task.subject_weight = good_weight
-                        utils.log(
-                            utils.subject.name, "weight: " + str(good_weight), "ACTION"
-                        )
-                        utils.log(
-                            utils.subject.name,
-                            "list_of_weights: " + list_weights,
-                            "ACTION",
-                        )
+                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
+                        utils.log(utils.subject.name, "list_of_weights: " + list_weights, "ACTION",)
                         weight = []
                         utils.change_to_state = (4)
                 except:  # because an animal can be stuck and then we have measures of weight and rfid at the same time
@@ -332,17 +324,12 @@ def main_loop():
                 weight.append((new_time, float(tag)))
                 weight = [value for value in weight if value[0] + 3 >= new_time]
                 list_weights = ",".join([str(item[1]) for item in weight])
-                if (
-                    len(weight) == 5
-                    and cam1.area_doors2.value < settings.NOMICEDOOR2
-                    and cam1.area_doors1.value > settings.NOMICEDOOR2
-                ):
+                if (len(weight) == 5 and cam1.area_doors2.value < settings.NOMICEDOOR2
+                        and cam1.area_doors1.value > settings.NOMICEDOOR2):
                     try:
                         good_weight = weight[2][1]
                         utils.task.subject_weight = good_weight
-                        utils.log(
-                            utils.subject.name, "weight: " + str(good_weight), "ACTION"
-                        )
+                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
                         utils.log(utils.subject.name,"list_of_weights: " + list_weights,"ACTION")
                         weight = []
                         utils.log_cam(utils.subject.name, "Returning home", "ACTION")
@@ -679,6 +666,9 @@ def go_to_state(num):
         utils.subject.task_number = int(utils.subject.task_number)  #Cast to int
         utils.subject.last_forward_stage = int(utils.subject.last_forward_stage)  #Cast to int
         utils.subject.last_backward_stage = int(utils.subject.last_backward_stage)  #Cast to int
+        utils.subject.reward_frequency = float(utils.subject.reward_frequency)  #Cast to float
+        utils.subject.reward_db = float(utils.subject.reward_db)  #Cast to float
+        utils.subject.reward_duration = float(utils.subject.reward_duration)  #Cast to float
 
 
 
@@ -723,6 +713,9 @@ def go_to_state(num):
         utils.task.task_number = utils.subject.task_number
         utils.task.last_forward_stage = utils.subject.last_forward_stage
         utils.task.last_backward_stage = utils.subject.last_backward_stage
+        utils.task.reward_frequency = utils.subject.reward_frequency
+        utils.task.reward_db = utils.subject.reward_db
+        utils.task.reward_duration = utils.subject.reward_duration
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
