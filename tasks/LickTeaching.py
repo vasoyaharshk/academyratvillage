@@ -70,7 +70,7 @@ class LickTeaching(Task):
         print('Trial: ' + str(self.current_trial))
 
         # flooding AVOIDANCE
-        if self.miss_acc_counter > 30:
+        if self.miss_acc_counter > 300:
             flooding = 'Wait_for_reward'
         else:
             flooding = 'Automatic_reward'
