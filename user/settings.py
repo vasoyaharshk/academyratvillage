@@ -49,11 +49,13 @@ XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI-3'   # <--
 WIN_SIZE = [400, 250]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 720]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, 360]          #This variable points to the centre of the screen. Essential for displaying images.
+CENTRE_SCREEN = [640, -360]          #This variable points to the centre of the screen. Essential for displaying images.
 SCREEN_NUMBER = 1
-VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
+VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), int(WIN_RESOLUTION[1] / 2)]  #Flipped to top left.
 WIN_COLOR = [-1, -1, -1]
-PIXELS_PER_MM = 3.2
+#PIXELS_PER_MM = 3.2
+PIXELS_PER_MM_X = 3.2
+PIXELS_PER_MM_Y = 2.88
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 
