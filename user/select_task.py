@@ -167,6 +167,12 @@ def select_task(df, subject):
                     pass
 
         elif task == 'LickTeaching':
+            message = f"DEBUG: Subject={my_subject}, Task={task}, Valid trials in last session={n_trials}"
+            try:
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
             wait_seconds = 3600 * 2
             if n_trials > 75:
                 task = 'TouchTeaching_no_mask'

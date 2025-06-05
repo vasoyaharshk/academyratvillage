@@ -124,7 +124,7 @@ class TouchTeaching_no_mask(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                output_actions=[])
+                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim)])
 
             self.sma.add_state(
                 state_name='Real_start',
@@ -143,8 +143,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Stimulus_Display'},
-            # when the last photogate is crossed, the stimulus is displayed
+            state_change_conditions={Bpod.Events.Port1In: 'Stimulus_Display'},
             output_actions=[])
 
         self.sma.add_state(
