@@ -2159,6 +2159,7 @@ def function220():
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
+    print(f"Correct")
     print(f"Reward Sound played at {freq} Hz")
 
     task_freq = getattr(utils.task, "reward_frequency", None)
@@ -2169,7 +2170,6 @@ def function220():
             telegram_bot.alarm_finish_session(message, rat)
         except:
             print("Telegram message not sent.")
-
 
 def loop220(timing):
     window.flip()
