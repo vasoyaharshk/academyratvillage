@@ -381,11 +381,8 @@ class Probability_Extra_Training_Acc(Task):
 
     def after_trial(self):
         if self.task_number == 1:
-            self.total_trials += 1  # remove this
             # self.block_trial_counter += 1  # For counting the blocks
 
-            if self.bias_breaking == 0:
-                self.stim_trial_counter += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -398,6 +395,10 @@ class Probability_Extra_Training_Acc(Task):
                 self.block_valid_count += 1
                 self.success = 0
                 self.block_trial_counter += 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
+
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
@@ -411,6 +412,10 @@ class Probability_Extra_Training_Acc(Task):
                 self.block_valid_count += 1
                 self.block_trial_counter += 1
                 self.success = 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
+
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
