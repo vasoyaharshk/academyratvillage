@@ -148,7 +148,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port1In: 'Stimulus_Display'},
+            state_change_conditions={Bpod.Events.Tup: 'Stimulus_Display'},
             output_actions=[])
 
         self.sma.add_state(

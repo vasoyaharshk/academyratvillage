@@ -1958,25 +1958,21 @@ def loop203(timing):
 
 def function204(): #Touchteaching read touchscreen
     stage = utils.task.stage
-    if stage == 1:
-        print("Stage= ", stage)
-        width = utils.task.width
-        height = utils.task.height
-        x_correct = utils.task.x_correcth_pos
-        y = utils.task.y_correcth_pos
-    else:
-        width = utils.task.width + 100 * settings.PIXELS_PER_MM
-        height = utils.task.height + 100 * settings.PIXELS_PER_MM
-        x_correct = utils.task.x_correcth_pos * settings.PIXELS_PER_MM
-        y = utils.task.y_correcth_pos * settings.PIXELS_PER_MM
+    px = settings.PIXELS_PER_MM_X
+    py = settings.PIXELS_PER_MM_Y
+
+    print("Stage= ", stage)
+    width = (utils.task.width + 100) * px
+    height = (utils.task.height + 100) * py
+    x_correct = utils.task.x_correcth_pos * px
+    y = utils.task.y_correcth_pos * py
 
     touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
     print('Resp Win 1')
-    # print('x_correct in functions: ', x_correct)
-    # print('x_incorrect in functions: ', x_incorrect)
+
 
 #From function 210 onwards, cognitive bias:
 def function211():  # Tone pair 1, negative reinforcement
