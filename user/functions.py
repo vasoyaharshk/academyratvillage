@@ -1921,13 +1921,21 @@ def loop201(timing):
     window.flip()
 
 def function202():  # touchteaching stage 2 - 'stimulus' is smaller
-    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
+    px = settings.PIXELS_PER_MM_X
+    py = settings.PIXELS_PER_MM_Y
 
+    x = int(utils.task.x_correcth_pos * px)
+    y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
+    width = int(utils.task.width * px)
+    height = int(utils.task.height * py)
+
+    square.pos = (x, y)
+    square.width = width
+    square.height = height
     cont = float(utils.task.contrast)
     square.fillColor = [cont, cont, cont]
     square.lineColor = [cont, cont, cont]
+
     print('Stimulus Shown')
 
 def loop202(timing):
@@ -2195,46 +2203,108 @@ def loop222(timing):
     window.flip()
 
 #Test for drawing 4 squares on each side of the screen:
-def function223():  # Tone pair 4, negative reinforcement
-    p = settings.PIXELS_PER_MM
-    w, h = settings.WIN_RESOLUTION  # In pixels
+# def function223():  # Tone pair 4, negative reinforcement
+#     p = settings.PIXELS_PER_MM
+#     w, h = settings.WIN_RESOLUTION  # In pixels
+#
+#     size_mm = 40
+#     size_px = int(size_mm * p)
+#
+#     # Top-left
+#     square.pos = (int(0 + size_px / 2), int(0 - size_px / 2))
+#     square.width = size_px
+#     square.height = size_px
+#     square.fillColor = "red"
+#     square.lineColor = "red"
+#
+#     # Top-right
+#     square2.pos = (int(w - size_px / 2), int(0 - size_px / 2))
+#     square2.width = size_px
+#     square2.height = size_px
+#     square2.fillColor = "blue"
+#     square2.lineColor = "blue"
+#
+#     # Bottom-left
+#     #square3.pos = (int(0 + size_px / 2), int(-h + size_px / 2))
+#     square3.width = size_px
+#     square3.height = size_px
+#     square3.fillColor = "green"
+#     square3.lineColor = "green"
+#
+#     # Bottom-right
+#     #square4.pos = (int(w - size_px / 2), int(-h + size_px / 2))
+#     square4.width = size_px
+#     square4.height = size_px
+#     square4.fillColor = "yellow"
+#     square4.lineColor = "yellow"
+#
+#     MARGIN = 5
+#     square3.pos = (int(0 + size_px / 2), int(-h + size_px + MARGIN))
+#     square4.pos = (int(w - size_px / 2), int(-h + size_px + MARGIN))
+#
+#     print('Stimuli positioned in all four corners')
 
+def function223():
+    p = settings.PIXELS_PER_MM
+    w_mm, h_mm = settings.WIN_SIZE  # 400 x 250 mm
     size_mm = 40
+    margin_mm = 40
+
     size_px = int(size_mm * p)
 
-    # Top-left
-    square.pos = (int(0 + size_px / 2), int(0 - size_px / 2))
+    # Usable area inside margins
+    usable_w = w_mm - 2 * margin_mm
+    usable_h = h_mm - 2 * margin_mm
+
+    # Horizontal positions (left and right)
+    x1_mm = margin_mm + usable_w * 0.25
+    x2_mm = margin_mm + usable_w * 0.75
+
+    # Vertical positions (top and bottom)
+    y1_mm = margin_mm + usable_h * 0.25
+    y2_mm = margin_mm + usable_h * 0.75
+
+    # Convert mm to pixels
+    x1 = int(x1_mm * p)
+    x2 = int(x2_mm * p)
+    # Flip Y direction for PsychoPy
+    y1 = int(-y1_mm * p)
+    y2 = int(-y2_mm * p)
+
+    # Top-left (red)
+    square.pos = (x1, y1)
     square.width = size_px
     square.height = size_px
     square.fillColor = "red"
     square.lineColor = "red"
 
-    # Top-right
-    square2.pos = (int(w - size_px / 2), int(0 - size_px / 2))
+    # Top-right (blue)
+    square2.pos = (x2, y1)
     square2.width = size_px
     square2.height = size_px
     square2.fillColor = "blue"
     square2.lineColor = "blue"
 
-    # Bottom-left
-    #square3.pos = (int(0 + size_px / 2), int(-h + size_px / 2))
+    # Bottom-left (green)
+    square3.pos = (x1, y2)
     square3.width = size_px
     square3.height = size_px
     square3.fillColor = "green"
     square3.lineColor = "green"
 
-    # Bottom-right
-    #square4.pos = (int(w - size_px / 2), int(-h + size_px / 2))
+    # Bottom-right (yellow)
+    square4.pos = (x2, y2)
     square4.width = size_px
     square4.height = size_px
     square4.fillColor = "yellow"
     square4.lineColor = "yellow"
 
-    MARGIN = 20
-    square3.pos = (int(0 + size_px / 2), int(-h + size_px + MARGIN))
-    square4.pos = (int(w - size_px / 2), int(-h + size_px + MARGIN))
+    print("Squares positioned at 4 central points, 40mm from edges")
 
-    print('Stimuli positioned in all four corners')
+    print("Square 1 position (px):", square.pos)
+    print("Square 2 position (px):", square2.pos)
+    print("Square 3 position (px):", square3.pos)
+    print("Square 4 position (px):", square4.pos)
 
 def loop223(timing):
     square.draw()

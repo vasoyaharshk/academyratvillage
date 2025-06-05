@@ -52,7 +52,7 @@ BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, Fal
 # CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images. For RV 1
 
 # #For RV 2:
-XINPUT = 'xinput map-to-output 13 DP-3-2'       #For RV 2 in laptop
+XINPUT = 'xinput map-to-output 22 DP-3-2'       #For RV 2 in laptop
 SCREEN_NUMBER = 2                  #For rat village 2
 WIN_SIZE = [400, 250]  # in mm. 410 and 250 is for touchscreen. For RV 2
 WIN_RESOLUTION = [1280, 720]        #For rat village 2
@@ -63,7 +63,9 @@ CENTRE_SCREEN = [640, -360]          #This variable points to the cecalntre of t
 TOUCH_RESOLUTION = [4096, 4096]
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), int(WIN_RESOLUTION[1] / 2)]  #Flipped to top left.
 WIN_COLOR = [-1, -1, -1]
-PIXELS_PER_MM = 3.2
+#PIXELS_PER_MM = 3.2
+PIXELS_PER_MM_X = 3.2
+PIXELS_PER_MM_Y = 2.88
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 

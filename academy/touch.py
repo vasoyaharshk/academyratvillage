@@ -18,12 +18,13 @@ except:
 
 class Touch:
 
-    def __init__(self, touch_device, only_x, first_touch, win_resolution, touch_resolution, pixels_per_mm):
+    def __init__(self, touch_device, only_x, first_touch, win_resolution, touch_resolution, pixels_per_mm_x, pixels_per_mm_y):
         self.connected = True
         self.touch_device = touch_device
         self.win_resolution = win_resolution
         self.touch_resolution = touch_resolution
-        self.pixels_per_mm = pixels_per_mm
+        self.pixels_per_mm_x = pixels_per_mm_x
+        self.pixels_per_mm_y = pixels_per_mm_y
         self.softcode = softcode
         self.only_x = None
         self.first_touch = first_touch
@@ -148,7 +149,7 @@ class Touch:
             if ytouch is None:
                 ytouch = 0
 
-            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+            response = [xtouch / self.pixels_per_mm_x, ytouch / self.pixels_per_mm_y]
 
         queues.responses.put(response)
 
@@ -245,7 +246,7 @@ class Touch:
             if ytouch is None:
                 ytouch = 0
 
-            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+            response = [xtouch / self.pixels_per_mm_x, ytouch / self.pixels_per_mm_y]
 
         queues.responses.put(response)
 
@@ -350,7 +351,7 @@ class Touch:
                 print('Touch is outside both areas. Waiting for valid touch...')
                 self.softcode.send(3)
 
-            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+            response = [xtouch / self.pixels_per_mm_x, ytouch / self.pixels_per_mm_y]
             print(f'Response (xtouch, ytouch in mm): {response}')  # Debugging response
         queues.responses.put(response)
 
@@ -452,7 +453,7 @@ class Touch:
                 #print('Touch is outside both areas. Waiting for valid touch...')
                 self.softcode.send(3)
 
-            response = [xtouch / self.pixels_per_mm, ytouch / self.pixels_per_mm]
+            response = [xtouch / self.pixels_per_mm_x, ytouch / self.pixels_per_mm_y]
             # print(f'Response (xtouch, ytouch in mm): {response}')  # Debugging response
         queues.responses.put(response)
 
@@ -468,6 +469,6 @@ class FakeTouch:
 
 try:
     touch = Touch(settings.TOUCHSCREEN_PORT, False, True, settings.WIN_RESOLUTION,
-                 settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM)
+                 settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM_X, settings.PIXELS_PER_MM_Y)
 except Exception:
     touch = FakeTouch()
