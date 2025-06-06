@@ -2,114 +2,103 @@ from multiprocessing import Process, Value
 import sounddevice as sd
 import numpy as np
 import time
+from scipy.signal import firwin, lfilter
 
-from scipy.signal import firwin, lfilter  # filters
-
+DEFAULT_FS = 44800
+DEFAULT_RAMP_DURATION = 0.01  # 10 ms
+REFERENCE_DB = 85.8           # Measured SPL reference
 
 class SoundR:
     def __init__(self):
         try:
             device = self.getDevice()
-        except:
-            print("error in sound device detection")
-            device = 1
+        except Exception as e:
+            print(f"❌ Error in sound device detection: {e}")
+            device = 1  # fallback device index
 
-        sd.default.device = device
-
+        sd.default.device = 'UACDemoV1.0'
 
     @staticmethod
+    def list_devices():
+        print("\n🔊 Available audio output devices:")
+        for idx, dev in enumerate(sd.query_devices()):
+            print(f"{idx}: {dev['name']} | max_output_channels = {dev['max_output_channels']}")
+
+    @staticmethod
+    # def getDevice():
+        # SoundR.list_devices()
+        # for idx, dev in enumerate(sd.query_devices()):
+        #     name = dev.get('name', '').lower()
+        #     max_out = dev.get('max_output_channels', 0)
+        #     if "dx3" in name and "analog" in name and max_out >= 2:
+        #         print(f"✅ External speaker found: {name} (index {idx})")
+        #         return idx
+        # raise RuntimeError("❌ DX3 Pro+ (Analog Output) not found in audio devices.")
+
     def getDevice():
-
-        devi = sd.query_devices()
-        result = 0
-        idx = 0
-        for dev in devi:
-            if dev['name'].startswith('UACDemoV1.0') and dev['max_output_channels'] == 2:
-                result = idx
-                print(' External speaker found')
-                break
-
-            idx += 1
-        return result
-
-
+        return 'UACDemoV1.0'
 
     def play(self, soundVec):
         sd.play(soundVec)
 
-    def stop(self, soundVec):
-       sd.stop()
+    def stop(self):
+        sd.stop()
 
     @staticmethod
     def _create_sound_vec(v1, v2):
-        sound = np.array([v1, v2])  # left and right channel
+        sound = np.array([v1, v2])
         return np.ascontiguousarray(sound.T, dtype=np.float32)
 
 
-
 def pureToneGen(amp, freq, toneDuration, FsOut=44800):
-    """Generates a given parameters pure tone vector. Generates a sine wave (pure tone) as a NumPy array.
-    FsOut is the sound quality (sampling rate), 44800 Hz is the CD quality. 192000 is Ultra-high quality:
-    """
-    t = time.time()
-    if type(amp) is float and type(freq) is int:
-        # Create a time vector from 0 to duration, sampled at FsOut
-        #tvec = np.linspace(0, toneDuration, toneDuration * FsOut
+    if isinstance(amp, float) and isinstance(freq, (float, int)):
         tvec = np.linspace(0, toneDuration, int(toneDuration * FsOut), endpoint=False)
-        # Generate a sine wave with the given amplitude and frequency
-        s1 = amp * np.sin(2 * np.pi * freq * tvec)
-        print("Time to call soundStream.play():", time.time() - t)
-        return s1
+        return amp * np.sin(2 * np.pi * freq * tvec)
     else:
-        raise ValueError('pureToneGen needs (float, int) as arguments')
+        raise ValueError('pureToneGen needs (float, float|int) as arguments')
 
+def db_to_amplitude(db, reference_db=REFERENCE_DB):
+    return 10 ** ((db - reference_db) / 20)
 
+def apply_cosine_ramp(sound, ramp_duration=DEFAULT_RAMP_DURATION, FsOut=DEFAULT_FS):
+    ramp_len = int(FsOut * ramp_duration)
+    ramp = 0.5 * (1 - np.cos(np.pi * np.arange(ramp_len) / ramp_len))
+    sound[:ramp_len] *= ramp
+    sound[-ramp_len:] *= ramp[::-1]
+    return sound
+
+def pureToneGen_dB(freq, duration, db=70, FsOut=DEFAULT_FS):
+    amp = db_to_amplitude(db)
+    tvec = np.linspace(0, duration, int(duration * FsOut), endpoint=False)
+    tone = amp * np.sin(2 * np.pi * freq * tvec)
+    return apply_cosine_ramp(tone, FsOut=FsOut).astype(np.float32)
 
 def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
-    """whiteNoiseGen(amp, band_fs_bot, band_fs_top):
-    beware this is not actually whitenoise
-    amp: float, amplitude
-    band_fs_bot: int, bottom freq of the band
-    band_fs_top: int, top freq
-    duration: secs
-    FsOut: SoundCard samplingrate to use (192k, 96k, 48k...)
-    Fn: filter len, def 10k
-    *** if this takes too long try shortening Fn or using a lower FsOut ***
-    adding some values here. Not meant to change them usually.
-    randgen: np.random.RandomState instance to sample from
-
-    returns: sound vector (np.array)
-    """
-
-    mean = 0
-    std = 1
     if randgen is None:
         randgen = np.random
 
-    if type(amp) is float and isinstance(band_fs_top, int) and isinstance(band_fs_bot, int) and band_fs_bot < band_fs_top:
-
-        band_fs = [band_fs_bot, band_fs_top]
-        white_noise = amp * randgen.normal(mean, std, size=int(FsOut * (duration + 1)))
-        band_pass = firwin(Fn, [band_fs[0] / (FsOut * 0.5), band_fs[1] / (FsOut * 0.5)], pass_zero=False)
+    if isinstance(amp, float) and isinstance(band_fs_bot, int) and isinstance(band_fs_top, int) and band_fs_bot < band_fs_top:
+        white_noise = amp * randgen.normal(0, 1, size=int(FsOut * (duration + 1)))
+        band_pass = firwin(Fn, [band_fs_bot / (FsOut * 0.5), band_fs_top / (FsOut * 0.5)], pass_zero=False)
         band_noise = lfilter(band_pass, 1, white_noise)
-        s1 = band_noise[FsOut:int(FsOut * (duration + 1))]
-        return s1  # use np.zeros(s1.size) to get equal-size empty vec.
+        return band_noise[FsOut:int(FsOut * (duration + 1))]
     else:
-        raise ValueError('whiteNoiseGen needs (float, int, int, num,) as arguments')
-
-
+        raise ValueError('whiteNoiseGen needs (float, int, int, num) as arguments')
 
 
 class FakeSoundR:
-
     def __init__(self):
         self.name = 'fake'
+
     def playSound(self):
         pass
+
     def stopSound(self):
         pass
+
     def load(self, v1=None, v2=None):
         pass
+
     def finalStop(self):
         pass
 
@@ -122,25 +111,28 @@ class FakeSoundVec:
         self.name = 'fake'
 
 
-try:
-    soundStream = SoundR()
-    #soundVec1 = whiteNoiseGen(1.0, 2000, 20000, 0.2, FsOut=44800, Fn=1000)
-    #soundVec2 = whiteNoiseGen(1.0, 2000, 20000, 1, FsOut=44800, Fn=1000)
+soundStream = SoundR()
+soundVec1 = pureToneGen(0.4, 14000, 1800)
+soundVec2 = pureToneGen(0.4, 4000, 1)
+soundVec3 = pureToneGen(0.4, 4000, 1)
 
-    soundVec1 = pureToneGen(0.4, 14000, 1800) #14000
-    soundVec2 = pureToneGen(0.4, 4000, 1) #4000  #Incorrect sound
-    soundVec3 = pureToneGen(0.4, 4000, 1)  # 4000  #Punish sound plays only for 1 second
+soundVec4 = pureToneGen(1.0, 250.0, 1)
+soundVec5 = pureToneGen(0.4, 500.0, 1)
 
-    soundVec4 = pureToneGen(1.0, 250, 1)  # 4000  #Punish sound plays only for 1 second
-    soundVec5 = pureToneGen(0.4, 500, 1)  # 4000  #Punish sound plays only for 1 second
+# Frequency definitions (Hz) per subject
+reward_frequency_map = {
+    'monika': 250.0,
+    'phoebe': 290.0,
+    'rachel': 336.4,
+    'm2': 100.5,
+}
 
-except:
-    print("______")
-    print("ERROR SOUND")
-    print("_______")
-    soundStream = FakeSoundR()
-    soundVec1 = FakeSoundVec()
-    soundVec2 = FakeSoundVec()
-    soundVec3 = FakeSoundVec()
+# Pre-generated tone vectors
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=70) for name, freq in reward_frequency_map.items()}
 
-
+rat_tones = {
+        'monika': pureToneGen(0.4, 250.0, 1.0),
+        'phoebe': pureToneGen(0.4, 290.0, 1.0),
+        'rachel': pureToneGen(0.4, 336.4, 1.0),
+        'm2': pureToneGen(0.4, 100, 1.0),
+}

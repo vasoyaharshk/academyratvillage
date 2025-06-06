@@ -52,7 +52,7 @@ class TouchTeaching_no_mask(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 2.0  # More reward for correct. 2.0 = 50uL
+        self.valve_factor_c = 1.0  # More reward for correct. 2.0 = 50uL
         #self.valve_factor_i = 0.0 #Less reward for misses
 
         # counters
@@ -102,16 +102,26 @@ class TouchTeaching_no_mask(Task):
             self.height = settings.WIN_RESOLUTION[1]
         elif self.stage == 2:
             self.stim = 202
-            self.x_correcth_pos = random.randint(125, 275)
-            self.y_correcth_pos = 57
-            self.width = 60
-            self.height = 60
+            # Screen margin limits in mm
+            self.min_x_mm = 90
+            self.max_x_mm = settings.WIN_SIZE[0] - 90  # screen width in mm - 60 mm margin
+            # Random X position within margins
+            self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
+            # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
+            self.y_correcth_pos = 150  # in mm
+            self.width = 80
+            self.height = 80
         elif self.stage == 3:
-            self.stim = 203
-            self.x_correcth_pos = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
-            self.y_correcth_pos = random.randint(43,82)  # 640 = center of the screen. Screen height is 250mmm. We minus 10 on each end to account for mask
-            self.width = 30
-            self.height = 30
+            self.stim = 202
+            # Screen margin limits in mm
+            self.min_x_mm = 90
+            self.max_x_mm = settings.WIN_SIZE[0] - 90  # screen width in mm - 60 mm margin
+            # Random X position within margins
+            self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
+            # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
+            self.y_correcth_pos = 150  # in mm
+            self.width = 40
+            self.height = 40
 
         print("X: ", self.x_correcth_pos)
         print("Y: ", self.y_correcth_pos)
@@ -124,7 +134,7 @@ class TouchTeaching_no_mask(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                output_actions=[])
+                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim)])
 
             self.sma.add_state(
                 state_name='Real_start',
@@ -143,8 +153,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Wait_for_fixation',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port6In: 'Stimulus_Display'},
-            # when the last photogate is crossed, the stimulus is displayed
+            state_change_conditions={Bpod.Events.Tup: 'Stimulus_Display'},
             output_actions=[])
 
         self.sma.add_state(
@@ -176,7 +185,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Miss',
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Miss_reward'},
+            state_change_conditions={Bpod.Events.Port1In: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
                             (Bpod.OutputChannels.SoftCode, 12)])
         # waterLED ON, global LED ON

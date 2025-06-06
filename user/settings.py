@@ -54,6 +54,8 @@ SCREEN_NUMBER = 0
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.4
+PIXELS_PER_MM_X = 3.4
+PIXELS_PER_MM_Y = 3.4
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 
@@ -74,8 +76,8 @@ THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 25                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_CAGE1 = 15                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 20                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR1 = 40                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 40                                               # <-- TO CHANGE Harsh-Done
 

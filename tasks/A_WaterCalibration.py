@@ -4,7 +4,7 @@ from academy.utils import utils
 from user import settings
 
 
-class WaterCalibration(Task):
+class A_WaterCalibration(Task):
     def __init__(self):
         super().__init__()
 

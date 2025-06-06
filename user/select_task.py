@@ -19,6 +19,64 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
+    #Assign reward decibels: Needs to be a dictionary if different for each individual.
+    reward_db = 70.0
+
+    #Reward Frequencies assigned again after the task:
+    # Map each rat to its centre frequency
+    reward_frequency_map = {
+        'monika': 250.0,
+        'phoebe': 290.0,
+        'rachel': 336.4,
+        'm2': 100.0,
+    }
+
+    # Assign frequency based on subject
+    reward_frequency = reward_frequency_map.get(my_subject)
+
+    # Double check the value for frequency from the above table
+    reward_frequency_subjects = subject.reward_frequency
+
+    if reward_frequency_subjects == reward_frequency:
+        print("the reward frequencies match")
+    else:
+        message = f"Reward frequency mismatch for subject '{my_subject}'"
+        try:
+            telegram_bot.alarm_finish_session(message, my_subject)
+        except:
+            print('Telegram message not sent')
+
+    reward_duration = 0 #Only change it when and if you need to for each rat different duration.
+
+    # #Reward duration assigned again after the task:
+    # # Map each rat to its duration
+    # reward_duration_map = {
+    #     'chandler': 1.0,
+    #     'felix': 2.0,
+    #     'fergus': 1.0,
+    #     'geralt': 2.0,
+    #     'joey': 1.0,
+    #     'ross': 2.0,
+    #     'innes': 1.0,
+    #     'pol': 2.0,
+    # }
+    #
+    # # Assign duration based on subject
+    # reward_duration = reward_duration_map.get(my_subject)
+    #
+    # # Double check the value for duration from the above table
+    # reward_duration_subjects = subject.reward_duration
+    # if reward_duration_subjects == reward_duration:
+    #     print("the reward duration match")
+    # else:
+    #     message = f"Reward duration mismatch for subject '{my_subject}'"
+    #     try:
+    #         telegram_bot.alarm_finish_session(message, my_subject)
+    #     except:
+    #         print('Telegram message not sent')
+    #     raise ValueError(message)
+
+
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
             val = last_row[column_name]
@@ -109,8 +167,14 @@ def select_task(df, subject):
                     pass
 
         elif task == 'LickTeaching':
+            message = f"DEBUG: Subject={my_subject}, Task={task}, Valid trials in last session={n_trials}"
+            try:
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
             wait_seconds = 3600 * 2
-            if n_trials > 75:
+            if n_trials >= 75:
                 task = 'TouchTeaching_no_mask'
                 stage = 1.0
                 message = 'Advance from Lickteaching to Touchteaching'
@@ -129,9 +193,9 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
-                if stage == 1:
-                    stage = 2.0
-                elif stage == 2:
+                # if stage == 1:
+                #     #stage = 2.0
+                if stage == 2:
                     stage = 3.0
                 elif stage == 3:
                     task = 'Probability_Extra_Training_Acc'
@@ -454,7 +518,7 @@ def select_task(df, subject):
                     condition_trial_counter = 0
                     conditions = []
 
-                    message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
+                    message = f"URGENT PI: Probability_WL_Training complete, Moving to {task}."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -499,7 +563,7 @@ def select_task(df, subject):
                     stim_trial_counter = 0
 
 
-                    message = f"PI: Probability_WL_Training_Runthrough complete, Moving to Post Training."
+                    message = f"URGENT PI: Probability_WL_Training_Runthrough complete, Moving to {task}."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
