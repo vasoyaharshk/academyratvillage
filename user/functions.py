@@ -211,7 +211,7 @@ def function5():
 
 def function9():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec1)  #14Khz sound played
+    soundStream.stop()  #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -300,7 +300,7 @@ def loop15(timing):
 # camera empty and delete screen
 def function17():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec1)
+    soundStream.stop()
 
     cam2.put_state("")
     cam3.put_state("")
@@ -311,7 +311,7 @@ def loop17(timing):
 
 def function18():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec3)
+    soundStream.stop()
     print("Punish Sound Stopped")
 
 

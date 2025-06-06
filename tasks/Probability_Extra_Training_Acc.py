@@ -240,6 +240,7 @@ class Probability_Extra_Training_Acc(Task):
         print('Stimulus trial: ', self.stim_trial)
         print('Stimulus Trial Counter', self.stim_trial_counter)
 
+        self.stim = 122
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
