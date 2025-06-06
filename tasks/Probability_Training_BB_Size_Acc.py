@@ -34,6 +34,7 @@ class Probability_Training_BB_Size_Acc(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
+        self.trials_max = 80
         self.stage = 1  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior

@@ -174,7 +174,7 @@ def select_task(df, subject):
                 print('Telegram message not sent')
                 pass
             wait_seconds = 3600 * 2
-            if n_trials > 75:
+            if n_trials >= 75:
                 task = 'TouchTeaching_no_mask'
                 stage = 1.0
                 message = 'Advance from Lickteaching to Touchteaching'
@@ -198,7 +198,7 @@ def select_task(df, subject):
                 elif stage == 2:
                     stage = 3.0
                 elif stage == 3:
-                    task = 'Probability_Extra_Training_Acc'
+                    #task = 'Probability_Extra_Training_Acc'
                     stage = 1.0
                     task_number = 1
                     message = f"{my_subject} advance from early training to probability training with pegs'"

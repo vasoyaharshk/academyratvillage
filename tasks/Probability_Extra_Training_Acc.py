@@ -36,6 +36,7 @@ class Probability_Extra_Training_Acc(Task):
         """
 
         # Variables for the task:
+        self.trials_max = 80
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
