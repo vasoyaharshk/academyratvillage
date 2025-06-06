@@ -1976,8 +1976,7 @@ def function204(): #Touchteaching read touchscreen
 
 #From function 210 onwards, cognitive bias:
 def function211():  # Tone pair 1, negative reinforcement
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec4)
+
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1995,8 +1994,7 @@ def loop211(timing):
     window.flip()
 
 def function212():  # Tone pair 1, positive reinforcement
-    if isinstance(soundStream, SoundR):
-        soundStream.play(soundVec5)
+
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -2138,7 +2136,7 @@ def function219():  #White noise, TBD
     if isinstance(soundStream, SoundR):
         soundStream.play(soundVec14)
 
-#New Correct sound function: Replace function 11 with this.
+#New Correct sound function: Replace function 11 and function 38 with this.
 def function220():
     rat = utils.task.subject.lower()
     tone = rat_tones.get(rat)

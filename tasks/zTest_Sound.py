@@ -16,7 +16,7 @@ class zTest_Sound(Task):
             state_name='RW_sound_on',
             state_timer=2,
             state_change_conditions={Bpod.Events.Tup: 'Waiting'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 220)])
 
         self.sma.add_state(
             state_name='Waiting',

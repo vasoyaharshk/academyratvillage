@@ -112,12 +112,12 @@ class FakeSoundVec:
 
 
 soundStream = SoundR()
-soundVec1 = pureToneGen(0.4, 14000, 1800)
-soundVec2 = pureToneGen(0.4, 4000, 1)
-soundVec3 = pureToneGen(0.4, 4000, 1)
+#soundVec1 = pureToneGen(0.4, 14000, 1800)
+#soundVec2 = pureToneGen(0.4, 4000, 1)
+#soundVec3 = pureToneGen(0.4, 4000, 1)
 
-soundVec4 = pureToneGen(1.0, 250.0, 1)
-soundVec5 = pureToneGen(0.4, 500.0, 1)
+soundVec2 = pureToneGen_dB(1368.5, 1, 70)
+soundVec3 = pureToneGen_dB(1368.5, 1, 70)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {

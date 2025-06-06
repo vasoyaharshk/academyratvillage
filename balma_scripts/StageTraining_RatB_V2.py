@@ -461,7 +461,7 @@ class StageTraining_RatB_V1(Task):
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(
@@ -505,7 +505,7 @@ class StageTraining_RatB_V1(Task):
             state_name='Correct_other',
             state_timer=0,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_other_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # waterLED and correct sound remain ON until poke
 
         self.sma.add_state(

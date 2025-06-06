@@ -239,8 +239,6 @@ class Probability_Extra_Training_Acc(Task):
 
         print('Stimulus trial: ', self.stim_trial)
         print('Stimulus Trial Counter', self.stim_trial_counter)
-
-        self.stim = 122
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
@@ -293,7 +291,7 @@ class Probability_Extra_Training_Acc(Task):
                 state_name='Correct',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # Turns on Water port LED and plays correct sound
 
             self.sma.add_state(

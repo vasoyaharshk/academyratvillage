@@ -111,7 +111,7 @@ class TouchTeaching_old(Task):
             state_name='Correct_first',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first_reward'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 11)])
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # waterLED and RWsound remain ON until poke
 
         self.sma.add_state(
