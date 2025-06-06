@@ -103,8 +103,8 @@ class TouchTeaching_no_mask(Task):
         elif self.stage == 2:
             self.stim = 202
             # Screen margin limits in mm
-            self.min_x_mm = 90
-            self.max_x_mm = settings.WIN_SIZE[0] - 90  # screen width in mm - 60 mm margin
+            self.min_x_mm = 120
+            self.max_x_mm = settings.WIN_SIZE[0] - 120  # screen width in mm - 60 mm margin
             # Random X position within margins
             self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
             # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
@@ -112,9 +112,14 @@ class TouchTeaching_no_mask(Task):
             self.width = 80
             self.height = 80
         elif self.stage == 3:
-            self.stim = 203
-            self.x_correcth_pos = random.randint(33,357)  # Screen width is 410mmm. We minus 10 on each end to account for mask
-            self.y_correcth_pos = random.randint(43,82)  # 640 = center of the screen. Screen height is 250mmm. We minus 10 on each end to account for mask
+            self.stim = 202
+            # Screen margin limits in mm
+            self.min_x_mm = 60
+            self.max_x_mm = settings.WIN_SIZE[0] - 60  # screen width in mm - 60 mm margin
+            # Random X position within margins
+            self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
+            # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
+            self.y_correcth_pos = 150  # in mm
             self.width = 40
             self.height = 40
 
