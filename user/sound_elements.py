@@ -134,15 +134,3 @@ reward_frequency_map = {
 
 # Pre-generated tone vectors
 rat_tones = {name: pureToneGen_dB(freq, 1800, db=70) for name, freq in reward_frequency_map.items()}
-
-# rat_tones = {
-#         'chand': pureToneGen(0.4, 250.0, 1.0),
-#         'felix':    pureToneGen(0.4, 290.0, 1.0),
-#         'fergus':   pureToneGen(0.4, 336.4, 1.0),
-#         'geralt':   pureToneGen(0.4, 390.2, 1.0),
-#         'joey':     pureToneGen(0.4, 452.7, 1.0),
-#         'ross':     pureToneGen(0.4, 525.1, 1.0),
-#         'innes':    pureToneGen(0.4, 609.1, 1.0),
-#         'pol':      pureToneGen(0.4, 706.6, 1.0),
-#         'm3':       pureToneGen(0.4, 100.0, 1.0),
-# }
