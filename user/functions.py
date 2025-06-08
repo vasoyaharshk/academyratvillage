@@ -2178,7 +2178,7 @@ def loop220(timing):
 
 #New Incorrect sound function: Replace function  with this.
 def function221():
-    play_incorrect_sound()
+    soundStream.play(soundVec3)
 
     cam2.put_state("Punish")
     cam3.put_state("Punish")

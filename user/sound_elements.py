@@ -117,7 +117,7 @@ soundStream = SoundR()
 #soundVec3 = pureToneGen(0.4, 4000, 1)
 
 soundVec2 = pureToneGen_dB(1368.5, 1, 70)
-soundVec3 = pureToneGen_dB(1368.5, 1, 70)
+soundVec3 = pureToneGen_dB(1368.5, 1800, 70)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {
