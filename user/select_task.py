@@ -25,10 +25,16 @@ def select_task(df, subject):
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
+        'ciri': 0,
+        'gal': 0,
+        'joy': 0,
+        'luna': 0,
+        'sorrel': 0,
+        'sparky': 0,
         'monika': 250.0,
         'phoebe': 290.0,
         'rachel': 336.4,
-        'm2': 100.0,
+        'm2': 100.5,
     }
 
     # Assign frequency based on subject
@@ -40,7 +46,7 @@ def select_task(df, subject):
     if reward_frequency_subjects == reward_frequency:
         print("the reward frequencies match")
     else:
-        message = f"Reward frequency mismatch for subject '{my_subject}'"
+        message = f"Reward frequency mismatch for subject. Reward frequency map {reward_frequency}, Reward freuquency in subjects {reward_frequency_subjects}"
         try:
             telegram_bot.alarm_finish_session(message, my_subject)
         except:
@@ -126,10 +132,6 @@ def select_task(df, subject):
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
     last_forward_stage = get_val_from_df_or_default('last_forward_stage', 0)
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
-
-    reward_frequency = get_val_from_df_or_default('reward_frequency', 0)
-    reward_db = get_val_from_df_or_default('reward_db', 0)
-    reward_duration = get_val_from_df_or_default('reward_duration', 0)
 
     #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():

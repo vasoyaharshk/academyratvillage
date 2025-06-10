@@ -211,7 +211,7 @@ def function5():
 
 def function9():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec1)  #14Khz sound played
+    soundStream.stop()  #14Khz sound played
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
@@ -235,6 +235,7 @@ def loop11(timing):
 def function12():
     cam2.put_state("Miss")
     cam3.put_state("Miss")
+    print("Miss")
 
 def loop12(timing):
     window.flip()
@@ -300,7 +301,7 @@ def loop15(timing):
 # camera empty and delete screen
 def function17():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec1)
+    soundStream.stop()
 
     cam2.put_state("")
     cam3.put_state("")
@@ -311,7 +312,7 @@ def loop17(timing):
 
 def function18():
     #if isinstance(soundStream, SoundR):
-    soundStream.stop(soundVec3)
+    soundStream.stop()
     print("Punish Sound Stopped")
 
 
@@ -1921,8 +1922,8 @@ def loop201(timing):
     window.flip()
 
 def function202():  # touchteaching stage 2 - 'stimulus' is smaller
-    px = settings.PIXELS_PER_MM_X
-    py = settings.PIXELS_PER_MM_Y
+    px = settings.PIXELS_PER_MM
+    py = settings.PIXELS_PER_MM
 
     x = int(utils.task.x_correcth_pos * px)
     y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
@@ -1942,19 +1943,6 @@ def loop202(timing):
     square.draw()
     window.flip()
 
-def function203():  # touchteaching stage 3 - 'stimulus' is smallest
-    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-
-    cont = float(utils.task.contrast)
-    square.fillColor = [cont, cont, cont]
-    square.lineColor = [cont, cont, cont]
-    print('Stimulus Shown')
-
-def loop203(timing):
-    square.draw()
-    window.flip()
 
 def function204(): #Touchteaching read touchscreen
     stage = utils.task.stage
