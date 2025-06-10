@@ -64,7 +64,7 @@ class TouchTeaching_no_mask(Task):
         # self.task_number = 0  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 0  # The number of trials in a block
+        self.block_size = 40  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -87,6 +87,54 @@ class TouchTeaching_no_mask(Task):
 
         self.trial_length = 0
 
+
+        #Variables for x positions:
+        self.min_x_mm = 112
+        self.max_x_mm = settings.WIN_SIZE[0] - 112  # screen width in mm - 60 mm margin
+        self.screen_third = (self.max_x_mm - self.min_x_mm) // 3  #1/3rd of the screen
+        self.x_zone_trials = []  # stores zone (1,2,3) for each trial in current block
+        self.current_x_zone = None
+
+        self.y_value_trials = []        #This is to randomise the y trials
+        self.y_choices = [140, 152, 165]        #Y-correcth positions to randomise with
+
+
+    # def generate_non_repeating_block(self, values, block_size=40):
+    #     sequence = []
+    #     while len(sequence) < block_size:
+    #         candidate = random.choice(values)
+    #         if len(sequence) >= 2 and sequence[-1] == sequence[-2] == candidate:
+    #             continue  # Skip if would cause 3 in a row
+    #         sequence.append(candidate)
+    #     return sequence
+
+    def generate_non_repeating_block(self, values, block_size=40):
+        from collections import Counter
+
+        # Calculate how many times each value should appear
+        base_count = block_size // len(values)
+        remainder = block_size % len(values)
+
+        # Create balanced pool
+        pool = []
+        for i, v in enumerate(values):
+            count = base_count + (1 if i < remainder else 0)
+            pool.extend([v] * count)
+
+        # Shuffle until valid (no >2 repeats)
+        max_attempts = 1000
+        for _ in range(max_attempts):
+            random.shuffle(pool)
+            valid = True
+            for i in range(2, len(pool)):
+                if pool[i] == pool[i - 1] == pool[i - 2]:
+                    valid = False
+                    break
+            if valid:
+                return pool
+
+        raise ValueError("Unable to generate non-repeating block with balanced values")
+
     def configure_gui(self):  # Variables that appear in the GUI
         self.gui_input = ['stage']
 
@@ -100,34 +148,62 @@ class TouchTeaching_no_mask(Task):
             self.y_correcth_pos = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
             self.width = settings.WIN_RESOLUTION[0]
             self.height = settings.WIN_RESOLUTION[1]
+
         elif self.stage == 2:
+            if self.block_trial_counter == 0 or len(self.x_zone_trials) < 1:
+                self.x_zone_trials = self.generate_non_repeating_block([1, 2, 3])
+                print("x_zone_trials:", self.x_zone_trials)
+
+            # X: get current_x_zone and convert to x position
+            self.current_x_zone = self.x_zone_trials[self.block_trial_counter]
+
+            self.zone_min = self.min_x_mm + (self.current_x_zone - 1) * self.screen_third
+            self.zone_max = self.zone_min + self.screen_third
+            self.x_correcth_pos = random.randint(self.zone_min, self.zone_max)
+
             self.stim = 202
-            # Screen margin limits in mm
-            self.min_x_mm = 120
-            self.max_x_mm = settings.WIN_SIZE[0] - 120  # screen width in mm - 60 mm margin
-            # Random X position within margins
-            self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
+
             # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
-            self.y_correcth_pos = 150  # in mm
-            self.width = 80
-            self.height = 80
+            self.y_correcth_pos = 152  # in mm
+            self.width =  75
+            self.height = 75
+
         elif self.stage == 3:
+
+            if self.block_trial_counter == 0 or len(self.x_zone_trials) < 1:
+                self.x_zone_trials = self.generate_non_repeating_block([1, 2, 3])
+                self.y_value_trials = self.generate_non_repeating_block(self.y_choices)
+                print("x_zone_trials:", self.x_zone_trials)
+                print("y value trials:", self.y_value_trials)
+
+            # X: get current_x_zone and convert to x position
+            self.current_x_zone = self.x_zone_trials[self.block_trial_counter]
+
+            self.zone_min = self.min_x_mm + (self.current_x_zone - 1) * self.screen_third
+            self.zone_max = self.zone_min + self.screen_third
+            self.x_correcth_pos = random.randint(self.zone_min, self.zone_max)
+
+            # Y: use predefined value directly
+            self.y_correcth_pos = self.y_value_trials[self.block_trial_counter]
+
             self.stim = 202
-            # Screen margin limits in mm
-            self.min_x_mm = 60
-            self.max_x_mm = settings.WIN_SIZE[0] - 60  # screen width in mm - 60 mm margin
-            # Random X position within margins
-            self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
-            # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
-            self.y_correcth_pos = 150  # in mm
-            self.width = 40
-            self.height = 40
+            self.width = 60
+            self.height = 60
+
+            # # Screen margin limits in mm
+
+            # # Random X position within margins
+            # self.x_correcth_pos = random.randint(self.min_x_mm, self.max_x_mm)
+            # # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
+            # self.y_correcth_pos = random.choice([140, 152, 165])
 
         print("X: ", self.x_correcth_pos)
         print("Y: ", self.y_correcth_pos)
         print("Width: ", self.width)
         print("Height: ", self.height)
         print("stim: ", self.stim)
+
+        print("Zone: ", self.current_x_zone)
 
         if self.current_trial == 0:
             self.sma.add_state(
@@ -204,6 +280,8 @@ class TouchTeaching_no_mask(Task):
             output_actions=[])
 
     def after_trial(self):
+        self.block_trial_counter = (self.block_trial_counter + 1) % 40
+
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0:
             self.trial_result = 'miss'
@@ -221,6 +299,10 @@ class TouchTeaching_no_mask(Task):
         self.register_value('response_y', self.response_y)
         self.register_value('x_correcth_pos', self.x_correcth_pos)
         self.register_value('y_correcth_pos', self.y_correcth_pos)
+        self.register_value('current_x_zone', self.current_x_zone)
+        self.register_value('zone_min', self.zone_min)
+        self.register_value('zone_max', self.zone_max)
+        self.register_value('x_zone_trials', self.x_zone_trials)
 
         #Trial Information:
         self.register_value('trial_length', self.trial_length)
