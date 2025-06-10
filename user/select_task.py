@@ -195,8 +195,8 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
-                # if stage == 1:
-                #     #stage = 2.0
+                if stage == 1:
+                    stage = 2.0
                 if stage == 2:
                     stage = 3.0
                 elif stage == 3:
