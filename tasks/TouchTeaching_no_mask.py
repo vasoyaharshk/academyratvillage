@@ -94,6 +94,8 @@ class TouchTeaching_no_mask(Task):
         self.screen_third = (self.max_x_mm - self.min_x_mm) // 3  #1/3rd of the screen
         self.x_zone_trials = []  # stores zone (1,2,3) for each trial in current block
         self.current_x_zone = None
+        self.zone_min = None
+        self.zone_max = None
 
         self.y_value_trials = []        #This is to randomise the y trials
         self.y_choices = [140, 152, 165]        #Y-correcth positions to randomise with
