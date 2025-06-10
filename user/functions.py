@@ -1921,8 +1921,8 @@ def loop201(timing):
     window.flip()
 
 def function202():  # touchteaching stage 2 - 'stimulus' is smaller
-    px = settings.PIXELS_PER_MM_X
-    py = settings.PIXELS_PER_MM_Y
+    px = settings.PIXELS_PER_MM
+    py = settings.PIXELS_PER_MM
 
     x = int(utils.task.x_correcth_pos * px)
     y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
@@ -1968,6 +1968,7 @@ def function204(): #Touchteaching read touchscreen
     y = utils.task.y_correcth_pos * py
 
     touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -2307,4 +2308,49 @@ def loop223(timing):
     square2.draw()
     square3.draw()
     square4.draw()
+    window.flip()
+
+
+def function225():
+    # Adjustable parameters
+    BAND_THICKNESS = 80
+    BAND_SPACING = 40
+
+    # Convert to pixels
+    band_thickness_px = BAND_THICKNESS * settings.PIXELS_PER_MM
+    band_spacing_px = BAND_SPACING * settings.PIXELS_PER_MM
+
+    Calculate
+    diagonal
+    length
+    to
+    overshoot
+    screen
+    size
+    diag_length = int((screen_width_px ** 2 + screen_height_px ** 2) ** 0.5) * 2
+
+    # Create and draw diagonal bands
+    bands = []
+    x_pos = -diag_length // 2
+
+    while x_pos < diag_length:
+        band = visual.Rect(
+            win=win,
+            width=diag_length,
+            height=band_thickness_px,
+            fillColor='white',
+            lineColor=None
+        )
+        band.ori = 45  # rotate to diagonal
+        band.pos = (x_pos, 0)
+        band.draw()
+        bands.append(band)
+        x_pos += band_thickness_px + band_spacing_px
+
+
+
+    print("Squares positioned at 4 central points, 40mm from edges")
+
+def loop225(timing):
+    diagonal.draw()
     window.flip()

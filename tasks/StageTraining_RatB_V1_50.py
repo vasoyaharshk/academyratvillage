@@ -5,7 +5,7 @@ from user import settings
 import random
 import numpy as np
 
-class zStageTraining_RatB_V1_50(Task):
+class StageTraining_RatB_V1_50(Task):
 
     def __init__(self):
         super().__init__()
@@ -82,7 +82,7 @@ class zStageTraining_RatB_V1_50(Task):
 
         #Screen Details:
         self.x = 0  # Centered horizontally
-        self.y = 102  # Positioned vertically
+        self.y = -148  # Positioned vertically
         self.width = 60  # Stimulus width in mm
         self.height = 60  # Stimulus height in mm
         self.contrast = 1.2  # Contrast level
