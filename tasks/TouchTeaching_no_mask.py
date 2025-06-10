@@ -243,7 +243,7 @@ class TouchTeaching_no_mask(Task):
 
         self.sma.add_state(
             state_name='Response_window',
-            state_timer=self.response_duration + 10,
+            state_timer=self.response_duration,
             state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', Bpod.Events.Tup: 'Miss'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 204)])  # function 204 defines the active touch area of our stims
 
