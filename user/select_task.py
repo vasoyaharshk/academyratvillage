@@ -132,6 +132,7 @@ def select_task(df, subject):
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
     last_forward_stage = get_val_from_df_or_default('last_forward_stage', 0)
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
+    stage_sequence = get_val_from_df_or_default('stage_sequence', [])
 
     #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():
@@ -651,7 +652,7 @@ def select_task(df, subject):
         wait_seconds = 1
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
