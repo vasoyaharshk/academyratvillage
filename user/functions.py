@@ -1955,7 +1955,7 @@ def function204(): #Touchteaching read touchscreen
     x_correct = utils.task.x_correcth_pos * px
     y = utils.task.y_correcth_pos * py
 
-    touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, None, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
