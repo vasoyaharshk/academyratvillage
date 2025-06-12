@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking_Gloves(Task):
+class Probability_Handtracking_Zoomed(Task):
     def __init__(self):
         super().__init__()
 
@@ -286,6 +286,7 @@ class Probability_Handtracking_Gloves(Task):
     def main_loop(self):
         print('')
         print('Block_trial_counter= ', self.block_trial_counter)
+        print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
         if self.current_trial == 0:
