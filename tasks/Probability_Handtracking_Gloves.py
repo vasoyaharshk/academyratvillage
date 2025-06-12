@@ -741,7 +741,7 @@ class Probability_Handtracking_Gloves(Task):
             self.x_incorrecth = None
             self.response_x = None
             self.response_y = None
-            self.trial_result = None
+
 
 
     def after_trial(self):

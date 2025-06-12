@@ -472,8 +472,7 @@ class Probability_WL_Training_Acc(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [61,
-                     62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
+        self.stim = [61, 62]  # These are the functions being called. 61 is for the correct answer is on the left and 62 is when the correct answer is on the right
 
         if self.block_change == 1:
             self.block_number += 1
@@ -517,88 +516,88 @@ class Probability_WL_Training_Acc(Task):
                     self.substage = 0
             self.ror_change = 0  # Reset the flag so it only triggers once
 
-        # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
-        if self.stim_trial_counter % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-            # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
-            self.last_stim_trial = self.stim_trials[
-                self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-            # print(f"Stimulus trials after first attempt: {self.stim_trials}")
-            while self.stim_trials is None:
-                # print("Retrying to generate stimulus trials...")
+        if self.stage == 5:
+            # Stimulus generation logic: every 20 trials the stimulus location will be regenerated.
+            if self.stim_trial_counter % self.block_wlt == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+                # If not the first block_wlt, pass the last stimulus of the previous block_wlt to avoid repetition
+                self.last_stim_trial = self.stim_trials[
+                    self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                 self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-                if self.stim_trials is None:
-                    print("generate_random_trials returned None. Retrying...")
-                else:
-                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                # print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                while self.stim_trials is None:
+                    # print("Retrying to generate stimulus trials...")
+                    self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+                    if self.stim_trials is None:
+                        print("generate_random_trials returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
 
-            self.stim_trial_counter = 0
+                self.stim_trial_counter = 0
 
-        print("Current_ror", self.current_ror)
-        print("Previous_ror", self.previous_ror)
+            print("Current_ror", self.current_ror)
+            print("Previous_ror", self.previous_ror)
 
-        # Stimulus generation logic: every 40 trials the stimulus CONDITIONS will be regenerated
-        if self.current_ror != self.previous_ror or not self.conditions or self.condition_trial_counter % self.block_wlt == 0:
-            self.last_condition_trial = self.conditions[
-                self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else 0
-            if self.current_ror in self.motivational_ror:
-                self.conditions = self.generate_random_trial_conditions_motivational(self.current_ror,
-                                                                                     self.last_condition_trial)
-                print(f"Trial conditions after first attempt: {self.conditions}")
-                while self.conditions is None:
-                    # print("Retrying to generate trial conditions...")
+            # Stimulus generation logic: every 40 trials the stimulus CONDITIONS will be regenerated
+            if self.current_ror != self.previous_ror or not self.conditions or self.condition_trial_counter % self.block_wlt == 0:
+                self.last_condition_trial = self.conditions[self.condition_trial_counter - 1] if self.condition_trial_counter > 0 else 0
+                if self.current_ror in self.motivational_ror:
                     self.conditions = self.generate_random_trial_conditions_motivational(self.current_ror,
                                                                                          self.last_condition_trial)
-                    if self.conditions is None:
-                        print("generate_random_trial_conditions_motivational returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.conditions}")
-            elif self.current_ror in self.target_ror:
-                self.conditions = self.generate_random_trial_conditions_target(self.current_ror,
-                                                                               self.last_condition_trial)
-                print(f"Trial conditions after first attempt: {self.conditions}")
-                while self.conditions is None:
-                    # print("Retrying to generate trial conditions...")
+                    print(f"Trial conditions after first attempt: {self.conditions}")
+                    while self.conditions is None:
+                        # print("Retrying to generate trial conditions...")
+                        self.conditions = self.generate_random_trial_conditions_motivational(self.current_ror,
+                                                                                             self.last_condition_trial)
+                        if self.conditions is None:
+                            print("generate_random_trial_conditions_motivational returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.conditions}")
+                elif self.current_ror in self.target_ror:
                     self.conditions = self.generate_random_trial_conditions_target(self.current_ror,
                                                                                    self.last_condition_trial)
-                    if self.conditions is None:
-                        print("generate_random_trial_conditions_target returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.conditions}")
+                    print(f"Trial conditions after first attempt: {self.conditions}")
+                    while self.conditions is None:
+                        # print("Retrying to generate trial conditions...")
+                        self.conditions = self.generate_random_trial_conditions_target(self.current_ror,
+                                                                                       self.last_condition_trial)
+                        if self.conditions is None:
+                            print("generate_random_trial_conditions_target returned None. Retrying...")
+                        else:
+                            print(f"Successfully generated stimulus trials: {self.conditions}")
 
-            # Update previous ROR so that conditions won't be regenerated again until it changes.
-            self.previous_ror = self.current_ror
-            self.condition_trial_counter = 0  # Optionally reset your counter if needed.
+                # Update previous ROR so that conditions won't be regenerated again until it changes.
+                self.previous_ror = self.current_ror
+                self.condition_trial_counter = 0  # Optionally reset your counter if needed.
 
-        # self.trial_condition = self.conditions[self.condition_trial_counter % len(self.conditions)]
+            # self.trial_condition = self.conditions[self.condition_trial_counter % len(self.conditions)]
 
-        self.trial_condition = self.conditions[self.condition_trial_counter]
+            self.trial_condition = self.conditions[self.condition_trial_counter]
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.stim_trial_counter]
-        else:
-            self.stim_trial = self.last_stim_trial
+            if self.bias_breaking == 0:
+                self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            else:
+                self.stim_trial = self.last_stim_trial
 
-        if self.stim_trial == 61:
-            self.x_correcth = self.x_correcth_pos[0]
-            self.x_incorrecth = self.x_correcth_pos[1]
-            # print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-        elif self.stim_trial == 62:
-            self.x_correcth = self.x_correcth_pos[1]
-            self.x_incorrecth = self.x_correcth_pos[0]
-            # print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            if self.stim_trial == 61:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+                # print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            elif self.stim_trial == 62:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+                # print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-        self.image_path_function = self.get_stim_image_path(self.stim_trial, self.trial_condition)
+            self.image_path_function = self.get_stim_image_path(self.stim_trial, self.trial_condition)
 
-        directory, filename = os.path.split(self.image_path_function)
-        self.image_displayed = filename
-        self.image_directory = directory
+            directory, filename = os.path.split(self.image_path_function)
+            self.image_displayed = filename
+            self.image_directory = directory
 
-        print('Stimulus Conditions', self.conditions)
-        print('Stimulus Condition', self.trial_condition)
-        print('Stimulus trial: ', self.stim_trial)
-        print('Stimulus Trial Counter', self.stim_trial_counter)
-        print('Stimulus Condition Counter', self.condition_trial_counter)
+            print('Stimulus Conditions', self.conditions)
+            print('Stimulus Condition', self.trial_condition)
+            print('Stimulus trial: ', self.stim_trial)
+            print('Stimulus Trial Counter', self.stim_trial_counter)
+            print('Stimulus Condition Counter', self.condition_trial_counter)
 
         ############ STATE MACHINE ################
         if self.stage == 5:
