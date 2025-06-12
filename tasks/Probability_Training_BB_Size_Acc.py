@@ -34,7 +34,6 @@ class Probability_Training_BB_Size_Acc(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.trials_max = 80
         self.stage = 1  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
@@ -121,6 +120,8 @@ class Probability_Training_BB_Size_Acc(Task):
         self.biased_consecutive_corrects = 3  # This is the number of corrects the rat needs to do to end bias breaking
         self.bias_accuracy_trials = []  # List that holds the last five success or failures.
         self.bias_accuracy = 0  # Accuracy of the last five trials.
+
+        self.task_end = False
 
 
     def configure_gui(self):
@@ -770,9 +771,6 @@ class Probability_Training_BB_Size_Acc(Task):
 
     def after_trial(self):
         if self.task_number == 2:
-            if self.bias_breaking == 0:
-                self.stim_trial_counter += 1
-                self.total_trials += 1  # remove this
                 # self.block_trial_counter += 1  # For counting the blocks
 
             ##### COUNT MISSES:
@@ -786,6 +784,9 @@ class Probability_Training_BB_Size_Acc(Task):
                 self.block_valid_count += 1
                 self.success = 0
                 self.block_trial_counter += 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
@@ -799,6 +800,9 @@ class Probability_Training_BB_Size_Acc(Task):
                 self.block_valid_count += 1
                 self.block_trial_counter += 1
                 self.success = 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
@@ -939,6 +943,7 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.response_x_array = []      #Clearing the array
         else:
             print("Task 2 ended because Core training completed. Task is now 3 so will move to Weber's law in next session.")
+            self.task_end = True
 
         ############ REGISTER VALUES ################
         self.register_value('stage', self.stage)

@@ -139,3 +139,5 @@ image_jar_right_sized = visual.ImageStim(
     size=(1280, 720),
     units='pix'
 )
+
+end_screen = visual.ImageStim(win=window, image=None)  # Image will be set dynamically

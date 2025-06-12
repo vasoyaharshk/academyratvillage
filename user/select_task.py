@@ -45,7 +45,7 @@ def select_task(df, subject):
     if reward_frequency_subjects == reward_frequency:
         print("the reward frequencies match")
     else:
-        message = f"Reward frequency mismatch for subject '{my_subject}'"
+        message = f"Reward frequency mismatch for subject. Reward frequency map {reward_frequency}, Reward freuquency in subjects {reward_frequency_subjects}"
         try:
             telegram_bot.alarm_finish_session(message, my_subject)
         except:
@@ -90,6 +90,7 @@ def select_task(df, subject):
             return val
         return default_val
 
+
     task_number = get_val_from_df_or_default('task_number', 0)
     stage = get_val_from_df_or_default('stage', 0)
     substage = get_val_from_df_or_default('substage', 0)
@@ -130,6 +131,7 @@ def select_task(df, subject):
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
     last_forward_stage = get_val_from_df_or_default('last_forward_stage', 0)
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
+    stage_sequence = get_val_from_df_or_default('stage_sequence', [])
 
     #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():
@@ -195,10 +197,10 @@ def select_task(df, subject):
                     pass
                 if stage == 1:
                     stage = 2.0
-                elif stage == 2:
+                if stage == 2:
                     stage = 3.0
                 elif stage == 3:
-                    #task = 'Probability_Extra_Training_Acc'
+                    task = 'Probability_Extra_Training_Acc'
                     stage = 1.0
                     task_number = 1
                     message = f"{my_subject} advance from early training to probability training with pegs'"
@@ -413,9 +415,10 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    task = 'Probability_Handtracking_Gloves'
+                    task = 'Probability_Handtracking_Zoomed'
                     # Weber's Law:
                     stage = 1
+                    substage = 1
                     ror = []
                     completed_ror = []
                     current_ror = 0.0
@@ -518,8 +521,7 @@ def select_task(df, subject):
                     condition_trial_counter = 0
                     conditions = []
 
-
-                    message = f"PI: Probability_WL_Training complete, Moving to Runthrough."
+                    message = f"URGENT PI: Probability_WL_Training complete, Moving to {task}."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -564,7 +566,7 @@ def select_task(df, subject):
                     stim_trial_counter = 0
 
 
-                    message = f"PI: Probability_WL_Training_Runthrough complete, Moving to Post Training."
+                    message = f"URGENT PI: Probability_WL_Training_Runthrough complete, Moving to {task}."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -648,9 +650,10 @@ def select_task(df, subject):
 
     if my_subject == 'm3':
         wait_seconds = 1
+        block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

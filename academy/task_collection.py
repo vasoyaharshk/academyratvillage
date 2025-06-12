@@ -76,6 +76,8 @@ class Task(object):
         self.reward_frequency = 0
         self.reward_db = 0
         self.reward_duration = 0
+        self.stage_sequence = []
+        self.task_end = False
 
 
         self.checksum = None
@@ -171,6 +173,8 @@ class Task(object):
             self.my_bpod.softcode_handler_function = softcode_handler
 
             while True:
+                if self.task_end:
+                    break
 
                 #print(utils.current_trials, utils.control_serials, utils.control_softcodes)
 

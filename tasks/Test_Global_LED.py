@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
 
-class Test_Global_LED(Task):
+class zTest_Global_LED(Task):
 
     def __init__(self):
         super().__init__()

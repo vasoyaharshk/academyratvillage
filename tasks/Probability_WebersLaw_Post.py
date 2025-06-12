@@ -55,7 +55,7 @@ class Probability_WebersLaw_Post(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 2.0  # Normal water delivery of 25ul multiplied by this
+        self.valve_factor_c = 1.0  # Normal water delivery of 25ul multiplied by this
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish
 
         # counters for trials:
@@ -99,6 +99,8 @@ class Probability_WebersLaw_Post(Task):
         self.stim_trial_counter = 0
 
         self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
+
+        self.task_end = False
 
     def generate_alternating_conditions(self):
         # Define easy and hard conditions
@@ -606,6 +608,7 @@ class Probability_WebersLaw_Post(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
+            self.task_end = True
 
 
         ############ REGISTER VALUES ################

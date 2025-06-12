@@ -36,7 +36,6 @@ class Probability_Extra_Training_Acc(Task):
         """
 
         # Variables for the task:
-        self.trials_max = 80
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
@@ -109,6 +108,8 @@ class Probability_Extra_Training_Acc(Task):
         self.last_forward_stage = 0     #This is important for the moved_back_counter. Stores the last valaue for the forward stage change
         self.last_backward_stage = 0       ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
         self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It needs to
+
+        self.task_end = False
 
 
     def configure_gui(self):
@@ -239,6 +240,7 @@ class Probability_Extra_Training_Acc(Task):
 
         print('Stimulus trial: ', self.stim_trial)
         print('Stimulus Trial Counter', self.stim_trial_counter)
+
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
@@ -381,11 +383,8 @@ class Probability_Extra_Training_Acc(Task):
 
     def after_trial(self):
         if self.task_number == 1:
-            self.total_trials += 1  # remove this
             # self.block_trial_counter += 1  # For counting the blocks
 
-            if self.bias_breaking == 0:
-                self.stim_trial_counter += 1
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -398,6 +397,10 @@ class Probability_Extra_Training_Acc(Task):
                 self.block_valid_count += 1
                 self.success = 0
                 self.block_trial_counter += 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
+
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
@@ -411,6 +414,10 @@ class Probability_Extra_Training_Acc(Task):
                 self.block_valid_count += 1
                 self.block_trial_counter += 1
                 self.success = 1
+                self.total_trials += 1
+                if self.bias_breaking == 0:
+                    self.stim_trial_counter += 1
+
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
@@ -547,6 +554,7 @@ class Probability_Extra_Training_Acc(Task):
             self.response_y = None
             self.trial_length = None
             self.trial_result = None
+            self.task_end = True
 
 
         ############ REGISTER VALUES ################

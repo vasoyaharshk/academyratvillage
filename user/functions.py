@@ -235,6 +235,7 @@ def loop11(timing):
 def function12():
     cam2.put_state("Miss")
     cam3.put_state("Miss")
+    print("Miss")
 
 def loop12(timing):
     window.flip()
@@ -1691,6 +1692,7 @@ def loop108(timing):
 #Functions from 110 onwards are for Bastos and Taylor:
 # Function 111: Correct answer on left:
 # Function 111: Display the first frame of Left Video (without playing)
+#Handtracking: Stage 2: 111 to 115
 def function111():
     global last_function_called
     last_function_called = 111 # This tells Python you're using a global variable named 'last_function_called' (meaning it exists outside this function and can be accessed or changed anywhere in your program).
@@ -1699,7 +1701,7 @@ def function111():
     video_left.setMovie(utils.task.video_path_function) # This sets the movie that will play on the 'left video screen'.
     # It's choosing the movie file based on the path stored in 'utils.task.video_path_function'.
 
-    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
     print(f"Assigned left video: {utils.task.video_path_function}")
 
 def loop111(timing):
@@ -1714,7 +1716,7 @@ def function112():
     print("112. video starts")
 
     video_right.setMovie(utils.task.video_path_function)
-    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
     print(f"Assigned right video: {utils.task.video_path_function}")
 
 def loop112(timing):
@@ -1740,10 +1742,10 @@ def function113():
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
-            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
-            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")
@@ -1822,8 +1824,7 @@ def loop115(timing):
     image_jar_left.draw()  # Display the first frame as an image
     window.flip()
 
-
-#Stage 1:
+#Handtracking: Stage 1: 121 to 122
 def function121():  # When the correct answer is on left
     global last_function_called, image_path
     last_function_called = 121
@@ -1831,7 +1832,11 @@ def function121():  # When the correct answer is on left
     image_path = utils.task.image_path_function
 
     image_jar_left_sized.image = image_path
-    image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    stage = utils.task.stage
+    if stage == 1:
+        image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
+    else:
+        image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
 
 def loop121(timing):
     image_jar_left_sized.draw()
@@ -1839,7 +1844,7 @@ def loop121(timing):
 
 
 
-## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
+#Handtracking: Stage 1:
 def function122():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 122
@@ -1847,7 +1852,11 @@ def function122():  # When the correct answer is on right
     image_path = utils.task.image_path_function
 
     image_jar_right_sized.image = image_path
-    image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    stage = utils.task.stage
+    if stage == 1:
+        image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
+    else:
+        image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
 
 def loop122(timing):
     image_jar_right_sized.draw()
@@ -1921,8 +1930,8 @@ def loop201(timing):
     window.flip()
 
 def function202():  # touchteaching stage 2 - 'stimulus' is smaller
-    px = settings.PIXELS_PER_MM_X
-    py = settings.PIXELS_PER_MM_Y
+    px = settings.PIXELS_PER_MM
+    py = settings.PIXELS_PER_MM
 
     x = int(utils.task.x_correcth_pos * px)
     y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
@@ -1942,19 +1951,6 @@ def loop202(timing):
     square.draw()
     window.flip()
 
-def function203():  # touchteaching stage 3 - 'stimulus' is smallest
-    square.pos = (int(utils.task.x_correcth_pos * settings.PIXELS_PER_MM), int(utils.task.y_correcth_pos * settings.PIXELS_PER_MM))
-    square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-    square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-
-    cont = float(utils.task.contrast)
-    square.fillColor = [cont, cont, cont]
-    square.lineColor = [cont, cont, cont]
-    print('Stimulus Shown')
-
-def loop203(timing):
-    square.draw()
-    window.flip()
 
 def function204(): #Touchteaching read touchscreen
     stage = utils.task.stage
@@ -1967,7 +1963,7 @@ def function204(): #Touchteaching read touchscreen
     x_correct = utils.task.x_correcth_pos * px
     y = utils.task.y_correcth_pos * py
 
-    touch.start_reading_probability_first_touch(utils.task.response_duration, x_correct, None, y, width, height)
+    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, None, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
@@ -1976,7 +1972,8 @@ def function204(): #Touchteaching read touchscreen
 
 #From function 210 onwards, cognitive bias:
 def function211():  # Tone pair 1, negative reinforcement
-
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec4)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -1994,7 +1991,8 @@ def loop211(timing):
     window.flip()
 
 def function212():  # Tone pair 1, positive reinforcement
-
+    if isinstance(soundStream, SoundR):
+        soundStream.play(soundVec5)
 
     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
@@ -2136,7 +2134,7 @@ def function219():  #White noise, TBD
     if isinstance(soundStream, SoundR):
         soundStream.play(soundVec14)
 
-#New Correct sound function: Replace function 11 and function 38 with this.
+#New Correct sound function: Replace function 11 with this.
 def function220():
     rat = utils.task.subject.lower()
     tone = rat_tones.get(rat)
@@ -2307,3 +2305,17 @@ def loop223(timing):
     square3.draw()
     square4.draw()
     window.flip()
+
+
+def function255():  # When the correct answer is on left
+    print("End screen image displayed")
+    image_path = "/home/ratvillage02/academy/stimuli/end_screen.png"
+
+    end_screen.image = image_path
+    end_screen.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    end_screen.draw()
+    window.flip()
+
+# def loop255(timing):
+#     image_jar_left.draw()
+#     window.flip()

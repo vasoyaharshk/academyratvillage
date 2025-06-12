@@ -91,7 +91,7 @@ DETECTION_WAITING_MINUTES = 25   #This is the amount of time animals are not all
 TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
-# camera corridor
+# camera
 CAM1_NUMBER = 1
 CAM1_NAME_VIDEO = 'Cor'
 CAM1_WIDTH = 640

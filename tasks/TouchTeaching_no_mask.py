@@ -88,6 +88,11 @@ class TouchTeaching_no_mask(Task):
         self.trial_length = 0
 
 
+        #Sound Variables:
+        self.reward_frequency = 0
+
+
+
         #Variables for x positions:
         self.min_x_mm = 112
         self.max_x_mm = settings.WIN_SIZE[0] - 112  # screen width in mm - 60 mm margin
@@ -171,7 +176,6 @@ class TouchTeaching_no_mask(Task):
             self.height = 75
 
         elif self.stage == 3:
-
             if self.block_trial_counter == 0 or len(self.x_zone_trials) < 1:
                 self.x_zone_trials = self.generate_non_repeating_block([1, 2, 3])
                 self.y_value_trials = self.generate_non_repeating_block(self.y_choices)
@@ -199,13 +203,13 @@ class TouchTeaching_no_mask(Task):
             # # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
             # self.y_correcth_pos = random.choice([140, 152, 165])
 
+        print("Zone: ", self.current_x_zone)
         print("X: ", self.x_correcth_pos)
         print("Y: ", self.y_correcth_pos)
         print("Width: ", self.width)
         print("Height: ", self.height)
         print("stim: ", self.stim)
 
-        print("Zone: ", self.current_x_zone)
 
         if self.current_trial == 0:
             self.sma.add_state(
@@ -237,7 +241,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Stimulus_Display',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Response_window'},  # starts the response window
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'},  # starts the response window
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim)])  #
         # show 3 stimuli when crossing end of corridor
 

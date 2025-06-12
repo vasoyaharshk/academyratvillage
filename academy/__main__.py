@@ -14,6 +14,7 @@ from academy.softcode import softcode
 from academy.camera import cam1, cam2, cam3
 from user import settings
 import ast
+from user.functions import function255
 
 
 # 0 waiting
@@ -249,23 +250,24 @@ def main_loop():
             screen_loop()
 
         elif utils.state == 3:  # 3 after min_time, data not saved, animal not back
-            if settings.ENABLE_EXIT_WEIGHING and status == "w":
-                try:
-                    new_time = time_utils.now_seconds()
-                    weight.append((new_time, float(tag)))
-                    weight = [value for value in weight if value[0] + 3 >= new_time]
-                    list_weights = ",".join([str(item[1]) for item in weight])
-                    if (len(weight) == 5
-                            and cam1.area_doors2.value < settings.NOMICEDOOR2
-                            and cam1.area_doors1.value > settings.NOMICEDOOR2):
-                        good_weight = weight[2][1]
-                        utils.task.subject_weight = good_weight
-                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
-                        utils.log(utils.subject.name, "list_of_weights: " + list_weights, "ACTION",)
-                        weight = []
-                        utils.change_to_state = (4)
-                except:  # because an animal can be stuck and then we have measures of weight and rfid at the same time
-                    pass
+            if settings.ENABLE_EXIT_WEIGHING:
+                if status == "w":
+                    try:
+                        new_time = time_utils.now_seconds()
+                        weight.append((new_time, float(tag)))
+                        weight = [value for value in weight if value[0] + 3 >= new_time]
+                        list_weights = ",".join([str(item[1]) for item in weight])
+                        if (len(weight) == 5
+                                and cam1.area_doors2.value < settings.NOMICEDOOR2
+                                and cam1.area_doors1.value > settings.NOMICEDOOR2):
+                            good_weight = weight[2][1]
+                            utils.task.subject_weight = good_weight
+                            utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
+                            utils.log(utils.subject.name, "list_of_weights: " + list_weights, "ACTION",)
+                            weight = []
+                            utils.change_to_state = (4)
+                    except:  # because an animal can be stuck and then we have measures of weight and rfid at the same time
+                        pass
             else:
                 utils.task.subject_weight = 0
                 if (cam1.area_doors2.value < settings.NOMICEDOOR2
@@ -319,24 +321,31 @@ def main_loop():
                 last_time_scale = time_utils.now_seconds()
                 arduino.tare_scale()
 
-            if settings.ENABLE_EXIT_WEIGHING and status == "w":
-                new_time = time_utils.now_seconds()
-                weight.append((new_time, float(tag)))
-                weight = [value for value in weight if value[0] + 3 >= new_time]
-                list_weights = ",".join([str(item[1]) for item in weight])
-                if (len(weight) == 5 and cam1.area_doors2.value < settings.NOMICEDOOR2
-                        and cam1.area_doors1.value > settings.NOMICEDOOR2):
-                    try:
-                        good_weight = weight[2][1]
-                        utils.task.subject_weight = good_weight
-                        utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
-                        utils.log(utils.subject.name,"list_of_weights: " + list_weights,"ACTION")
-                        weight = []
-                        utils.log_cam(utils.subject.name, "Returning home", "ACTION")
-                    except:
-                        utils.log("Academy", "returning home after relaunch", "ACTION")
-                    arduino.move_doors_to_go_home()
-                    utils.change_to_state = 0  # waiting
+            if settings.ENABLE_EXIT_WEIGHING:
+                if status == "w":
+                    new_time = time_utils.now_seconds()
+                    weight.append((new_time, float(tag)))
+                    weight = [value for value in weight if value[0] + 3 >= new_time]
+                    list_weights = ",".join([str(item[1]) for item in weight])
+                    if (len(weight) == 5 and cam1.area_doors2.value < settings.NOMICEDOOR2
+                            and cam1.area_doors1.value > settings.NOMICEDOOR2):
+                        try:
+                            good_weight = weight[2][1]
+                            utils.task.subject_weight = good_weight
+                            utils.log(utils.subject.name, "weight: " + str(good_weight), "ACTION")
+                            utils.log(utils.subject.name,"list_of_weights: " + list_weights,"ACTION")
+                            weight = []
+                            utils.log_cam(utils.subject.name, "Returning home", "ACTION")
+                        except:
+                            utils.log("Academy", "returning home after relaunch", "ACTION")
+                        arduino.move_doors_to_go_home()
+
+                        screen.win.flip()
+                        screen.tag = None
+                        screen.first = False
+                        screen.my_loop = lambda *args, **kwargs: None
+
+                        utils.change_to_state = 0  # waiting
             else:
                 utils.task.subject_weight = 0
                 if (cam1.area_doors2.value < settings.NOMICEDOOR2
@@ -346,6 +355,12 @@ def main_loop():
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")
                     arduino.move_doors_to_go_home()
+
+                    screen.win.flip()
+                    screen.tag = None
+                    screen.first = False
+                    screen.my_loop = lambda *args, **kwargs: None
+
                     utils.change_to_state = 0  # waiting
 
         elif utils.state == 7:  # 7 setting task
@@ -431,6 +446,7 @@ def screen_loop():
     if (
         trials_performed >= utils.task.trials_max
         or utils.chrono.get_seconds() >= utils.task.duration_max
+        or utils.task.task_end
     ):
         if utils.state == 8:
             utils.change_to_state = 9  # after max time, data not saved, direct task
@@ -670,7 +686,9 @@ def go_to_state(num):
         utils.subject.reward_db = float(utils.subject.reward_db)  #Cast to float
         utils.subject.reward_duration = float(utils.subject.reward_duration)  #Cast to float
 
-
+        if isinstance(utils.subject.stage_sequence, str):
+            utils.subject.stage_sequence = ast.literal_eval(utils.subject.stage_sequence)
+        utils.subject.stage_sequence = list(map(float, utils.subject.stage_sequence))
 
         #From subject to task:
         utils.task.stage = utils.subject.stage
@@ -716,6 +734,8 @@ def go_to_state(num):
         utils.task.reward_frequency = utils.subject.reward_frequency
         utils.task.reward_db = utils.subject.reward_db
         utils.task.reward_duration = utils.subject.reward_duration
+
+        utils.task.stage_sequence = utils.subject.stage_sequence
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
@@ -766,6 +786,7 @@ def go_to_state(num):
         # bpod.play_buzzer2()
         utils.task_real_duration = utils.chrono.get_seconds()
         utils.log("Academy", "Go to state 6", "ACTION")
+        function255()  # Show end screen image
 
     elif num == 7:  # setting task
         cam2.put_state('inactive')
@@ -777,6 +798,7 @@ def go_to_state(num):
         screen.tag = None
         screen.first = False
         screen.my_loop = lambda *args, **kwargs: None
+        function255()  # Show end screen image
 
     elif num == 8:  # running direct task
 
@@ -795,6 +817,11 @@ def go_to_state(num):
         utils.task.set_and_run(
             gui.subject, subject_name, utils.task.subject_weight, utils.task_manager
         )
+
+    elif num == 9:  # after max time, data not saved, direct task
+        utils.log("Academy", "Go to state 9", "ACTION")
+        function255()
+        screen.win.flip()
 
     elif num == 10:  # multiple animals inside
         # bpod.open_inner_door()
