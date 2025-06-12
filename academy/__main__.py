@@ -14,6 +14,7 @@ from academy.softcode import softcode
 from academy.camera import cam1, cam2, cam3
 from user import settings
 import ast
+from user.functions import function255
 
 
 # 0 waiting
@@ -336,6 +337,12 @@ def main_loop():
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")
                     arduino.move_doors_to_go_home()
+
+                    screen.win.flip()
+                    screen.tag = None
+                    screen.first = False
+                    screen.my_loop = lambda *args, **kwargs: None
+
                     utils.change_to_state = 0  # waiting
             else:
                 utils.task.subject_weight = 0
@@ -346,6 +353,12 @@ def main_loop():
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")
                     arduino.move_doors_to_go_home()
+
+                    screen.win.flip()
+                    screen.tag = None
+                    screen.first = False
+                    screen.my_loop = lambda *args, **kwargs: None
+
                     utils.change_to_state = 0  # waiting
 
         elif utils.state == 7:  # 7 setting task
@@ -431,6 +444,7 @@ def screen_loop():
     if (
         trials_performed >= utils.task.trials_max
         or utils.chrono.get_seconds() >= utils.task.duration_max
+        or utils.task.task_end
     ):
         if utils.state == 8:
             utils.change_to_state = 9  # after max time, data not saved, direct task
@@ -670,7 +684,9 @@ def go_to_state(num):
         utils.subject.reward_db = float(utils.subject.reward_db)  #Cast to float
         utils.subject.reward_duration = float(utils.subject.reward_duration)  #Cast to float
 
-
+        if isinstance(utils.subject.stage_sequence, str):
+            utils.subject.stage_sequence = ast.literal_eval(utils.subject.stage_sequence)
+        utils.subject.stage_sequence = list(map(float, utils.subject.stage_sequence))
 
         #From subject to task:
         utils.task.stage = utils.subject.stage
@@ -716,6 +732,8 @@ def go_to_state(num):
         utils.task.reward_frequency = utils.subject.reward_frequency
         utils.task.reward_db = utils.subject.reward_db
         utils.task.reward_duration = utils.subject.reward_duration
+
+        utils.task.stage_sequence = utils.subject.stage_sequence
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
@@ -766,6 +784,7 @@ def go_to_state(num):
         # bpod.play_buzzer2()
         utils.task_real_duration = utils.chrono.get_seconds()
         utils.log("Academy", "Go to state 6", "ACTION")
+        function255()  # Show end screen image
 
     elif num == 7:  # setting task
         cam2.put_state('inactive')
@@ -777,6 +796,7 @@ def go_to_state(num):
         screen.tag = None
         screen.first = False
         screen.my_loop = lambda *args, **kwargs: None
+        function255()  # Show end screen image
 
     elif num == 8:  # running direct task
 
@@ -795,6 +815,11 @@ def go_to_state(num):
         utils.task.set_and_run(
             gui.subject, subject_name, utils.task.subject_weight, utils.task_manager
         )
+
+    elif num == 9:  # after max time, data not saved, direct task
+        utils.log("Academy", "Go to state 9", "ACTION")
+        function255()
+        screen.win.flip()
 
     elif num == 10:  # multiple animals inside
         # bpod.open_inner_door()

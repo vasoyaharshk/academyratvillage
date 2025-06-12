@@ -2297,3 +2297,17 @@ def loop223(timing):
     square3.draw()
     square4.draw()
     window.flip()
+
+
+def function255():  # When the correct answer is on left
+    print("End screen image displayed")
+    image_path = "/home/ratvillage01/academy/stimuli/end_screen.png"
+
+    end_screen.image = image_path
+    end_screen.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    end_screen.draw()
+    window.flip()
+
+# def loop255(timing):
+#     image_jar_left.draw()
+#     window.flip()
