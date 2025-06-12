@@ -1692,6 +1692,7 @@ def loop108(timing):
 #Functions from 110 onwards are for Bastos and Taylor:
 # Function 111: Correct answer on left:
 # Function 111: Display the first frame of Left Video (without playing)
+#Handtracking: Stage 2: 111 to 115
 def function111():
     global last_function_called
     last_function_called = 111 # This tells Python you're using a global variable named 'last_function_called' (meaning it exists outside this function and can be accessed or changed anywhere in your program).
@@ -1700,7 +1701,7 @@ def function111():
     video_left.setMovie(utils.task.video_path_function) # This sets the movie that will play on the 'left video screen'.
     # It's choosing the movie file based on the path stored in 'utils.task.video_path_function'.
 
-    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
     print(f"Assigned left video: {utils.task.video_path_function}")
 
 def loop111(timing):
@@ -1715,7 +1716,7 @@ def function112():
     print("112. video starts")
 
     video_right.setMovie(utils.task.video_path_function)
-    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
     print(f"Assigned right video: {utils.task.video_path_function}")
 
 def loop112(timing):
@@ -1741,10 +1742,10 @@ def function113():
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
-            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
-            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")
@@ -1823,8 +1824,7 @@ def loop115(timing):
     image_jar_left.draw()  # Display the first frame as an image
     window.flip()
 
-
-#Stage 1:
+#Handtracking: Stage 1: 121 to 122
 def function121():  # When the correct answer is on left
     global last_function_called, image_path
     last_function_called = 121
@@ -1832,7 +1832,11 @@ def function121():  # When the correct answer is on left
     image_path = utils.task.image_path_function
 
     image_jar_left_sized.image = image_path
-    image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    stage = utils.task.stage
+    if stage == 1:
+        image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
+    else:
+        image_jar_left_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
 
 def loop121(timing):
     image_jar_left_sized.draw()
@@ -1840,7 +1844,7 @@ def loop121(timing):
 
 
 
-## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
+#Handtracking: Stage 1:
 def function122():  # When the correct answer is on right
     global last_function_called, image_path
     last_function_called = 122
@@ -1848,7 +1852,11 @@ def function122():  # When the correct answer is on right
     image_path = utils.task.image_path_function
 
     image_jar_right_sized.image = image_path
-    image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    stage = utils.task.stage
+    if stage == 1:
+        image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
+    else:
+        image_jar_right_sized.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
 
 def loop122(timing):
     image_jar_right_sized.draw()

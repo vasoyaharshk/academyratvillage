@@ -33,8 +33,8 @@ class Probability_Handtracking_Gloves(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.stage = 0  # Current stage within the task
-        self.substage = 0  # Current substage within the stage
+        self.stage = 1  # Current stage within the task
+        self.substage = 1  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
         self.task_number = 4  # Each task has a unique number. See RV script guide.
 
@@ -135,6 +135,9 @@ class Probability_Handtracking_Gloves(Task):
         self.video_path_function = None
         self.video_displayed = None
         self.video_directory = None
+
+        self.stage_sequence = []
+        self.task_end = False
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -282,6 +285,7 @@ class Probability_Handtracking_Gloves(Task):
 
     def main_loop(self):
         print('')
+        print('Block_trial_counter= ', self.block_trial_counter)
         ### Randomizing the stimulus positions for both the images:
 
         if self.current_trial == 0:
@@ -304,14 +308,14 @@ class Probability_Handtracking_Gloves(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
-            self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            self.stage += 1
-            message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
+            self.last_forward_stage = self.substage  # Save current BEFORE increasing
+            self.substage += 1
+            message = f"Stage moved forward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 4:
+            if self.substage == 5:
                 self.task_number = 5
                 self.tired = True
 
@@ -323,7 +327,7 @@ class Probability_Handtracking_Gloves(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 1)
+            new_stage = max(self.substage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -333,8 +337,8 @@ class Probability_Handtracking_Gloves(Task):
             else:
                 self.moved_back_counter = 1
                 self.last_backward_stage = new_stage
-            self.stage = new_stage
-            message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
+            self.substage = new_stage
+            message = f"Stage moved backward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except:
@@ -343,6 +347,27 @@ class Probability_Handtracking_Gloves(Task):
         ### Randomizing the stimulus positions for image and the videos:
         # Choose x positions:
         #self.stim = [111, 112] for video
+
+        #Stage Assignment:
+        if self.block_trial_counter == 0:
+            if self.substage in [1, 2, 3, 4]:
+                if self.substage == 1:
+                    probs = [0.9, 0.1]
+                elif self.substage == 2:
+                    probs = [0.7, 0.3]
+                elif self.substage == 3:
+                    probs = [0.5, 0.5]
+                elif self.substage == 4:
+                    probs = [0.0, 1.0]
+
+                self.stage_sequence = random.choices([1, 2], weights=probs, k=40)
+                print("New Block — Substage:", self.substage)
+
+
+        print("stage_sequence = ", self.stage_sequence)
+        self.stage = self.stage_sequence[self.block_trial_counter]
+        print("Stage: ", self.stage)
+        print("Substage: ", self.substage)
 
         ### IMAGE Randomisation
         self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
@@ -414,8 +439,7 @@ class Probability_Handtracking_Gloves(Task):
 
             if self.stage == 2:
                 self.video_length = 1
-            if self.stage == 3:
-                self.video_length = 2
+
 
             if self.stage != 1:
                 # Figure out the full path to the video we want to play.
@@ -814,7 +838,7 @@ class Probability_Handtracking_Gloves(Task):
                     print('Telegram message not sent')
                     pass
 
-            if self.stage > self.last_backward_stage + 1:
+            if self.substage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
 
             # Side Bias Breaking formula:
@@ -876,7 +900,6 @@ class Probability_Handtracking_Gloves(Task):
             print("Block Number: ", self.block_number)
             print("Block Size: ", self.block_size)
             #print("Task Number: ", self.task_number)
-            print("Stage Number: ", self.stage)
             print("Block Change: ", self.block_change)
             print("Stage Change Forward: ", self.stage_forward_change)
             print("Stage Change Backward: ", self.stage_backward_change)
@@ -884,6 +907,7 @@ class Probability_Handtracking_Gloves(Task):
 
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
+            self.task_end = True
 
 
         ############ REGISTER VALUES ################
@@ -983,3 +1007,4 @@ class Probability_Handtracking_Gloves(Task):
         self.register_value('video_displayed', self.video_displayed)
         self.register_value('video_directory', self.video_directory)
         self.register_value('image_number', self.image_name)
+        self.register_value('stage_sequence', self.stage_sequence)

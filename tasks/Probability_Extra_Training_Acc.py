@@ -109,6 +109,8 @@ class Probability_Extra_Training_Acc(Task):
         self.last_backward_stage = 0       ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
         self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It needs to
 
+        self.task_end = False
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -552,6 +554,7 @@ class Probability_Extra_Training_Acc(Task):
             self.response_y = None
             self.trial_length = None
             self.trial_result = None
+            self.task_end = True
 
 
         ############ REGISTER VALUES ################

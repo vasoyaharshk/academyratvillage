@@ -121,6 +121,8 @@ class Probability_Training_BB_Size_Acc(Task):
         self.bias_accuracy_trials = []  # List that holds the last five success or failures.
         self.bias_accuracy = 0  # Accuracy of the last five trials.
 
+        self.task_end = False
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'task_number', 'block_size']
@@ -941,6 +943,7 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.response_x_array = []      #Clearing the array
         else:
             print("Task 2 ended because Core training completed. Task is now 3 so will move to Weber's law in next session.")
+            self.task_end = True
 
         ############ REGISTER VALUES ################
         self.register_value('stage', self.stage)

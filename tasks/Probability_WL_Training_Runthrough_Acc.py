@@ -137,6 +137,8 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.condition_trial_counter = 0
         self.conditions = []
 
+        self.task_end = False
+
     def get_stim_image_path(self, stim_trial, condition):
         """
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
@@ -882,6 +884,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
+            self.task_end = True
 
 
 

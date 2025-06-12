@@ -100,6 +100,8 @@ class Probability_WebersLaw_Post(Task):
 
         self.running_window = self.block  # This is the number of trials the accuracy is measured by. It will take accuracy for every 12 trials.
 
+        self.task_end = False
+
     def generate_alternating_conditions(self):
         # Define easy and hard conditions
         easy_conditions = [9, 10, 11, 12, 13, 14, 15, 16]
@@ -606,6 +608,7 @@ class Probability_WebersLaw_Post(Task):
             print("Stage is 5. All repetitions completed. Task Ended.")
             self.trial_length = 0.1
             self.trial_result = None
+            self.task_end = True
 
 
         ############ REGISTER VALUES ################
