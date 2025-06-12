@@ -361,7 +361,7 @@ class Probability_Handtracking_Zoomed(Task):
                 elif self.substage == 4:
                     probs = [0.0, 1.0]
 
-                self.stage_sequence = random.choices([1, 2], weights=probs, k=40)
+                self.stage_sequence = random.choices([1, 2], weights=probs, k=self.block_size)
                 print("New Block — Substage:", self.substage)
 
 
