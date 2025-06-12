@@ -570,6 +570,6 @@ class FakeTouch:
 
 try:
     touch = Touch(settings.TOUCHSCREEN_PORT, False, True, settings.WIN_RESOLUTION,
-                 settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM_X, settings.PIXELS_PER_MM_Y)
+                 settings.TOUCH_RESOLUTION, settings.PIXELS_PER_MM, settings.PIXELS_PER_MM_X, settings.PIXELS_PER_MM_Y)
 except Exception:
     touch = FakeTouch()
