@@ -14,11 +14,18 @@ class Probability_Handtracking_Zoomed(Task):
 
         self.image_name = None # Initialize image_name # NEW
         self.info = """
-        This task is for Bastos and Taylor for Probabilistic Inference training and test.
+        This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
+        mixed in.
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
         Stage 2 - Videos - starts from open hands and then closes as rat approaches.
-        Stage 3 - Jar Videos
+        
+        Substages:
+        Substage 1: 90% stage 1 and 10% stage 2
+        Substage 2: 70% stage 1 and 30% stage 2
+        Substage 3: 50% stage 1 and 50% stage 2
+        Substage 4: 100% stage 2
+        
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
@@ -311,7 +318,7 @@ class Probability_Handtracking_Zoomed(Task):
             self.stage_forward_change = 0
             self.last_forward_stage = self.substage  # Save current BEFORE increasing
             self.substage += 1
-            message = f"Stage moved forward to {self.substage} for {self.subject} in {self.task}"
+            message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
@@ -339,7 +346,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.moved_back_counter = 1
                 self.last_backward_stage = new_stage
             self.substage = new_stage
-            message = f"Stage moved backward to {self.substage} for {self.subject} in {self.task}"
+            message = f"Substage moved backward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except:
