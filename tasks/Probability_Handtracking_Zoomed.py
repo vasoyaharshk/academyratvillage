@@ -26,6 +26,8 @@ class Probability_Handtracking_Zoomed(Task):
         Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 74%.
         Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80.
         
+        if they hit 320 trials, move back one substage
+        
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
         Stage 2 - Videos - starts from open hands and then closes as rat approaches.
