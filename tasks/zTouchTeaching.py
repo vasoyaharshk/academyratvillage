@@ -3,7 +3,7 @@ from pybpodapi.protocol import Bpod
 from academy.utils import utils
 from user import settings
 
-class TouchTeaching(Task):
+class zTouchTeaching(Task):
 
     def __init__(self):
         super().__init__()

@@ -16,17 +16,20 @@ class Probability_Handtracking_Zoomed(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
+        
+        Substages:
+        Substages: Only the trials for stage 2 are counted for accuracy.
+        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%.
+        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%.
+        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%.
+        Substage 4: 75% stage 2 and 25% stage 1, accuracy criteria 70%.
+        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 74%.
+        Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80.
+        
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
         Stage 2 - Videos - starts from open hands and then closes as rat approaches.
         
-        Substages:
-        Substage 1: 90% stage 1 and 10% stage 2
-        Substage 2: 70% stage 1 and 30% stage 2
-        Substage 3: 50% stage 1 and 50% stage 2
-        Substage 4: 100% stage 2
-        
-
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
         Port 2 - PHOTOGATES 2: Photogates next to lickport. STARTS TRIAL
@@ -76,7 +79,7 @@ class Probability_Handtracking_Zoomed(Task):
         # Untracked Variables
         # ==============================
         # Task specific:
-        self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
+        self.accuracy_criteria = None  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.probabilities = []  # The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
@@ -144,7 +147,10 @@ class Probability_Handtracking_Zoomed(Task):
         self.video_directory = None
 
         self.stage_sequence = []
+        self.last_stage_trial = 0
         self.task_end = False
+
+        self.alert_sent = False
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -164,7 +170,20 @@ class Probability_Handtracking_Zoomed(Task):
                 trials.append(candidate)
         return trials
 
-
+    def generate_random_trials_stages(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+        trials = []
+        # Define a 50% probability for each stimulus (two stimuli)
+        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        while len(trials) < self.block_size:
+            # Use random.choices to select a candidate with 50% probability for each stimulus
+            candidate = random.choices(self.stage, probabilities)[0]
+            # Ensure no repetition more than twice in sequence
+            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
+                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
+                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
+                    continue  # Skip if the first trial of new block matches last trial of previous block
+                trials.append(candidate)
+        return trials
 
     def get_stim_image_path(self, stim_trial, stage):
         """
@@ -296,6 +315,15 @@ class Probability_Handtracking_Zoomed(Task):
         print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
+        self.accuracy_criteria_substage = {
+            1: 0.75,
+            2: 0.60,
+            3: 0.65,
+            4: 0.70,
+            5: 0.74,
+            6: 0.80
+        }
+
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
@@ -358,19 +386,29 @@ class Probability_Handtracking_Zoomed(Task):
 
         #Stage Assignment:
         if self.block_trial_counter == 0:
-            if self.substage in [1, 2, 3, 4]:
-                if self.substage == 1:
-                    probs = [0.9, 0.1]
-                elif self.substage == 2:
-                    probs = [0.7, 0.3]
-                elif self.substage == 3:
-                    probs = [0.5, 0.5]
-                elif self.substage == 4:
-                    probs = [0.0, 1.0]
+            # Set per-substage accuracy criteria
+            self.accuracy_criteria = self.accuracy_criteria_substage.get(self.substage, 0.8)
 
-                self.stage_sequence = random.choices([1, 2], weights=probs, k=self.block_size)
-                print("New Block — Substage:", self.substage)
+            stage2_counts = {
+                1: 4,  # 10%
+                2: 10,  # 25%
+                3: 20,  # 50%
+                4: 30,  # 75%
+                5: 35,  # 87.5%
+                6: 40  # 100%
+            }
+            stage2_n = stage2_counts.get(self.substage, 0)
+            stage1_n = self.block_size - stage2_n
 
+            if self.substage == 3:
+                self.stage = [1, 2]
+                self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
+            else:
+                # Deterministic: exact counts, then shuffle
+                self.stage_sequence = [1] * stage1_n + [2] * stage2_n
+                random.shuffle(self.stage_sequence)
+
+            self.last_stage_trial = self.stage_sequence[-1]
 
         print("stage_sequence = ", self.stage_sequence)
         self.stage = self.stage_sequence[self.block_trial_counter]
@@ -766,7 +804,8 @@ class Probability_Handtracking_Zoomed(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
-                self.block_valid_count += 1
+                if self.stage == 2:
+                    self.block_valid_count += 1
                 self.success = 0
                 self.block_trial_counter += 1
                 self.total_trials += 1
@@ -781,8 +820,9 @@ class Probability_Handtracking_Zoomed(Task):
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 #print('Correct_count: ', self.correct_count)
-                self.block_correct_count += 1
-                self.block_valid_count += 1
+                if self.stage == 2:
+                    self.block_correct_count += 1
+                    self.block_valid_count += 1
                 self.block_trial_counter += 1
                 self.success = 1
                 self.total_trials += 1
@@ -913,6 +953,17 @@ class Probability_Handtracking_Zoomed(Task):
             print("Stage Change Backward: ", self.stage_backward_change)
             print("Moved Back Counter: ", self.moved_back_counter)
 
+            if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent_substage5:
+                try:
+                    message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                    self.alert_sent_substage5 = True
+                except Exception as e:
+                    print("Telegram message not sent. Error:", e)
+
+            if self.substage != 5:
+                self.alert_sent_substage5 = False
+
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
             self.task_end = True
@@ -1016,3 +1067,4 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('video_directory', self.video_directory)
         self.register_value('image_number', self.image_name)
         self.register_value('stage_sequence', self.stage_sequence)
+        self.register_value('last_stage_trial', self.last_stage_trial)

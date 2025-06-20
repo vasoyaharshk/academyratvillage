@@ -690,6 +690,10 @@ def go_to_state(num):
             utils.subject.stage_sequence = ast.literal_eval(utils.subject.stage_sequence)
         utils.subject.stage_sequence = list(map(float, utils.subject.stage_sequence))
 
+        utils.subject.last_stage_trial = int(utils.subject.last_stage_trial)  #Cast to int
+
+
+
         #From subject to task:
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -734,8 +738,8 @@ def go_to_state(num):
         utils.task.reward_frequency = utils.subject.reward_frequency
         utils.task.reward_db = utils.subject.reward_db
         utils.task.reward_duration = utils.subject.reward_duration
-
         utils.task.stage_sequence = utils.subject.stage_sequence
+        utils.task.last_stage_trial = utils.subject.last_stage_trial
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task
