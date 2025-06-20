@@ -389,7 +389,7 @@ class Probability_Handtracking_Zoomed(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 5:
+            if self.substage == 7:
                 self.task_number = 5
                 self.tired = True
 
@@ -424,9 +424,6 @@ class Probability_Handtracking_Zoomed(Task):
 
         #Stage Assignment:
         if self.block_trial_counter == 0:
-            # Set accuracy criterion
-            self.accuracy_criteria = self.accuracy_criteria_substage.get(self.substage, 0.8)
-
             if self.substage == 3:
                 # For substage 3, use the balanced + no three-in-a-row generator
                 self.stage = [1, 2]
@@ -441,9 +438,6 @@ class Probability_Handtracking_Zoomed(Task):
             self.last_stage_trial = self.stage_sequence[-1]
 
             print("stage_sequence = ", self.stage_sequence)
-            self.stage = self.stage_sequence[self.block_trial_counter]
-            print("Stage: ", self.stage)
-            print("Substage: ", self.substage)
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
 
@@ -471,6 +465,14 @@ class Probability_Handtracking_Zoomed(Task):
             else:
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
+
+            self.stage = self.stage_sequence[self.block_trial_counter]
+            print("Stage: ", self.stage)
+            print("Substage: ", self.substage)
+
+            # Set accuracy criterion
+            self.accuracy_criteria = self.accuracy_criteria_substage.get(self.substage, 0.8)
+            print("Accuracy Criteria: ", self.accuracy_criteria)
 
             #self.stim_trial = 121  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
 
