@@ -152,8 +152,46 @@ class Probability_Handtracking_Zoomed(Task):
 
         self.alert_sent = False
 
+        self.stage2_proportions = {
+            1: 0.10,
+            2: 0.25,
+            3: 0.50,
+            4: 0.75,
+            5: 0.875,
+            6: 1.00
+        }
+
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
+
+    def get_stage_sequence(self, block_size=None, substage=None, last_stage_trial=None):
+        """
+        Returns a randomised stage sequence for the given block size and substage,
+        using the correct proportions for stage 1 and stage 2 trials.
+        For substages other than 3, just returns the correct shuffled sequence.
+        """
+        if block_size is None:
+            block_size = self.block_size
+        if substage is None:
+            substage = self.substage
+
+        prop = self.stage2_proportions.get(substage, 0)
+        stage2_n = int(round(block_size * prop))
+        stage1_n = block_size - stage2_n
+
+        # Always generate the exact number required for each
+        sequence = [1] * stage1_n + [2] * stage2_n
+        random.shuffle(sequence)
+
+        # Ensure the first trial is not the same as last_stage_trial (if provided)
+        if last_stage_trial is not None and sequence[0] == last_stage_trial:
+            # Try to swap with another trial
+            for i in range(1, len(sequence)):
+                if sequence[i] != last_stage_trial:
+                    sequence[0], sequence[i] = sequence[i], sequence[0]
+                    break
+
+        return sequence
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -386,34 +424,29 @@ class Probability_Handtracking_Zoomed(Task):
 
         #Stage Assignment:
         if self.block_trial_counter == 0:
-            # Set per-substage accuracy criteria
+            # Set accuracy criterion
             self.accuracy_criteria = self.accuracy_criteria_substage.get(self.substage, 0.8)
 
-            stage2_counts = {
-                1: 4,  # 10%
-                2: 10,  # 25%
-                3: 20,  # 50%
-                4: 30,  # 75%
-                5: 35,  # 87.5%
-                6: 40  # 100%
-            }
-            stage2_n = stage2_counts.get(self.substage, 0)
-            stage1_n = self.block_size - stage2_n
-
             if self.substage == 3:
+                # For substage 3, use the balanced + no three-in-a-row generator
                 self.stage = [1, 2]
                 self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
             else:
-                # Deterministic: exact counts, then shuffle
-                self.stage_sequence = [1] * stage1_n + [2] * stage2_n
-                random.shuffle(self.stage_sequence)
-
+                # For all other substages, use the general modular function
+                self.stage_sequence = self.get_stage_sequence(
+                    block_size=self.block_size,
+                    substage=self.substage,
+                    last_stage_trial=self.last_stage_trial
+                )
             self.last_stage_trial = self.stage_sequence[-1]
 
-        print("stage_sequence = ", self.stage_sequence)
-        self.stage = self.stage_sequence[self.block_trial_counter]
-        print("Stage: ", self.stage)
-        print("Substage: ", self.substage)
+            print("stage_sequence = ", self.stage_sequence)
+            self.stage = self.stage_sequence[self.block_trial_counter]
+            print("Stage: ", self.stage)
+            print("Substage: ", self.substage)
+
+        #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
+
 
         ### IMAGE Randomisation
         self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
