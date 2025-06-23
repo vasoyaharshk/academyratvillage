@@ -111,7 +111,7 @@ class Automatic_Water(Task):
         print('Trial: ' + str(self.current_trial))
 
         # flooding AVOIDANCE
-        if self.miss_acc_counter > 3000:
+        if self.miss_acc_counter > 300:
             flooding = 'Wait_for_reward'
         else:
             flooding = 'Automatic_reward'
@@ -139,7 +139,7 @@ class Automatic_Water(Task):
         self.sma.add_state(
             state_name='Fixation',  # if animal licks during fixation, this is started again.
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break'},
+            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: flooding},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
@@ -158,7 +158,7 @@ class Automatic_Water(Task):
 
         self.sma.add_state(
             state_name='Wait_for_reward',
-            state_timer=30,
+            state_timer=55,
             state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
             output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)])
             # lickportLED and RWsound remain ON until poke o timeup
@@ -177,7 +177,7 @@ class Automatic_Water(Task):
 
         self.sma.add_state(
             state_name='Exit',
-            state_timer=10,
+            state_timer=60,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 222), (Bpod.OutputChannels.PWM6, 5)])
             # Wait 10 sec for the next automatic reward
