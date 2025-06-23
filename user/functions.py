@@ -2319,3 +2319,12 @@ def function255():  # When the correct answer is on left
 # def loop255(timing):
 #     image_jar_left.draw()
 #     window.flip()
+
+def function225():
+    try:
+        frequency = utils.task.reward_frequency
+        db = utils.task.reward_db
+        play_any_frequency(frequency, duration=3, db=db)
+        print(f"Played frequency: {frequency} Hz at {db} dB SPL")
+    except Exception as e:
+        print(f"Error in function255: {e}")

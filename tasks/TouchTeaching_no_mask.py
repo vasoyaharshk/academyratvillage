@@ -242,9 +242,7 @@ class TouchTeaching_no_mask(Task):
         self.sma.add_state(
             state_name='Stimulus_Display',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Port4In: 'Response_window',
-                                     Bpod.Events.Port5In: 'Response_window',
-                                     Bpod.Events.Port6In: 'Response_window'}, # starts the response window
+            state_change_conditions={Bpod.Events.Port6In: 'Response_window'}, # starts the response window
             output_actions=[(Bpod.OutputChannels.SoftCode, self.stim)])  #shows the stimuli
 
         self.sma.add_state(

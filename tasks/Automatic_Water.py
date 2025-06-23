@@ -1,8 +1,10 @@
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
+from academy import telegram_bot
 
-class Test_Water_Pump(Task):
+
+class Automatic_Water(Task):
 
     def __init__(self):
         super().__init__()
@@ -17,8 +19,8 @@ class Test_Water_Pump(Task):
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - BUZZER: valve (16kHz): correct
         Port 4 - PHOTOGATES 0: Photogates next to lickport & Global LED
-        
-        
+
+
         ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -26,43 +28,31 @@ class Test_Water_Pump(Task):
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
-        
-        
         """
-
-
-
-
 
     def init_variables(self):
         # general
-        self.duration_min = 1200  # 20 mins
-        self.duration_max = 1260 #21 mins
+        self.duration_max = 3000
+        self.duration_min = 2100
+        self.trials_max = 300
         self.stage = 0
         self.substage = 0
 
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1.8
+        self.valve_factor_c = 4.0  # More reward for correct. 2.0 = 50uL
 
         # counters
         self.miss_acc_counter = 0
         self.reward_drunk = 0
 
-
-    def configure_gui(self): # Variables that appear in the GUI
+    def configure_gui(self):  # Variables that appear in the GUI
         pass
 
     def main_loop(self):
         print('')
         print('Trial: ' + str(self.current_trial))
-
-        # FLOADING AVOIDANCE
-        if self.miss_acc_counter >= 10:  #Task will stop pumping water after this many trials
-            floading = 'Wait_for_reward'
-        else:
-            floading = 'Automatic_reward'
 
         if self.current_trial == 0:
             self.sma.add_state(
@@ -70,7 +60,7 @@ class Test_Water_Pump(Task):
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.PWM6, 5)])
-                # global LED ON
+            # global LED ON
 
             self.sma.add_state(
                 state_name='Real_start',  # close corridor door 2 when subject enters to behavioral box
@@ -87,7 +77,7 @@ class Test_Water_Pump(Task):
         self.sma.add_state(
             state_name='Fixation',  # if animal licks during fixation, this is started again.
             state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: floading},
+            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break'},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
@@ -100,40 +90,57 @@ class Test_Water_Pump(Task):
             state_name='Automatic_reward',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)])
-            # Automatic water, lickportLED, and Reward sound
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1),
+                            (Bpod.OutputChannels.PWM6, 1),
+                            (Bpod.OutputChannels.SoftCode, 220)])
+        # Automatic water, lickportLED, and Reward sound
 
         self.sma.add_state(
             state_name='Wait_for_reward',
-            state_timer=1,
+            state_timer=60,
             state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
             output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)])
-            # lickportLED and RWsound remain ON until poke o timeup
+        # lickportLED and RWsound remain ON until poke o timeup
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 8)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 12),(Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.SoftCode, 12), (Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
             state_name='Exit',
-            state_timer=1,
+            state_timer=120,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 17), (Bpod.OutputChannels.PWM6, 5)])
-            # Wait 10 sec for the next automatic reward
-
+            output_actions=[(Bpod.OutputChannels.SoftCode, 222), (Bpod.OutputChannels.PWM6, 5)])
+        # Wait 10 sec for the next automatic reward
 
     def after_trial(self):
+        # Frequency verification
+        # expected = self.reward_frequency_map.get(self.subject, None)
+        # actual = self.reward_frequency
+        #
+        # if expected is None:
+        #     message = f"URGENT: No expected frequency set for '{self.subject}'"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
+        # elif round(expected, 2) != round(actual, 2):
+        #     message = f"🚨 URGENT: Frequency mismatch for {self.subject} — expected {expected} Hz, got {actual} Hz"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except:
+        #         print('Telegram message not sent')
 
         # Trial Counter
-        if self.current_trial_states['Miss'][0][0] > 0: # Missed trial
+        if self.current_trial_states['Miss'][0][0] > 0:  # Missed trial
             self.register_value('trial_result', 'miss')
             self.register_value('response_x', '')  # we add '' here to easily compare with other tasks
             self.register_value('response_y', '')  # we add '' here to easily compare with other tasks
@@ -150,5 +157,6 @@ class Test_Water_Pump(Task):
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('trial_result', 'correct_first')
+        # self.register_value('reward_frequency', 'self.reward_frequency')
 
 

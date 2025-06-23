@@ -158,6 +158,22 @@ def select_task(df, subject):
         n_trials = df_last1[df_last1.trial_result != 'miss'].trial.count()
         n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
+        if task == 'Automatic_Water':
+            wait_seconds = 3600 * 1
+            prev_session = df.loc[df['session'] == last_session - 2].iloc[-1]
+            wait_seconds = 3600 * 5
+            task = prev_session.task
+            stage = float(prev_session.stage)
+            #Here have all the weber's law variables that needs to be assinged.
+            message = f"Advance from Automatic_Water to {task}"
+            try:
+                telegram_bot.alarm_finish_session(message, my_subject)
+                telegram_bot.alarm_completed_criteria(task, my_subject)
+            except:
+                print('Telegram message not sent')
+                pass
+
+
         if task == 'Habituation':
             wait_seconds = 3600 * 1
             if len(df_last3.session.unique())>=3: # Pass after 3 sessions
