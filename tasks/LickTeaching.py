@@ -172,9 +172,7 @@ class LickTeaching(Task):
             self.register_value('response_x', 0)  # we add a zero here to easily compare with other tasks
             self.register_value('response_y', 0)  # we add a zero here to easily compare with other tasks
             self.miss_acc_counter = 0
-
-        if self.current_trial_states['Automatic_reward'][0][0] > 0:
-            self.reward_drunk += self.valve_reward
+            self.reward_drunk += self.valve_reward * self.valve_factor_c
 
         # Relevant prints
         self.register_value('reward_drunk', self.reward_drunk)

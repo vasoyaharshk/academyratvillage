@@ -17,8 +17,6 @@ class Test_Sound_Task(Task):
     def main_loop(self):
         print(f"Reward tone: {self.reward_frequency} Hz, {self.reward_db} dB")
 
-        self.reward_frequency = 250.0     # Hz, float allowed
-        self.reward_db = 100           # dB SPL
 
         self.sma.add_state(
             state_name='Wait_for_Poke',

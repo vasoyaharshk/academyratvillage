@@ -295,6 +295,7 @@ class TouchTeaching_no_mask(Task):
             self.trial_result = 'miss'
         elif self.current_trial_states['Correct'][0][0] > 0:
             self.trial_result = 'correct'
+            self.reward_drunk += self.valve_reward * self.valve_factor_c
 
 
         self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]

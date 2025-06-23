@@ -50,6 +50,8 @@ self.stim_trial = 0  # The function number of the correct stimulus in the curren
 self.stim_trials = []  # List of correct stimulus function randomised.
 self.stim_trial_counter = 0  #It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
 self.last_stim_trial = 0  #the function of the last trial of the previous block. Used to ensure first trial of next block is different
+self.max_move_backs = 0
+self.stage_sequence = []
 
 #Only defined in select_task:
 self.wait_seconds = 0  # Time between two sessions.
