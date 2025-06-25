@@ -53,7 +53,7 @@ class TouchTeaching_no_mask(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1.0  # More reward for correct. 2.0 = 50uL
+        self.valve_factor_c = 3.0  # More reward for correct. 2.0 = 50uL
         #self.valve_factor_i = 0.0 #Less reward for misses
 
         # counters
@@ -309,6 +309,7 @@ class TouchTeaching_no_mask(Task):
         self.register_value('zone_min', self.zone_min)
         self.register_value('zone_max', self.zone_max)
         self.register_value('x_zone_trials', self.x_zone_trials)
+        self.register_value('valve_factor_c', self.valve_factor_c)
 
         #Trial Information:
         self.register_value('trial_length', self.trial_length)

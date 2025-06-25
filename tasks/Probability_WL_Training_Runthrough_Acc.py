@@ -55,7 +55,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 2.0  # Normal water delivery of 25ul multiplied by this
+        self.valve_factor_c = 3.0  # Normal water delivery of 25ul multiplied by this
 
         # counters for trials:
         self.valid_counter = 0
@@ -922,6 +922,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
         self.register_value('bias_accuracy', self.bias_accuracy)
         self.register_value('response_x_array', self.response_x_array)
+        self.register_value('valve_factor_c', self.valve_factor_c)
         # #Weber's Law:
         # self.register_value('block', self.block)
         # self.register_value('conditions', self.conditions)
