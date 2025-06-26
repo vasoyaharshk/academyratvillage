@@ -129,11 +129,13 @@ def select_task(df, subject):
     stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
     stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
     moved_back_counter = get_val_from_df_or_default('moved_back_counter', 0)
-    max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
     last_forward_stage = get_val_from_df_or_default('last_forward_stage', 0)
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
     stage_sequence = get_val_from_df_or_default('stage_sequence', [])
     last_stage_trial  = get_val_from_df_or_default('last_stage_trial', 0)
+
+    #Not tracked:
+    max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
 
     #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():
