@@ -846,9 +846,9 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.stage_forward_change = 1  # Indicate that a stage change is due
                 else:
                     print("Accuracy criteria not met.")
-
-            if self.total_trials >= self.trial_end_criteria:
-                self.stage_backward_change = 1
+                #Trial limit check (set backward ONLY if forward is NOT happening)
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
+                    self.stage_backward_change = 1
 
             #Assign in pass what to do when the rat is moved back more than 5 times.
             if self.moved_back_counter > self.max_move_backs:
