@@ -1,24 +1,22 @@
-from user import settings
 from academy.utils import utils
+import os
+# from user.sound_elements_version1 import *
+import random
+import re
+
+from academy import telegram_bot
 from academy.camera import cam2, cam3
 from academy.touch import touch
+from academy.utils import utils
 from user.psychopy_elements import *
-#from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
+# from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
 from user.sound_elements import *
-#from user.sound_elements_version1 import *
-import random
-import os
-import re
-from academy import telegram_bot
 
 #To avoid the video logs debugging prints. Comment this part if there is a need to debug:
 os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"  # Ensure FFmpeg path is set
 os.environ["IMAGEIO_FFMPEG_LOGLEVEL"] = "error"  # Suppress FFmpeg logs
 os.environ["FFREPORT"] = "quiet"  # Fully disable FFmpeg reports
 os.environ["IMAGEIO_NO_INTERNET"] = "1"  # Prevent external FFmpeg updates
-
-
-import traceback
 
 # when softcode n is called, function n runs once
 # then loop n runs until another softcode is called
@@ -1958,8 +1956,8 @@ def function204(): #Touchteaching read touchscreen
     py = settings.PIXELS_PER_MM_Y
 
     print("Stage= ", stage)
-    width = (utils.task.width + 100) * px
-    height = (utils.task.height + 100) * py
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
     x_correct = utils.task.x_correcth_pos * px
     y = utils.task.y_correcth_pos * py
 
