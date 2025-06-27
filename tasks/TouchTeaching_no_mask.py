@@ -172,7 +172,7 @@ class TouchTeaching_no_mask(Task):
             self.stim = 202
 
             # Y fixed: 20 cm (200 mm) from top → translate to coordinate system where Y=0 is top
-            self.y_correcth_pos = 152  # in mm
+            self.y_correcth_pos = 170  # in mm
             self.width =  75
             self.height = 75
 
