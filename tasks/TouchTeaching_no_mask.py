@@ -104,7 +104,7 @@ class TouchTeaching_no_mask(Task):
         self.zone_max = None
 
         self.y_value_trials = []        #This is to randomise the y trials
-        self.y_choices = [140, 152, 165]        #Y-correcth positions to randomise with
+        self.y_choices = [155, 170, 185]        #Y-correcth positions to randomise with
 
 
     # def generate_non_repeating_block(self, values, block_size=40):

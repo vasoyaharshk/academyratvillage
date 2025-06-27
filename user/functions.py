@@ -1958,8 +1958,8 @@ def function204(): #Touchteaching read touchscreen
     py = settings.PIXELS_PER_MM_Y
 
     print("Stage= ", stage)
-    width = (utils.task.width + 100) * px
-    height = (utils.task.height + 100) * py
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
     x_correct = utils.task.x_correcth_pos * px
     y = utils.task.y_correcth_pos * py
 

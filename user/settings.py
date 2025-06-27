@@ -42,10 +42,10 @@ BPOD_WIRED_PORTS_ENABLED = [False, False]
 BPOD_BEHAVIOR_PORTS_ENABLED = [True, True, True, True, True, True, False, False]  # ports that are activated
 BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, False]  # ports that deliver water
 
-
+XINPUT = 'xinput map-to-output 14 DP-3-2'     #For RV 1 in laptop
+SCREEN_NUMBER = 2
 # touchscreen:
 #For RV 1:
-# XINPUT = 'xinput map-to-output 14 DP-3-3-1'     #For RV 1 in laptop
 # WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 # WIN_RESOLUTION = [1280, 1024]
 # TOUCH_RESOLUTION = [4096, 4096]
@@ -64,12 +64,11 @@ WIN_SIZE = [400, 250]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 720]
 TOUCH_RESOLUTION = [4096, 4096]
 CENTRE_SCREEN = [640, -360]          #This variable points to the centre of the screen. Essential for displaying images.
-SCREEN_NUMBER = 1
 VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), int(WIN_RESOLUTION[1] / 2)]  #Flipped to top left.
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.0
-PIXELS_PER_MM_X = 3.2
-PIXELS_PER_MM_Y = 2.88
+PIXELS_PER_MM_X = 3.0
+PIXELS_PER_MM_Y = 3.0
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 
