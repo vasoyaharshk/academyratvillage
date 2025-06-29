@@ -220,7 +220,7 @@ def select_task(df, subject):
                     pass
                 if stage == 1:
                     stage = 2.0
-                if stage == 2:
+                elif stage == 2:
                     stage = 3.0
                 elif stage == 3:
                     task = 'Probability_Extra_Training_Acc'
