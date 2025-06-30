@@ -95,8 +95,8 @@ class TouchTeaching_no_mask(Task):
 
 
         #Variables for x positions:
-        self.min_x_mm = 112
-        self.max_x_mm = settings.WIN_SIZE[0] - 112  # screen width in mm - 60 mm margin
+        self.min_x_mm = 80
+        self.max_x_mm = settings.WIN_SIZE[0] - 80  # screen width in mm - 60 mm margin
         self.screen_third = (self.max_x_mm - self.min_x_mm) // 3  #1/3rd of the screen
         self.x_zone_trials = []  # stores zone (1,2,3) for each trial in current block
         self.current_x_zone = None
