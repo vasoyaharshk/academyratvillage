@@ -38,7 +38,9 @@ class Probability_Handtracking_Zoomed(Task):
         Port 3 - PHOTOGATES 3: Photogates. DOES NOTHING
         Port 4 - PHOTOGATES 4: Photogates. DOES NOTHING
         Port 5 - PHOTOGATES 5: Photogates. STARTS THE VIDEO 
-        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED. STARTS THE RESPONSE WINDOW    
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED. STARTS THE RESPONSE WINDOW
+        
+        IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
         """
 
         # ==============================
@@ -60,7 +62,7 @@ class Probability_Handtracking_Zoomed(Task):
         self.total_trials = 0  # Total trials across the task.
         self.block_correct_count = 0  # Number of correct responses in the block
         self.block_valid_count = 0  # Number of valid (non-missed) trials in the block
-        self.condition_trial_counter = 0  # Counter for randomising conditions
+        self.condition_trial_counter = 0  # Counter for randomising conditions and for TOTAL TRIALS IN HANDTRACKING FOR TASK END CRITERIA.
         self.last_forward_stage = 0  # The stage moved forward from after a forward change
         self.last_backward_stage = 0  # The stage moved backward to after the last backward change
         self.moved_back_counter = 0  # Counter for how many times the subject moved back a stage
@@ -83,6 +85,7 @@ class Probability_Handtracking_Zoomed(Task):
         # Task specific:
         self.accuracy_criteria = None  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
+        self.task_end_criteria = 1600  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.probabilities = []  # The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 
@@ -160,8 +163,11 @@ class Probability_Handtracking_Zoomed(Task):
             3: 0.50,
             4: 0.75,
             5: 0.875,
-            6: 1.00
+            6: 1.00,
+            7: 1.00
         }
+
+        self.fixation_trigger_port = Bpod.Events.Port6In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -361,7 +367,8 @@ class Probability_Handtracking_Zoomed(Task):
             3: 0.65,
             4: 0.70,
             5: 0.74,
-            6: 0.80
+            6: 0.80,
+            7: 0.80
         }
 
         if self.current_trial == 0:
@@ -391,7 +398,7 @@ class Probability_Handtracking_Zoomed(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 7:
+            if self.substage == 8:
                 self.task_number = 5
                 self.tired = True
 
@@ -539,6 +546,12 @@ class Probability_Handtracking_Zoomed(Task):
 
             #print("image_path_function: ", self.image_path_function)
             #print("video_path_function: ", self.video_path_function)
+
+            # Decide which port triggers video for this trial
+            if self.substage == 7:
+                self.fixation_trigger_port = Bpod.Events.Port5In
+            else:
+                self.fixation_trigger_port = Bpod.Events.Port6In
 
         ############ STATE MACHINE ################
         # First trial:
@@ -707,7 +720,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.sma.add_state(
                     state_name='Fixation', # displays image
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port5In: 'Start_Video'}, # This starts the video when they cross photogate port 5 is crossed .
+                    state_change_conditions={self.fixation_trigger_port: 'Start_Video'}, # This starts the video when they cross photogate port 5 is crossed .
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Change the number in Port5In to select which photogate
 
@@ -830,9 +843,6 @@ class Probability_Handtracking_Zoomed(Task):
     def after_trial(self):
         if self.task_number == 4:
 
-            # self.block_trial_counter += 1  # For counting the blocks
-
-
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
                 self.trial_result = 'miss'
@@ -846,6 +856,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.success = 0
                 self.block_trial_counter += 1
                 self.total_trials += 1
+                self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -863,6 +874,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.block_trial_counter += 1
                 self.success = 1
                 self.total_trials += 1
+                self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
 
@@ -1001,6 +1013,15 @@ class Probability_Handtracking_Zoomed(Task):
             if self.substage != 5:
                 self.alert_sent_substage5 = False
 
+
+            if self.condition_trial_counter >= self.task_end_criteria:
+                try:
+                    message = f"URGENT: {self.subject} has completed 1600 trials in this task."
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print("Telegram message not sent. Error:", e)
+                self.task_end = True
+
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
             self.task_end = True
@@ -1034,6 +1055,7 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('correct_count', self.correct_count)
         self.register_value('accuracy', self.accuracy)
 
+
         # Stimulus-related
         self.register_value('stim', self.stim)
         self.register_value('x_correcth_pos', self.x_correcth_pos)
@@ -1057,6 +1079,7 @@ class Probability_Handtracking_Zoomed(Task):
         # Criteria
         self.register_value('accuracy_criteria', self.accuracy_criteria)
         self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('task_end_criteria', self.task_end_criteria)
         self.register_value('max_move_backs', self.max_move_backs)
 
         # Trial/block tracking
@@ -1070,6 +1093,7 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('total_trials', self.total_trials)
         self.register_value('block_correct_count', self.block_correct_count)
         self.register_value('block_valid_count', self.block_valid_count)
+        self.register_value('condition_trial_counter', self.condition_trial_counter)
 
         # Stimulus trial control
         self.register_value('stim_trial', self.stim_trial)
