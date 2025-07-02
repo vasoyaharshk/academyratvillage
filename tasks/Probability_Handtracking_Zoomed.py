@@ -25,6 +25,7 @@ class Probability_Handtracking_Zoomed(Task):
         Substage 4: 75% stage 2 and 25% stage 1, accuracy criteria 70%.
         Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 74%.
         Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80.
+        Substage 7: 100% stage 2 and 0% stage 1, accuracy criteria 80. The photogate that triggers the video is 5
         
         if they hit 320 trials, move back one substage
         
