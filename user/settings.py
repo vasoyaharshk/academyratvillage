@@ -43,15 +43,15 @@ BPOD_BEHAVIOR_PORTS_ENABLED = [True, True, True, True, True, True, False, False]
 BPOD_BEHAVIOR_PORTS_WATER = [True, False, False, False, False, False, False, False]  # ports that deliver water
 
 
-# touchscreen
-#XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." HDMI1'   # <-- TO CHANGE
-XINPUT = 'xinput map-to-output "Touch__KiT Touch  Computer INC." DP-2'   # <-- TO CHANGE
+# touchscreen:
+#For RV 1:
+XINPUT = 'xinput map-to-output 14 DP-3-3-1'     #For RV 1 in laptop
 WIN_SIZE = [375, 300]  # in mm. 410 and 250 is for touchscreen
 WIN_RESOLUTION = [1280, 1024]
 TOUCH_RESOLUTION = [4096, 4096]
-CENTRE_SCREEN = [640, -512]          #This variable points to the centre of the screen. Essential for displaying images.
+CENTRE_SCREEN = [640, 512]          #This variable points to the centre of the screen. Essential for displaying images.
 SCREEN_NUMBER = 0
-VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), int(WIN_RESOLUTION[1] / 2)]
+VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), -int(WIN_RESOLUTION[1] / 2)]
 WIN_COLOR = [-1, -1, -1]
 PIXELS_PER_MM = 3.4
 PIXELS_PER_MM_X = 3.4
@@ -59,10 +59,28 @@ PIXELS_PER_MM_Y = 3.4
 STIM_WIDTH = 40  # mm
 TIME_BETWEEN_RESPONSES = 0.5
 
+# # #For RV 2:
+# WIN_SIZE = [400, 250]  # in mm. 410 and 250 is for touchscreen
+# WIN_RESOLUTION = [1280, 720]
+# TOUCH_RESOLUTION = [4096, 4096]
+# CENTRE_SCREEN = [640, -360]          #This variable points to the centre of the screen. Essential for displaying images.
+# SCREEN_NUMBER = 1
+# VIEW_POSITION = [-int(WIN_RESOLUTION[0] / 2), int(WIN_RESOLUTION[1] / 2)]  #Flipped to top left.
+# WIN_COLOR = [-1, -1, -1]
+# PIXELS_PER_MM = 3.0
+# PIXELS_PER_MM_X = 3.2
+# PIXELS_PER_MM_Y = 2.88
+# STIM_WIDTH = 40  # mm
+# TIME_BETWEEN_RESPONSES = 0.5
+
+#General:
+
+
+
 
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICECAGE = 25  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
+NOMICECAGE = 5000  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 50  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
@@ -71,13 +89,13 @@ ONEMOUSE = 3000  # if area_total > ONEMOUSE animal can not enter         # <-- T
 SEVERALMICE = 14000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
-THRESHOLD_DAY_CAGE1 = 25                                                  # <-- TO CHANGE
+THRESHOLD_DAY_CAGE1 = 60                                                  # <-- TO CHANGE
 THRESHOLD_DAY_CAGE2 = 30
 THRESHOLD_DAY_DOOR1 = 30                                                 # <-- TO CHANGE. Harsh-Done. Cannot incraese to 60 becuase the
 THRESHOLD_DAY_DOOR2 = 60                                                 # <-- TO CHANGE
 
-THRESHOLD_NIGHT_CAGE1 = 15                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
-THRESHOLD_NIGHT_CAGE2 = 15                                               # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
+THRESHOLD_NIGHT_CAGE1 = 20                                                # <-- TO CHANGE Harsh-Done                                               # <-- TO CHANGE Harsh-Done
+THRESHOLD_NIGHT_CAGE2 = 25                                                # <-- TO CHANGE Harsh-Done                                             # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR1 = 40                                              # <-- TO CHANGE Harsh-Done.
 THRESHOLD_NIGHT_DOOR2 = 40                                               # <-- TO CHANGE Harsh-Done
 
@@ -91,7 +109,7 @@ DETECTION_WAITING_MINUTES = 25   #This is the amount of time animals are not all
 TIME_TO_ENTER = 4               # time between session and session (hours)            # <-- TO CHANGE
 LONGER_TIME_TO_ENTER = [] #animals with longer inter session times      # <-- TO CHANGE
 
-# camera
+# camera corridor
 CAM1_NUMBER = 1
 CAM1_NAME_VIDEO = 'Cor'
 CAM1_WIDTH = 640
@@ -102,10 +120,10 @@ CAM1_STATES = {}
 CAM1_DURATION_VIDEO = 1800
 CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
-CAM1_CAGE_ZONE1 = [50, 135, 95, 200]       # <-- TO CHANGE left, right, top, down
-CAM1_CAGE_ZONE2 = [45, 225, 200, 300]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [225, 460, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [460, 560, 265, 290]   # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE1 = [120, 200, 85, 220]       # <-- TO CHANGE left, right, top, down
+CAM1_CAGE_ZONE2 = [120, 180, 220, 300]     # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [180, 460, 260, 295]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_DOORS2_ZONE = [460, 620, 265, 290]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
@@ -125,8 +143,10 @@ CAM2_STATES = {
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 70
-CAM2_DOORS1_ZONE = [125, 500, 140, 370]
-CAM2_DOORS2_ZONE = [1, 2, 1, 2]
+CAM2_DOORS1_ZONE = [1, 2, 1, 2]
+CAM2_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
+CAM2_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
+CAM2_FLOOR2_ZONE = [7, 8, 7, 8]
 
 CAM3_NUMBER = 3
 CAM3_NAME_VIDEO = "BB"
@@ -140,28 +160,23 @@ CAM3_STATES = {"Correct": (600, 30),
                "Miss": (600, 130),
     "Resp Win": (600, 160),
 }
-CAM3_DURATION_VIDEO = 0
+CAM3_DURATION_VIDEO = 0             # CAM 3 is waterport Camera
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 70                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
-#CAM3_DOORS1_ZONE = [550, 600, 150, 350]     # <-- TO CHANGE  left, right, top, down
-CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
-#CAM3_DOORS2_ZONE = [1, 10, 330, 340]    # <-- TO CHANGE left, right, top, down
+#CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
-#CAM3_FLOOR1_ZONE = [100, 640, 10, 170]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
-#CAM3_FLOOR2_ZONE = [100, 640, 310, 470]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR2_ZONE = [7, 8, 7, 8]    # <-- TO CHANGE left, right, top, down
+CAM3_DOORS1_ZONE = [200, 500, 30, 270]
 CAM3_FLOOR_ON = True
 CAM3_TRACKING_POSITION = True
 
 # telegram
-TELEGRAM_TOKEN = "6745482132:AAFLKnMmUZU0G2ImH7DR3Ak8cRkNdQy3zRc"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002317343440"  # <-- TO CHANGE
+TELEGRAM_TOKEN = ""  # <-- TO CHANGE
+TELEGRAM_CHAT = ""  # <-- TO CHANGE
 TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
+''
 }
 
 #AWS
@@ -169,11 +184,11 @@ OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
 TASK_TABLE = "task_times"  # <-- TO CHANGE
 
 # other
-BOX_NAME = 3                         # <-- TO CHANGE
+BOX_NAME = 4                         # <-- TO CHANGE
 
 DEFAULT_TRIALS_MIN = 0
 DEFAULT_DURATION_MIN = 0  # seconds
-DEFAULT_TRIALS_MAX = 500
+DEFAULT_TRIALS_MAX = 75
 DEFAULT_DURATION_MAX = 36000  # seconds
 DEFAULT_TRIALS_TIRED = 500
 DEFAULT_DURATION_TIRED = 36000  # seconds
@@ -188,7 +203,7 @@ MAXIMUM_TEMPERATURE = 30
 MAXIMUM_TIME = 7200  # in seconds
 
 INACTIVE_SUBJECTS = ["None"]  # subjects that don't raise alarms and not save data
-TESTING = False  # if true academy works without cams, arduino, screen or bpod
+TESTING = True  # if true academy works without cams, arduino, screen or bpod
 
 OVERDETECTIONS = 50000
 
@@ -196,5 +211,3 @@ OVERDETECTIONS = 50000
 #RV 2 Sound:
 INCORRECT_FREQ = 1368.5
 INCORRECT_DB = 70.0
-
-ENABLE_EXIT_WEIGHING = True
