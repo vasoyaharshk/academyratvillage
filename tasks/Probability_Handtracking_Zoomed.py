@@ -27,6 +27,17 @@ class Probability_Handtracking_Zoomed(Task):
         Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80.
         Substage 7: 100% stage 2 and 0% stage 1, accuracy criteria 80. The photogate that triggers the video is 5
         
+        Stage 3: Introduction of the yellow tokens:
+        Substage 8: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 6.
+        Substage 9: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5.
+        
+        Stage 4: Introduction of hands crossing:
+        Substage 10: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. 
+        Substage 11: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side.
+        
+        Only if rats fail at substage 11:
+        Substage 12: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side.
+        
         if they hit 320 trials, move back one substage
         
         Stages:
@@ -249,11 +260,9 @@ class Probability_Handtracking_Zoomed(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
-            elif stage == 3:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_images'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -312,13 +321,24 @@ class Probability_Handtracking_Zoomed(Task):
                 position = 'right'
             else:
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
+
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
             elif stage == 3:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/'
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
+            elif stage == 4:
+                if self.substage == 10:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
+                elif self.substage == 11:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
+                elif self.substage == 12:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
+                else:
+                    raise ValueError("Invalid substage for stage 4")
             else:
-                raise ValueError(f"Invalid stage value: {stage}.")
+                raise ValueError(f"Invalid stage: {stage}")
+
             # Get relevant videos based on position
             videos = [f for f in os.listdir(video_folder) if
                       os.path.isfile(os.path.join(video_folder, f)) and
@@ -369,7 +389,12 @@ class Probability_Handtracking_Zoomed(Task):
             4: 0.70,
             5: 0.74,
             6: 0.80,
-            7: 0.80
+            7: 0.80,
+            8: 0.80,
+            9: 0.80,
+            10: 0.80,
+            11: 0.80,
+            12: 0.80,
         }
 
         if self.current_trial == 0:
@@ -433,21 +458,26 @@ class Probability_Handtracking_Zoomed(Task):
         #self.stim = [111, 112] for video
 
         #Stage Assignment:
-        if self.block_trial_counter == 0:
-            if self.substage == 3:
-                # For substage 3, use the balanced + no three-in-a-row generator
-                self.stage = [1, 2]
-                self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
-            else:
-                # For all other substages, use the general modular function
-                self.stage_sequence = self.get_stage_sequence(
-                    block_size=self.block_size,
-                    substage=self.substage,
-                    last_stage_trial=self.last_stage_trial
-                )
-            self.last_stage_trial = self.stage_sequence[-1]
-
-            print("stage_sequence = ", self.stage_sequence)
+        if self.substage <= 7:
+            if self.block_trial_counter == 0:
+                if self.substage == 3:
+                    self.stage = [1, 2]
+                    self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
+                else:
+                    self.stage_sequence = self.get_stage_sequence(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                self.last_stage_trial = self.stage_sequence[-1]
+                print("stage_sequence = ", self.stage_sequence)
+            self.stage = self.stage_sequence[self.block_trial_counter]
+        else:
+            # For substages 8+, set stage by substage (no sequence/randomisation)
+            if self.substage in [8, 9]:
+                self.stage = 3
+            elif self.substage in [10, 11, 12]:
+                self.stage = 4
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
 
@@ -476,7 +506,6 @@ class Probability_Handtracking_Zoomed(Task):
                 self.stim_trial = self.last_stim_trial
                 print('last_stim_trial', self.last_stim_trial)
 
-            self.stage = self.stage_sequence[self.block_trial_counter]
             print("Stage: ", self.stage)
             print("Substage: ", self.substage)
 
@@ -485,7 +514,6 @@ class Probability_Handtracking_Zoomed(Task):
             print("Accuracy Criteria: ", self.accuracy_criteria)
 
             #self.stim_trial = 121  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
-
 
             ### VIDEOS
             if self.stage == 1:  # We have only one stimulus in stage 1
