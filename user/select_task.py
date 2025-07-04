@@ -211,7 +211,7 @@ def select_task(df, subject):
                     pass
 
         elif task == 'TouchTeaching_no_mask':
-            if n_trials >= 75:
+            if n_trials >= 50:
                 message = f"{my_subject} advance to next stage in Touchteaching from {stage}'"
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
