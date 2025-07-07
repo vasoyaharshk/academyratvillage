@@ -102,9 +102,11 @@ class Automatic_Water(Task):
         self.max_move_backs = 0
         self.stage_sequence = []
 
+        self.intertrial_interval = 60
+        self.trial_result = None
+
     def configure_gui(self):  # Variables that appear in the GUI
         pass
-
 
     def main_loop(self):
         print('')
@@ -122,7 +124,7 @@ class Automatic_Water(Task):
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
                 output_actions=[(Bpod.OutputChannels.PWM6, 5)])
-                # global LED ON
+            # global LED ON
 
             self.sma.add_state(
                 state_name='Real_start',  # close corridor door 2 when subject enters to behavioral box
@@ -137,71 +139,74 @@ class Automatic_Water(Task):
                 output_actions=[(Bpod.OutputChannels.PWM6, 5)])
 
         self.sma.add_state(
-            state_name='Fixation',  # if animal licks during fixation, this is started again.
-            state_timer=1,
-            state_change_conditions={Bpod.Events.Port1In: 'Fixation_break', Bpod.Events.Tup: flooding},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+            state_name='Fixation',
+            state_timer=self.intertrial_interval,  # 1-minute trial window
+            state_change_conditions={Bpod.Events.Port1In: 'Deliver_Water', Bpod.Events.Tup: 'Miss'},
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)]
+        )
 
         self.sma.add_state(
-            state_name='Fixation_break',
-            state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
-
-        self.sma.add_state(
-            state_name='Automatic_reward',
+            state_name='Deliver_Water',
             state_timer=self.valve_time * self.valve_factor_c,
-            state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
-            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
-                            (Bpod.OutputChannels.SoftCode, 220)])
-            # Automatic water, lickportLED, and Reward sound
+            state_change_conditions={Bpod.Events.Tup: 'Reward_Window'},
+            output_actions=[
+                (Bpod.OutputChannels.Valve, 1),
+                (Bpod.OutputChannels.PWM1, 1),
+                (Bpod.OutputChannels.PWM6, 1),
+                (Bpod.OutputChannels.SoftCode, 38)
+            ]
+        )
 
         self.sma.add_state(
-            state_name='Wait_for_reward',
+            state_name='Reward_Window',
             state_timer=55,
-            state_change_conditions={Bpod.Events.Tup: 'Miss', Bpod.Events.Port1In: 'Correct_first'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)])
-            # lickportLED and RWsound remain ON until poke o timeup
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_first', Bpod.Events.Tup: 'Wait_for_next_trial'},
+            output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)]
+        )
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
-            state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+            state_change_conditions={Bpod.Events.Tup: 'Wait_for_next_trial'},
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)]
+        )
 
         self.sma.add_state(
             state_name='Miss',
             state_timer=0,
+            state_change_conditions={Bpod.Events.Tup: 'Wait_for_next_trial'},
+            output_actions=[
+                (Bpod.OutputChannels.SoftCode, 12),
+                (Bpod.OutputChannels.PWM6, 5)
+            ]
+        )
+
+        self.sma.add_state(
+            state_name='Wait_for_next_trial',
+            state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 12),(Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM6, 5)]
+        )
 
         self.sma.add_state(
             state_name='Exit',
-            state_timer=60,
+            state_timer=1,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.SoftCode, 222), (Bpod.OutputChannels.PWM6, 5)])
-            # Wait 10 sec for the next automatic reward
-
-
-
+            output_actions=[(Bpod.OutputChannels.SoftCode, 222), (Bpod.OutputChannels.PWM6, 5)]
+        )
 
     def after_trial(self):
 
         # Trial Counter
         if self.current_trial_states['Miss'][0][0] > 0:  # Missed trial
-            self.register_value('trial_result', 'miss')
-            self.register_value('response_x', '')  # we add '' here to easily compare with other tasks
-            self.register_value('response_y', '')  # we add '' here to easily compare with other tasks
+            self.trial_result = 'miss'
             self.miss_acc_counter += 1
         else:
-            self.register_value('trial_result', 'correct_first')  # Correct trial
-            self.register_value('response_x', 0)  # we add a zero here to easily compare with other tasks
-            self.register_value('response_y', 0)  # we add a zero here to easily compare with other tasks
+            self.trial_result = 'correct_first'
             self.miss_acc_counter = 0
 
-        if self.current_trial_states['Automatic_reward'][0][0] > 0:
+        if self.current_trial_states['Deliver_Water'][0][0] > 0:
             self.reward_drunk += self.valve_reward
-
 
 
         # General counters
@@ -264,5 +269,8 @@ class Automatic_Water(Task):
         self.register_value('last_stim_trial', self.last_stim_trial)
 
         # Trial outcome placeholder
-        self.register_value('trial_result', 'correct_first')  # dynamic per trial
+        self.register_value('trial_result', self.trial_result)
+        self.register_value('response_x', 0)  # we add a zero here to easily compare with other tasks
+        self.register_value('response_y', 0)  # we add a zero here to easily compare with other tasks
+
 
