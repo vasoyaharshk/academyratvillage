@@ -609,7 +609,7 @@ class Probability_Handtracking_Zoomed(Task):
                     state_name='Correct',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
                 # Turns on Water port LED and plays correct sound
 
                 self.sma.add_state(
@@ -752,7 +752,7 @@ class Probability_Handtracking_Zoomed(Task):
                     state_name='Correct',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'Correct_video_display'},
-                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
                 # Turns on Water port LED and plays correct sound
 
                 self.sma.add_state(

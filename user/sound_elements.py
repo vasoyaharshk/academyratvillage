@@ -125,6 +125,12 @@ reward_frequency_map = {
     'phoebe': 290.0,
     'rachel': 336.4,
     'm2': 200.5,
+    'ciri': 14000.0,
+    'gal': 14000.0,
+    'joy': 14000.0,
+    'luna': 14000.0,
+    'correl': 14000.0,
+    'sparky': 14000.0,
 }
 
 # Pre-generated tone vectors
