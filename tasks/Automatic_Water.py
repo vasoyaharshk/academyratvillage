@@ -144,7 +144,7 @@ class Automatic_Water(Task):
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Reward_Window'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1),
-                            (Bpod.OutputChannels.PWM6, 1), (Bpod.OutputChannels.SoftCode, 38)]
+                            (Bpod.OutputChannels.PWM6, 1), (Bpod.OutputChannels.SoftCode, 220)]
         )
 
         self.sma.add_state(

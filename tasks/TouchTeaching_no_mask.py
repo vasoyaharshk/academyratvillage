@@ -32,6 +32,7 @@ class TouchTeaching_no_mask(Task):
         Port 5 - PHOTOGATES 5: Photogates 
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
 
+        NOTE: FOR NEW SOUNDS, FUNCTION38 NEEDS TO BE REPLACED WITH 220 EVERYWHERE.
         """
 
     def init_variables(self):
