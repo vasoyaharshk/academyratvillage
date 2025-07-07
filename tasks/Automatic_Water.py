@@ -112,12 +112,6 @@ class Automatic_Water(Task):
         print('')
         print('Trial: ' + str(self.current_trial))
 
-        # flooding AVOIDANCE
-        if self.miss_acc_counter > 300:
-            flooding = 'Wait_for_reward'
-        else:
-            flooding = 'Automatic_reward'
-
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
@@ -140,8 +134,8 @@ class Automatic_Water(Task):
 
         self.sma.add_state(
             state_name='Fixation',
-            state_timer=self.intertrial_interval,  # 1-minute trial window
-            state_change_conditions={Bpod.Events.Port1In: 'Deliver_Water', Bpod.Events.Tup: 'Miss'},
+            state_timer=0,
+            state_change_conditions={Bpod.Events.Port1In: 'Deliver_Water', Bpod.Events.Tup: 'Fixation'},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)]
         )
 
@@ -149,18 +143,14 @@ class Automatic_Water(Task):
             state_name='Deliver_Water',
             state_timer=self.valve_time * self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Reward_Window'},
-            output_actions=[
-                (Bpod.OutputChannels.Valve, 1),
-                (Bpod.OutputChannels.PWM1, 1),
-                (Bpod.OutputChannels.PWM6, 1),
-                (Bpod.OutputChannels.SoftCode, 38)
-            ]
+            output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1),
+                            (Bpod.OutputChannels.PWM6, 1), (Bpod.OutputChannels.SoftCode, 220)]
         )
 
         self.sma.add_state(
             state_name='Reward_Window',
             state_timer=55,
-            state_change_conditions={Bpod.Events.Port1In: 'Correct_first', Bpod.Events.Tup: 'Wait_for_next_trial'},
+            state_change_conditions={Bpod.Events.Port1In: 'Correct_first', Bpod.Events.Tup: 'Miss'},
             output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)]
         )
 
@@ -175,15 +165,12 @@ class Automatic_Water(Task):
             state_name='Miss',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_next_trial'},
-            output_actions=[
-                (Bpod.OutputChannels.SoftCode, 12),
-                (Bpod.OutputChannels.PWM6, 5)
-            ]
+            output_actions=[(Bpod.OutputChannels.SoftCode, 12), (Bpod.OutputChannels.PWM6, 5)]
         )
 
         self.sma.add_state(
             state_name='Wait_for_next_trial',
-            state_timer=0,
+            state_timer=self.intertrial_interval,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.PWM6, 5)]
         )
