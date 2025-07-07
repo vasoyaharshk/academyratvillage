@@ -43,6 +43,7 @@ class LickTeaching(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
+        self.self.valve_factor_c = 2
 
         # counters
         self.miss_acc_counter = 0
@@ -109,7 +110,7 @@ class LickTeaching(Task):
 
         self.sma.add_state(
             state_name='Automatic_reward',
-            state_timer=self.valve_time,
+            state_timer=self.valve_time*self.valve_factor_c,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_reward'},
             output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1),
                             (Bpod.OutputChannels.SoftCode, 220)])
