@@ -228,6 +228,7 @@ def select_task(df, subject):
                     task = 'Probability_Extra_Training_Acc'
                     stage = 1.0
                     task_number = 1
+                    block_size = 40
                     message = f"{my_subject} advance from early training to probability training with pegs'"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
