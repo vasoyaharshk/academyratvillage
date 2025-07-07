@@ -989,8 +989,20 @@ def loop55(timing):
 def function56():
     global last_function_called
 
-    #if isinstance(soundStream, SoundR):
-    soundStream.play(soundVec3)
+    rat = utils.task.subject.lower()
+
+    if rat in ['m2', 'ciri', 'gal', 'joy', 'luna', 'sorrel', 'sparky']:
+        soundStream.play(soundVec3)
+    elif rat in ['monika', 'phoebe', 'rachel']:
+        soundStream.play(soundVec4)
+    else:
+        message = f"Incorrect sound for {rat} not found"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
+
 
     cam2.put_state("Punish")
     cam3.put_state("Punish")
