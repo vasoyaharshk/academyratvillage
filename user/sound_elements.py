@@ -131,7 +131,7 @@ reward_frequency_map = {
     'gal': 14000.0,
     'joy': 14000.0,
     'luna': 14000.0,
-    'correl': 14000.0,
+    'sorrel': 14000.0,
     'sparky': 14000.0,
 }
 

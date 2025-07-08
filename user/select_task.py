@@ -25,12 +25,12 @@ def select_task(df, subject):
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
-        'ciri': 0,
-        'gal': 0,
-        'joy': 0,
-        'luna': 0,
-        'sorrel': 0,
-        'sparky': 0,
+        'ciri': 14000.0,
+        'gal': 14000.0,
+        'joy': 14000.0,
+        'luna': 14000.0,
+        'sorrel': 14000.0,
+        'sparky': 14000.0,
         'monika': 250.0,
         'phoebe': 290.0,
         'rachel': 336.4,
@@ -229,6 +229,7 @@ def select_task(df, subject):
                     stage = 1.0
                     task_number = 1
                     block_size = 40
+                    block_number = 1
                     message = f"{my_subject} advance from early training to probability training with pegs'"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
