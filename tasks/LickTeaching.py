@@ -43,7 +43,7 @@ class LickTeaching(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.self.valve_factor_c = 2
+        self.valve_factor_c = 2
 
         # counters
         self.miss_acc_counter = 0
