@@ -854,10 +854,10 @@ class Probability_Handtracking_Zoomed(Task):
                 self.valid_counter += 1
                 if self.stage == 2:
                     self.block_valid_count += 1
+                    self.condition_trial_counter += 1
                 self.success = 0
                 self.block_trial_counter += 1
                 self.total_trials += 1
-                self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -872,10 +872,10 @@ class Probability_Handtracking_Zoomed(Task):
                 if self.stage == 2:
                     self.block_correct_count += 1
                     self.block_valid_count += 1
+                    self.condition_trial_counter += 1
                 self.block_trial_counter += 1
                 self.success = 1
                 self.total_trials += 1
-                self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
 
@@ -1015,7 +1015,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.alert_sent = False
 
 
-            if self.substage == 6 and self.moved_back_counter == 2 and not self.alert_sent:
+            if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
                     telegram_bot.alarm_finish_session(message, self.subject)
