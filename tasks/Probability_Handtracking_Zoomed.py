@@ -1003,7 +1003,7 @@ class Probability_Handtracking_Zoomed(Task):
             print("Stage Change Backward: ", self.stage_backward_change)
             print("Moved Back Counter: ", self.moved_back_counter)
 
-            if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent:
+            if self.substage == 5 and self.moved_back_counter == 3 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
                     telegram_bot.alarm_finish_session(message, self.subject)
@@ -1015,7 +1015,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.alert_sent = False
 
 
-            if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent:
+            if self.substage == 6 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
                     telegram_bot.alarm_finish_session(message, self.subject)
