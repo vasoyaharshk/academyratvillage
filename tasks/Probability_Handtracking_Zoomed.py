@@ -855,9 +855,9 @@ class Probability_Handtracking_Zoomed(Task):
                 if self.stage == 2:
                     self.block_valid_count += 1
                     self.condition_trial_counter += 1
+                    self.total_trials += 1
                 self.success = 0
                 self.block_trial_counter += 1
-                self.total_trials += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -873,9 +873,9 @@ class Probability_Handtracking_Zoomed(Task):
                     self.block_correct_count += 1
                     self.block_valid_count += 1
                     self.condition_trial_counter += 1
+                    self.total_trials += 1
                 self.block_trial_counter += 1
                 self.success = 1
-                self.total_trials += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
 
@@ -1024,13 +1024,12 @@ class Probability_Handtracking_Zoomed(Task):
                     print("Telegram message not sent. Error:", e)
 
 
-            if self.condition_trial_counter >= self.task_end_criteria:
+            if self.total_trials >= self.task_end_criteria:
                 try:
                     message = f"URGENT: {self.subject} has completed 1600 trials in this task."
                     telegram_bot.alarm_finish_session(message, self.subject)
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
-                self.task_end = True
 
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
