@@ -173,7 +173,6 @@ def select_task(df, subject):
                     last_valid_session = previous_non_auto.sort_values('session').iloc[-1]
                     task = last_valid_session.task
                     # Optionally, revert stage as well if you need
-                    stage = last_valid_session.stage
                     message = f"Completed 1 session of Automatic_Water. Reverting to task: {task}, stage: {stage}"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
