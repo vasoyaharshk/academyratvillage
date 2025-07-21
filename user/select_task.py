@@ -160,24 +160,28 @@ def select_task(df, subject):
         n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
         if task == 'Automatic_Water':
-            # Find the latest session number
-            last_session_num = df['session'].max()
-            # Check if the latest session was Automatic_Water
-            last_task = df.loc[df['session'] == last_session_num, 'task'].iloc[0]
-            if last_task == 'Automatic_Water':
-                # Find all sessions before the last one, excluding Automatic_Water tasks
-                previous_non_auto = df[(df['session'] < last_session_num) & (df['task'] != 'Automatic_Water')]
+            # Get last two sessions for this subject
+            last2_sessions = df_last2['session'].unique()
+
+            # Check if both of them are Automatic_Water
+            recent_tasks = df[df['session'].isin(last2_sessions)]['task'].unique()
+            if all(t == 'Automatic_Water' for t in recent_tasks):
+                # Look at the session before those two
+                min_session_in_auto = min(last2_sessions)
+                df_before_auto = df[df['session'] < min_session_in_auto]
+                previous_non_auto = df_before_auto[df_before_auto['task'] != 'Automatic_Water']
+
                 if not previous_non_auto.empty:
-                    # Get the task from the most recent previous non-Automatic_Water session
-                    last_valid_session = previous_non_auto.sort_values('session').iloc[-1]
+                    last_valid_session = previous_non_auto.sort_values(by='session').iloc[-1]
                     task = last_valid_session.task
-                    # Optionally, revert stage as well if you need
-                    message = f"Completed 1 session of Automatic_Water. Reverting to task: {task}, stage: {stage}"
+
+                    message = f"Completed 2 sessions of Automatic_Water. Reverting to task: {task}, stage: {stage}"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
                         telegram_bot.alarm_completed_criteria(task, my_subject)
                     except:
                         print('Telegram message not sent')
+
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
