@@ -266,7 +266,7 @@ def select_task(df, subject):
                 block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
-                block_number = 0  # Sequential block number
+                block_number = 1  # Sequential block number
                 ror_change = 0  # If it is 1, ROR will change on the next trial.
                 block_change = 0  # If it is 1, a new block will start on the next trial
                 total_trials = 0  # Total trials across the task.
@@ -332,7 +332,7 @@ def select_task(df, subject):
                 block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
-                block_number = 0  # Sequential block number
+                block_number = 1  # Sequential block number
                 ror_change = 0  # If it is 1, ROR will change on the next trial.
                 block_change = 0  # If it is 1, a new block will start on the next trial
                 total_trials = 0  # Total trials across the task.
