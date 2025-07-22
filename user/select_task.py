@@ -667,7 +667,7 @@ def select_task(df, subject):
     print("Assign Automatic Water?:", automatic_water_needed)
     print("-------------------------")
 
-    if my_subject == 'm3':
+    if my_subject == 'm2':
         wait_seconds = 1
         block_size = 10
 
