@@ -767,6 +767,9 @@ class Probability_Training_BB_Size_Bias_Acc(Task):
             #         self.response_x_array = []      #Clearing the array
 
         else:
+            self.trial_length = 0.1
+            self.trial_result = None
+            self.task_end = True
             print("Task Side bias ended. Task is now the normal task so will move to Extra training in next session.")
 
         ############ REGISTER VALUES ################

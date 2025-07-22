@@ -908,6 +908,8 @@ class Probability_Handtracking_Zoomed(Task):
 
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
+            self.trial_length = 0.1
+            self.trial_result = None
             self.task_end = True
 
 

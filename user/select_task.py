@@ -19,6 +19,10 @@ def select_task(df, subject):
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
+    #This removes all the blank trials which the system generates by mistake:
+    df = df[~((df['trial_result'].isna() | (df['trial_result'] == '')) & (
+                df['trial_length'].isna() | (df['trial_length'] == '')))].copy()
+
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
 
@@ -671,11 +675,38 @@ def select_task(df, subject):
         #             print('Telegram message not sent')
         #             pass
 
-    elif task == 'Water_Filler':
-        print("rat drank water")
+    # ======== AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
+    # Make all new variables; do not modify the main df
 
-    # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
-    df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+    df_aw_check = df.copy()
+    df_aw_check['date'] = pd.to_datetime(df_aw_check['date'])
+    df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])].copy()
+
+    latest_date_aw = df_aw_valid['date'].max()
+    all_dates_aw = df_aw_valid[df_aw_valid['date'] < latest_date_aw]['date'].sort_values(ascending=False).unique()
+    last5_dates_aw = all_dates_aw[:5]
+
+    df_last5_aw = df_aw_valid[df_aw_valid['date'].isin(last5_dates_aw)]
+
+    aw_days_in5 = df_last5_aw[df_last5_aw['task'] == 'Automatic_Water']['date']
+    most_recent_aw_in5 = aw_days_in5.max() if not aw_days_in5.empty else None
+
+    if most_recent_aw_in5 is not None:
+        df_last5_post_aw = df_last5_aw[df_last5_aw['date'] > most_recent_aw_in5]
+    else:
+        df_last5_post_aw = df_last5_aw
+
+    correct_5day_total_aw = len(df_last5_post_aw)
+
+    # Only move to Automatic_Water if not already on it
+    if task != "Automatic_Water":
+        if (most_recent_aw_in5 is None) and (correct_5day_total_aw < 250):
+            task = "Automatic_Water"
+            try:
+                message = f"Check: {my_subject} has only {correct_5day_total_aw} correct trials in last 5 days. Moving to Automatic_Water."
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except:
+                print('Telegram message not sent')
 
     if my_subject == 'm3':
         wait_seconds = 1
