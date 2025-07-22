@@ -102,7 +102,7 @@ class Automatic_Water(Task):
         self.max_move_backs = 0
         self.stage_sequence = []
 
-        self.intertrial_interval = 5
+        self.intertrial_interval = 60
         self.trial_result = None
 
     def configure_gui(self):  # Variables that appear in the GUI
