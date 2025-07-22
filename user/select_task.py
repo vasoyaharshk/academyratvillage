@@ -6,6 +6,7 @@ import random
 import json
 import pandas as pd
 from types import SimpleNamespace
+from datetime import datetime, timedelta
 
 
 # Examples of functions to calculate new task and stage
@@ -620,93 +621,54 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
-        # elif 'Probability_Turtle_Training' in task:
-        #     trial_criteria = 30
-        #     accuracy_criteria = 0.80
-        #     trial_end_criteria = 3000
-        #
-        #     if my_subject == 'm2':
-        #         trial_criteria = 3
-        #         accuracy_criteria = 0.7
-        #         trial_end_criteria = 10
-        #
-        #     trial_counter = last_row['trial_counter']
-        #
-        #     if trial_counter >= trial_end_criteria:
-        #         stage = 7
-        #         message = f"{trial_end_criteria} trials completed in substage {substage}. Task ended."
-        #         print(f'{message}')
-        #         try:
-        #             telegram_bot.alarm_finish_session(message, my_subject)
-        #             telegram_bot.alarm_completed_criteria(task, my_subject)
-        #         except:
-        #             print('Telegram message not sent')
-        #             pass
-        #
-        #     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria):
-        #         # Move to the next stage up to stage 3
-        #         if substage < 3:
-        #             substage += 1
-        #             trial_counter = 0
-        #             message = (f"Moving to stage {substage} due to 80% accuracy in a session of {valid_trials_last} trials.")
-        #             print(f'{message}')
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #         else:
-        #             stage = 7
-        #             #task = 'Probability_Turtle_Test'
-        #             message = (f"Last substage {substage} completed, Training complete")
-        #             print(f'{message}')
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #                 telegram_bot.alarm_completed_criteria(task, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #     else:
-        #         message = ("Criteria for moving to the next stage not met.")
-        #         print(f'{message}')
-        #         try:
-        #             telegram_bot.alarm_finish_session(message, my_subject)
-        #         except:
-        #             print('Telegram message not sent')
-        #             pass
-
     # ======== AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
-    # Make all new variables; do not modify the main df
+
+    today_aw = datetime.now().date()
+    last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
+    last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
 
     df_aw_check = df.copy()
-    df_aw_check['date'] = pd.to_datetime(df_aw_check['date'])
-    df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])].copy()
+    df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
 
-    latest_date_aw = df_aw_valid['date'].max()
-    all_dates_aw = df_aw_valid[df_aw_valid['date'] < latest_date_aw]['date'].sort_values(ascending=False).unique()
-    last5_dates_aw = all_dates_aw[:5]
+    # Check if ANY session in today+last5 is Automatic Water
+    has_aw_session = (
+            df_aw_check[
+                (df_aw_check['date'].isin(last6_days)) &
+                (df_aw_check['task'] == 'Automatic_Water')
+                ].shape[0] > 0
+    )
 
-    df_last5_aw = df_aw_valid[df_aw_valid['date'].isin(last5_dates_aw)]
+    # Count corrects in last 5 full days (not including today)
+    df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
+    corrects_last5 = (
+        df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
+        .groupby('date')
+        .size()
+        .reindex(last5_full_days, fill_value=0)
+    )
+    total_corrects_last5 = corrects_last5.sum()
 
-    aw_days_in5 = df_last5_aw[df_last5_aw['task'] == 'Automatic_Water']['date']
-    most_recent_aw_in5 = aw_days_in5.max() if not aw_days_in5.empty else None
+    # Determine if Automatic Water is needed
+    automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
 
-    if most_recent_aw_in5 is not None:
-        df_last5_post_aw = df_last5_aw[df_last5_aw['date'] > most_recent_aw_in5]
-    else:
-        df_last5_post_aw = df_last5_aw
+    # (Optional) Annotate entire dataframe with the status for this run
+    df_aw_check['automatic_water'] = automatic_water_needed
 
-    correct_5day_total_aw = len(df_last5_post_aw)
+    # Assign Automatic Water if needed
+    if task != "Automatic_Water" and automatic_water_needed:
+        #task = "Automatic_Water"
+        try:
+            message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+            telegram_bot.alarm_finish_session(message, my_subject)
+        except:
+            print('Telegram message not sent')
 
-    # Only move to Automatic_Water if not already on it
-    if task != "Automatic_Water":
-        if (most_recent_aw_in5 is None) and (correct_5day_total_aw < 250):
-            task = "Automatic_Water"
-            try:
-                message = f"Check: {my_subject} has only {correct_5day_total_aw} correct trials in last 5 days. Moving to Automatic_Water."
-                telegram_bot.alarm_finish_session(message, my_subject)
-            except:
-                print('Telegram message not sent')
+    # Debug print (optional)
+    print("-----DEBUG: AW CHECK-----")
+    print("Has AW session in last 6 days (inc. today):", has_aw_session)
+    print("Total corrects in last 5 full days:", total_corrects_last5)
+    print("Assign Automatic Water?:", automatic_water_needed)
+    print("-------------------------")
 
     if my_subject == 'm3':
         wait_seconds = 1

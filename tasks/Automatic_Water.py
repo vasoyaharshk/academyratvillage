@@ -102,7 +102,7 @@ class Automatic_Water(Task):
         self.max_move_backs = 0
         self.stage_sequence = []
 
-        self.intertrial_interval = 60
+        self.intertrial_interval = 5
         self.trial_result = None
 
     def configure_gui(self):  # Variables that appear in the GUI
@@ -121,10 +121,10 @@ class Automatic_Water(Task):
             # global LED ON
 
             self.sma.add_state(
-                state_name='Real_start',  # close corridor door 2 when subject enters to behavioral box
-                state_timer=0,
+                state_name='Real_start',
+                state_timer=self.valve_time * 2,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM6, 5)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
         else:
             self.sma.add_state(
                 state_name='Start_task',
@@ -151,14 +151,14 @@ class Automatic_Water(Task):
             state_name='Reward_Window',
             state_timer=55,
             state_change_conditions={Bpod.Events.Port1In: 'Correct_first', Bpod.Events.Tup: 'Miss'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 1), (Bpod.OutputChannels.PWM6, 1)]
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.PWM6, 1)]
         )
 
         self.sma.add_state(
             state_name='Correct_first',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'Wait_for_next_trial'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)]
+            output_actions=[(Bpod.OutputChannels.PWM6, 5), (Bpod.OutputChannels.SoftCode, 17)]
         )
 
         self.sma.add_state(
