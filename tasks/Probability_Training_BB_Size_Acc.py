@@ -943,6 +943,8 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.response_x_array = []      #Clearing the array
         else:
             print("Task 2 ended because Core training completed. Task is now 3 so will move to Weber's law in next session.")
+            self.trial_length = 0.1
+            self.trial_result = None
             self.task_end = True
 
         ############ REGISTER VALUES ################
