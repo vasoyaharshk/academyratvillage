@@ -882,8 +882,8 @@ class Probability_Handtracking_Zoomed(Task):
                 self.valid_counter += 1
                 if self.stage == 2:
                     self.block_valid_count += 1
+                    self.block_trial_counter += 1
                 self.success = 0
-                self.block_trial_counter += 1
                 self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
@@ -900,7 +900,7 @@ class Probability_Handtracking_Zoomed(Task):
                 if self.stage == 2:
                     self.block_correct_count += 1
                     self.block_valid_count += 1
-                self.block_trial_counter += 1
+                    self.block_trial_counter += 1
                 self.success = 1
                 self.total_trials += 1
                 self.condition_trial_counter += 1
