@@ -653,7 +653,7 @@ def select_task(df, subject):
 
     # Assign Automatic Water if needed
     if task != "Automatic_Water" and automatic_water_needed:
-        #task = "Automatic_Water"
+        task = "Automatic_Water"
         try:
             message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
             telegram_bot.alarm_finish_session(message, my_subject)
