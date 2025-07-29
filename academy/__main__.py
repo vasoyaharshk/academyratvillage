@@ -397,6 +397,10 @@ def stop_and_save_task():
         pass
     utils.task.my_bpod = None
 
+    # Ensure reward_drunk exists before saving
+    if not hasattr(utils.task, 'reward_drunk'):
+        utils.task.reward_drunk = 0.0
+
     if utils.task_manager is not None:
         try:
             utils.task_manager.save_csvs(weight=utils.task.subject_weight)

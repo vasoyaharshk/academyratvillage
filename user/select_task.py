@@ -17,12 +17,13 @@ from datetime import datetime, timedelta
 def select_task(df, subject):
     task = subject.task
     wait_seconds = 3600 * settings.TIME_TO_ENTER
-    last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
 
     #This removes all the blank trials which the system generates by mistake:
     df = df[~((df['trial_result'].isna() | (df['trial_result'] == '')) & (
                 df['trial_length'].isna() | (df['trial_length'] == '')))].copy()
+
+    last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
