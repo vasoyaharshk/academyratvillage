@@ -78,6 +78,7 @@ class Task(object):
         self.reward_duration = 0
         self.stage_sequence = []
         self.last_stage_trial = 0
+        self.stage_sequence_counter = 0
         self.task_end = False
 
 

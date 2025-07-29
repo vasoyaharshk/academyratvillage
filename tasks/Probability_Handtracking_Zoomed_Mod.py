@@ -183,6 +183,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             10: 0.875,
             11: 0.875,
         }
+        self.stage_sequence_counter = 0
 
         self.fixation_trigger_port = Bpod.Events.Port6In
 
@@ -493,7 +494,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             self.last_stage_trial = self.stage_sequence[-1]
             print("stage_sequence = ", self.stage_sequence)
 
-        self.stage = self.stage_sequence[self.block_trial_counter]
+        self.stage = self.stage_sequence[self.stage_sequence_counter]
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
         
@@ -896,10 +897,11 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
+                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 if self.substage < 4 or self.stage == 2:
                     self.block_trial_counter += 1
                     self.block_valid_count += 1
-                self.success = 0
+                    self.success = 0
                 self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
@@ -910,6 +912,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
+                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 #print('Correct_count: ', self.correct_count)
@@ -1147,6 +1150,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         self.register_value('block_correct_count', self.block_correct_count)
         self.register_value('block_valid_count', self.block_valid_count)
         self.register_value('condition_trial_counter', self.condition_trial_counter)
+        self.register_value('stage_sequence_counter', self.stage_sequence_counter)
 
         # Stimulus trial control
         self.register_value('stim_trial', self.stim_trial)
