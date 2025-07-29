@@ -45,6 +45,11 @@ class TaskManager:
             self.df.to_csv(raw_path, index=None, header=True, sep=';')
 
             self.new_df = self.transform_df()
+
+            # --- Add this block ---
+            if 'reward_drunk' not in self.new_df.columns:
+                self.new_df['reward_drunk'] = 0.0
+
             water = self.new_df['reward_drunk'].iloc[-1]
             self.new_df.to_csv(clean_path, sep=';', header=True, index=False)
 
