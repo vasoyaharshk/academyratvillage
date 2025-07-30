@@ -665,12 +665,12 @@ def select_task(df, subject):
             except:
                 print('Telegram message not sent')
 
-    # Debug print (optional)
-    print("-----DEBUG: AW CHECK-----")
-    print("Has AW session in last 6 days (inc. today):", has_aw_session)
-    print("Total corrects in last 5 full days:", total_corrects_last5)
-    print("Assign Automatic Water?:", automatic_water_needed)
-    print("-------------------------")
+        # Debug print (optional)
+        print("-----DEBUG: AW CHECK-----")
+        print("Has AW session in last 6 days (inc. today):", has_aw_session)
+        print("Total corrects in last 5 full days:", total_corrects_last5)
+        print("Assign Automatic Water?:", automatic_water_needed)
+        print("-------------------------")
 
     if my_subject == 'm2':
         wait_seconds = 1

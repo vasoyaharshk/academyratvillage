@@ -19,25 +19,28 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         
         Substages:
         Substages: Only the trials for stage 2 are counted for accuracy.
-        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%.
-        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%.
-        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%.
+        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
+        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 6.
+        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 6.
         
         Only stage 2 counted  towards the block after substage 3:
-        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%.
-        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%.
-        Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80. The photogate that triggers the video is 5
+        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 6.
+        
+        From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
+        and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
+        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 6.
+        Substage 6: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
         
         Stage 3: Introduction of the yellow tokens:
-        Substage 8: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 6.
-        Substage 9: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5.
+        Substage 7: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 6. Stage 3 and stage 4 trials interleaved.
+        Substage 8: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 3 and stage 4 trials interleaved.
         
         Stage 4: Introduction of hands crossing:
-        Substage 10: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. 
-        Substage 11: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side.
+        Substage 9: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. Stage 5 and stage 6 trials interleaved.
+        Substage 10: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side. Stage 7 and stage 8 trials interleaved.
         
-        Only if rats fail at substage 11:
-        Substage 12: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side.
+        Only if rats fail at substage 1:
+        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved.
         
         if they hit 320 trials, move back one substage
         
@@ -184,6 +187,18 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             11: 0.875,
         }
         self.stage_sequence_counter = 0
+        self.substage_counter_1= 0
+        self.substage_counter_2 = 0
+        self.substage_counter_3 = 0
+        self.substage_counter_4 = 0
+        self.substage_counter_5 = 0
+        self.substage_counter_6 = 0
+        self.substage_counter_7 = 0
+        self.substage_counter_8 = 0
+        self.substage_counter_9 = 0
+        self.substage_counter_10 = 0
+        self.substage_counter_11 = 0
+        self.substage_counter_12 = 0
 
         self.fixation_trigger_port = Bpod.Events.Port6In
 
@@ -399,7 +414,6 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             9: 0.80,
             10: 0.80,
             11: 0.80,
-            12: 0.80,
         }
 
         if self.current_trial == 0:
@@ -489,8 +503,10 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             if self.substage == 3:
                 self.stage = [1, 2]
                 self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
+                self.stage_sequence_counter = 0
             else:
                 self.stage_sequence = self.get_stage_sequence(block_size=self.block_size, substage=self.substage, last_stage_trial=self.last_stage_trial)
+                self.stage_sequence_counter = 0
             self.last_stage_trial = self.stage_sequence[-1]
             print("stage_sequence = ", self.stage_sequence)
 
@@ -986,6 +1002,34 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             if self.substage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
 
+
+            #Substage trial counters for only videos:
+            if self.stage % 2 == 0:
+                if self.substage == 1:
+                    self.substage_counter_1 += 1
+                elif self.substage == 2:
+                    self.substage_counter_2 += 1
+                elif self.substage == 3:
+                    self.substage_counter_3 += 1
+                elif self.substage == 4:
+                    self.substage_counter_4 += 1
+                elif self.substage == 5:
+                    self.substage_counter_5 += 1
+                elif self.substage == 6:
+                    self.substage_counter_6 += 1
+                elif self.substage == 7:
+                    self.substage_counter_7 += 1
+                elif self.substage == 8:
+                    self.substage_counter_8 += 1
+                elif self.substage == 9:
+                    self.substage_counter_9 += 1
+                elif self.substage == 10:
+                    self.substage_counter_10 += 1
+                elif self.substage == 11:
+                    self.substage_counter_11 += 1
+                elif self.substage == 12:
+                    self.substage_counter_12 += 1
+
             # Side Bias Breaking formula:
 
             # Calculate bias accuracy for the last five trials without using accuracy window
@@ -1186,3 +1230,15 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         self.register_value('image_number', self.image_name)
         self.register_value('stage_sequence', self.stage_sequence)
         self.register_value('last_stage_trial', self.last_stage_trial)
+        self.register_value('substage_counter_1', self.substage_counter_1)
+        self.register_value('substage_counter_2', self.substage_counter_2)
+        self.register_value('substage_counter_3', self.substage_counter_3)
+        self.register_value('substage_counter_4', self.substage_counter_4)
+        self.register_value('substage_counter_5', self.substage_counter_5)
+        self.register_value('substage_counter_6', self.substage_counter_6)
+        self.register_value('substage_counter_7', self.substage_counter_7)
+        self.register_value('substage_counter_8', self.substage_counter_8)
+        self.register_value('substage_counter_9', self.substage_counter_9)
+        self.register_value('substage_counter_10', self.substage_counter_10)
+        self.register_value('substage_counter_11', self.substage_counter_11)
+        self.register_value('substage_counter_12', self.substage_counter_12)

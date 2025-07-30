@@ -389,19 +389,42 @@ class Probability_Handtracking_Zoomed(Task):
             self.block_valid_count = 0
             self.stim_trial_counter = 0
 
+        # if self.stage_forward_change == 1:
+        #     self.total_trials = 0
+        #     self.stage_forward_change = 0
+        #     self.last_forward_stage = self.substage  # Save current BEFORE increasing
+        #     self.substage += 1
+        #     message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
+        #     try:
+        #         telegram_bot.alarm_finish_session(message, self.subject)
+        #     except Exception as e:
+        #         print(f"Telegram message not sent. Error: {e}")
+        #     if self.substage == 8:
+        #         self.task_number = 5
+        #         self.tired = True
+
         if self.stage_forward_change == 1:
-            self.total_trials = 0
-            self.stage_forward_change = 0
-            self.last_forward_stage = self.substage  # Save current BEFORE increasing
-            self.substage += 1
-            message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
-            try:
-                telegram_bot.alarm_finish_session(message, self.subject)
-            except Exception as e:
-                print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 8:
+            if self.subject == "joy" and self.substage == 3:
                 self.task_number = 5
                 self.tired = True
+                message = "joy blocked from entering substage 4; moved to task 5 instead"
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+            else:
+                self.total_trials = 0
+                self.stage_forward_change = 0
+                self.last_forward_stage = self.substage  # Save current BEFORE increasing
+                self.substage += 1
+                message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+                if self.substage == 8:
+                    self.task_number = 5
+                    self.tired = True
 
         if self.stage_backward_change == 1:
             self.total_trials = 0
