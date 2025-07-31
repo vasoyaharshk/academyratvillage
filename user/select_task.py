@@ -141,6 +141,18 @@ def select_task(df, subject):
     last_stage_trial  = get_val_from_df_or_default('last_stage_trial', 0)
     stage_sequence_counter  = get_val_from_df_or_default('stage_sequence_counter', 0)
 
+    substage_counter_1  = get_val_from_df_or_default('substage_counter_1', 0)
+    substage_counter_2  = get_val_from_df_or_default('substage_counter_2', 0)
+    substage_counter_3  = get_val_from_df_or_default('substage_counter_3', 0)
+    substage_counter_4  = get_val_from_df_or_default('substage_counter_4', 0)
+    substage_counter_5  = get_val_from_df_or_default('substage_counter_5', 0)
+    substage_counter_6  = get_val_from_df_or_default('substage_counter_6', 0)
+    substage_counter_7  = get_val_from_df_or_default('substage_counter_7', 0)
+    substage_counter_8  = get_val_from_df_or_default('substage_counter_8', 0)
+    substage_counter_9  = get_val_from_df_or_default('substage_counter_9', 0)
+    substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
+    substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
+
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
 
@@ -677,7 +689,7 @@ def select_task(df, subject):
         block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

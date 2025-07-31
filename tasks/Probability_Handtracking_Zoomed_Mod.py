@@ -173,19 +173,20 @@ class Probability_Handtracking_Zoomed_Mod(Task):
 
         self.alert_sent = False
 
-        self.stage2_proportions = {
-            1: 0.10,
-            2: 0.25,
-            3: 0.50,
-            4: 0.75,
-            5: 0.875,
-            6: 0.875,
-            7: 0.875,
-            8: 0.875,
-            9: 0.875,
-            10: 0.875,
-            11: 0.875,
+        self.substage_stage_map = {
+            1: {1: 0.90, 2: 0.10},
+            2: {1: 0.75, 2: 0.25},
+            3: {1: 0.50, 2: 0.50},
+            4: {1: 0.25, 2: 0.75},
+            5: {1: 0.125, 2: 0.875},
+            6: {1: 0.125, 2: 0.875},
+            7: {3: 0.125, 4: 0.875},
+            8: {3: 0.125, 4: 0.875},
+            9: {5: 0.125, 6: 0.875},
+            10: {7: 0.125, 8: 0.875},
+            11: {9: 0.125, 10: 0.875},
         }
+
         self.stage_sequence_counter = 0
         self.substage_counter_1= 0
         self.substage_counter_2 = 0
@@ -208,7 +209,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
     def get_stage_sequence(self, block_size=None, substage=None, last_stage_trial=None):
         """
         Returns a randomised stage sequence for the given block size and substage,
-        using the correct proportions for stage 1 and stage 2 trials.
+        using the correct proportions for image and video trials.
         For substages other than 3, just returns the correct shuffled sequence.
         """
         if block_size is None:
@@ -216,17 +217,30 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         if substage is None:
             substage = self.substage
 
-        prop = self.stage2_proportions.get(substage, 0)
-        stage2_n = int(round(block_size * prop))
-        stage1_n = block_size - stage2_n
+        # Special handling for substage 3
+        if substage == 3:
+            return self.generate_random_trials_stages(last_trial=last_stage_trial)
 
-        # Always generate the exact number required for each
-        sequence = [1] * stage1_n + [2] * stage2_n
+        # General handling for other substages
+        if substage not in self.substage_stage_map:
+            raise ValueError(f"Invalid substage: {substage}")
+        stage_map = self.substage_stage_map[substage]
+
+        sequence = []
+
+        for stage, prop in stage_map.items():
+            stage_n = int(round(block_size * prop))
+            sequence.extend([stage] * stage_n)
+
+        # Fix rounding issues
+        while len(sequence) < block_size:
+            sequence.append(random.choice(list(stage_map.keys())))
+        sequence = sequence[:block_size]
+
         random.shuffle(sequence)
 
-        # Ensure the first trial is not the same as last_stage_trial (if provided)
+        # Avoid repeating the same stage as last trial
         if last_stage_trial is not None and sequence[0] == last_stage_trial:
-            # Try to swap with another trial
             for i in range(1, len(sequence)):
                 if sequence[i] != last_stage_trial:
                     sequence[0], sequence[i] = sequence[i], sequence[0]
@@ -249,19 +263,22 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_random_trials_stages(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials_stages(self, last_trial=None):
+        """
+        Special generator for substage 3: 50/50 interleaved stages (1 and 2)
+        with no more than 2 repetitions in sequence.
+        """
         trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        choices = [1, 2]
+        probabilities = [0.5, 0.5]
+
         while len(trials) < self.block_size:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stage, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
+            candidate = random.choices(choices, probabilities)[0]
             if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
                 if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
+                    continue
                 trials.append(candidate)
+
         return trials
 
     def get_stim_image_path(self, stim_trial, stage):
@@ -473,40 +490,14 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 print("Telegram message not sent")
 
         ### Randomizing the stimulus positions for image and the videos:
-        # Choose x positions:
-        #self.stim = [111, 112] for video
-
         #Stage Assignment:
-        # if self.substage <= 7:
-        #     if self.block_trial_counter == 0:
-        #         if self.substage == 3:
-        #             self.stage = [1, 2]
-        #             self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
-        #         else:
-        #             self.stage_sequence = self.get_stage_sequence(
-        #                 block_size=self.block_size,
-        #                 substage=self.substage,
-        #                 last_stage_trial=self.last_stage_trial
-        #             )
-        #         self.last_stage_trial = self.stage_sequence[-1]
-        #
-        #         print("stage_sequence = ", self.stage_sequence)
-        #         self.stage = self.stage_sequence[self.block_trial_counter]
-        # else:
-        #     # For substages 8+, set stage by substage (no sequence/randomisation)
-        #     if self.substage in [8, 9]:
-        #         self.stage = 3
-        #     elif self.substage in [10, 11, 12]:
-        #         self.stage = 4
-
         if self.block_trial_counter == 0:
-            if self.substage == 3:
-                self.stage = [1, 2]
-                self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
-                self.stage_sequence_counter = 0
-            else:
-                self.stage_sequence = self.get_stage_sequence(block_size=self.block_size, substage=self.substage, last_stage_trial=self.last_stage_trial)
-                self.stage_sequence_counter = 0
+            self.stage_sequence = self.get_stage_sequence(
+                block_size=self.block_size,
+                substage=self.substage,
+                last_stage_trial=self.last_stage_trial
+            )
+            self.stage_sequence_counter = 0
             self.last_stage_trial = self.stage_sequence[-1]
             print("stage_sequence = ", self.stage_sequence)
 

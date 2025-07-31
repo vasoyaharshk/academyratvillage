@@ -79,6 +79,17 @@ class Task(object):
         self.stage_sequence = []
         self.last_stage_trial = 0
         self.stage_sequence_counter = 0
+        self.substage_counter_1 = 0
+        self.substage_counter_2 = 0
+        self.substage_counter_3 = 0
+        self.substage_counter_4 = 0
+        self.substage_counter_5 = 0
+        self.substage_counter_6 = 0
+        self.substage_counter_7 = 0
+        self.substage_counter_8 = 0
+        self.substage_counter_9 = 0
+        self.substage_counter_10 = 0
+        self.substage_counter_11 = 0
         self.task_end = False
 
 
