@@ -1801,10 +1801,10 @@ def function114():
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
-            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
-            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")

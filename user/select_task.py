@@ -40,7 +40,7 @@ def select_task(df, subject):
         'monika': 250.0,
         'phoebe': 290.0,
         'rachel': 336.4,
-        'm2': 100.0,
+        'm2': 200.5,
     }
 
     # Assign frequency based on subject

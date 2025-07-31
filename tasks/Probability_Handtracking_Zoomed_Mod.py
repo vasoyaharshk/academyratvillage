@@ -213,6 +213,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         Returns a randomised stage sequence for the given block size and substage,
         using the correct proportions for image and video trials.
         For substages other than 3, just returns the correct shuffled sequence.
+        This is only fo substage 1 and 2 and 3.
         """
         if block_size is None:
             block_size = self.block_size
@@ -239,6 +240,50 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             sequence.append(random.choice(list(stage_map.keys())))
         sequence = sequence[:block_size]
 
+        random.shuffle(sequence)
+
+        # Avoid repeating the same stage as last trial
+        if last_stage_trial is not None and sequence[0] == last_stage_trial:
+            for i in range(1, len(sequence)):
+                if sequence[i] != last_stage_trial:
+                    sequence[0], sequence[i] = sequence[i], sequence[0]
+                    break
+
+        return sequence
+
+    def get_stage_sequence_fixed_video(self, block_size=None, substage=None, last_stage_trial=None):
+        """
+        For substages 4+, creates a block with exactly block_size video (even) trials
+        and a fixed number of image (odd) trials according to the map.
+        """
+        if block_size is None:
+            block_size = self.block_size
+        if substage is None:
+            substage = self.substage
+
+        if substage not in self.substage_stage_map:
+            raise ValueError(f"Invalid substage: {substage}")
+        stage_map = self.substage_stage_map[substage]
+
+        # Identify image and video stages
+        image_stages = [s for s in stage_map if s % 2 == 1]
+        video_stages = [s for s in stage_map if s % 2 == 0]
+
+        if not video_stages or not image_stages:
+            raise ValueError("Expected both image and video stages for substage 4+")
+
+        video_stage = video_stages[0]
+        image_stage = image_stages[0]
+
+        # Compute number of image trials to match the intended proportion
+        prop_image = stage_map[image_stage]
+        n_image = int(round(block_size * prop_image / (1 - prop_image)))
+        # For example, if prop_image = 0.25, block_size = 40:
+        # n_image = round(40 * 0.25 / 0.75) = round(13.33) = 13
+        # For example, if prop_image = 0.125, block_size = 40:
+        # n_image = round(40 * 0.125 / 0.875) = round(6.349) = 6
+
+        sequence = [video_stage] * block_size + [image_stage] * n_image
         random.shuffle(sequence)
 
         # Avoid repeating the same stage as last trial
@@ -418,6 +463,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
     def main_loop(self):
         print('')
         print('Block_trial_counter= ', self.block_trial_counter)
+        print('Stage_sequence_counter= ', self.stage_sequence_counter)
         print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
@@ -451,6 +497,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
+            self.stage_sequence_counter = 0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
@@ -492,13 +539,20 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 print("Telegram message not sent")
 
         ### Randomizing the stimulus positions for image and the videos:
-        #Stage Assignment:
-        if self.block_trial_counter == 0:
-            self.stage_sequence = self.get_stage_sequence(
-                block_size=self.block_size,
-                substage=self.substage,
-                last_stage_trial=self.last_stage_trial
-            )
+        # Stage Assignment:
+        if self.stage_sequence_counter == 0:
+            if self.substage <= 3:
+                self.stage_sequence = self.get_stage_sequence(
+                    block_size=self.block_size,
+                    substage=self.substage,
+                    last_stage_trial=self.last_stage_trial
+                )
+            else:
+                self.stage_sequence = self.get_stage_sequence_fixed_video(
+                    block_size=self.block_size,
+                    substage=self.substage,
+                    last_stage_trial=self.last_stage_trial
+                )
             self.stage_sequence_counter = 0
             self.last_stage_trial = self.stage_sequence[-1]
             print("stage_sequence = ", self.stage_sequence)
@@ -582,11 +636,8 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             self.image_path_function,self.image_name=self.get_stim_image_path(self.stim_trial,self.stage)
             #self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
 
-            if self.stage % 2 == 1:
-                self.video_length = 1
-
-
             if self.stage % 2 == 0:
+                self.video_length = 1
                 # Figure out the full path to the video we want to play.
                 # This uses some kind of function (self.get_stim_video_path, probably defined earlier in your code) that takes in which video to play and what stage we're in.
                 self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage, self.image_name)
@@ -893,8 +944,6 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             self.response_x = None
             self.response_y = None
 
-
-
     def after_trial(self):
         if self.task_number == 4:
 
@@ -906,27 +955,32 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
-                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
-                if self.stage % 2 == 1:
+                self.stage_sequence_counter += 1 # Always advance in the sequence if it was a valid trial
+                # Block trial counter logic
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
                     self.block_valid_count += 1
-                    self.success = 0
+                self.success = 0
                 self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
 
-            ##### COUNT CORRECTS POKE
+                ##### COUNT CORRECTS POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
                 self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
-                #print('Correct_count: ', self.correct_count)
-                if self.stage % 2 == 1:
+                # Block trial counter logic
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1
@@ -934,7 +988,6 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
-
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
