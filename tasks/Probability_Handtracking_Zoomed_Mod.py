@@ -17,6 +17,8 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
         
+        ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
+        
         Substages:
         Substages: Only the trials for stage 2 are counted for accuracy.
         Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
@@ -36,11 +38,11 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         Substage 8: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 3 and stage 4 trials interleaved.
         
         Stage 4: Introduction of hands crossing:
-        Substage 9: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. Stage 5 and stage 6 trials interleaved.
-        Substage 10: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side. Stage 7 and stage 8 trials interleaved.
+        Substage 9: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. Stage 5 and stage 6 trials interleaved. The photogate that triggers the video is 5.
+        Substage 10: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side. Stage 7 and stage 8 trials interleaved. The photogate that triggers the video is 5.
         
-        Only if rats fail at substage 1:
-        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved.
+        Only if rats fail at substage 10:
+        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved. The photogate that triggers the video is 5.
         
         if they hit 320 trials, move back one substage
         
@@ -540,7 +542,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
 
 
             ### VIDEOS
-            if self.stage == 1:  # We have only one stimulus in stage 1
+            if self.stage % 2 == 1 :  # We have only one stimulus in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
                 if self.stim_trial in [121]: # if image is left correct
                     self.video_stim_play = 111 # display videos with correct on left
@@ -580,11 +582,11 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             self.image_path_function,self.image_name=self.get_stim_image_path(self.stim_trial,self.stage)
             #self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
 
-            if self.stage == 2:
+            if self.stage % 2 == 1:
                 self.video_length = 1
 
 
-            if self.stage != 1:
+            if self.stage % 2 == 0:
                 # Figure out the full path to the video we want to play.
                 # This uses some kind of function (self.get_stim_video_path, probably defined earlier in your code) that takes in which video to play and what stage we're in.
                 self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage, self.image_name)
@@ -601,7 +603,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             #print("video_path_function: ", self.video_path_function)
 
             # Decide which port triggers video for this trial
-            if self.substage == 7:
+            if self.substage == 6 or self.substage >= 8:
                 self.fixation_trigger_port = Bpod.Events.Port5In
             else:
                 self.fixation_trigger_port = Bpod.Events.Port6In
@@ -609,7 +611,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 4:
-            if self.stage == 1:
+            if self.stage % 2 == 1 :
                 # First trial:
                 if self.current_trial == 0:
                     self.sma.add_state(
@@ -905,7 +907,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
                 self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
-                if self.substage < 4 or self.stage == 2:
+                if self.stage % 2 == 1:
                     self.block_trial_counter += 1
                     self.block_valid_count += 1
                     self.success = 0
@@ -923,7 +925,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 #print('Correct_count: ', self.correct_count)
-                if self.substage < 4 or self.stage == 2:
+                if self.stage % 2 == 1:
                     self.block_trial_counter += 1
                     self.block_valid_count += 1
                     self.block_correct_count += 1
