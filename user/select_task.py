@@ -150,6 +150,7 @@ def select_task(df, subject):
     substage_counter_8  = get_val_from_df_or_default('substage_counter_8', 0)
     substage_counter_9  = get_val_from_df_or_default('substage_counter_9', 0)
     substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
+    substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
 
     group  = get_val_from_df_or_default('group', 0)
     pair  = get_val_from_df_or_default('pair', 0)
@@ -389,17 +390,78 @@ def select_task(df, subject):
 
                 # Cognitive Bias:
                 reward_group = {
-                    'chandler': 'A',
-                    'felix': 'A',
-                    'joey': 'A',
-                    'ross': 'A',
-                    'fergus': 'B',
-                    'geralt': 'B',
-                    'innes': 'B',
-                    'pol': 'B'
+                    'chandler': 1,
+                    'felix': 1,
+                    'joey': 1,
+                    'ross': 1,
+                    'fergus': 2,
+                    'geralt': 2,
+                    'innes': 2,
+                    'pol': 2
                 }
-                pair = 1
 
+                group = reward_group.get(my_subject.lower(), group)
+                pair = 1  # same for all rats
+
+                print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
+
+        elif 'Cognitive_Bias_Auditory_Training' in task:
+            #Move pair +1 when criterion is met:
+            accuracy_criteria = 0.85
+
+            df_cb = df[df['task'].str.contains('Cognitive_Bias_Auditory_Training', na=False)].copy()
+            if not df_cb.empty:
+                sessions = sorted(df_cb['session'].unique())
+
+                def session_stats(sess_id):
+                    s = df_cb[df_cb['session'] == sess_id]
+                    valid = s[s['trial_result'] != 'miss']
+                    n_valid = valid.shape[0]
+                    correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+                    acc = (correct / n_valid) if n_valid > 0 else 0.0
+                    return n_valid, acc
+
+                # Version 1 (strict):
+                # (uncomment this block if you want strict criterion)
+                # (n1, a1) = session_stats(sessions[-2])
+                # (n2, a2) = session_stats(sessions[-1])
+                # print(f"[CB] last2 sessions={sessions[-2:]} "
+                #       f"| s1: valid={n1}, acc={a1:.3f} | s2: valid={n2}, acc={a2:.3f}")
+                # meets = (n1 == 75 and a1 >= accuracy_criteria) and (n2 == 75 and a2 >= accuracy_criteria)
+
+
+
+                # Version 2 (skip short sessions):
+                # (uncomment this block if you want skip-short behaviour)
+                full_sessions = [s for s in sessions if session_stats(s)[0] == 75]
+                if len(full_sessions) >= 2:
+                    last_two_full = full_sessions[-2:]
+                    (n1, a1) = session_stats(last_two_full[0])
+                    (n2, a2) = session_stats(last_two_full[1])
+                    print(f"[CB] last2 full sessions={last_two_full} "
+                          f"| s1: valid={n1}, acc={a1:.3f} | s2: valid={n2}, acc={a2:.3f}")
+                    meets = (a1 >= accuracy_criteria) and (a2 >= accuracy_criteria)
+                else:
+                    meets = False
+                    print(f"[CB] Not enough full 75-trial sessions for {my_subject}")
+
+
+                if meets:
+                    new_pair = min(int(pair) + 1, 4)
+                    if new_pair != pair:
+                        message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
+                                   f"on two 75-trial sessions). pair {pair} → {new_pair}")
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_completed_criteria(f"CB pair→{new_pair}", my_subject)
+                        except:
+                            print('Telegram message not sent')
+                        pair = new_pair
+                    else:
+                        print(f"[CB] {my_subject}: already at max pair={pair}, no change.")
+            else:
+                print(f"[CB] {my_subject}: no CB sessions found; no pair change.")
 
 
         elif 'Probability_Training_BB_Size_Bias' in task:

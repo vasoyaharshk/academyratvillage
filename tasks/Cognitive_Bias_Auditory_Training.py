@@ -456,7 +456,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
-                self.trial_result = 'low_reward'
+                self.trial_result = 'incorrect'
                 self.reward_drunk += self.valve_reward * self.valve_factor_i
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
@@ -465,7 +465,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
-                self.trial_result = 'high_reward'
+                self.trial_result = 'correct'
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
