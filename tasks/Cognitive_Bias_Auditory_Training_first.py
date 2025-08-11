@@ -7,7 +7,7 @@ import numpy as np
 from academy import telegram_bot
 
 
-class Cognitive_Bias_Auditory_Training(Task):
+class Cognitive_Bias_Auditory_Training_first(Task):
     def __init__(self):
         super().__init__()
 
@@ -64,23 +64,22 @@ class Cognitive_Bias_Auditory_Training(Task):
             
             So in order to have a full factorial design:
             Summary of Reward Mapping per Group
-                Group 1 (Pairs 1 & 3: High → large reward, left, triangle; Pairs 2 & 4: Low → large reward, right, triangle):
+                Group A (Pairs 1 & 3: High → large reward; Pairs 2 & 4: Low → large reward):
                     Rats: chandler, felix, joey, ross
 
-                Group 2 (Pairs 1 & 3: Low → large reward, right, triangle; Pairs 2 & 4: High → large reward, right, triangle):
+                Group B (Pairs 1 & 3: Low → large reward; Pairs 2 & 4: High → large reward):
                     Rats: fergus, geralt, innes, pol
         
-                So pairs 1 and 3 for these would be:
-                | **Rat**  | **Reward Group** | **Low Tone Side** | **Shape**
-                | -------- | ---------------- | ----------------- | ----------------- |
-                | chandler | A                | Left              | triangle          |
-                | felix    | A                | Right             | triangle          |
-                | fergus   | B                | Left              | circle            |
-                | geralt   | B                | Right             | circle            |
-                | joey     | A                | Left              | triangle          |
-                | ross     | A                | Right             | triangle          |
-                | innes    | B                | Left              | circle            |
-                | pol      | B                | Right             | circle            |
+                | **Rat**  | **Reward Group** | **Low Tone Side** |
+                | -------- | ---------------- | ----------------- |
+                | chandler | A                | Left              |
+                | felix    | A                | Right             |
+                | fergus   | B                | Left              |
+                | geralt   | B                | Right             |
+                | joey     | A                | Left              |
+                | ross     | A                | Right             |
+                | innes    | B                | Left              |
+                | pol      | B                | Right             |
                 
     
                 ########   PORTS INFO   ########
@@ -93,7 +92,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         """
 
         # Variables for the task:
-        self.trials_max = 75
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
@@ -130,8 +128,37 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         # Variables for Cognitive_Bias_Auditory_Training:
 
+        self.pair = 1
 
+        self.reward_group = {
+            'chandler': 'A',
+            'felix': 'A',
+            'joey': 'A',
+            'ross': 'A',
+            'fergus': 'B',
+            'geralt': 'B',
+            'innes': 'B',
+            'pol': 'B'
+        }
 
+        self.low_tone_side = {
+            'chandler': 'left',
+            'felix': 'right',
+            'joey': 'left',
+            'ross': 'right',
+            'fergus': 'left',
+            'geralt': 'right',
+            'innes': 'left',
+            'pol': 'right'
+        }
+
+        # --- Frequency pairs in Hz ---
+        self.frequency_pairs = {
+            1: {'low': 2000, 'high': 3621},
+            2: {'low': 4573, 'high': 8281},
+            3: {'low': 10458, 'high': 18935},
+            4: {'low': 23913, 'high': 43298}
+        }
 
         # --- Reward volumes (µL) ---
         self.reward_small = 20.0
@@ -145,6 +172,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         # --- Training parameters ---
         self.partial_reinforcement_ratio = 0.2
         self.accuracy_criterion = 0.85
+        self.consecutive_sessions_required = 2
 
         # Image output stims:
         self.stim = [0]  # defines if correct side is left or right
@@ -152,8 +180,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         # Correcth location and size:
         self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
         self.y_correcth = 110
-        self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
-        self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 75  # Stimulus width in mm. Original size for peg is 120mm.
+        self.height = 75  # Stimulus height in mm. Original size for jar is 110mm.
         self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
         self.response_duration = 60

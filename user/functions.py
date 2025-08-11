@@ -2328,3 +2328,53 @@ def function225():
         print(f"🔊 Played frequency: {frequency} Hz at {db} dB SPL")
     except Exception as e:
         print(f"❌ Error in function255: {e}")
+
+#Function to test all the sounds generated:
+# Play Cognitive Bias tone (pair & index chosen from task vars)
+def function230():
+    try:
+        # Get trial parameters from task
+        pair         = int(utils.task.pair)
+        probe        = int(utils.task.probe)
+        shape        = str(utils.task.shape).lower().strip()
+
+        px = settings.PIXELS_PER_MM
+        py = settings.PIXELS_PER_MM
+        x_correct = int(utils.task.x_correcth * px)
+        x_incorrect = int(utils.task.x_incorrecth * px)
+        y = int(-utils.task.y_correcth * py)  # flipped Y axis
+        width = int(utils.task.width * px)
+        height = int(utils.task.height * py)
+
+        print(f"px={px}, py={py}")
+        print(f"x_correct={x_correct}, x_incorrect={x_incorrect}")
+        print(f"y={y}")
+        print(f"width={width}, height={height}")
+
+        # Play tone
+        tone = cb_tones[pair][probe]
+        soundStream.play(tone)
+        print(f"[230] Playing CB tone: pair {pair}, probe {probe}, "
+              f"{cb_tones_hz[pair][probe]} Hz, correct shape={shape}")
+
+        # Draw correct shape
+        if shape == "triangle":
+            triangle1.pos = (x_correct, y)
+            triangle1.size = (width, height)
+            circle1.pos = (x_incorrect, y)
+            circle1.size = (width, height)
+        elif shape == "circle":
+            circle1.pos = (x_correct, y)
+            circle1.size = (width, height)
+            triangle1.pos = (x_incorrect, y)
+            triangle1.size = (width, height)
+        else:
+            print(f"[230] Unknown shape: {shape}")
+    except Exception as e:
+        print(f"[230] Error: {e}")
+
+
+def loop230(timing):
+    triangle1.draw()
+    circle1.draw()
+    window.flip()
