@@ -694,6 +694,23 @@ def go_to_state(num):
             utils.subject.stage_sequence = ast.literal_eval(utils.subject.stage_sequence)
         utils.subject.stage_sequence = list(map(float, utils.subject.stage_sequence))
 
+        utils.subject.last_stage_trial = int(utils.subject.last_stage_trial)  #Cast to int
+        utils.subject.stage_sequence_counter = int(utils.subject.stage_sequence_counter)  #Cast to int
+
+        utils.subject.substage_counter_1 = int(utils.subject.substage_counter_1)  #Cast to int
+        utils.subject.substage_counter_2 = int(utils.subject.substage_counter_2)  #Cast to int
+        utils.subject.substage_counter_3 = int(utils.subject.substage_counter_3)  #Cast to int
+        utils.subject.substage_counter_4 = int(utils.subject.substage_counter_4)  #Cast to int
+        utils.subject.substage_counter_5 = int(utils.subject.substage_counter_5)  #Cast to int
+        utils.subject.substage_counter_6 = int(utils.subject.substage_counter_6)  #Cast to int
+        utils.subject.substage_counter_7 = int(utils.subject.substage_counter_7)  #Cast to int
+        utils.subject.substage_counter_8 = int(utils.subject.substage_counter_8)  #Cast to int
+        utils.subject.substage_counter_9 = int(utils.subject.substage_counter_9)  #Cast to int
+        utils.subject.substage_counter_10 = int(utils.subject.substage_counter_10)  #Cast to int
+        utils.subject.substage_counter_11 = int(utils.subject.substage_counter_11)  #Cast to int
+
+
+        #NEXT:
         #From subject to task:
         utils.task.stage = utils.subject.stage
         utils.task.substage = utils.subject.substage
@@ -738,8 +755,21 @@ def go_to_state(num):
         utils.task.reward_frequency = utils.subject.reward_frequency
         utils.task.reward_db = utils.subject.reward_db
         utils.task.reward_duration = utils.subject.reward_duration
-
         utils.task.stage_sequence = utils.subject.stage_sequence
+        utils.task.last_stage_trial = utils.subject.last_stage_trial
+        utils.task.stage_sequence_counter = utils.subject.stage_sequence_counter
+
+        utils.task.substage_counter_1 = utils.subject.substage_counter_1
+        utils.task.substage_counter_2 = utils.subject.substage_counter_2
+        utils.task.substage_counter_3 = utils.subject.substage_counter_3
+        utils.task.substage_counter_4 = utils.subject.substage_counter_4
+        utils.task.substage_counter_5 = utils.subject.substage_counter_5
+        utils.task.substage_counter_6 = utils.subject.substage_counter_6
+        utils.task.substage_counter_7 = utils.subject.substage_counter_7
+        utils.task.substage_counter_8 = utils.subject.substage_counter_8
+        utils.task.substage_counter_9 = utils.subject.substage_counter_9
+        utils.task.substage_counter_10 = utils.subject.substage_counter_10
+        utils.task.substage_counter_11 = utils.subject.substage_counter_11
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

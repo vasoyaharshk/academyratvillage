@@ -312,8 +312,8 @@ class Touch:
             xtouch = abs(answer[0] * (self.win_resolution[0] / self.touch_resolution[0]))
             ytouch = abs(answer[1] * (self.win_resolution[1] / self.touch_resolution[1]))
 
-            print(f'Touch Coordinates: {answer}')  # Debugging raw touch coordinates
-            print(f'Converted Touch (xtouch, ytouch): {xtouch}, {ytouch}')  # Debugging touch conversion
+            #print(f'Touch Coordinates: {answer}')  # Debugging raw touch coordinates
+            #print(f'Converted Touch (xtouch, ytouch): {xtouch}, {ytouch}')  # Debugging touch conversion
 
             # Define boundaries for the correct rectangular area:
             left_boundary_correct = (xpsy_correct - width / 2)

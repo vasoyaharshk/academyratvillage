@@ -50,8 +50,6 @@ self.stim_trial = 0  # The function number of the correct stimulus in the curren
 self.stim_trials = []  # List of correct stimulus function randomised.
 self.stim_trial_counter = 0  #It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
 self.last_stim_trial = 0  #the function of the last trial of the previous block. Used to ensure first trial of next block is different
-self.max_move_backs = 0
-self.stage_sequence = []
 
 #Only defined in select_task:
 self.wait_seconds = 0  # Time between two sessions.
@@ -124,3 +122,4 @@ self.bias_accuracy = 0  #Accuracy of the last five trials.
 self.probabilities = [] #The probability for left and right in extra training in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 self.probabilities_size = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 self.probabilities_side  = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
+self.stage_sequence_counter = 0 #tracks the stage sequeunce in handtracking

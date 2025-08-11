@@ -138,6 +138,19 @@ def select_task(df, subject):
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
     stage_sequence = get_val_from_df_or_default('stage_sequence', [])
     last_stage_trial  = get_val_from_df_or_default('last_stage_trial', 0)
+    stage_sequence_counter  = get_val_from_df_or_default('stage_sequence_counter', 0)
+
+    substage_counter_1  = get_val_from_df_or_default('substage_counter_1', 0)
+    substage_counter_2  = get_val_from_df_or_default('substage_counter_2', 0)
+    substage_counter_3  = get_val_from_df_or_default('substage_counter_3', 0)
+    substage_counter_4  = get_val_from_df_or_default('substage_counter_4', 0)
+    substage_counter_5  = get_val_from_df_or_default('substage_counter_5', 0)
+    substage_counter_6  = get_val_from_df_or_default('substage_counter_6', 0)
+    substage_counter_7  = get_val_from_df_or_default('substage_counter_7', 0)
+    substage_counter_8  = get_val_from_df_or_default('substage_counter_8', 0)
+    substage_counter_9  = get_val_from_df_or_default('substage_counter_9', 0)
+    substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
+    substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
 
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
@@ -622,61 +635,64 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
-    # ======== AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
+    #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
+    # Skip AW logic for subject m2
+    if my_subject == 'm3':
+        print("Subject is m2. no AW")
+    else:
+        today_aw = datetime.now().date()
+        last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
+        last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
 
-    today_aw = datetime.now().date()
-    last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
-    last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
+        df_aw_check = df.copy()
+        df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
 
-    df_aw_check = df.copy()
-    df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
+        # Check if ANY session in today+last5 is Automatic Water
+        has_aw_session = (
+                df_aw_check[
+                    (df_aw_check['date'].isin(last6_days)) &
+                    (df_aw_check['task'] == 'Automatic_Water')
+                    ].shape[0] > 0
+        )
 
-    # Check if ANY session in today+last5 is Automatic Water
-    has_aw_session = (
-            df_aw_check[
-                (df_aw_check['date'].isin(last6_days)) &
-                (df_aw_check['task'] == 'Automatic_Water')
-                ].shape[0] > 0
-    )
+        # Count corrects in last 5 full days (not including today)
+        df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
+        corrects_last5 = (
+            df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
+            .groupby('date')
+            .size()
+            .reindex(last5_full_days, fill_value=0)
+        )
+        total_corrects_last5 = corrects_last5.sum()
 
-    # Count corrects in last 5 full days (not including today)
-    df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
-    corrects_last5 = (
-        df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
-        .groupby('date')
-        .size()
-        .reindex(last5_full_days, fill_value=0)
-    )
-    total_corrects_last5 = corrects_last5.sum()
+        # Determine if Automatic Water is needed
+        automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
 
-    # Determine if Automatic Water is needed
-    automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
+        # (Optional) Annotate entire dataframe with the status for this run
+        df_aw_check['automatic_water'] = automatic_water_needed
 
-    # (Optional) Annotate entire dataframe with the status for this run
-    df_aw_check['automatic_water'] = automatic_water_needed
+        # Assign Automatic Water if needed
+        if task != "Automatic_Water" and automatic_water_needed:
+            task = "Automatic_Water"
+            try:
+                message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except:
+                print('Telegram message not sent')
 
-    # Assign Automatic Water if needed
-    if task != "Automatic_Water" and automatic_water_needed:
-        task = "Automatic_Water"
-        try:
-            message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
-            telegram_bot.alarm_finish_session(message, my_subject)
-        except:
-            print('Telegram message not sent')
-
-    # Debug print (optional)
-    print("-----DEBUG: AW CHECK-----")
-    print("Has AW session in last 6 days (inc. today):", has_aw_session)
-    print("Total corrects in last 5 full days:", total_corrects_last5)
-    print("Assign Automatic Water?:", automatic_water_needed)
-    print("-------------------------")
+        # Debug print (optional)
+        print("-----DEBUG: AW CHECK-----")
+        print("Has AW session in last 6 days (inc. today):", has_aw_session)
+        print("Total corrects in last 5 full days:", total_corrects_last5)
+        print("Assign Automatic Water?:", automatic_water_needed)
+        print("-------------------------")
 
     if my_subject == 'm3':
         wait_seconds = 1
         block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

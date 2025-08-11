@@ -1,9 +1,16 @@
 from user import settings
 from academy.utils import utils
+import os
+# from user.sound_elements_version1 import *
+import random
+import re
+
+from academy import telegram_bot
 from academy.camera import cam2, cam3
 from academy.touch import touch
+from academy.utils import utils
 from user.psychopy_elements import *
-#from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
+# from user.psychopy_elements import window ,square, square2, square3, border1, border2, border3, image_jar_left, image_jar_right, circle_correcth, video_left, video_right
 from user.sound_elements import *
 #from user.sound_elements_version1 import *
 import random
@@ -1782,10 +1789,10 @@ def function114():
     if video_path_replaced:
         if last_function_called in LEFT_FUNCTIONS:
             video_left.setMovie(video_path_replaced)
-            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         elif last_function_called in RIGHT_FUNCTIONS:
             video_right.setMovie(video_path_replaced)
-            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+            video_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1]-45)
         #print(f"Correct image path: {video_path_replaced}")
     else:
         print("Warning: image_path is None or could not be processed. No image will be updated.")
@@ -2325,6 +2332,6 @@ def function225():
         frequency = utils.task.reward_frequency
         db = utils.task.reward_db
         play_any_frequency(frequency, duration=3, db=db)
-        print(f"🔊 Played frequency: {frequency} Hz at {db} dB SPL")
+        print(f"Played frequency: {frequency} Hz at {db} dB SPL")
     except Exception as e:
-        print(f"❌ Error in function255: {e}")
+        print(f"Error in function255: {e}")
