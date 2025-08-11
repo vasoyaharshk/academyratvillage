@@ -1037,13 +1037,13 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                     self.stage_backward_change = 1
 
             #Assign in pass what to do when the rat is moved back more than 5 times.
-            if self.moved_back_counter > self.max_move_backs:
-                #message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
-                try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
+            # if self.moved_back_counter > self.max_move_backs:
+            #     #message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+            #     try:
+            #         #telegram_bot.alarm_finish_session(message, self.subject)
+            #     except:
+            #         print('Telegram message not sent')
+            #         pass
 
             if self.substage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
@@ -1143,7 +1143,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    #telegram_bot.alarm_finish_session(message, self.subject)
                     self.alert_sent = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
@@ -1155,7 +1155,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             if self.substage == 6 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    #telegram_bot.alarm_finish_session(message, self.subject)
                     self.alert_sent = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
