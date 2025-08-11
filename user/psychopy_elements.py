@@ -4,6 +4,7 @@ from psychopy import visual, logging
 from psychopy.visual import Circle
 from user import settings
 from psychopy import prefs
+from psychopy.visual import ShapeStim
 prefs.hardware['audioLib'] = ['no sound']
 
 # to avoid the recurrent psychopy monitor warning
@@ -141,3 +142,27 @@ image_jar_right_sized = visual.ImageStim(
 )
 
 end_screen = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
+
+
+#Cognitive Bias Script:
+# White triangle
+triangle1 = ShapeStim(
+    win=window,
+    vertices=[(-0.5, -0.288675), (0.5, -0.288675), (0.0, 0.57735)],  # equilateral
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    closeShape=True,
+    pos=(0, 0)
+)
+
+# White circle
+circle1 = Circle(
+    win=window,
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    pos=(0, 0)
+)
