@@ -155,4 +155,4 @@ cb_tones_hz = {
 # Pre-generate 2s tones with ramp
 cb_tones = {}
 for pair, freqs in cb_tones_hz.items():
-    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=70, FsOut=DEFAULT_FS) for f in freqs]
+    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=50, FsOut=DEFAULT_FS) for f in freqs]

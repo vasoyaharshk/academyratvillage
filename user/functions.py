@@ -2340,11 +2340,11 @@ def function230():
 
         px = settings.PIXELS_PER_MM
         py = settings.PIXELS_PER_MM
-        x_correct = int(utils.task.x_correcth * px)
-        x_incorrect = int(utils.task.x_incorrecth * px)
-        y = int(-utils.task.y_correcth * py)  # flipped Y axis
-        width = int(utils.task.width * px)
-        height = int(utils.task.height * py)
+        x_correct = utils.task.x_correcth * px
+        x_incorrect = utils.task.x_incorrecth * px
+        y = -utils.task.y_correcth * py # flipped Y axis
+        width = utils.task.width * px
+        height = utils.task.height * py
 
         print(f"px={px}, py={py}")
         print(f"x_correct={x_correct}, x_incorrect={x_incorrect}")
@@ -2354,7 +2354,7 @@ def function230():
         # Play tone
         tone = cb_tones[pair][probe]
         soundStream.play(tone)
-        print(f"[230] Playing CB tone: pair {pair}, probe {probe}, "
+        print(f"Playing CB tone: pair {pair}, probe {probe}, "
               f"{cb_tones_hz[pair][probe]} Hz, correct shape={shape}")
 
         # Draw correct shape
@@ -2381,19 +2381,39 @@ def loop230(timing):
 
 
 def function231(): #Touchteaching read touchscreen
-    stage = utils.task.stage
     px = settings.PIXELS_PER_MM_X
     py = settings.PIXELS_PER_MM_Y
 
-    print("Stage= ", stage)
     width = (utils.task.width + 50) * px
     height = (utils.task.height + 50) * py
-    x_correct = utils.task.x_correcth_pos * px
-    x_incorrect = int(utils.task.x_incorrecth * px)
-    y = utils.task.y_correcth_pos * py
+    x_correct = utils.task.x_correcth * px
+    x_incorrect = utils.task.x_incorrecth * px
+    y = utils.task.y_correcth * py
 
     touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
     print('Resp Win 1')
+
+
+#Correct without image display:
+def function232():
+    cam2.put_state("Correct")
+    cam3.put_state("Correct")
+    print("Correct")
+
+
+#Punish without image display:
+def function233():
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Incorrect")
+
+
+#Miss:
+def function234():
+    print("Blank Screen")
+
+def loop234(timing):
+    window.flip()

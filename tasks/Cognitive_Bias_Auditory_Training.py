@@ -297,7 +297,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     state_name='Start_task',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 234)])
                 # Starts task and displays stimuli instanly
 
                 self.sma.add_state(
@@ -312,21 +312,28 @@ class Cognitive_Bias_Auditory_Training(Task):
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
+                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                    output_actions=[])
 
             self.sma.add_state(
                 state_name='Wait_for_fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port4In: 'Fixation'},
-                output_actions=[])
+                state_change_conditions={Bpod.Events.Port4In: 'Fixation1'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 234)])
             # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
             self.sma.add_state(
-                state_name='Fixation',
+                state_name='Fixation1',
+                state_timer=2,
+                state_change_conditions={Bpod.Events.Tup: 'Fixation2'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
+            # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+
+            self.sma.add_state(
+                state_name='Fixation2',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
+                output_actions=[])
             # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
             self.sma.add_state(
@@ -341,14 +348,14 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_name='Correct',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 232)])
             # Turns on Water port LED and plays correct sound
 
             self.sma.add_state(
                 state_name='Correct_image_display',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 55)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5)])
             # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
             self.sma.add_state(
@@ -377,15 +384,14 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_timer=self.valve_time * self.valve_factor_i,
                 state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 39)])
+                                (Bpod.OutputChannels.SoftCode, 233)])
             # Turns on Global LED and water port LED on
 
             self.sma.add_state(
                 state_name='Punish_image_display',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 56)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
             # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
             self.sma.add_state(
