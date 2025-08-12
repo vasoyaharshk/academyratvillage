@@ -2335,7 +2335,7 @@ def function230():
     try:
         # Get trial parameters from task
         pair  = int(utils.task.pair)
-        probe = int(utils.task.stim)  # probe == self.stim
+        probe = int(utils.task.stim_trial)  # probe == self.stim
         shape   = str(utils.task.shape_correct).lower().strip()
 
         px = settings.PIXELS_PER_MM

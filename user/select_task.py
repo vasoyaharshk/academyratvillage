@@ -408,6 +408,7 @@ def select_task(df, subject):
         elif 'Cognitive_Bias_Auditory_Training' in task:
             #Move pair +1 when criterion is met:
             accuracy_criteria = 0.85
+            trials_criteria = 75
 
             df_cb = df[df['task'].str.contains('Cognitive_Bias_Auditory_Training', na=False)].copy()
             if not df_cb.empty:
@@ -427,13 +428,13 @@ def select_task(df, subject):
                 # (n2, a2) = session_stats(sessions[-1])
                 # print(f"[CB] last2 sessions={sessions[-2:]} "
                 #       f"| s1: valid={n1}, acc={a1:.3f} | s2: valid={n2}, acc={a2:.3f}")
-                # meets = (n1 == 75 and a1 >= accuracy_criteria) and (n2 == 75 and a2 >= accuracy_criteria)
+                # meets = (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
 
 
 
                 # Version 2 (skip short sessions):
                 # (uncomment this block if you want skip-short behaviour)
-                full_sessions = [s for s in sessions if session_stats(s)[0] == 75]
+                full_sessions = [s for s in sessions if session_stats(s)[0] >= trials_criteria]
                 if len(full_sessions) >= 2:
                     last_two_full = full_sessions[-2:]
                     (n1, a1) = session_stats(last_two_full[0])

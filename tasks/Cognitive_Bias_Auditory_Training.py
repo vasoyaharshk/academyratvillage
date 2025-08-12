@@ -16,18 +16,15 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         ########   TASK INFO   ########
         Goal: Train discrimination between tones within each of 4 frequency pairs.
-        
         Procedure:
             Rats begin with Pair 1.
             Left/right responses (touchscreen) indicate tone identity (low/high); rewards differ in size (20 µL left vs 40 µL right sucrose water).
             Side and reward counterbalanced across rats.
             Partial reinforcement is introduced: 1 in 5 training trials is unrewarded.
             Rats proceed sequentially to Pairs 2, 3, and 4.
-            Each pair uses a different screen colour to aid discrimination.
+            Each pair uses a different shape to aid discrimination.
             Rats are split into 2 groups to counterbalance tone-reward mappings across pairs.
-        
         Criterion: ≥85% correct for 2 consecutive sessions.
-
         Pairs:
         Pair 1:
             Low reference: 2000 Hz
@@ -41,33 +38,27 @@ class Cognitive_Bias_Auditory_Training(Task):
         Pair 4:
             Low reference: 23.913 Hz
             High reference: 43.298 Hz
-            
         Training order: All rats follow Pair 1, Pair 2, Pair 3, Pair 4
-        
-        Randomization:
+        Randomization for Groups:
             8 rats:
             chandler, felix, fergus, geralt, joey, ross, innes, pol
-    
             Stimulus sides:
                 For each rat: randomly counterbalanced →
                 Low tone = Left or Right
                 High tone = Right or Left
-        
             Reward mapping groups (between-subjects):
                 Reward Group 1:
                     Pairs 1 & 3: High tone = Large reward
                     Pairs 2 & 4: Low tone = Large reward
-        
                 Reward Group 2 (opposite):
                     Pairs 1 & 3: Low tone = Large reward
                     Pairs 2 & 4: High tone = Large reward
-            
             So in order to have a full factorial design:
             Summary of Reward Mapping per Group
                 Group 1 (Pairs 1 & 3: High → large reward, left, triangle; Pairs 2 & 4: Low → large reward, right, triangle):
                     Rats: chandler, felix, joey, ross
-
                 Group 2 (Pairs 1 & 3: Low → large reward, right, triangle; Pairs 2 & 4: High → large reward, right, triangle):
+                
                     Rats: fergus, geralt, innes, pol
                 
                 ########   PORTS INFO   ########
@@ -132,15 +123,15 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.partial_reinforcement_ratio = 0.2
 
         # Correcth location and size:
-        self.x_correcth_pos = [95, 281]  # Positions of the stim on the screen
-        self.y_correcth = 110
+        self.x_correcth_pos = [103, 308]  # Positions of the stim on the screen
+        self.y_correcth = 150
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
         self.response_duration = 60
 
 
     def configure_gui(self):
-        self.gui_input = ['pair', 'substage', 'duration_max']
+        self.gui_input = ['group', 'pair', 'duration_max']
 
     def generate_random_trials(self,last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -191,10 +182,15 @@ class Cognitive_Bias_Auditory_Training(Task):
     #             return {'low': self.reward_small, 'high': self.reward_large}
 
     def main_loop(self):
-        print(self.subject)
+        print('subject', self.subject)
+        print('task', self.task)
+        print('block_size', self.block_size)
+        print('stim_trial_counter', self.stim_trial_counter)
 
         if self.current_trial == 0:
             self.accuracy = 0
+            self.stim_trial_counter = 0
+            self.stim = [0, 4]
 
         # if self.block_change == 1:
         #     self.block_number += 1
@@ -295,13 +291,13 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task == "Cognitive_Bias_Auditory_Training_first":
+        if self.task == "Cognitive_Bias_Auditory_Training":
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                    output_actions=[])
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
                 # Starts task and displays stimuli instanly
 
                 self.sma.add_state(
@@ -317,7 +313,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     state_name='Start_task',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
-                    output_actions=[])
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
 
             self.sma.add_state(
                 state_name='Wait_for_fixation',
@@ -434,7 +430,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.trial_result = None
 
     def after_trial(self):
-        if self.task_number == 1:
+        if self.task == "Cognitive_Bias_Auditory_Training":
             self.total_trials += 1  # remove this
 
             ##### COUNT MISSES:
@@ -518,10 +514,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('y_correcth', self.y_correcth)
         self.register_value('width', self.width)
         self.register_value('height', self.height)
-
-        # Criteria
-        self.register_value('accuracy_criteria', self.accuracy_criteria)
-        self.register_value('trial_end_criteria', self.trial_end_criteria)
 
         # Stage changes
         self.register_value('moved_back_counter', self.moved_back_counter)
