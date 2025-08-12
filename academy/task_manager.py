@@ -45,6 +45,11 @@ class TaskManager:
             self.df.to_csv(raw_path, index=None, header=True, sep=';')
 
             self.new_df = self.transform_df()
+
+            # --- Add this block ---
+            if 'reward_drunk' not in self.new_df.columns:
+                self.new_df['reward_drunk'] = 0.0
+
             water = self.new_df['reward_drunk'].iloc[-1]
             self.new_df.to_csv(clean_path, sep=';', header=True, index=False)
 
@@ -60,7 +65,7 @@ class TaskManager:
             self.df_all = self.df_all.apply(pd.to_numeric, args=('ignore', ))
 
 
-            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, group, pair  = select_task.select_task(self.df_all, self.subject)
+            task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair  = select_task.select_task(self.df_all, self.subject)
 
             if weight:
                 utils.subjects.add_new_item({'task': task,

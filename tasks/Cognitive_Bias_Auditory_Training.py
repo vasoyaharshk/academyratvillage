@@ -121,7 +121,9 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # --- Training parameters ---
-        self.partial_reinforcement_ratio = 0.2
+        self.variable_reinforcement = 1
+        self.variable_reinforcement_ratio = 0.2
+        self.partial_reinforcement_trials = []
 
         # Correcth location and size:
         self.x_correcth_pos = [103, 308]  # Positions of the stim on the screen
@@ -298,7 +300,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     state_name='Start_task',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, 234)])
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 234)]) #Draws black screen
                 # Starts task and displays stimuli instanly
 
                 self.sma.add_state(
@@ -319,17 +321,14 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Wait_for_fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
+                state_change_conditions={Bpod.Events.Port3In: 'Fixation'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 234)])  #Draws black screen
-            # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
             self.sma.add_state(
                 state_name='Fixation',
                 state_timer=2,
                 state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 230)]) #PLayes sound and displays stims
-            # Does Nothing. Make it close door 3 later when Duncan has fixed it.
-
 
             self.sma.add_state(
                 state_name='Response_window',
@@ -376,10 +375,10 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             self.sma.add_state(
                 state_name='Punish',
-                state_timer=self.valve_time * self.valve_factor_i,
+                state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 231)])
+                                (Bpod.OutputChannels.SoftCode, 232)])
             # Turns on Global LED and water port LED on
 
             self.sma.add_state(
@@ -391,9 +390,9 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             self.sma.add_state(
                 state_name='After_punish',
-                state_timer=0,
+                state_timer=self.valve_time * self.valve_factor_i,
                 state_change_conditions={Bpod.Events.Tup: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 40)])
             # Flips the screen after water port poked in.
 
             self.sma.add_state(

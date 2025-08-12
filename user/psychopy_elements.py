@@ -148,7 +148,7 @@ end_screen = visual.ImageStim(win=window, image=None)  # Image will be set dynam
 # White triangle
 triangle1 = ShapeStim(
     win=window,
-    vertices=[(-0.5, -0.288675), (0.5, -0.288675), (0.0, 0.57735)],  # equilateral
+    vertices=[(-0.5, -0.4330127), (0.5, -0.4330127), (0.0, 0.4330127)],
     units='pix',
     size=(100, 100),
     lineColor=[1, 1, 1],
@@ -156,6 +156,7 @@ triangle1 = ShapeStim(
     closeShape=True,
     pos=(0, 0)
 )
+
 
 # White circle
 circle1 = Circle(
