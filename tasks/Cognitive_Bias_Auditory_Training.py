@@ -69,20 +69,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
                 Group 2 (Pairs 1 & 3: Low → large reward, right, triangle; Pairs 2 & 4: High → large reward, right, triangle):
                     Rats: fergus, geralt, innes, pol
-        
-                So pairs 1 and 3 for these would be:
-                | **Rat**  | **Reward Group** | **Low Tone Side** | **Shape**
-                | -------- | ---------------- | ----------------- | ----------------- |
-                | chandler | A                | Left              | triangle          |
-                | felix    | A                | Right             | triangle          |
-                | fergus   | B                | Left              | circle            |
-                | geralt   | B                | Right             | circle            |
-                | joey     | A                | Left              | triangle          |
-                | ross     | A                | Right             | triangle          |
-                | innes    | B                | Left              | circle            |
-                | pol      | B                | Right             | circle            |
                 
-    
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -153,7 +140,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
 
     def configure_gui(self):
-        self.gui_input = ['pairs', 'substage', 'duration_max']
+        self.gui_input = ['pair', 'substage', 'duration_max']
 
     def generate_random_trials(self,last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -351,7 +338,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_timer=self.response_duration,
                 state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
                                          Bpod.Events.Tup: 'No_Touch'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 231)])
             # Starts to read the touchscreen with one touch processing
 
             self.sma.add_state(

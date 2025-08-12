@@ -2378,3 +2378,22 @@ def loop230(timing):
     triangle1.draw()
     circle1.draw()
     window.flip()
+
+
+def function231(): #Touchteaching read touchscreen
+    stage = utils.task.stage
+    px = settings.PIXELS_PER_MM_X
+    py = settings.PIXELS_PER_MM_Y
+
+    print("Stage= ", stage)
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
+    x_correct = utils.task.x_correcth_pos * px
+    x_incorrect = int(utils.task.x_incorrecth * px)
+    y = utils.task.y_correcth_pos * py
+
+    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win 1')
