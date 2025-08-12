@@ -2397,19 +2397,17 @@ def function231(): #Touchteaching read touchscreen
     print('Resp Win 1')
 
 
-#Correct without image display:
-def function232():
-    cam2.put_state("Correct")
-    cam3.put_state("Correct")
-    print("Correct")
-
-
 #Punish without image display:
-def function233():
+def function232():
+    soundStream.play(soundVec3)
+
     cam2.put_state("Punish")
     cam3.put_state("Punish")
-    print("Incorrect")
+    print("Punish, Punish Sound played")
 
+
+def loop232(timing):
+    window.flip()
 
 #Miss:
 def function234():

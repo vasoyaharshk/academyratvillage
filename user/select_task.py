@@ -408,7 +408,7 @@ def select_task(df, subject):
         elif 'Cognitive_Bias_Auditory_Training' in task:
             #Move pair +1 when criterion is met:
             accuracy_criteria = 0.85
-            trials_criteria = 75
+            trials_criteria = 5
 
             df_cb = df[df['task'].str.contains('Cognitive_Bias_Auditory_Training', na=False)].copy()
             if not df_cb.empty:

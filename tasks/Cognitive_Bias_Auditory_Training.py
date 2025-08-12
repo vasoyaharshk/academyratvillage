@@ -81,6 +81,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.valid_counter = 0
         self.tired_counter = 0
         self.reward_drunk = 0
+        self.reward = 0
         self.correct_count = 0
         self.accuracy = 0
         self.total_trials = 0  # Total number of trials in the current pair
@@ -318,23 +319,17 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Wait_for_fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port4In: 'Fixation1'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 234)])
+                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 234)])  #Draws black screen
             # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
             self.sma.add_state(
-                state_name='Fixation1',
+                state_name='Fixation',
                 state_timer=2,
-                state_change_conditions={Bpod.Events.Tup: 'Fixation2'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 230)])
+                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                output_actions=[(Bpod.OutputChannels.SoftCode, 230)]) #PLayes sound and displays stims
             # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
-            self.sma.add_state(
-                state_name='Fixation2',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-                output_actions=[])
-            # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
             self.sma.add_state(
                 state_name='Response_window',
@@ -348,7 +343,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_name='Correct',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 232)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # Turns on Water port LED and plays correct sound
 
             self.sma.add_state(
@@ -384,7 +379,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_timer=self.valve_time * self.valve_factor_i,
                 state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
                 output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 233)])
+                                (Bpod.OutputChannels.SoftCode, 231)])
             # Turns on Global LED and water port LED on
 
             self.sma.add_state(
@@ -447,6 +442,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.reward_drunk += self.valve_reward * self.valve_factor_i
+                self.reward = self.valve_reward * self.valve_factor_i
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
                 self.success = 0
@@ -458,6 +454,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
+                self.reward = self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 # print('Correct_count: ', self.correct_count)
                 self.success = 1
@@ -510,6 +507,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('valid_counter', self.valid_counter)
         self.register_value('tired_counter', self.tired_counter)
         self.register_value('reward_drunk', self.reward_drunk)
+        self.register_value('reward', self.reward)
         self.register_value('correct_count', self.correct_count)
         self.register_value('accuracy', self.accuracy)
         self.register_value('success', self.success)
