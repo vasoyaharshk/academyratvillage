@@ -51,7 +51,7 @@ class Probability_Handtracking_PG5(Task):
         self.stage = 1  # Current stage within the task
         self.substage = 1  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
-        self.task_number = 4  # Each task has a unique number. See RV script guide.
+        self.task_number = 5  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
         self.block_size = 40  # The number of trials in a block
@@ -177,7 +177,7 @@ class Probability_Handtracking_PG5(Task):
         self.substage_counter_11 = 0
         self.substage_counter_12 = 0
 
-        self.fixation_trigger_port = Bpod.Events.Port6In
+        self.fixation_trigger_port = Bpod.Events.Port5In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -495,7 +495,7 @@ class Probability_Handtracking_PG5(Task):
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
             if self.substage == 8:
-                self.task_number = 5
+                self.task_number = 6
                 self.tired = True
 
         if self.stage_backward_change == 1:
@@ -548,7 +548,7 @@ class Probability_Handtracking_PG5(Task):
         
         ### IMAGE Randomisation
         self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
-        if self.task_number == 4:
+        if self.task_number == 5:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
@@ -639,14 +639,11 @@ class Probability_Handtracking_PG5(Task):
             #print("video_path_function: ", self.video_path_function)
 
             # Decide which port triggers video for this trial
-            if self.substage == 6 or self.substage >= 8:
-                self.fixation_trigger_port = Bpod.Events.Port5In
-            else:
-                self.fixation_trigger_port = Bpod.Events.Port6In
+            self.fixation_trigger_port = Bpod.Events.Port5In
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 4:
+        if self.task_number == 5:
             if self.stage % 2 == 1 :
                 # First trial:
                 if self.current_trial == 0:
@@ -930,7 +927,7 @@ class Probability_Handtracking_PG5(Task):
             self.response_y = None
 
     def after_trial(self):
-        if self.task_number == 4:
+        if self.task_number == 5:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
