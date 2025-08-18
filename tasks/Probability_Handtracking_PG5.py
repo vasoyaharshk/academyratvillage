@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking_Zoomed_Mod(Task):
+class Probability_Handtracking_PG5(Task):
     def __init__(self):
         super().__init__()
 
@@ -16,7 +16,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
-        
+        This script is for 
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
         Substages:
