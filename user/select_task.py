@@ -657,6 +657,19 @@ def select_task(df, subject):
                 stage_backward_change = 0
                 last_forward_stage = 0
                 last_backward_stage = 0
+                self.stage_sequence_counter = 0
+                self.substage_counter_1 = 0
+                self.substage_counter_2 = 0
+                self.substage_counter_3 = 0
+                self.substage_counter_4 = 0
+                self.substage_counter_5 = 0
+                self.substage_counter_6 = 0
+                self.substage_counter_7 = 0
+                self.substage_counter_8 = 0
+                self.substage_counter_9 = 0
+                self.substage_counter_10 = 0
+                self.substage_counter_11 = 0
+                self.substage_counter_12 = 0
                 message = f"PI: Probability_Handtracking_Zoomed_Mod complete, Moving to {task}."
                 print(f'{message}')
                 try:
@@ -690,6 +703,19 @@ def select_task(df, subject):
                 stage_backward_change = 0
                 last_forward_stage = 0
                 last_backward_stage = 0
+                self.stage_sequence_counter = 0
+                self.substage_counter_1 = 0
+                self.substage_counter_2 = 0
+                self.substage_counter_3 = 0
+                self.substage_counter_4 = 0
+                self.substage_counter_5 = 0
+                self.substage_counter_6 = 0
+                self.substage_counter_7 = 0
+                self.substage_counter_8 = 0
+                self.substage_counter_9 = 0
+                self.substage_counter_10 = 0
+                self.substage_counter_11 = 0
+                self.substage_counter_12 = 0
                 message = f"PI: Probability_Handtracking_PG5 complete, Moving to {task}."
                 print(f'{message}')
                 try:
@@ -723,6 +749,19 @@ def select_task(df, subject):
                 stage_backward_change = 0
                 last_forward_stage = 0
                 last_backward_stage = 0
+                self.stage_sequence_counter = 0
+                self.substage_counter_1 = 0
+                self.substage_counter_2 = 0
+                self.substage_counter_3 = 0
+                self.substage_counter_4 = 0
+                self.substage_counter_5 = 0
+                self.substage_counter_6 = 0
+                self.substage_counter_7 = 0
+                self.substage_counter_8 = 0
+                self.substage_counter_9 = 0
+                self.substage_counter_10 = 0
+                self.substage_counter_11 = 0
+                self.substage_counter_12 = 0
                 message = f"PI: Probability_Handtracking_Yellow complete, Moving to {task}."
                 print(f'{message}')
                 try:
