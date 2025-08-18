@@ -19,7 +19,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
-        Substages:
+        Substages: Only substages 1 to 5 are covered here. Afterwards there is a different script for the substages:
         Substages: Only the trials for stage 2 are counted for accuracy.
         Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
         Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 6.
@@ -31,6 +31,8 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
         and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
         Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 6.
+        
+        Covered by different scripts:
         Substage 6: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
         
         Stage 3: Introduction of the yellow tokens:
@@ -59,6 +61,8 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED. STARTS THE RESPONSE WINDOW
         
         IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
+        
+        Task Number = 4
         """
 
         # ==============================
@@ -181,12 +185,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             3: {1: 0.50, 2: 0.50},
             4: {1: 0.25, 2: 0.75},
             5: {1: 0.125, 2: 0.875},
-            6: {1: 0.125, 2: 0.875},
-            7: {3: 0.125, 4: 0.875},
-            8: {3: 0.125, 4: 0.875},
-            9: {5: 0.125, 6: 0.875},
-            10: {7: 0.125, 8: 0.875},
-            11: {9: 0.125, 10: 0.875},
+            6: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
@@ -509,7 +508,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 8:
+            if self.substage == :
                 self.task_number = 5
                 self.tired = True
 

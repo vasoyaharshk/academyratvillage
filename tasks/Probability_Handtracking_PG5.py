@@ -16,35 +16,16 @@ class Probability_Handtracking_PG5(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
-        This script is for 
+        This script is for stage 6 onwwards where the photogate that triggers the video is 5.
+        
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
-        Substages:
-        Substages: Only the trials for stage 2 are counted for accuracy.
-        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
-        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 6.
-        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 6.
-        
-        Only stage 2 counted  towards the block after substage 3:
-        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 6.
+        Substages: Substages 1 to 5 are covered in another script "Probability_Handtracking_Zoomed_Mod".
         
         From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
         and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
-        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 6.
-        Substage 6: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
-        
-        Stage 3: Introduction of the yellow tokens:
-        Substage 7: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 6. Stage 3 and stage 4 trials interleaved.
-        Substage 8: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 3 and stage 4 trials interleaved.
-        
-        Stage 4: Introduction of hands crossing:
-        Substage 9: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. Stage 5 and stage 6 trials interleaved. The photogate that triggers the video is 5.
-        Substage 10: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side. Stage 7 and stage 8 trials interleaved. The photogate that triggers the video is 5.
-        
-        Only if rats fail at substage 10:
-        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved. The photogate that triggers the video is 5.
-        
-        if they hit 320 trials, move back one substage
+        Substage 6: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 5.
+        Substage 7: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
         
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
@@ -59,6 +40,8 @@ class Probability_Handtracking_PG5(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED. STARTS THE RESPONSE WINDOW
         
         IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
+        
+        Task Number = 5
         """
 
         # ==============================
@@ -176,17 +159,8 @@ class Probability_Handtracking_PG5(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            1: {1: 0.90, 2: 0.10},
-            2: {1: 0.75, 2: 0.25},
-            3: {1: 0.50, 2: 0.50},
-            4: {1: 0.25, 2: 0.75},
-            5: {1: 0.125, 2: 0.875},
-            6: {1: 0.125, 2: 0.875},
-            7: {3: 0.125, 4: 0.875},
-            8: {3: 0.125, 4: 0.875},
-            9: {5: 0.125, 6: 0.875},
-            10: {7: 0.125, 8: 0.875},
-            11: {9: 0.125, 10: 0.875},
+            5: {1: 0.25, 2: 0.75},
+            6: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
@@ -348,6 +322,17 @@ class Probability_Handtracking_PG5(Task):
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+            # elif stage == 3:
+            #     image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+            # elif stage == 4:
+            #     if self.substage == 10:
+            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/images'
+            #     elif self.substage == 11:
+            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/images'
+            #     elif self.substage == 12:
+            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/images'
+            #     else:
+            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -409,17 +394,17 @@ class Probability_Handtracking_PG5(Task):
             # Define video folder based on stage
             if stage == 2:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            elif stage == 3:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
-            elif stage == 4:
-                if self.substage == 10:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
-                elif self.substage == 11:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
-                elif self.substage == 12:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
-                else:
-                    raise ValueError("Invalid substage for stage 4")
+            # elif stage == 3:
+            #     video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
+            # elif stage == 4:
+            #     if self.substage == 10:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/videos'
+            #     elif self.substage == 11:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/videos'
+            #     elif self.substage == 12:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/videos'
+            #     else:
+            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
