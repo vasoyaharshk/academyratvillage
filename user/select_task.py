@@ -632,6 +632,57 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
+        elif 'Probability_Handtracking' in task:
+            if task == 'Probability_Handtracking_Zoomed_Mod':
+                task_number == 5: #change to yellow tokens
+                task = 'Probability_Handtracking_Yellow'
+
+                # Weber's Law:
+                stage = 1
+                substage = 1
+                ror = []
+                completed_ror = []
+                current_ror = 0.0
+                trial_counter_ror = 0
+                trial_counter = 0
+
+                block_size = 40  # Every 40 blocks the criteria will be tested.
+                block_trial_counter = 0  # Counter for accuracy.
+                block_accuracy = 0.0  # Accuracy for that 40 trial block
+                block_number = 1
+                ror_change = 0
+                block_change = 0
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
+                last_stim_trial = 0
+                last_condition_trial = 0
+                total_trials = 0
+                block_correct_count = 0  # Tracks the number of corrects in the block
+                block_valid_count = 0  ##Tracks the number of valid trials in the block
+                moved_back_counter = 0
+                stage_forward_change = 0
+                stage_backward_change = 0
+                last_forward_stage = 0
+                last_backward_stage = 0
+
+                message = 'PI: Probability_WebersLaw_Post Test complete, Moving to Probability_Handtracking_Gloves'
+                print(f'{message}')
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+
+            elif task == 'Probability_Handtracking_Zoomed_Mod':
+
+            elif task == 'Probability_Handtracking_Zoomed_Mod':
+
+            elif task == 'Probability_Handtracking_Zoomed_Mod':
+
+
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
     # Skip AW logic for subject m2
     if my_subject == 'm2':

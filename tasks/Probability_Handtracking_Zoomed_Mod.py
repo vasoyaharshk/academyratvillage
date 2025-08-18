@@ -492,7 +492,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == :
+            if self.substage == 6:
                 self.task_number = 5
                 self.tired = True
 

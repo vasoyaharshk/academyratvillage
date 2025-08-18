@@ -21,11 +21,8 @@ class Probability_Handtracking_Yellow(Task):
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
         Stage 3: Introduction of the yellow tokens:
-        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved.
-
-        Stage 4: Introduction of hands crossing:
-        Substage 1: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. Stage 5 and stage 6 trials interleaved. The photogate that triggers the video is 5.
-        Substage 2: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side. Stage 7 and stage 8 trials interleaved. The photogate that triggers the video is 5.
+        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 75% stage 2 and 25% stage 1 , accuracy criteria 80%.
+        Substage 2: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
 
         Only if rats fail at substage 10:
         Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved. The photogate that triggers the video is 5.
@@ -46,7 +43,7 @@ class Probability_Handtracking_Yellow(Task):
 
         IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
 
-        Task Number = 4
+        Task Number = 6
         """
 
         # ==============================
@@ -56,7 +53,7 @@ class Probability_Handtracking_Yellow(Task):
         self.stage = 1  # Current stage within the task
         self.substage = 1  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
-        self.task_number = 4  # Each task has a unique number. See RV script guide.
+        self.task_number = 6  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
         self.block_size = 40  # The number of trials in a block
@@ -184,7 +181,7 @@ class Probability_Handtracking_Yellow(Task):
         self.substage_counter_11 = 0
         self.substage_counter_12 = 0
 
-        self.fixation_trigger_port = Bpod.Events.Port6In
+        self.fixation_trigger_port = Bpod.Events.Port5In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -327,7 +324,7 @@ class Probability_Handtracking_Yellow(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             elif stage == 2:
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
             else:
@@ -389,18 +386,18 @@ class Probability_Handtracking_Yellow(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            elif stage == 3:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
-            elif stage == 4:
-                if self.substage == 10:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
-                elif self.substage == 11:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
-                elif self.substage == 12:
-                    video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
-                else:
-                    raise ValueError("Invalid substage for stage 4")
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
+            # elif stage == 3:
+            #     video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
+            # elif stage == 4:
+            #     if self.substage == 10:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
+            #     elif self.substage == 11:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
+            #     elif self.substage == 12:
+            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
+            #     else:
+            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
@@ -449,17 +446,8 @@ class Probability_Handtracking_Yellow(Task):
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            1: 0.75,
-            2: 0.60,
-            3: 0.65,
-            4: 0.80,
-            5: 0.80,
-            6: 0.80,
-            7: 0.80,
-            8: 0.80,
-            9: 0.80,
-            10: 0.80,
-            11: 0.80,
+            1: 0.80,
+            2: 0.80,
         }
 
         if self.current_trial == 0:
@@ -490,8 +478,8 @@ class Probability_Handtracking_Yellow(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage ==:
-                self.task_number = 5
+            if self.substage == 3:
+                self.task_number = 7
                 self.tired = True
 
         if self.stage_backward_change == 1:
@@ -544,7 +532,7 @@ class Probability_Handtracking_Yellow(Task):
 
         ### IMAGE Randomisation
         self.stim = [121, 122]  # function 121 is image where the left hand is correct and 122 is where right is correct
-        if self.task_number == 4:
+        if self.task_number == 6:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
@@ -633,15 +621,11 @@ class Probability_Handtracking_Yellow(Task):
             # print("image_path_function: ", self.image_path_function)
             # print("video_path_function: ", self.video_path_function)
 
-            # Decide which port triggers video for this trial
-            if self.substage == 6 or self.substage >= 8:
-                self.fixation_trigger_port = Bpod.Events.Port5In
-            else:
-                self.fixation_trigger_port = Bpod.Events.Port6In
+            self.fixation_trigger_port = Bpod.Events.Port5In
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 4:
+        if self.task_number == 6:
             if self.stage % 2 == 1:
                 # First trial:
                 if self.current_trial == 0:
@@ -928,7 +912,7 @@ class Probability_Handtracking_Yellow(Task):
             self.response_y = None
 
     def after_trial(self):
-        if self.task_number == 4:
+        if self.task_number == 6:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc

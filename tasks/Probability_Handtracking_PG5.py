@@ -164,18 +164,10 @@ class Probability_Handtracking_PG5(Task):
         }
 
         self.stage_sequence_counter = 0
-        self.substage_counter_1= 0
-        self.substage_counter_2 = 0
-        self.substage_counter_3 = 0
-        self.substage_counter_4 = 0
+
         self.substage_counter_5 = 0
         self.substage_counter_6 = 0
-        self.substage_counter_7 = 0
-        self.substage_counter_8 = 0
-        self.substage_counter_9 = 0
-        self.substage_counter_10 = 0
-        self.substage_counter_11 = 0
-        self.substage_counter_12 = 0
+
 
         self.fixation_trigger_port = Bpod.Events.Port5In
 
@@ -453,17 +445,8 @@ class Probability_Handtracking_PG5(Task):
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            1: 0.75,
-            2: 0.60,
-            3: 0.65,
-            4: 0.80,
             5: 0.80,
             6: 0.80,
-            7: 0.80,
-            8: 0.80,
-            9: 0.80,
-            10: 0.80,
-            11: 0.80,
         }
 
         if self.current_trial == 0:
@@ -506,7 +489,7 @@ class Probability_Handtracking_PG5(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.substage - 1, 1)
+            new_stage = max(self.substage - 1, 5)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
