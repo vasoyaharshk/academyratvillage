@@ -2329,87 +2329,73 @@ def function225():
     except Exception as e:
         print(f"❌ Error in function255: {e}")
 
-#Function to test all the sounds generated:
+
 # Play Cognitive Bias tone (pair & index chosen from task vars)
+
 def function230():
     try:
-        # Get trial parameters from task
-        pair  = int(utils.task.pair)
-        probe = int(utils.task.stim_trial)  # probe == self.stim
-        shape   = str(utils.task.shape).lower().strip()
+        pair   = int(utils.task.pair)
+        probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
+        shape  = str(utils.task.shape).strip().lower()
 
+        # Geometry (mm → px; PsychoPy Y down)
         px = settings.PIXELS_PER_MM
         py = settings.PIXELS_PER_MM
-        x_correct = utils.task.x_correcth * px
+        x_correct   = utils.task.x_correcth   * px
         x_incorrect = utils.task.x_incorrecth * px
-        y = -utils.task.y_correcth * py # flipped Y axis
-        width = utils.task.width * px
-        height = utils.task.height * py
-
-        print(f"px={px}, py={py}")
-        print(f"x_correct={x_correct}, x_incorrect={x_incorrect}")
-        print(f"y={y}")
-        print(f"width={width}, height={height}")
+        y           = -utils.task.y_correcth  * py
+        width       = utils.task.width        * px
+        height      = utils.task.height       * py
 
         # Play tone
         tone = cb_tones[pair][probe]
         soundStream.play(tone)
-        print(f"Playing CB tone: pair {pair}, probe {probe}, "
-              f"{cb_tones_hz[pair][probe]} Hz, correct shape={shape}")
+        print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
-        # Draw shapes per pair
-        if pair == 1:  # triangles
-            triangle1.pos  = (x_correct, y)
-            triangle1.size = (width, height)
-            triangle2.pos  = (x_incorrect, y)
-            triangle2.size = (width, height)
-
-        elif pair == 2:  # circles
-            circle1.pos  = (x_correct, y)
-            circle1.size = (width, height)
-            circle2.pos  = (x_incorrect, y)
-            circle2.size = (width, height)
-
-        elif pair == 3:  # stars
-            star1.pos  = (x_correct, y)
-            star1.size = (width, height)
-            star2.pos  = (x_incorrect, y)
-            star2.size = (width, height)
-
-        elif pair == 4:  # squares
-            square1.pos  = (x_correct, y)
-            square1.size = (width, height)
-            square2.pos  = (x_incorrect, y)
-            square2.size = (width, height)
+        # Select objects by shape (no helper)
+        if shape == "triangle":
+            obj_correct, obj_incorrect = triangle1, triangle2
+        elif shape == "circle":
+            obj_correct, obj_incorrect = circle1, circle2
+        elif shape == "star":
+            obj_correct, obj_incorrect = star1, star2
+        elif shape == "square":
+            obj_correct, obj_incorrect = square1, square2
         else:
             print(f"[230] Unknown shape: {shape}")
+            return
+
+        # Position & size
+        obj_correct.pos  = (x_correct, y)
+        obj_correct.size = (width, height)
+        obj_incorrect.pos  = (x_incorrect, y)
+        obj_incorrect.size = (width, height)
+
     except Exception as e:
         print(f"[230] Error: {e}")
 
 
 def loop230(timing):
     try:
-        pair = int(utils.task.pair)
+        shape = str(utils.task.shape).strip().lower()
 
-        if pair == 1:      # triangles
-            triangle1.draw()
-            triangle2.draw()
-        elif pair == 2:    # circles
-            circle1.draw()
-            circle2.draw()
-        elif pair == 3:    # stars
-            star1.draw()
-            star2.draw()
-        elif pair == 4:    # squares
-            square1.draw()
-            square2.draw()
+        if shape == "triangle":
+            obj_correct, obj_incorrect = triangle1, triangle2
+        elif shape == "circle":
+            obj_correct, obj_incorrect = circle1, circle2
+        elif shape == "star":
+            obj_correct, obj_incorrect = star1, star2
+        elif shape == "square":
+            obj_correct, obj_incorrect = square1, square2
         else:
-            print(f"[230] Unknown pair: {pair}")
+            print(f"[230] Unknown shape in loop: {shape}")
+            return
 
+        obj_correct.draw()
+        obj_incorrect.draw()
         window.flip()
     except Exception as e:
         print(f"[230] loop error: {e}")
-
 
 def function231(): #Touchteaching read touchscreen
     px = settings.PIXELS_PER_MM_X

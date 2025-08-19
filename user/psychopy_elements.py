@@ -36,6 +36,14 @@ square = visual.Rect(win=window,
                      fillColor= [0.2, 0.2, 0.2],
                      pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
 
+square1 = visual.Rect(win=window,
+                     height=settings.WIN_RESOLUTION[1],
+                     width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM_X),
+                     units='pix',
+                     lineColor= [0.2, 0.2, 0.2],
+                     fillColor= [0.2, 0.2, 0.2],
+                     pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+
 square2 = visual.Rect(win=window,
                      height=settings.WIN_RESOLUTION[1],
                      width=int(settings.STIM_WIDTH * settings.PIXELS_PER_MM_X),
@@ -151,8 +159,8 @@ triangle1 = ShapeStim(
     vertices=[(-0.5, -0.4330127), (0.5, -0.4330127), (0.0, 0.4330127)],
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     closeShape=True,
     pos=(0, 0)
 )
@@ -162,8 +170,8 @@ triangle2 = ShapeStim(
     vertices=[(-0.5, -0.4330127), (0.5, -0.4330127), (0.0, 0.4330127)],
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     closeShape=True,
     pos=(0, 0)
 )
@@ -175,8 +183,8 @@ circle1 = Circle(
     win=window,
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     pos=(0, 0)
 )
 
@@ -184,8 +192,8 @@ circle2 = Circle(
     win=window,
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     pos=(0, 0)
 )
 
@@ -208,8 +216,8 @@ star1 = ShapeStim(
     vertices=star_vertices_5,
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     closeShape=True,
     pos=(0, 0)
 )
@@ -219,8 +227,8 @@ star2 = ShapeStim(
     vertices=star_vertices_5,
     units='pix',
     size=(100, 100),
-    lineColor=[1, 1, 1],
-    fillColor=[1, 1, 1],
+    lineColor=[0.2, 0.2, 0.2],
+    fillColor=[0.2, 0.2, 0.2],
     closeShape=True,
     pos=(0, 0)
 )

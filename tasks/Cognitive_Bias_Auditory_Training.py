@@ -210,11 +210,51 @@ class Cognitive_Bias_Auditory_Training(Task):
     #         else:  # pair in [2, 4]
     #             return {'low': self.reward_small, 'high': self.reward_large}
 
+    # --- NEW: per-rat/per-group counterbalanced shapes (all four pairs different) ---
+    def shape_for_pair(self, subject: str, group: int, pair: int) -> str:
+        """
+        Return the shape name for a given (subject, group, pair) with a Latin-square-style rotation.
+        Group 1 rats: chandler, felix, joey, ross
+        Group 2 rats: fergus, geralt, innes, pol
+        Pairs are 1..4
+        """
+        name = (subject or "").strip().lower()
+
+        rotations = {
+            1: {  # Group 1
+                "chandler": ["triangle", "circle", "square", "star"],
+                "felix": ["circle", "square", "star", "triangle"],
+                "joey": ["square", "star", "triangle", "circle"],
+                "ross": ["star", "triangle", "circle", "square"],
+                "m3": ["star", "triangle", "circle", "square"],
+            },
+            2: {  # Group 2
+                "fergus": ["triangle", "circle", "square", "star"],
+                "geralt": ["circle", "square", "star", "triangle"],
+                "innes": ["square", "star", "triangle", "circle"],
+                "pol": ["star", "triangle", "circle", "square"],
+                "m3": ["triangle", "circle", "square", "star"],
+            },
+        }
+
+        # If subject not listed, fall back to a deterministic rotation
+        seq = rotations.get(group, {}).get(name)
+        if seq is None:
+            base = ["triangle", "circle", "square", "star"]
+            shift = (hash(name) % 4)
+            seq = base[shift:] + base[:shift]
+
+        if pair not in (1, 2, 3, 4):
+            raise ValueError(f"Invalid pair: {pair}")
+        return seq[pair - 1]
+
     def main_loop(self):
+        print('')
+        print('stim_trial_counter', self.stim_trial_counter)
         print('subject', self.subject)
         print('task', self.task)
         print('block_size', self.block_size)
-        print('stim_trial_counter', self.stim_trial_counter)
+
 
         if self.current_trial == 0:
             self.accuracy = 0
@@ -289,7 +329,9 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         # get mapping from your counterbalance
         # get mapping from your counterbalance
-        (high_side, shape), (low_side, _) = self.derive_high_low(int(self.group), int(self.pair))
+        # NEW: get sides from existing mapping, but override shape per subject/group/pair
+        (high_side, _), (low_side, _) = self.derive_high_low(int(self.group), int(self.pair))
+        shape = self.shape_for_pair(self.subject, int(self.group), int(self.pair))
 
         # pick correct side based on probe
         if self.stim_trial == 4:  # HIGH probe
@@ -310,11 +352,10 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.x_correcth, self.x_incorrecth = self.x_correcth_pos[1], self.x_correcth_pos[0]
 
         print(
-            f"group={self.group} pair={self.pair} probe={self.stim_trial} "
-            f"correct_side={self.side} shape={self.shape} "
-            f"incorrect_side={self.side_incorrect}"
+            f"Group={self.group} Pair={self.pair} Probe={self.stim_trial} "
+            f"Correct_side={self.side} Shape={self.shape} "
+            f"Incorrect_side={self.side_incorrect} "
             f"x_correcth={self.x_correcth} x_incorrecth={self.x_incorrecth} "
-            f"width={self.width}, height={self.height}"
         )
 
         ############ STATE MACHINE ################
