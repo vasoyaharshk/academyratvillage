@@ -154,21 +154,47 @@ class Cognitive_Bias_Auditory_Training(Task):
     #Function to map high, low sounds
     def derive_high_low(self, group: int, pair: int):
         """
-        Return ((high_side, high_shape), (low_side, low_shape)) following the rule:
-          group 1: pairs 1 & 3 → high=left/triangle; pairs 2 & 4 → high=right/circle
-          group 2: inverse of group 1
+        Return ((high_side, high_shape), (low_side, low_shape)).
+
+        NEW PROTOCOL:
+          - Side still depends on (group, pair).
+          - Shape depends ONLY on pair:
+              1→triangle, 2→circle, 3→star, 4→square
+          - Both high and low use the same shape for a given pair.
         """
+        # Shape fixed by pair
+        if pair == 1:
+            shape = "triangle"
+        elif pair == 2:
+            shape = "circle"
+        elif pair == 3:
+            shape = "star"
+        elif pair == 4:
+            shape = "square"
+        else:
+            raise ValueError(f"Invalid pair: {pair}")
+
+        # Side mapping unchanged (as before)
         if group == 1:
             if pair in (1, 3):  # high on left
-                return ("left", "triangle"), ("right", "circle")
-            if pair in (2, 4):  # high on right
-                return ("right", "circle"), ("left", "triangle")
+                high_side, low_side = "left", "right"
+            elif pair in (2, 4):  # high on right
+                high_side, low_side = "right", "left"
+            else:
+                raise ValueError(f"Invalid pair: {pair}")
         elif group == 2:
             if pair in (1, 3):  # high on right
-                return ("right", "circle"), ("left", "triangle")
-            if pair in (2, 4):  # high on left
-                return ("left", "triangle"), ("right", "circle")
-        raise ValueError(f"Invalid group/pair: group={group}, pair={pair}")
+                high_side, low_side = "right", "left"
+            elif pair in (2, 4):  # high on left
+                high_side, low_side = "left", "right"
+            else:
+                raise ValueError(f"Invalid pair: {pair}")
+        else:
+            raise ValueError(f"Invalid group: {group}")
+
+        # Same shape returned for both high and low (per-pair)
+        return (high_side, shape), (low_side, shape)
+
 
     # --- Reward mapping lookup function ---
     # def get_reward_mapping(self, subject, pair):
@@ -262,20 +288,19 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
 
         # get mapping from your counterbalance
-        (high_side, high_shape), (low_side, low_shape) = self.derive_high_low(int(self.group), int(self.pair))
+        # get mapping from your counterbalance
+        (high_side, shape), (low_side, _) = self.derive_high_low(int(self.group), int(self.pair))
 
-        # pick correct side/shape for THIS trial based on probe
+        # pick correct side based on probe
         if self.stim_trial == 4:  # HIGH probe
             self.side = high_side
-            self.shape_correct = high_shape
-            self.shape_incorrect = low_shape
         elif self.stim_trial == 0:  # LOW probe
             self.side = low_side
-            self.shape_correct = low_shape
-            self.shape_incorrect = high_shape
         else:
             raise ValueError(f"Unexpected probe (0 or 4 expected): {self.stim_trial}")
 
+        # shape is fixed by pair → same for both sides
+        self.shape = shape
         self.side_incorrect = "right" if self.side == "left" else "left"
 
         # x positions
@@ -286,8 +311,8 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         print(
             f"group={self.group} pair={self.pair} probe={self.stim_trial} "
-            f"correct_side={self.side} correct_shape={self.shape_correct} "
-            f"incorrect_side={self.side_incorrect} incorrect_shape={self.shape_incorrect} "
+            f"correct_side={self.side} shape={self.shape} "
+            f"incorrect_side={self.side_incorrect}"
             f"x_correcth={self.x_correcth} x_incorrecth={self.x_incorrecth} "
             f"width={self.width}, height={self.height}"
         )

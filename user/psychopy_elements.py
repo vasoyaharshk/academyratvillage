@@ -157,6 +157,18 @@ triangle1 = ShapeStim(
     pos=(0, 0)
 )
 
+triangle2 = ShapeStim(
+    win=window,
+    vertices=[(-0.5, -0.4330127), (0.5, -0.4330127), (0.0, 0.4330127)],
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    closeShape=True,
+    pos=(0, 0)
+)
+
+
 
 # White circle
 circle1 = Circle(
@@ -165,5 +177,50 @@ circle1 = Circle(
     size=(100, 100),
     lineColor=[1, 1, 1],
     fillColor=[1, 1, 1],
+    pos=(0, 0)
+)
+
+circle2 = Circle(
+    win=window,
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    pos=(0, 0)
+)
+
+star_vertices_5 = [
+    (0, 0.5),   # top
+    (0.118, 0.154),
+    (0.475, 0.154),
+    (0.191, -0.059),
+    (0.293, -0.404),
+    (0, -0.191),
+    (-0.293, -0.404),
+    (-0.191, -0.059),
+    (-0.475, 0.154),
+    (-0.118, 0.154)
+]
+
+
+star1 = ShapeStim(
+    win=window,
+    vertices=star_vertices_5,
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    closeShape=True,
+    pos=(0, 0)
+)
+
+star2 = ShapeStim(
+    win=window,
+    vertices=star_vertices_5,
+    units='pix',
+    size=(100, 100),
+    lineColor=[1, 1, 1],
+    fillColor=[1, 1, 1],
+    closeShape=True,
     pos=(0, 0)
 )

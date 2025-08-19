@@ -2336,7 +2336,7 @@ def function230():
         # Get trial parameters from task
         pair  = int(utils.task.pair)
         probe = int(utils.task.stim_trial)  # probe == self.stim
-        shape   = str(utils.task.shape_correct).lower().strip()
+        shape   = str(utils.task.shape).lower().strip()
 
         px = settings.PIXELS_PER_MM
         py = settings.PIXELS_PER_MM
@@ -2357,17 +2357,30 @@ def function230():
         print(f"Playing CB tone: pair {pair}, probe {probe}, "
               f"{cb_tones_hz[pair][probe]} Hz, correct shape={shape}")
 
-        # Draw correct shape
-        if shape == "triangle":
-            triangle1.pos = (x_correct, y)
+        # Draw shapes per pair
+        if pair == 1:  # triangles
+            triangle1.pos  = (x_correct, y)
             triangle1.size = (width, height)
-            circle1.pos = (x_incorrect, y)
+            triangle2.pos  = (x_incorrect, y)
+            triangle2.size = (width, height)
+
+        elif pair == 2:  # circles
+            circle1.pos  = (x_correct, y)
             circle1.size = (width, height)
-        elif shape == "circle":
-            circle1.pos = (x_correct, y)
-            circle1.size = (width, height)
-            triangle1.pos = (x_incorrect, y)
-            triangle1.size = (width, height)
+            circle2.pos  = (x_incorrect, y)
+            circle2.size = (width, height)
+
+        elif pair == 3:  # stars
+            star1.pos  = (x_correct, y)
+            star1.size = (width, height)
+            star2.pos  = (x_incorrect, y)
+            star2.size = (width, height)
+
+        elif pair == 4:  # squares
+            square1.pos  = (x_correct, y)
+            square1.size = (width, height)
+            square2.pos  = (x_incorrect, y)
+            square2.size = (width, height)
         else:
             print(f"[230] Unknown shape: {shape}")
     except Exception as e:
@@ -2375,9 +2388,27 @@ def function230():
 
 
 def loop230(timing):
-    triangle1.draw()
-    circle1.draw()
-    window.flip()
+    try:
+        pair = int(utils.task.pair)
+
+        if pair == 1:      # triangles
+            triangle1.draw()
+            triangle2.draw()
+        elif pair == 2:    # circles
+            circle1.draw()
+            circle2.draw()
+        elif pair == 3:    # stars
+            star1.draw()
+            star2.draw()
+        elif pair == 4:    # squares
+            square1.draw()
+            square2.draw()
+        else:
+            print(f"[230] Unknown pair: {pair}")
+
+        window.flip()
+    except Exception as e:
+        print(f"[230] loop error: {e}")
 
 
 def function231(): #Touchteaching read touchscreen
