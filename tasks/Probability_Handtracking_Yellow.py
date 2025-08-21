@@ -8,42 +8,31 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking_Zoomed(Task):
+
+class Probability_Handtracking_Yellow(Task):
     def __init__(self):
         super().__init__()
 
-        self.image_name = None # Initialize image_name # NEW
+        self.image_name = None  # Initialize image_name # NEW
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
-        
-        Substages:
-        Substages: Only the trials for stage 2 are counted for accuracy.
-        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%.
-        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%.
-        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%.
-        Substage 4: 75% stage 2 and 25% stage 1, accuracy criteria 70%.
-        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 74%.
-        Substage 6: 100% stage 2 and 0% stage 1, accuracy criteria 80.
-        Substage 7: 100% stage 2 and 0% stage 1, accuracy criteria 80. The photogate that triggers the video is 5
+
+        ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
         Stage 3: Introduction of the yellow tokens:
-        Substage 8: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 6.
-        Substage 9: This is actually stage 3.2 where we introduce the yellow token. The photogate that triggers the video is 5.
-        
-        Stage 4: Introduction of hands crossing:
-        Substage 10: this is actually stage 4.1 where the 1 hand, shows the blue token and either stays in the same position of moves to the other side. 
-        Substage 11: this is actually stage 4.2 where 2 hands, one with blue token other with yellow, fists close and the hands either stays in the same position of moves to the other side.
-        
-        Only if rats fail at substage 11:
-        Substage 12: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side.
-        
+        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 75% stage 2 and 25% stage 1 , accuracy criteria 80%.
+        Substage 2: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
+
+        Only if rats fail at substage 10:
+        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved. The photogate that triggers the video is 5.
+
         if they hit 320 trials, move back one substage
-        
+
         Stages:
-        Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
-        Stage 2 - Videos - starts from open hands and then closes as rat approaches.
-        
+        stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
+        stage 2 - Videos - starts from open hands and then closes as rat approaches.
+
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
         Port 2 - PHOTOGATES 2: Photogates next to lickport. STARTS TRIAL
@@ -51,8 +40,10 @@ class Probability_Handtracking_Zoomed(Task):
         Port 4 - PHOTOGATES 4: Photogates. DOES NOTHING
         Port 5 - PHOTOGATES 5: Photogates. STARTS THE VIDEO 
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED. STARTS THE RESPONSE WINDOW
-        
+
         IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
+
+        Task Number = 6
         """
 
         # ==============================
@@ -62,7 +53,7 @@ class Probability_Handtracking_Zoomed(Task):
         self.stage = 1  # Current stage within the task
         self.substage = 1  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
-        self.task_number = 4  # Each task has a unique number. See RV script guide.
+        self.task_number = 6  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
         self.block_size = 40  # The number of trials in a block
@@ -109,14 +100,16 @@ class Probability_Handtracking_Zoomed(Task):
         self.tired = False  # The door 2 opens whenever this is true. Used to end the task.
         self.response_duration = 60  # The response time after the last photogate has been crossed in secs.
         self.image_display = 3  # Number of seconds the image will display after correct and incorrect
-        self.trial_length = 0 # time from when a trial starts until next trial starts
+        self.trial_length = 0  # time from when a trial starts until next trial starts
         self.trial_result = None  # Result of the trial, correct, incorrect or miss
 
         # Pump:
-        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
-        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
+        self.valve_time = utils.water_calibration.read_last_value('port',
+                                                                  1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
+        self.valve_reward = utils.water_calibration.read_last_value('port',
+                                                                    1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
         self.valve_factor_c = 3.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
-        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
+        # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # Counters for trials:
         self.valid_counter = 0  # Counter for valid counts in a session
@@ -151,12 +144,12 @@ class Probability_Handtracking_Zoomed(Task):
         self.bias_accuracy_trials = []  # List that holds the last five success or failures.
         self.bias_accuracy = 0  # Accuracy of the last five trials.
 
-        #For Videos:
+        # For Videos:
         # Video parameters:
         self.video_display = 3  # Number of seconds the video will display after correct and incorrect
-        self.video_stim_play = 0    #The function that plays the video
-        self.video_length =  0     #Length of the video till what it is played
-        self.response_image = 0     #Not used yet. This was a function that can display the first frame of the video but it is not used now.
+        self.video_stim_play = 0  # The function that plays the video
+        self.video_length = 0  # Length of the video till what it is played
+        self.response_image = 0  # Not used yet. This was a function that can display the first frame of the video but it is not used now.
 
         # Video output paths:
         self.video_path_function = None
@@ -169,17 +162,26 @@ class Probability_Handtracking_Zoomed(Task):
 
         self.alert_sent = False
 
-        self.stage2_proportions = {
-            1: 0.10,
-            2: 0.25,
-            3: 0.50,
-            4: 0.75,
-            5: 0.875,
-            6: 1.00,
-            7: 1.00
+        self.substage_stage_map = {
+            1: {1: 0.25, 2: 0.75},
+            2: {1: 0.125, 2: 0.875}
         }
 
-        self.fixation_trigger_port = Bpod.Events.Port6In
+        self.stage_sequence_counter = 0
+        self.substage_counter_1 = 0
+        self.substage_counter_2 = 0
+        self.substage_counter_3 = 0
+        self.substage_counter_4 = 0
+        self.substage_counter_5 = 0
+        self.substage_counter_6 = 0
+        self.substage_counter_7 = 0
+        self.substage_counter_8 = 0
+        self.substage_counter_9 = 0
+        self.substage_counter_10 = 0
+        self.substage_counter_11 = 0
+        self.substage_counter_12 = 0
+
+        self.fixation_trigger_port = Bpod.Events.Port5In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -187,25 +189,39 @@ class Probability_Handtracking_Zoomed(Task):
     def get_stage_sequence(self, block_size=None, substage=None, last_stage_trial=None):
         """
         Returns a randomised stage sequence for the given block size and substage,
-        using the correct proportions for stage 1 and stage 2 trials.
+        using the correct proportions for image and video trials.
         For substages other than 3, just returns the correct shuffled sequence.
+        This is only fo substage 1 and 2 and 3.
         """
         if block_size is None:
             block_size = self.block_size
         if substage is None:
             substage = self.substage
 
-        prop = self.stage2_proportions.get(substage, 0)
-        stage2_n = int(round(block_size * prop))
-        stage1_n = block_size - stage2_n
+        # Special handling for substage 3
+        if substage == 3:
+            return self.generate_random_trials_stages(last_trial=last_stage_trial)
 
-        # Always generate the exact number required for each
-        sequence = [1] * stage1_n + [2] * stage2_n
+        # General handling for other substages
+        if substage not in self.substage_stage_map:
+            raise ValueError(f"Invalid substage: {substage}")
+        stage_map = self.substage_stage_map[substage]
+
+        sequence = []
+
+        for stage, prop in stage_map.items():
+            stage_n = int(round(block_size * prop))
+            sequence.extend([stage] * stage_n)
+
+        # Fix rounding issues
+        while len(sequence) < block_size:
+            sequence.append(random.choice(list(stage_map.keys())))
+        sequence = sequence[:block_size]
+
         random.shuffle(sequence)
 
-        # Ensure the first trial is not the same as last_stage_trial (if provided)
+        # Avoid repeating the same stage as last trial
         if last_stage_trial is not None and sequence[0] == last_stage_trial:
-            # Try to swap with another trial
             for i in range(1, len(sequence)):
                 if sequence[i] != last_stage_trial:
                     sequence[0], sequence[i] = sequence[i], sequence[0]
@@ -213,7 +229,52 @@ class Probability_Handtracking_Zoomed(Task):
 
         return sequence
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def get_stage_sequence_fixed_video(self, block_size=None, substage=None, last_stage_trial=None):
+        """
+        For substages 4+, creates a block with exactly block_size video (even) trials
+        and a fixed number of image (odd) trials according to the map.
+        """
+        if block_size is None:
+            block_size = self.block_size
+        if substage is None:
+            substage = self.substage
+
+        if substage not in self.substage_stage_map:
+            raise ValueError(f"Invalid substage: {substage}")
+        stage_map = self.substage_stage_map[substage]
+
+        # Identify image and video stages
+        image_stages = [s for s in stage_map if s % 2 == 1]
+        video_stages = [s for s in stage_map if s % 2 == 0]
+
+        if not video_stages or not image_stages:
+            raise ValueError("Expected both image and video stages for substage 4+")
+
+        video_stage = video_stages[0]
+        image_stage = image_stages[0]
+
+        # Compute number of image trials to match the intended proportion
+        prop_image = stage_map[image_stage]
+        n_image = int(round(block_size * prop_image / (1 - prop_image)))
+        # For example, if prop_image = 0.25, block_size = 40:
+        # n_image = round(40 * 0.25 / 0.75) = round(13.33) = 13
+        # For example, if prop_image = 0.125, block_size = 40:
+        # n_image = round(40 * 0.125 / 0.875) = round(6.349) = 6
+
+        sequence = [video_stage] * block_size + [image_stage] * n_image
+        random.shuffle(sequence)
+
+        # Avoid repeating the same stage as last trial
+        if last_stage_trial is not None and sequence[0] == last_stage_trial:
+            for i in range(1, len(sequence)):
+                if sequence[i] != last_stage_trial:
+                    sequence[0], sequence[i] = sequence[i], sequence[0]
+                    break
+
+        return sequence
+
+    def generate_random_trials(self,
+                               last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
@@ -228,19 +289,22 @@ class Probability_Handtracking_Zoomed(Task):
                 trials.append(candidate)
         return trials
 
-    def generate_random_trials_stages(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials_stages(self, last_trial=None):
+        """
+        Special generator for substage 3: 50/50 interleaved stages (1 and 2)
+        with no more than 2 repetitions in sequence.
+        """
         trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
+        choices = [1, 2]
+        probabilities = [0.5, 0.5]
+
         while len(trials) < self.block_size:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stage, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
+            candidate = random.choices(choices, probabilities)[0]
             if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
                 if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
+                    continue
                 trials.append(candidate)
+
         return trials
 
     def get_stim_image_path(self, stim_trial, stage):
@@ -248,7 +312,7 @@ class Probability_Handtracking_Zoomed(Task):
         Determines whether stim_trial is 121 or 122, retrieves the corresponding image path based on the stage, and returns it.
         """
         image_path = None
-        image_name = None # NEW
+        image_name = None  # NEW
 
         try:
             if stim_trial == 121:
@@ -260,9 +324,9 @@ class Probability_Handtracking_Zoomed(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             elif stage == 2:
-                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -274,29 +338,28 @@ class Probability_Handtracking_Zoomed(Task):
             if not images:
                 raise ValueError(f"No images found in {image_folder} for position {position}.")
 
-
-          ### NEW Ensure no image is displayed more than twice in a row
+            ### NEW Ensure no image is displayed more than twice in a row
             while True:
-                image_path = os.path.join(image_folder, images[self.image_counter % len(images)]) # NEW
+                image_path = os.path.join(image_folder, images[self.image_counter % len(images)])  # NEW
                 image_name = os.path.splitext(os.path.basename(image_path))[0]
                 if self.image_history.count(image_name) < 2:  # NEW
-                   break
+                    break
                 self.image_counter += 1  # NEW
 
             self.image_counter += 1  # NEW
             self.image_history.append(image_name)  # NEW
-            if len(self.image_history) > 2:   # NEW
+            if len(self.image_history) > 2:  # NEW
                 self.image_history.pop(0)  # NEW
 
             print(f'Stage: {stage}')
             print(f'Image Correct answer on {position}: {image_path}')
 
         except Exception as e:
-             print(f"Error occurred: {e}")
+            print(f"Error occurred: {e}")
 
         return image_path, image_name  # EDITED
 
-            #     # Choose a random image
+        #     # Choose a random image
         #     image_path = os.path.join(image_folder, random.choice(images))
         #     image_name = os.path.splitext(os.path.basename(image_path))[0]
         #     print(f'XXXXX{image_name}')
@@ -321,21 +384,9 @@ class Probability_Handtracking_Zoomed(Task):
                 position = 'right'
             else:
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
-
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            elif stage == 3:
-                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
-            elif stage == 4:
-                if self.substage == 10:
-                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
-                elif self.substage == 11:
-                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
-                elif self.substage == 12:
-                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
-                else:
-                    raise ValueError("Invalid substage for stage 4")
+                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
@@ -349,14 +400,14 @@ class Probability_Handtracking_Zoomed(Task):
 
             # Choose a video that matches with the image left or right, and 1-5
             def filter_videos(videos, keyword, number):
-                 return [video for video in videos if keyword in video and str(number) in video]
+                return [video for video in videos if keyword in video and str(number) in video]
 
             if "left" in image_name:
-                 keyword = "left"
+                keyword = "left"
             elif "right" in image_name:
-                 keyword = "right"
+                keyword = "right"
             else:
-                 keyword = ""
+                keyword = ""
             number = next((num for num in range(1, 7) if str(num) in image_name), None)
 
             # Filter videos based on keyword and number
@@ -364,12 +415,12 @@ class Probability_Handtracking_Zoomed(Task):
 
             # Choose a random video from the filtered list
             if filtered_videos:
-                 video_path = os.path.join(video_folder, random.choice(filtered_videos))
+                video_path = os.path.join(video_folder, random.choice(filtered_videos))
             else:
-             print("No matching video found.")
+                print("No matching video found.")
             ## to here
 
-            #video_path = os.path.join(video_folder, random.choice(videos)) # here is where it picks a random video
+            # video_path = os.path.join(video_folder, random.choice(videos)) # here is where it picks a random video
             print(f'Video Correct answer on {position} {video_path}')
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -378,23 +429,11 @@ class Probability_Handtracking_Zoomed(Task):
 
     def main_loop(self):
         print('')
-        print('Block_trial_counter= ', self.block_trial_counter)
-        print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            1: 0.75,
-            2: 0.60,
-            3: 0.65,
-            4: 0.70,
-            5: 0.74,
-            6: 0.80,
-            7: 0.80,
-            8: 0.80,
-            9: 0.80,
-            10: 0.80,
-            11: 0.80,
-            12: 0.80,
+            1: 0.80,
+            2: 0.80,
         }
 
         if self.current_trial == 0:
@@ -413,6 +452,7 @@ class Probability_Handtracking_Zoomed(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
+            self.stage_sequence_counter = 0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
@@ -424,8 +464,8 @@ class Probability_Handtracking_Zoomed(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 8:
-                self.task_number = 5
+            if self.substage == 3:
+                self.task_number = 7
                 self.tired = True
 
         if self.stage_backward_change == 1:
@@ -453,44 +493,43 @@ class Probability_Handtracking_Zoomed(Task):
             except:
                 print("Telegram message not sent")
 
-        ### Randomizing the stimulus positions for image and the videos:
-        # Choose x positions:
-        #self.stim = [111, 112] for video
+        print('Block_trial_counter= ', self.block_trial_counter)
+        print('Stage_sequence_counter= ', self.stage_sequence_counter)
+        print('Substage= ', self.substage)
 
-        #Stage Assignment:
-        if self.substage <= 7:
-            if self.block_trial_counter == 0:
-                if self.substage == 3:
-                    self.stage = [1, 2]
-                    self.stage_sequence = self.generate_random_trials_stages(last_trial=self.last_stage_trial)
-                else:
+        ### Randomizing the stimulus positions for image and the videos:
+        # Stage Assignment:
+        if self.task_number == 6:
+            if self.stage_sequence_counter == 0:
+                if self.substage <= 3:
                     self.stage_sequence = self.get_stage_sequence(
                         block_size=self.block_size,
                         substage=self.substage,
                         last_stage_trial=self.last_stage_trial
                     )
+                else:
+                    self.stage_sequence = self.get_stage_sequence_fixed_video(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                self.stage_sequence_counter = 0
                 self.last_stage_trial = self.stage_sequence[-1]
                 print("stage_sequence = ", self.stage_sequence)
-            self.stage = self.stage_sequence[self.block_trial_counter]
-        else:
-            # For substages 8+, set stage by substage (no sequence/randomisation)
-            if self.substage in [8, 9]:
-                self.stage = 3
-            elif self.substage in [10, 11, 12]:
-                self.stage = 4
 
-        #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
+            self.stage = self.stage_sequence[self.stage_sequence_counter]
 
+        # REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
 
         ### IMAGE Randomisation
-        self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
-        if self.task_number == 4:
+        self.stim = [121, 122]  # function 121 is image where the left hand is correct and 122 is where right is correct
+        if self.task_number == 6:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
                 last_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
                 self.stim_trials = self.generate_random_trials(last_trial)
-                #print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                # print(f"Stimulus trials after first attempt: {self.stim_trials}")
                 while self.stim_trials is None:
                     print("Retrying to generate stimulus trials...")
                     self.stim_trials = self.generate_random_trials(last_trial)
@@ -513,54 +552,51 @@ class Probability_Handtracking_Zoomed(Task):
             self.accuracy_criteria = self.accuracy_criteria_substage.get(self.substage, 0.8)
             print("Accuracy Criteria: ", self.accuracy_criteria)
 
-            #self.stim_trial = 121  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
+            # self.stim_trial = 121  #Remove this if you need to randomise left and right. Cause the video for left is only ready, only left is done.
 
             ### VIDEOS
-            if self.stage == 1:  # We have only one stimulus in stage 1
+            if self.stage % 2 == 1:  # We have only one stimulus in stage 1
                 # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-                if self.stim_trial in [121]: # if image is left correct
-                    self.video_stim_play = 111 # display videos with correct on left
+                if self.stim_trial in [121]:  # if image is left correct
+                    self.video_stim_play = 111  # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]  # No incorrect area in stage 1
-                    #print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-                elif self.stim_trial in [122]: # if image is right correct
+                    # print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+                elif self.stim_trial in [122]:  # if image is right correct
                     self.video_stim_play = 112
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]  # No incorrect area in stage 1
-                    #print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+                    # print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
 
             ### For stage 2 onwards
             else:  # We have two stimuli after stage 1 with correct and incorrect areas
-                if self.stim_trial in [121]: # if image is left correct
-                    self.video_stim_play = 111 # display videos with correct on left
+                if self.stim_trial in [121]:  # if image is left correct
+                    self.video_stim_play = 111  # display videos with correct on left
                     self.response_image = 117
                     self.x_correcth = self.x_correcth_pos[0]
                     self.x_incorrecth = self.x_correcth_pos[1]
-                    #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                          #self.x_incorrecth)
-                elif self.stim_trial in [122]: # if image is right correct
-                    self.video_stim_play = 112 # should display videos with correct on right
+                    # print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                    # self.x_incorrecth)
+                elif self.stim_trial in [122]:  # if image is right correct
+                    self.video_stim_play = 112  # should display videos with correct on right
                     self.response_image = 118
                     self.x_correcth = self.x_correcth_pos[1]
                     self.x_incorrecth = self.x_correcth_pos[0]
-                    #print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
-                          #self.x_incorrecth)
+                    # print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',
+                    # self.x_incorrecth)
 
-            #print('randomisation counter: ', self.stim_trial_counter)
-            #print('stim_trial: ', self.stim_trial)
-            #print('video_stim_play: ', self.video_stim_play)
-            #print('response_image: ', self.response_image)
+            # print('randomisation counter: ', self.stim_trial_counter)
+            # print('stim_trial: ', self.stim_trial)
+            # print('video_stim_play: ', self.video_stim_play)
+            # print('response_image: ', self.response_image)
 
-            self.image_path_function,self.image_name=self.get_stim_image_path(self.stim_trial,self.stage)
-            #self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+            self.image_path_function, self.image_name = self.get_stim_image_path(self.stim_trial, self.stage)
+            # self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
 
-            if self.stage == 2:
+            if self.stage % 2 == 0:
                 self.video_length = 1
-
-
-            if self.stage != 1:
                 # Figure out the full path to the video we want to play.
                 # This uses some kind of function (self.get_stim_video_path, probably defined earlier in your code) that takes in which video to play and what stage we're in.
                 self.video_path_function = self.get_stim_video_path(self.video_stim_play, self.stage, self.image_name)
@@ -573,26 +609,25 @@ class Probability_Handtracking_Zoomed(Task):
                 # Save the directory (location) where the video file lives.
                 self.video_directory = directory
 
-            #print("image_path_function: ", self.image_path_function)
-            #print("video_path_function: ", self.video_path_function)
+            # print("image_path_function: ", self.image_path_function)
+            # print("video_path_function: ", self.video_path_function)
 
             # Decide which port triggers video for this trial
-            if self.substage == 7:
-                self.fixation_trigger_port = Bpod.Events.Port5In
-            else:
-                self.fixation_trigger_port = Bpod.Events.Port6In
+            self.fixation_trigger_port = Bpod.Events.Port5In
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 4:
-            if self.stage == 1:
+        if self.task_number == 6:
+            if self.stage % 2 == 1:
                 # First trial:
                 if self.current_trial == 0:
                     self.sma.add_state(
                         state_name='Start_task',
-                        state_timer=0, # the timer is set to 0 meaning it will immediately proceed to the next state when photogate at port 2 has been crossed
+                        state_timer=0,
+                        # the timer is set to 0 meaning it will immediately proceed to the next state when photogate at port 2 has been crossed
                         state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)]) # displays the still image of the first frame of the video
+                        output_actions=[(Bpod.OutputChannels.SoftCode,
+                                         self.stim_trial)])  # displays the still image of the first frame of the video
                     # Starts task and displays stimuli instanly
 
                     self.sma.add_state(
@@ -637,7 +672,7 @@ class Probability_Handtracking_Zoomed(Task):
                     state_name='Correct',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
                 # Turns on Water port LED and plays correct sound
 
                 self.sma.add_state(
@@ -715,8 +750,8 @@ class Probability_Handtracking_Zoomed(Task):
                     output_actions=[])
 
             ### STAGE 2 ONWARDS
-            else: #For stage 2 involving videos
-                if self.current_trial == 0:     #This is a separate statement for the first trial as we need it to also close door 2
+            else:  # For stage 2 involving videos
+                if self.current_trial == 0:  # This is a separate statement for the first trial as we need it to also close door 2
                     self.sma.add_state(
                         state_name='Start_task',
                         state_timer=0,
@@ -736,7 +771,8 @@ class Probability_Handtracking_Zoomed(Task):
                     self.sma.add_state(
                         state_name='Start_task',
                         state_timer=0,
-                        state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'}, # This starts the trial when they cross photogate port 2 is crossed.
+                        state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                        # This starts the trial when they cross photogate port 2 is crossed.
                         output_actions=[])
 
                 self.sma.add_state(
@@ -745,11 +781,11 @@ class Probability_Handtracking_Zoomed(Task):
                     state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                     output_actions=[])
 
-
                 self.sma.add_state(
-                    state_name='Fixation', # displays image
+                    state_name='Fixation',  # displays image
                     state_timer=0,
-                    state_change_conditions={self.fixation_trigger_port: 'Start_Video'}, # This starts the video when they cross photogate port 5 is crossed .
+                    state_change_conditions={self.fixation_trigger_port: 'Start_Video'},
+                    # This starts the video when they cross photogate port 5 is crossed .
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Change the number in Port5In to select which photogate
 
@@ -780,7 +816,7 @@ class Probability_Handtracking_Zoomed(Task):
                     state_name='Correct',
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'Correct_video_display'},
-                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
                 # Turns on Water port LED and plays correct sound
 
                 self.sma.add_state(
@@ -867,10 +903,8 @@ class Probability_Handtracking_Zoomed(Task):
             self.response_x = None
             self.response_y = None
 
-
-
     def after_trial(self):
-        if self.task_number == 4:
+        if self.task_number == 6:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -880,40 +914,46 @@ class Probability_Handtracking_Zoomed(Task):
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.valid_counter += 1
-                if self.stage == 2:
-                    self.block_valid_count += 1
+                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
+                # Block trial counter logic
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                    self.total_trials += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
+                    self.block_valid_count += 1
                 self.success = 0
-                self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
                 print('Acc Valid_count: ', self.block_valid_count)
 
-            ##### COUNT CORRECTS FIRST POKE
+                ##### COUNT CORRECTS POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
                 self.valid_counter += 1
+                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
-                #print('Correct_count: ', self.correct_count)
-                if self.stage == 2:
-                    self.block_correct_count += 1
-                    self.block_valid_count += 1
+                # Block trial counter logic
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
-                self.success = 1
-                self.total_trials += 1
+                    self.total_trials += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
+                    self.block_valid_count += 1
+                    self.block_correct_count += 1
+                    self.success = 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
-
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
                 # Check if side bias is active and if the current trial was correct
                 if self.bias_breaking == 1:  # Side bias active
                     self.biased_consecutive_corrects_counter += 1  # Increment counter for consecutive corrects
-                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:   #If three corrects after bias breaking
+                    if self.biased_consecutive_corrects_counter >= self.biased_consecutive_corrects:  # If three corrects after bias breaking
                         self.bias_breaking = 0  # End bias breaking
                         self.stim_trial_counter = 0
                         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
@@ -924,7 +964,7 @@ class Probability_Handtracking_Zoomed(Task):
                 self.status = 'Touch_Outside'
 
             # End-trial calculations
-            #self.last_x = self.x
+            # self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
 
@@ -941,7 +981,8 @@ class Probability_Handtracking_Zoomed(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Check accuracy for every block of 40 trials
-            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            self.block_accuracy = (
+                self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
@@ -951,13 +992,13 @@ class Probability_Handtracking_Zoomed(Task):
                     self.stage_forward_change = 1  # Indicate that a stage change is due
                 else:
                     print("Accuracy criteria not met.")
-                #Trial limit check (set backward ONLY if forward is NOT happening)
+                # Trial limit check (set backward ONLY if forward is NOT happening)
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
-            #Assign in pass what to do when the rat is moved back more than 5 times.
+            # Assign in pass what to do when the rat is moved back more than 5 times.
             if self.moved_back_counter > self.max_move_backs:
-                #message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
                 try:
                     telegram_bot.alarm_finish_session(message, self.subject)
                 except:
@@ -967,6 +1008,33 @@ class Probability_Handtracking_Zoomed(Task):
             if self.substage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
 
+            # Substage trial counters for only videos:
+            if self.stage % 2 == 0:
+                if self.substage == 1:
+                    self.substage_counter_1 += 1
+                elif self.substage == 2:
+                    self.substage_counter_2 += 1
+                elif self.substage == 3:
+                    self.substage_counter_3 += 1
+                elif self.substage == 4:
+                    self.substage_counter_4 += 1
+                elif self.substage == 5:
+                    self.substage_counter_5 += 1
+                elif self.substage == 6:
+                    self.substage_counter_6 += 1
+                elif self.substage == 7:
+                    self.substage_counter_7 += 1
+                elif self.substage == 8:
+                    self.substage_counter_8 += 1
+                elif self.substage == 9:
+                    self.substage_counter_9 += 1
+                elif self.substage == 10:
+                    self.substage_counter_10 += 1
+                elif self.substage == 11:
+                    self.substage_counter_11 += 1
+                elif self.substage == 12:
+                    self.substage_counter_12 += 1
+
             # Side Bias Breaking formula:
 
             # Calculate bias accuracy for the last five trials without using accuracy window
@@ -974,7 +1042,8 @@ class Probability_Handtracking_Zoomed(Task):
             if len(self.bias_accuracy_trials) > self.side_bias_trigger:
                 self.bias_accuracy_trials.pop(0)  # Keep only the last 5 trials
 
-            self.bias_accuracy = sum(self.bias_accuracy_trials) / len(self.bias_accuracy_trials) if self.bias_accuracy_trials else 0
+            self.bias_accuracy = sum(self.bias_accuracy_trials) / len(
+                self.bias_accuracy_trials) if self.bias_accuracy_trials else 0
 
             print(f"Bias Accuracy (last 5 trials): {self.bias_accuracy}")
 
@@ -995,18 +1064,20 @@ class Probability_Handtracking_Zoomed(Task):
                     self.response_x_bias = response_x_list[-1]
                     print(f"Using last value from response_x array: {self.response_x_bias}")
                 except Exception as e:
-                    #print(f"Failed to process response_x as array. Error: {e}")
+                    # print(f"Failed to process response_x as array. Error: {e}")
                     return  # Handle this case if needed
 
             # Append the response to the array:
             self.response_x_array.append(self.response_x_bias)
-            #print(f"Responses so far: {self.response_x_array}")
+            # print(f"Responses so far: {self.response_x_array}")
 
-            #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
+            # if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
-                all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
-                all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
+                all_left_side = all(
+                    45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+                all_right_side = all(
+                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
 
                 if all_left_side:
                     self.sameside = 'left'
@@ -1019,13 +1090,13 @@ class Probability_Handtracking_Zoomed(Task):
                     self.last_stim_trial = random.choice([121])  # Ensure the new stim is on the left
                     print('Bias breaking active, side:', self.sameside)
 
-                self.response_x_array = []      #Clearing the array
+                self.response_x_array = []  # Clearing the array
 
             print("Block Trial Counter: ", self.block_trial_counter)
-            #print("Block Accuracy: ", self.block_accuracy)
+            # print("Block Accuracy: ", self.block_accuracy)
             print("Block Number: ", self.block_number)
             print("Block Size: ", self.block_size)
-            #print("Task Number: ", self.task_number)
+            # print("Task Number: ", self.task_number)
             print("Block Change: ", self.block_change)
             print("Stage Change Forward: ", self.stage_forward_change)
             print("Stage Change Backward: ", self.stage_backward_change)
@@ -1034,7 +1105,7 @@ class Probability_Handtracking_Zoomed(Task):
             if self.substage == 5 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
                     self.alert_sent = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
@@ -1042,28 +1113,24 @@ class Probability_Handtracking_Zoomed(Task):
             if self.substage != 5:
                 self.alert_sent = False
 
-
             if self.substage == 6 and self.moved_back_counter == 2 and not self.alert_sent:
                 try:
                     message = f"URGENT: {self.subject} has moved back from substage 5 twice in {self.task}"
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
                     self.alert_sent = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
 
-
-            if self.condition_trial_counter >= self.task_end_criteria:
+            if self.total_trials >= self.task_end_criteria:
                 try:
                     message = f"URGENT: {self.subject} has completed 1600 trials in this task."
                     telegram_bot.alarm_finish_session(message, self.subject)
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
-                self.task_end = True
 
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")
             self.task_end = True
-
 
         ############ REGISTER VALUES ################
         # Task-related
@@ -1092,7 +1159,6 @@ class Probability_Handtracking_Zoomed(Task):
         # self.register_value('running_window', self.running_window)  # Uncomment if used
         self.register_value('correct_count', self.correct_count)
         self.register_value('accuracy', self.accuracy)
-
 
         # Stimulus-related
         self.register_value('stim', self.stim)
@@ -1132,6 +1198,7 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('block_correct_count', self.block_correct_count)
         self.register_value('block_valid_count', self.block_valid_count)
         self.register_value('condition_trial_counter', self.condition_trial_counter)
+        self.register_value('stage_sequence_counter', self.stage_sequence_counter)
 
         # Stimulus trial control
         self.register_value('stim_trial', self.stim_trial)
@@ -1143,20 +1210,20 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('stage_backward_change', self.stage_backward_change)
         self.register_value('moved_back_counter', self.moved_back_counter)
 
-        #Corecth location:
+        # Corecth location:
         self.register_value('correct_th', self.x_correcth)
         self.register_value('incorrect_th', self.x_incorrecth)
         self.register_value('response_x', self.response_x)
         self.register_value('response_y', self.response_y)
 
-        #Trial Information:
+        # Trial Information:
         self.register_value('trial_length', self.trial_length)
         self.register_value('trial_result', self.trial_result)
 
         self.register_value('last_forward_stage', self.last_forward_stage)
         self.register_value('last_backward_stage', self.last_backward_stage)
 
-        #Videos:
+        # Videos:
         self.register_value('video_display', self.video_display)
         self.register_value('video_stim_play', self.video_stim_play)
         self.register_value('video_length', self.video_length)
@@ -1167,3 +1234,15 @@ class Probability_Handtracking_Zoomed(Task):
         self.register_value('image_number', self.image_name)
         self.register_value('stage_sequence', self.stage_sequence)
         self.register_value('last_stage_trial', self.last_stage_trial)
+        self.register_value('substage_counter_1', self.substage_counter_1)
+        self.register_value('substage_counter_2', self.substage_counter_2)
+        self.register_value('substage_counter_3', self.substage_counter_3)
+        self.register_value('substage_counter_4', self.substage_counter_4)
+        self.register_value('substage_counter_5', self.substage_counter_5)
+        self.register_value('substage_counter_6', self.substage_counter_6)
+        self.register_value('substage_counter_7', self.substage_counter_7)
+        self.register_value('substage_counter_8', self.substage_counter_8)
+        self.register_value('substage_counter_9', self.substage_counter_9)
+        self.register_value('substage_counter_10', self.substage_counter_10)
+        self.register_value('substage_counter_11', self.substage_counter_11)
+        self.register_value('substage_counter_12', self.substage_counter_12)

@@ -144,7 +144,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
         """
         image_path = None
-        image_folder = f'/home/harsh/academy/stimuli/webers_law/5_webers_law_training_runthrough/{condition}'
+        image_folder = f'/home/ratvillage01/academy/stimuli/webers_law/5_webers_law_training_runthrough/{condition}'
 
         try:
             if stim_trial == 61:
@@ -645,7 +645,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
                 state_name='Correct',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # Turns on Water port LED and plays correct sound
 
             self.sma.add_state(

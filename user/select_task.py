@@ -6,6 +6,7 @@ import random
 import json
 import pandas as pd
 from types import SimpleNamespace
+from datetime import datetime, timedelta
 
 
 # Examples of functions to calculate new task and stage
@@ -16,8 +17,13 @@ from types import SimpleNamespace
 def select_task(df, subject):
     task = subject.task
     wait_seconds = 3600 * settings.TIME_TO_ENTER
-    last_row = df.iloc[-1]  # Get the last row of the DataFrame
     my_subject = df.subject.iloc[0]
+
+    #This removes all the blank trials which the system generates by mistake:
+    df = df[~((df['trial_result'].isna() | (df['trial_result'] == '')) & (
+                df['trial_length'].isna() | (df['trial_length'] == '')))].copy()
+
+    last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
@@ -25,12 +31,12 @@ def select_task(df, subject):
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
-        'ciri': 0,
-        'gal': 0,
-        'joy': 0,
-        'luna': 0,
-        'sorrel': 0,
-        'sparky': 0,
+        'ciri': 14000.0,
+        'gal': 14000.0,
+        'joy': 14000.0,
+        'luna': 14000.0,
+        'sorrel': 14000.0,
+        'sparky': 14000.0,
         'monika': 250.0,
         'phoebe': 290.0,
         'rachel': 336.4,
@@ -133,6 +139,19 @@ def select_task(df, subject):
     last_backward_stage = get_val_from_df_or_default('last_backward_stage', 0)
     stage_sequence = get_val_from_df_or_default('stage_sequence', [])
     last_stage_trial  = get_val_from_df_or_default('last_stage_trial', 0)
+    stage_sequence_counter  = get_val_from_df_or_default('stage_sequence_counter', 0)
+
+    substage_counter_1  = get_val_from_df_or_default('substage_counter_1', 0)
+    substage_counter_2  = get_val_from_df_or_default('substage_counter_2', 0)
+    substage_counter_3  = get_val_from_df_or_default('substage_counter_3', 0)
+    substage_counter_4  = get_val_from_df_or_default('substage_counter_4', 0)
+    substage_counter_5  = get_val_from_df_or_default('substage_counter_5', 0)
+    substage_counter_6  = get_val_from_df_or_default('substage_counter_6', 0)
+    substage_counter_7  = get_val_from_df_or_default('substage_counter_7', 0)
+    substage_counter_8  = get_val_from_df_or_default('substage_counter_8', 0)
+    substage_counter_9  = get_val_from_df_or_default('substage_counter_9', 0)
+    substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
+    substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
 
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
@@ -161,20 +180,24 @@ def select_task(df, subject):
         n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
         if task == 'Automatic_Water':
-            wait_seconds = 3600 * 1
-            prev_session = df.loc[df['session'] == last_session - 2].iloc[-1]
-            wait_seconds = 3600 * 5
-            task = prev_session.task
-            stage = float(prev_session.stage)
-            #Here have all the weber's law variables that needs to be assinged.
-            message = f"Advance from Automatic_Water to {task}"
-            try:
-                telegram_bot.alarm_finish_session(message, my_subject)
-                telegram_bot.alarm_completed_criteria(task, my_subject)
-            except:
-                print('Telegram message not sent')
-                pass
-
+            # Find the latest session number
+            last_session_num = df['session'].max()
+            # Check if the latest session was Automatic_Water
+            last_task = df.loc[df['session'] == last_session_num, 'task'].iloc[0]
+            if last_task == 'Automatic_Water':
+                # Find all sessions before the last one, excluding Automatic_Water tasks
+                previous_non_auto = df[(df['session'] < last_session_num) & (df['task'] != 'Automatic_Water')]
+                if not previous_non_auto.empty:
+                    # Get the task from the most recent previous non-Automatic_Water session
+                    last_valid_session = previous_non_auto.sort_values('session').iloc[-1]
+                    task = last_valid_session.task
+                    # Optionally, revert stage as well if you need
+                    message = f"Completed 1 session of Automatic_Water. Reverting to task: {task}, stage: {stage}"
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
@@ -208,7 +231,7 @@ def select_task(df, subject):
                     pass
 
         elif task == 'TouchTeaching_no_mask':
-            if n_trials >= 75:
+            if n_trials >= 50:
                 message = f"{my_subject} advance to next stage in Touchteaching from {stage}'"
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -223,6 +246,8 @@ def select_task(df, subject):
                     task = 'Probability_Extra_Training_Acc'
                     stage = 1.0
                     task_number = 1
+                    block_size = 40
+                    block_number = 1
                     message = f"{my_subject} advance from early training to probability training with pegs'"
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -252,7 +277,7 @@ def select_task(df, subject):
                 block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
-                block_number = 0  # Sequential block number
+                block_number = 1  # Sequential block number
                 ror_change = 0  # If it is 1, ROR will change on the next trial.
                 block_change = 0  # If it is 1, a new block will start on the next trial
                 total_trials = 0  # Total trials across the task.
@@ -318,7 +343,7 @@ def select_task(df, subject):
                 block_size = 40  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
-                block_number = 0  # Sequential block number
+                block_number = 1  # Sequential block number
                 ror_change = 0  # If it is 1, ROR will change on the next trial.
                 block_change = 0  # If it is 1, a new block will start on the next trial
                 total_trials = 0  # Total trials across the task.
@@ -607,73 +632,210 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
-        # elif 'Probability_Turtle_Training' in task:
-        #     trial_criteria = 30
-        #     accuracy_criteria = 0.80
-        #     trial_end_criteria = 3000
-        #
-        #     if my_subject == 'm2':
-        #         trial_criteria = 3
-        #         accuracy_criteria = 0.7
-        #         trial_end_criteria = 10
-        #
-        #     trial_counter = last_row['trial_counter']
-        #
-        #     if trial_counter >= trial_end_criteria:
-        #         stage = 7
-        #         message = f"{trial_end_criteria} trials completed in substage {substage}. Task ended."
-        #         print(f'{message}')
-        #         try:
-        #             telegram_bot.alarm_finish_session(message, my_subject)
-        #             telegram_bot.alarm_completed_criteria(task, my_subject)
-        #         except:
-        #             print('Telegram message not sent')
-        #             pass
-        #
-        #     if (valid_trials_last >= trial_criteria and accuracy_last >= accuracy_criteria):
-        #         # Move to the next stage up to stage 3
-        #         if substage < 3:
-        #             substage += 1
-        #             trial_counter = 0
-        #             message = (f"Moving to stage {substage} due to 80% accuracy in a session of {valid_trials_last} trials.")
-        #             print(f'{message}')
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #         else:
-        #             stage = 7
-        #             #task = 'Probability_Turtle_Test'
-        #             message = (f"Last substage {substage} completed, Training complete")
-        #             print(f'{message}')
-        #             try:
-        #                 telegram_bot.alarm_finish_session(message, my_subject)
-        #                 telegram_bot.alarm_completed_criteria(task, my_subject)
-        #             except:
-        #                 print('Telegram message not sent')
-        #                 pass
-        #     else:
-        #         message = ("Criteria for moving to the next stage not met.")
-        #         print(f'{message}')
-        #         try:
-        #             telegram_bot.alarm_finish_session(message, my_subject)
-        #         except:
-        #             print('Telegram message not sent')
-        #             pass
+        elif 'Probability_Handtracking' in task:
+            if task == 'Probability_Handtracking_Zoomed_Mod':
+                if task_number == 5: #change to yellow tokens
+                    task = 'Probability_Handtracking_PG5'
+                    stage = 1
+                    substage = 6
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
+                    block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    block_number = 1
+                    ror_change = 0
+                    block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
+                    block_correct_count = 0  # Tracks the number of corrects in the block
+                    block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
+                    stage_sequence_counter = 0
+                    substage_counter_1 = 0
+                    substage_counter_2 = 0
+                    substage_counter_3 = 0
+                    substage_counter_4 = 0
+                    substage_counter_5 = 0
+                    substage_counter_6 = 0
+                    substage_counter_7 = 0
+                    substage_counter_8 = 0
+                    substage_counter_9 = 0
+                    substage_counter_10 = 0
+                    substage_counter_11 = 0
+                    condition_trial_counter = 0
+                    stage_sequence = []
+                    last_stage_trial = 0
+                    message = f"PI: Probability_Handtracking_Zoomed_Mod complete, Moving to {task}."
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
 
-    elif task == 'Water_Filler':
-        print("rat drank water")
+            elif task == 'Probability_Handtracking_PG5':
+                if task_number == 6: #change to yellow tokens
+                    task = 'Probability_Handtracking_Yellow'
+                    stage = 1
+                    substage = 1
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
+                    block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    block_number = 1
+                    ror_change = 0
+                    block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
+                    block_correct_count = 0  # Tracks the number of corrects in the block
+                    block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
+                    stage_sequence_counter = 0
+                    substage_counter_1 = 0
+                    substage_counter_2 = 0
+                    substage_counter_3 = 0
+                    substage_counter_4 = 0
+                    substage_counter_5 = 0
+                    substage_counter_6 = 0
+                    substage_counter_7 = 0
+                    substage_counter_8 = 0
+                    substage_counter_9 = 0
+                    substage_counter_10 = 0
+                    substage_counter_11 = 0
+                    condition_trial_counter = 0
+                    stage_sequence = []
+                    last_stage_trial = 0
+                    message = f"PI: Probability_Handtracking_PG5 complete, Moving to {task}."
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
 
-    # Remove all the blank trials: It doesnt work as the file doesn'd get saved here.
-    df = df.loc[~((df['trial_length'] == 0.1) & (df['trial_result'].isna()))].copy()
+            elif task == 'Probability_Handtracking_Yellow':
+                if task_number == 7: #change to yellow tokens
+                    task = 'Probability_Handtracking_Crossing'
+                    stage = 1
+                    substage = 1
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
+                    block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    block_number = 1
+                    ror_change = 0
+                    block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
+                    block_correct_count = 0  # Tracks the number of corrects in the block
+                    block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
+                    stage_sequence_counter = 0
+                    substage_counter_1 = 0
+                    substage_counter_2 = 0
+                    substage_counter_3 = 0
+                    substage_counter_4 = 0
+                    substage_counter_5 = 0
+                    substage_counter_6 = 0
+                    substage_counter_7 = 0
+                    substage_counter_8 = 0
+                    substage_counter_9 = 0
+                    substage_counter_10 = 0
+                    substage_counter_11 = 0
+                    condition_trial_counter = 0
+                    stage_sequence = []
+                    last_stage_trial = 0
+                    message = f"PI: Probability_Handtracking_Yellow complete, Moving to {task}."
+                    print(f'{message}')
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria(task, my_subject)
+                    except:
+                        print('Telegram message not sent')
+                        pass
+
+
+    #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
+    # Skip AW logic for subject m2
+    if my_subject == 'm2':
+        print("Subject is m2. no AW")
+    else:
+        today_aw = datetime.now().date()
+        last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
+        last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
+
+        df_aw_check = df.copy()
+        df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
+
+        # Check if ANY session in today+last5 is Automatic Water
+        has_aw_session = (
+                df_aw_check[
+                    (df_aw_check['date'].isin(last6_days)) &
+                    (df_aw_check['task'] == 'Automatic_Water')
+                    ].shape[0] > 0
+        )
+
+        # Count corrects in last 5 full days (not including today)
+        df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
+        corrects_last5 = (
+            df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
+            .groupby('date')
+            .size()
+            .reindex(last5_full_days, fill_value=0)
+        )
+        total_corrects_last5 = corrects_last5.sum()
+
+        # Determine if Automatic Water is needed
+        automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
+
+        # (Optional) Annotate entire dataframe with the status for this run
+        df_aw_check['automatic_water'] = automatic_water_needed
+
+        # Assign Automatic Water if needed
+        if task != "Automatic_Water" and automatic_water_needed:
+            task = "Automatic_Water"
+            try:
+                message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+                telegram_bot.alarm_finish_session(message, my_subject)
+            except:
+                print('Telegram message not sent')
+
+        # Debug print (optional)
+        print("-----DEBUG: AW CHECK-----")
+        print("Has AW session in last 6 days (inc. today):", has_aw_session)
+        print("Total corrects in last 5 full days:", total_corrects_last5)
+        print("Assign Automatic Water?:", automatic_water_needed)
+        print("-------------------------")
 
     if my_subject == 'm2':
         wait_seconds = 1
         block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

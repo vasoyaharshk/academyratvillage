@@ -114,10 +114,12 @@ class FakeSoundVec:
 soundStream = SoundR()
 soundVec1 = pureToneGen(0.4, 14000, 1800)
 soundVec2 = pureToneGen(0.4, 4000, 1)
+
+#For incorrect for old rats:
 soundVec3 = pureToneGen(0.4, 4000, 1)
 
-soundVec4 = pureToneGen(1.0, 250.0, 1)
-soundVec5 = pureToneGen(0.4, 500.0, 1)
+#For incorrect for new rats:
+soundVec4 = pureToneGen(1.0, 1368.5, 1)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {
@@ -125,6 +127,12 @@ reward_frequency_map = {
     'phoebe': 290.0,
     'rachel': 336.4,
     'm2': 200.5,
+    'ciri': 14000.0,
+    'gal': 14000.0,
+    'joy': 14000.0,
+    'luna': 14000.0,
+    'sorrel': 14000.0,
+    'sparky': 14000.0,
 }
 
 # Pre-generated tone vectors

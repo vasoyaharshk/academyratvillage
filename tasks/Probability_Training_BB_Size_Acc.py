@@ -472,13 +472,13 @@ class Probability_Training_BB_Size_Acc(Task):
             spacer = 'spacer' if stim_trial in [105, 106, 107, 108] else ''
 
             if stage == 1:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/1_indication'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
             elif stage == 2:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/2_discrimination_a'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_a'
             elif stage == 3:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/3_discrimination_b'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_b'
             elif stage == 4:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/4_discrimination_c'
+                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c'
             else:
                 raise ValueError(f"Invalid stage value: {stage}.")
 
@@ -684,7 +684,7 @@ class Probability_Training_BB_Size_Acc(Task):
                 state_name='Correct',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 38)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
             # Turns on Water port LED and plays correct sound
 
             self.sma.add_state(
@@ -943,6 +943,8 @@ class Probability_Training_BB_Size_Acc(Task):
                     self.response_x_array = []      #Clearing the array
         else:
             print("Task 2 ended because Core training completed. Task is now 3 so will move to Weber's law in next session.")
+            self.trial_length = 0.1
+            self.trial_result = None
             self.task_end = True
 
         ############ REGISTER VALUES ################

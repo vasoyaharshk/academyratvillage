@@ -122,3 +122,4 @@ self.bias_accuracy = 0  #Accuracy of the last five trials.
 self.probabilities = [] #The probability for left and right in extra training in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 self.probabilities_size = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 self.probabilities_side  = [] #The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
+self.stage_sequence_counter = 0 #tracks the stage sequeunce in handtracking
