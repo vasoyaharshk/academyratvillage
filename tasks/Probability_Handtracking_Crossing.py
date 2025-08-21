@@ -1018,7 +1018,7 @@ class Probability_Handtracking_Crossing(Task):
                 else:
                     print("Accuracy criteria not met.")
                 # Trial limit check (set backward ONLY if forward is NOT happening)
-                if self.block_trial_counter >= self.trial_end_criteria and self.stage_forward_change == 0:
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
             # Assign in pass what to do when the rat is moved back more than 5 times.

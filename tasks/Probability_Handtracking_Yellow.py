@@ -30,8 +30,8 @@ class Probability_Handtracking_Yellow(Task):
         if they hit 320 trials, move back one substage
 
         Stages:
-        Substage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
-        Substage 2 - Videos - starts from open hands and then closes as rat approaches.
+        stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
+        stage 2 - Videos - starts from open hands and then closes as rat approaches.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
@@ -326,7 +326,7 @@ class Probability_Handtracking_Yellow(Task):
             if stage == 1:
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -387,17 +387,6 @@ class Probability_Handtracking_Yellow(Task):
             # Define video folder based on stage
             if stage == 2:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
-            # elif stage == 3:
-            #     video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
-            # elif stage == 4:
-            #     if self.substage == 10:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
-            #     elif self.substage == 11:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
-            #     elif self.substage == 12:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
-            #     else:
-            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
@@ -440,9 +429,6 @@ class Probability_Handtracking_Yellow(Task):
 
     def main_loop(self):
         print('')
-        print('Block_trial_counter= ', self.block_trial_counter)
-        print('Stage_sequence_counter= ', self.stage_sequence_counter)
-        print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
@@ -507,26 +493,31 @@ class Probability_Handtracking_Yellow(Task):
             except:
                 print("Telegram message not sent")
 
+        print('Block_trial_counter= ', self.block_trial_counter)
+        print('Stage_sequence_counter= ', self.stage_sequence_counter)
+        print('Substage= ', self.substage)
+
         ### Randomizing the stimulus positions for image and the videos:
         # Stage Assignment:
-        if self.stage_sequence_counter == 0:
-            if self.substage <= 3:
-                self.stage_sequence = self.get_stage_sequence(
-                    block_size=self.block_size,
-                    substage=self.substage,
-                    last_stage_trial=self.last_stage_trial
-                )
-            else:
-                self.stage_sequence = self.get_stage_sequence_fixed_video(
-                    block_size=self.block_size,
-                    substage=self.substage,
-                    last_stage_trial=self.last_stage_trial
-                )
-            self.stage_sequence_counter = 0
-            self.last_stage_trial = self.stage_sequence[-1]
-            print("stage_sequence = ", self.stage_sequence)
+        if self.task_number == 6:
+            if self.stage_sequence_counter == 0:
+                if self.substage <= 3:
+                    self.stage_sequence = self.get_stage_sequence(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                else:
+                    self.stage_sequence = self.get_stage_sequence_fixed_video(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                self.stage_sequence_counter = 0
+                self.last_stage_trial = self.stage_sequence[-1]
+                print("stage_sequence = ", self.stage_sequence)
 
-        self.stage = self.stage_sequence[self.stage_sequence_counter]
+            self.stage = self.stage_sequence[self.stage_sequence_counter]
 
         # REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
 
@@ -621,6 +612,7 @@ class Probability_Handtracking_Yellow(Task):
             # print("image_path_function: ", self.image_path_function)
             # print("video_path_function: ", self.video_path_function)
 
+            # Decide which port triggers video for this trial
             self.fixation_trigger_port = Bpod.Events.Port5In
 
         ############ STATE MACHINE ################
@@ -926,11 +918,11 @@ class Probability_Handtracking_Yellow(Task):
                 # Block trial counter logic
                 if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                    self.total_trials += 1
                 # Count only if video trial
                 if self.stage % 2 == 0:
                     self.block_valid_count += 1
                 self.success = 0
-                self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
@@ -946,12 +938,12 @@ class Probability_Handtracking_Yellow(Task):
                 # Block trial counter logic
                 if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                    self.total_trials += 1
                 # Count only if video trial
                 if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1
-                self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
@@ -1001,7 +993,7 @@ class Probability_Handtracking_Yellow(Task):
                 else:
                     print("Accuracy criteria not met.")
                 # Trial limit check (set backward ONLY if forward is NOT happening)
-                if self.block_trial_counter >= self.trial_end_criteria and self.stage_forward_change == 0:
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
             # Assign in pass what to do when the rat is moved back more than 5 times.
