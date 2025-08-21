@@ -159,14 +159,23 @@ class Probability_Handtracking_PG5(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            5: {1: 0.25, 2: 0.75},
-            6: {1: 0.125, 2: 0.875}
+            6: {1: 0.25, 2: 0.75},
+            7: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
-
+        self.substage_counter_1= 0
+        self.substage_counter_2 = 0
+        self.substage_counter_3 = 0
+        self.substage_counter_4 = 0
         self.substage_counter_5 = 0
         self.substage_counter_6 = 0
+        self.substage_counter_7 = 0
+        self.substage_counter_8 = 0
+        self.substage_counter_9 = 0
+        self.substage_counter_10 = 0
+        self.substage_counter_11 = 0
+        self.substage_counter_12 = 0
 
 
         self.fixation_trigger_port = Bpod.Events.Port5In
@@ -439,14 +448,11 @@ class Probability_Handtracking_PG5(Task):
 
     def main_loop(self):
         print('')
-        print('Block_trial_counter= ', self.block_trial_counter)
-        print('Stage_sequence_counter= ', self.stage_sequence_counter)
-        print('Substage= ', self.substage)
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            5: 0.80,
             6: 0.80,
+            7: 0.80,
         }
 
         if self.current_trial == 0:
@@ -489,7 +495,7 @@ class Probability_Handtracking_PG5(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.substage - 1, 5)
+            new_stage = max(self.substage - 1, 6)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -506,26 +512,31 @@ class Probability_Handtracking_PG5(Task):
             except:
                 print("Telegram message not sent")
 
+        print('Block_trial_counter= ', self.block_trial_counter)
+        print('Stage_sequence_counter= ', self.stage_sequence_counter)
+        print('Substage= ', self.substage)
+
         ### Randomizing the stimulus positions for image and the videos:
         # Stage Assignment:
-        if self.stage_sequence_counter == 0:
-            if self.substage <= 3:
-                self.stage_sequence = self.get_stage_sequence(
-                    block_size=self.block_size,
-                    substage=self.substage,
-                    last_stage_trial=self.last_stage_trial
-                )
-            else:
-                self.stage_sequence = self.get_stage_sequence_fixed_video(
-                    block_size=self.block_size,
-                    substage=self.substage,
-                    last_stage_trial=self.last_stage_trial
-                )
-            self.stage_sequence_counter = 0
-            self.last_stage_trial = self.stage_sequence[-1]
-            print("stage_sequence = ", self.stage_sequence)
+        if self.task_number == 5:
+            if self.stage_sequence_counter == 0:
+                if self.substage <= 3:
+                    self.stage_sequence = self.get_stage_sequence(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                else:
+                    self.stage_sequence = self.get_stage_sequence_fixed_video(
+                        block_size=self.block_size,
+                        substage=self.substage,
+                        last_stage_trial=self.last_stage_trial
+                    )
+                self.stage_sequence_counter = 0
+                self.last_stage_trial = self.stage_sequence[-1]
+                print("stage_sequence = ", self.stage_sequence)
 
-        self.stage = self.stage_sequence[self.stage_sequence_counter]
+            self.stage = self.stage_sequence[self.stage_sequence_counter]
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
         
@@ -924,11 +935,11 @@ class Probability_Handtracking_PG5(Task):
                 # Block trial counter logic
                 if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                    self.total_trials += 1
                 # Count only if video trial
                 if self.stage % 2 == 0:
                     self.block_valid_count += 1
                 self.success = 0
-                self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
@@ -944,12 +955,12 @@ class Probability_Handtracking_PG5(Task):
                 # Block trial counter logic
                 if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
+                    self.total_trials += 1
                 # Count only if video trial
                 if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1
-                self.total_trials += 1
                 self.condition_trial_counter += 1
                 if self.bias_breaking == 0:
                     self.stim_trial_counter += 1
@@ -998,7 +1009,7 @@ class Probability_Handtracking_PG5(Task):
                 else:
                     print("Accuracy criteria not met.")
                 #Trial limit check (set backward ONLY if forward is NOT happening)
-                if self.block_trial_counter >= self.trial_end_criteria and self.stage_forward_change == 0:
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
             #Assign in pass what to do when the rat is moved back more than 5 times.
