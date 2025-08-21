@@ -320,18 +320,18 @@ class Probability_Handtracking_PG5(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
             # elif stage == 3:
-            #     image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+            #     image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             # elif stage == 4:
             #     if self.substage == 10:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/images'
+            #         image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/images'
             #     elif self.substage == 11:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/images'
+            #         image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/images'
             #     elif self.substage == 12:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/images'
+            #         image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/images'
             #     else:
             #         raise ValueError("Invalid substage for stage 4")
             else:
@@ -394,16 +394,16 @@ class Probability_Handtracking_PG5(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
             # elif stage == 3:
-            #     video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
+            #     video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
             # elif stage == 4:
             #     if self.substage == 10:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/videos'
+            #         video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/videos'
             #     elif self.substage == 11:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/videos'
+            #         video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/videos'
             #     elif self.substage == 12:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/videos'
+            #         video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/videos'
             #     else:
             #         raise ValueError("Invalid substage for stage 4")
             else:
