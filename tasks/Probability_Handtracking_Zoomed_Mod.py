@@ -169,7 +169,6 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             3: {1: 0.50, 2: 0.50},
             4: {1: 0.25, 2: 0.75},
             5: {1: 0.125, 2: 0.875},
-            6: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
@@ -453,7 +452,6 @@ class Probability_Handtracking_Zoomed_Mod(Task):
             3: 0.65,
             4: 0.80,
             5: 0.80,
-            6: 0.80,
         }
 
         if self.current_trial == 0:
@@ -484,8 +482,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 7:
-                #self.substage = 6
+            if self.substage == 6:
                 self.task_number = 5
                 self.tired = True
 
