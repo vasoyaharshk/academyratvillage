@@ -21,8 +21,8 @@
 // academy1
 #define ANGLEOPEN1 90 //was 80    - 0
 #define ANGLECLOSE1 5// was 28   - 1
-#define ANGLEOPEN2 70 // was 5   - 2
-#define ANGLECLOSE2 125 //was 49     - 3
+#define ANGLEOPEN2 130 // was 5   - 2
+#define ANGLECLOSE2 168 //was 49     - 3
 #define ANGLESEMICLOSE2 1 //Harsh: what is this?
 
 

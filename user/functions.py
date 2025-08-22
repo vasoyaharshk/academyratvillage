@@ -2335,3 +2335,7 @@ def function225():
         print(f"Played frequency: {frequency} Hz at {db} dB SPL")
     except Exception as e:
         print(f"Error in function255: {e}")
+
+
+def function226():  #test photogate
+    print('Photogate working')

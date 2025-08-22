@@ -41,7 +41,7 @@ class Test_Photogate(Task):
                                      'Port5Out': 'Waiting',
                                      'Port6Out': 'Waiting',
                                     Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 6)])
+            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 226)])
 
     def after_trial(self):
         self.register_value('animal_crossed', self.animal_crossed)
