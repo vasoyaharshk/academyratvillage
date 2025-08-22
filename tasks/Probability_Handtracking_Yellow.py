@@ -21,11 +21,8 @@ class Probability_Handtracking_Yellow(Task):
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
         Stage 3: Introduction of the yellow tokens:
-        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 75% stage 2 and 25% stage 1 , accuracy criteria 80%.
-        Substage 2: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
-
-        Only if rats fail at substage 10:
-        Substage 11: this is actually stage 4.3 where 2 hands, one with blue token other empty, fists close and the hands either stays in the same position of moves to the other side. Stage 9 and stage 10 trials interleaved. The photogate that triggers the video is 5.
+        Substage 0: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 75% stage 2 and 25% stage 1 , accuracy criteria 80%.
+        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
 
         if they hit 320 trials, move back one substage
 
@@ -163,8 +160,8 @@ class Probability_Handtracking_Yellow(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            1: {1: 0.25, 2: 0.75},
-            2: {1: 0.125, 2: 0.875}
+            0: {1: 0.25, 2: 0.75},
+            1: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
@@ -464,7 +461,7 @@ class Probability_Handtracking_Yellow(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 3:
+            if self.substage == 2:
                 self.task_number = 7
                 self.tired = True
 
@@ -476,7 +473,7 @@ class Probability_Handtracking_Yellow(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.substage - 1, 1)
+            new_stage = max(self.substage - 1, 0)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -916,11 +913,9 @@ class Probability_Handtracking_Yellow(Task):
                 self.valid_counter += 1
                 self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 # Block trial counter logic
-                if self.substage < 4 or self.stage % 2 == 0:
+                if self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
-                # Count only if video trial
-                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                 self.success = 0
                 self.condition_trial_counter += 1
@@ -936,11 +931,9 @@ class Probability_Handtracking_Yellow(Task):
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 # Block trial counter logic
-                if self.substage < 4 or self.stage % 2 == 0:
+                if self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
-                # Count only if video trial
-                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1

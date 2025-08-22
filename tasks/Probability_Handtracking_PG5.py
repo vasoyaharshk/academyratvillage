@@ -19,13 +19,14 @@ class Probability_Handtracking_PG5(Task):
         This script is for stage 6 onwwards where the photogate that triggers the video is 5.
         
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
+        THIS TASK STARTS WITH SUBSTAGE 2 AND THE RATS GET MOVED BACK ONLY WHEN THEY DO NOT MEET CRITERIA AFTER 320 TRIALS TO SUBSTAGE 1.
         
         Substages: Substages 1 to 5 are covered in another script "Probability_Handtracking_Zoomed_Mod".
         
         From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
         and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
-        Substage 6: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 5.
-        Substage 7: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
+        Substage 1: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 5.
+        Substage 2: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
         
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
@@ -159,8 +160,8 @@ class Probability_Handtracking_PG5(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            6: {1: 0.25, 2: 0.75},
-            7: {1: 0.125, 2: 0.875}
+            1: {1: 0.25, 2: 0.75},
+            2: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
@@ -323,17 +324,6 @@ class Probability_Handtracking_PG5(Task):
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
                 image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
-            # elif stage == 3:
-            #     image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
-            # elif stage == 4:
-            #     if self.substage == 10:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/images'
-            #     elif self.substage == 11:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/images'
-            #     elif self.substage == 12:
-            #         image_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/images'
-            #     else:
-            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -367,17 +357,6 @@ class Probability_Handtracking_PG5(Task):
 
         return image_path, image_name  # EDITED
 
-            #     # Choose a random image
-        #     image_path = os.path.join(image_folder, random.choice(images))
-        #     image_name = os.path.splitext(os.path.basename(image_path))[0]
-        #     print(f'XXXXX{image_name}')
-        #     print(f'Stage: {stage}')
-        #     print(f'Image Correct answer on {position}: {image_path}')
-        #
-        # except Exception as e:
-        #     print(f"Error occurred: {e}")
-        #
-        # return image_path, image_name # EDITED
 
     def get_stim_video_path(self, stim_trial, stage, image_name):
         """
@@ -395,17 +374,6 @@ class Probability_Handtracking_PG5(Task):
             # Define video folder based on stage
             if stage == 2:
                 video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            # elif stage == 3:
-            #     video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
-            # elif stage == 4:
-            #     if self.substage == 10:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand/videos'
-            #     elif self.substage == 11:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token/videos'
-            #     elif self.substage == 12:
-            #         video_folder = '/home/ratvillage01/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty/videos'
-            #     else:
-            #         raise ValueError("Invalid substage for stage 4")
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
@@ -451,8 +419,8 @@ class Probability_Handtracking_PG5(Task):
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            6: 0.80,
-            7: 0.80,
+            1: 0.80,
+            2: 0.80,
         }
 
         if self.current_trial == 0:
@@ -483,7 +451,7 @@ class Probability_Handtracking_PG5(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 8:
+            if self.substage == 3:
                 self.task_number = 6
                 self.tired = True
 
@@ -495,7 +463,7 @@ class Probability_Handtracking_PG5(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.substage - 1, 6)
+            new_stage = max(self.substage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -933,11 +901,9 @@ class Probability_Handtracking_PG5(Task):
                 self.valid_counter += 1
                 self.stage_sequence_counter += 1 # Always advance in the sequence if it was a valid trial
                 # Block trial counter logic
-                if self.substage < 4 or self.stage % 2 == 0:
+                if self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
-                # Count only if video trial
-                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                 self.success = 0
                 self.condition_trial_counter += 1
@@ -953,11 +919,9 @@ class Probability_Handtracking_PG5(Task):
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 # Block trial counter logic
-                if self.substage < 4 or self.stage % 2 == 0:
+                if self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
-                # Count only if video trial
-                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1

@@ -637,7 +637,7 @@ def select_task(df, subject):
                 if task_number == 5: #change to yellow tokens
                     task = 'Probability_Handtracking_PG5'
                     stage = 1
-                    substage = 6
+                    substage = 2    #MOST IMPORTANT THAT THEY MOVE TO SUBSTAGE 2
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
@@ -685,7 +685,7 @@ def select_task(df, subject):
                 if task_number == 6: #change to yellow tokens
                     task = 'Probability_Handtracking_Yellow'
                     stage = 1
-                    substage = 1
+                    substage = 1    #MOST IMPORTANT THAT THEY MOVE TO SUBSTAGE 1
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
