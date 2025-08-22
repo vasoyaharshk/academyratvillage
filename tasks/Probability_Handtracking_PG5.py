@@ -487,6 +487,8 @@ class Probability_Handtracking_PG5(Task):
         ### Randomizing the stimulus positions for image and the videos:
         # Stage Assignment:
         if self.task_number == 5:
+            # Generate the sequence on the first block (or whenever you want),
+            # but DO NOT regenerate later — we'll fall back to stage 2 instead.
             if self.stage_sequence_counter == 0:
                 if self.substage <= 3:
                     self.stage_sequence = self.get_stage_sequence(
@@ -500,11 +502,14 @@ class Probability_Handtracking_PG5(Task):
                         substage=self.substage,
                         last_stage_trial=self.last_stage_trial
                     )
-                self.stage_sequence_counter = 0
                 self.last_stage_trial = self.stage_sequence[-1]
                 print("stage_sequence = ", self.stage_sequence)
 
-            self.stage = self.stage_sequence[self.stage_sequence_counter]
+            # Use planned sequence while available; once consumed, fill with stage 2
+            if self.stage_sequence_counter < len(self.stage_sequence):
+                self.stage = self.stage_sequence[self.stage_sequence_counter]
+            else:
+                self.stage = 2  # fallback: keep using stage 2 for all remaining trials
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
         
