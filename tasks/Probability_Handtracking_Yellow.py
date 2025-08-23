@@ -84,7 +84,7 @@ class Probability_Handtracking_Yellow(Task):
         # ==============================
         # Task specific:
         self.accuracy_criteria = None  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 20  # Move back criteria. Badly named - this is task end criteria.
+        self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.task_end_criteria = 1600  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.probabilities = []  # The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
