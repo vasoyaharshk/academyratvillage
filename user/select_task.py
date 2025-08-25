@@ -460,7 +460,7 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
                 if task == "Probability_WebersLaw_Post":
-                    task = 'Probability_Handtracking_Zoomed'
+                    task = 'Probability_Handtracking_Zoomed_Mod'
                     # Weber's Law:
                     stage = 1
                     substage = 1
