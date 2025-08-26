@@ -4,7 +4,8 @@ import numpy as np
 import time
 from scipy.signal import firwin, lfilter
 
-DEFAULT_FS = 44800
+#DEFAULT_FS = 44800
+DEFAULT_FS = 384000  # or 192000 if that’s your device limit. This is essential for the high tones.
 DEFAULT_RAMP_DURATION = 0.01  # 10 ms
 REFERENCE_DB = 85.8           # Measured SPL reference
 
@@ -129,7 +130,7 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 100.5,
+    'm3': 200.5,
 }
 
 # Pre-generated tone vectors
@@ -139,3 +140,18 @@ rat_tones = {name: pureToneGen_dB(freq, 1800, db=70) for name, freq in reward_fr
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
     soundStream.play(tone)
+
+
+#Cognitive Bias Script:
+# 4 pairs × (low_ref, probe25, probe50, probe75, high_ref)
+cb_tones_hz = {
+    1: [2000.0, 2320.0, 2691.0, 3122.0, 3621.0],
+    2: [4573.0, 5305.0, 6154.0, 7138.0, 8281.0],
+    3: [10458.0, 12131.0, 14072.0, 16323.0, 18935.0],
+    4: [23913.0, 27739.0, 32177.0, 37326.0, 43298.0]
+}
+
+# Pre-generate 2s tones with ramp
+cb_tones = {}
+for pair, freqs in cb_tones_hz.items():
+    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=70, FsOut=DEFAULT_FS) for f in freqs]

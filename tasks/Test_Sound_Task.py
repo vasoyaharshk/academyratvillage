@@ -9,7 +9,7 @@ class Test_Sound_Task(Task):
 
         # SOUND PARAMETERS (used by functions.py softcode logic)
         self.reward_frequency = 250.0     # Hz, float allowed
-        self.reward_db = 100           # dB SPL
+        self.reward_db = 70           # dB SPL
 
     def configure_gui(self):
         self.gui_input = ['reward_frequency', 'reward_db']

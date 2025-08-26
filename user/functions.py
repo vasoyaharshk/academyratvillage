@@ -2339,3 +2339,105 @@ def function225():
 
 def function226():  #test photogate
     print('Photogate working')
+
+
+def function230():
+    try:
+        pair   = int(utils.task.pair)
+        probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
+        shape  = str(utils.task.shape).strip().lower()
+
+        # Geometry (mm → px; PsychoPy Y down)
+        px = settings.PIXELS_PER_MM
+        py = settings.PIXELS_PER_MM
+        x_correct   = utils.task.x_correcth   * px
+        x_incorrect = utils.task.x_incorrecth * px
+        y           = -utils.task.y_correcth  * py
+        width       = utils.task.width        * px
+        height      = utils.task.height       * py
+
+        # Play tone
+        tone = cb_tones[pair][probe]
+        soundStream.play(tone)
+        print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
+
+        # Select objects by shape (no helper)
+        if shape == "triangle":
+            obj_correct, obj_incorrect = triangle1, triangle2
+        elif shape == "circle":
+            obj_correct, obj_incorrect = circle1, circle2
+        elif shape == "star":
+            obj_correct, obj_incorrect = star1, star2
+        elif shape == "square":
+            obj_correct, obj_incorrect = square1, square2
+        else:
+            print(f"[230] Unknown shape: {shape}")
+            return
+
+        # Position & size
+        obj_correct.pos  = (x_correct, y)
+        obj_correct.size = (width, height)
+        obj_incorrect.pos  = (x_incorrect, y)
+        obj_incorrect.size = (width, height)
+
+    except Exception as e:
+        print(f"[230] Error: {e}")
+
+
+def loop230(timing):
+    try:
+        shape = str(utils.task.shape).strip().lower()
+
+        if shape == "triangle":
+            obj_correct, obj_incorrect = triangle1, triangle2
+        elif shape == "circle":
+            obj_correct, obj_incorrect = circle1, circle2
+        elif shape == "star":
+            obj_correct, obj_incorrect = star1, star2
+        elif shape == "square":
+            obj_correct, obj_incorrect = square1, square2
+        else:
+            print(f"[230] Unknown shape in loop: {shape}")
+            return
+
+        obj_correct.draw()
+        obj_incorrect.draw()
+        window.flip()
+    except Exception as e:
+        print(f"[230] loop error: {e}")
+
+def function231(): #Touchteaching read touchscreen
+    px = settings.PIXELS_PER_MM_X
+    py = settings.PIXELS_PER_MM_Y
+
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
+    x_correct = utils.task.x_correcth * px
+    x_incorrect = utils.task.x_incorrecth * px
+    y = utils.task.y_correcth * py
+
+    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+
+    cam2.put_state("Resp Win")
+    cam3.put_state("Resp Win")
+    print('Resp Win 1')
+
+
+#Punish without image display:
+def function232():
+    soundStream.play(soundVec3)
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
+
+def loop232(timing):
+    window.flip()
+
+#Miss:
+def function234():
+    print("Blank Screen")
+
+def loop234(timing):
+    window.flip()
