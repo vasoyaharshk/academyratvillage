@@ -134,7 +134,7 @@ reward_frequency_map = {
 }
 
 # Pre-generated tone vectors
-rat_tones = {name: pureToneGen_dB(freq, 1800, db=70) for name, freq in reward_frequency_map.items()}
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=44800) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
