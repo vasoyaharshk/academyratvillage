@@ -4,8 +4,8 @@ import numpy as np
 import time
 from scipy.signal import firwin, lfilter
 
-#DEFAULT_FS = 44800
-DEFAULT_FS = 384000  # or 192000 if that’s your device limit. This is essential for the high tones.
+DEFAULT_FS = 48000
+CB_FS = 384000 # or 192000 if that’s your device limit. This is essential for the high tones.
 DEFAULT_RAMP_DURATION = 0.01  # 10 ms
 REFERENCE_DB = 85.8           # Measured SPL reference
 
@@ -18,29 +18,27 @@ class SoundR:
             device = 1  # fallback device index
 
         sd.default.device = 'dx3'
+        sd.default.samplerate = DEFAULT_FS
 
     @staticmethod
     def list_devices():
-        print("\n🔊 Available audio output devices:")
+        print("\n Available audio output devices:")
         for idx, dev in enumerate(sd.query_devices()):
             print(f"{idx}: {dev['name']} | max_output_channels = {dev['max_output_channels']}")
 
     @staticmethod
-    # def getDevice():
-        # SoundR.list_devices()
-        # for idx, dev in enumerate(sd.query_devices()):
-        #     name = dev.get('name', '').lower()
-        #     max_out = dev.get('max_output_channels', 0)
-        #     if "dx3" in name and "analog" in name and max_out >= 2:
-        #         print(f"✅ External speaker found: {name} (index {idx})")
-        #         return idx
-        # raise RuntimeError("❌ DX3 Pro+ (Analog Output) not found in audio devices.")
-
     def getDevice():
         return 'dx3'
 
-    def play(self, soundVec):
-        sd.play(soundVec)
+    # def play(self, soundVec):
+    #     sd.play(soundVec)
+
+    # Replace SoundR.play with this version (single change point for all calls)
+    def play(self, soundVec, FsOut=DEFAULT_FS):
+        data = np.asarray(soundVec, dtype=np.float32)
+        if data.ndim == 1:  # force stereo L=R for your crossover
+            data = np.column_stack([data, data])
+        sd.play(data, samplerate=FsOut)
 
     def stop(self):
         sd.stop()
@@ -51,7 +49,7 @@ class SoundR:
         return np.ascontiguousarray(sound.T, dtype=np.float32)
 
 
-def pureToneGen(amp, freq, toneDuration, FsOut=44800):
+def pureToneGen(amp, freq, toneDuration, FsOut=DEFAULT_FS):
     if isinstance(amp, float) and isinstance(freq, (float, int)):
         tvec = np.linspace(0, toneDuration, int(toneDuration * FsOut), endpoint=False)
         return amp * np.sin(2 * np.pi * freq * tvec)
@@ -74,7 +72,7 @@ def pureToneGen_dB(freq, duration, db=70, FsOut=DEFAULT_FS):
     tone = amp * np.sin(2 * np.pi * freq * tvec)
     return apply_cosine_ramp(tone, FsOut=FsOut).astype(np.float32)
 
-def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=44800, Fn=10000, randgen=None):
+def whiteNoiseGen(amp, band_fs_bot, band_fs_top, duration, FsOut=DEFAULT_FS, Fn=10000, randgen=None):
     if randgen is None:
         randgen = np.random
 
@@ -117,8 +115,8 @@ soundStream = SoundR()
 #soundVec2 = pureToneGen(0.4, 4000, 1)
 #soundVec3 = pureToneGen(0.4, 4000, 1)
 
-soundVec2 = pureToneGen_dB(1368.5, 1, 70)
-soundVec3 = pureToneGen_dB(1368.5, 1, 70)
+soundVec2 = pureToneGen_dB(1368.5, 1, 70, FsOut=DEFAULT_FS)
+soundVec3 = pureToneGen_dB(1368.5, 1, 70, FsOut=DEFAULT_FS)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {
@@ -134,13 +132,12 @@ reward_frequency_map = {
 }
 
 # Pre-generated tone vectors
-rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=44800) for name, freq in reward_frequency_map.items()}
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
-    soundStream.play(tone)
-
+    soundStream.play(tone, FsOut=FsOut)
 
 #Cognitive Bias Script:
 # 4 pairs × (low_ref, probe25, probe50, probe75, high_ref)
@@ -154,4 +151,4 @@ cb_tones_hz = {
 # Pre-generate 2s tones with ramp
 cb_tones = {}
 for pair, freqs in cb_tones_hz.items():
-    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=70, FsOut=DEFAULT_FS) for f in freqs]
+    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=70, FsOut=CB_FS) for f in freqs]

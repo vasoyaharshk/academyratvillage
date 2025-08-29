@@ -2331,10 +2331,11 @@ def function225():
     try:
         frequency = utils.task.reward_frequency
         db = utils.task.reward_db
-        play_any_frequency(frequency, duration=3, db=db)
-        print(f"Played frequency: {frequency} Hz at {db} dB SPL")
+        fs = int(utils.task.fs)
+        play_any_frequency(frequency, duration=3, db=db, FsOut=fs)
+        print(f"Played frequency: {frequency} Hz at {db} dB SPL (FsOut={fs} Hz)")
     except Exception as e:
-        print(f"Error in function255: {e}")
+        print(f"Error in function225: {e}")
 
 
 def function226():  #test photogate
@@ -2358,7 +2359,7 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
-        soundStream.play(tone)
+        soundStream.play(tone, FsOut=CB_FS)  # <— only change
         print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
         # Select objects by shape (no helper)
