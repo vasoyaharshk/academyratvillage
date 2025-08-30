@@ -338,26 +338,26 @@ def select_task(df, subject):
                     pass
 
             if task_number == 3:
-                substage = 0  # Current substage within the stage
-                substage_bias = 0  # Side bias stage for substage behavior
+                # substage = 0  # Current substage within the stage
+                # substage_bias = 0  # Side bias stage for substage behavior
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
-                # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 40  # The number of trials in a block
-                block_trial_counter = 0  # Trial count within the current block
-                block_accuracy = 0.0  # Accuracy in the current block
-                block_number = 1  # Sequential block number
-                ror_change = 0  # If it is 1, ROR will change on the next trial.
-                block_change = 0  # If it is 1, a new block will start on the next trial
-                total_trials = 0  # Total trials across the task.
-                block_correct_count = 0  # Number of correct responses in the block
-                block_valid_count = 0  # Number of valid (non-missed) trials in the block
-                condition_trial_counter = 0  # Counter for randomising conditions
-                last_forward_stage = 0  # The stage moved forward from after a forward change
-                last_backward_stage = 0  # The stage moved backward to after the last backward change
-                moved_back_counter = 0  # Counter for how many times the subject moved back a stage
-                stage_forward_change = 0  # Whether stage move forward on the next trial
-                stage_backward_change = 0  # Whether stage move backward on the next trial
+                # # Needed to create blocks of 40 trials for criterion to be assessed on:
+                # block_size = 40  # The number of trials in a block
+                # block_trial_counter = 0  # Trial count within the current block
+                # block_accuracy = 0.0  # Accuracy in the current block
+                # block_number = 1  # Sequential block number
+                # ror_change = 0  # If it is 1, ROR will change on the next trial.
+                # block_change = 0  # If it is 1, a new block will start on the next trial
+                # total_trials = 0  # Total trials across the task.
+                # block_correct_count = 0  # Number of correct responses in the block
+                # block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                # condition_trial_counter = 0  # Counter for randomising conditions
+                # last_forward_stage = 0  # The stage moved forward from after a forward change
+                # last_backward_stage = 0  # The stage moved backward to after the last backward change
+                # moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                # stage_forward_change = 0  # Whether stage move forward on the next trial
+                # stage_backward_change = 0  # Whether stage move backward on the next trial
 
                 # Left Right Function Randomisation variables:
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
@@ -370,19 +370,20 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-                stage = 4
+                #Remove comments for Weber's Law:
+                # stage = 4
                # task = 'Probability_WebersLaw_Pre'
-                block = 12  # This is the number of trials one conditions will remain for
-                conditions = []  # Takes the conditions from select task file.
-                completed_conditions = []  # To store completed conditions
-                current_condition = 0  # To track the current condition in progress
-                repetition = 2  # To store how many times the conditions needs to repeat.
-                current_repetition = 0  # To store how many times the condition has repeated.
-                trial_counter = 0  # Track the number of trials for the current condition
-                # Image output stims:
-                stim_trial = 0
-                stim_trials = []
-                stim_trial_counter = 0
+               #  block = 12  # This is the number of trials one conditions will remain for
+               #  conditions = []  # Takes the conditions from select task file.
+               #  completed_conditions = []  # To store completed conditions
+               #  current_condition = 0  # To track the current condition in progress
+               #  repetition = 2  # To store how many times the conditions needs to repeat.
+               #  current_repetition = 0  # To store how many times the condition has repeated.
+               #  trial_counter = 0  # Track the number of trials for the current condition
+               #  # Image output stims:
+               #  stim_trial = 0
+               #  stim_trials = []
+               #  stim_trial_counter = 0
 
         elif 'Probability_Training_BB_Size_Bias' in task:
             if moved_back_counter > max_move_backs:
