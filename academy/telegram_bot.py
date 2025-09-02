@@ -198,6 +198,16 @@ def alarm_touchscreen(subject_name):
     except:
         pass
 
+def data_not_save():
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+        message = 'ALARM: URGENT: DATA NOT SAVED '
+        utils.alarms.add_new_item({'message': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+        request.urlopen(url, data.encode('utf-8'))
+    except:
+        pass
+
 
 def status(update, context):
     try:

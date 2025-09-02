@@ -12,7 +12,7 @@ class Probability_Extra_Training_Acc(Task):
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is for the extra training if rats are struggling to discriminate between stimuli.
-        
+                
         ########   TASK INFO   ########
         Task Numbers:
         1: Extra training
@@ -370,7 +370,7 @@ class Probability_Extra_Training_Acc(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print("Task 1 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because Extra training completed. Task is now 2 so will move to Urn training in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
@@ -545,7 +545,7 @@ class Probability_Extra_Training_Acc(Task):
             print("Moved Back Counter: ", self.moved_back_counter)
 
         else:
-            print("Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because Extra training completed. Task is now 2 so will move to Urn training in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0

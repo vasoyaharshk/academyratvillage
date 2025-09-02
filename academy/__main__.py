@@ -406,6 +406,10 @@ def stop_and_save_task():
             utils.task_manager.save_csvs(weight=utils.task.subject_weight)
         except Exception as e:
             print(f"No data to save, session stopped. Error: {e}")
+            try:
+                telegram_bot.data_not_save()
+            except Exception as e2:
+                print(f"Telegram alert failed. Error: {e2}")
 
     if utils.subject is None:
         name = "None"
@@ -689,6 +693,8 @@ def go_to_state(num):
         utils.subject.reward_frequency = float(utils.subject.reward_frequency)  #Cast to float
         utils.subject.reward_db = float(utils.subject.reward_db)  #Cast to float
         utils.subject.reward_duration = float(utils.subject.reward_duration)  #Cast to float
+        utils.subject.group = int(utils.subject.group)  # Cast to int
+        utils.subject.pair = int(utils.subject.pair)  # Cast to int
 
         if isinstance(utils.subject.stage_sequence, str):
             utils.subject.stage_sequence = ast.literal_eval(utils.subject.stage_sequence)
@@ -756,6 +762,9 @@ def go_to_state(num):
         utils.task.reward_db = utils.subject.reward_db
         utils.task.reward_duration = utils.subject.reward_duration
         utils.task.stage_sequence = utils.subject.stage_sequence
+        utils.task.group = utils.subject.group
+        utils.task.pair = utils.subject.pair
+
         utils.task.last_stage_trial = utils.subject.last_stage_trial
         utils.task.stage_sequence_counter = utils.subject.stage_sequence_counter
 
