@@ -1,0 +1,259 @@
+diff --git a/arduino/tags_and_motors/tags_and_motors.ino b/arduino/tags_and_motors/tags_and_motors.ino
+index 9d9c3e3bfc092bd39c4c5454b5faccf8c83015ff..981f3e098e223ccfbc06b1f68adbdfcd5a7f24f4 100644
+--- a/arduino/tags_and_motors/tags_and_motors.ino
++++ b/arduino/tags_and_motors/tags_and_motors.ino
+@@ -1,83 +1,89 @@
+ #include <HX711.h>
+ #include <Wire.h>
+ #include <Servo.h>
+ #include <Arduino.h>
+ #include "Adafruit_SHT31.h"
+ 
+ // servo1
+ #define TIMEOPEN1 150
+ #define TIMECLOSE1 350
+ #define SERVOPIN1 9
+ 
+ 
+ // servo2
+ #define TIMEOPEN2 200
+ #define TIMECLOSE2 200
+ #define SERVOPIN2 10
+ 
++// servo3 mirrors door2 behaviour
++#define SERVOPIN3 11
++
+ 
+ // always 90 degrees from open to close
+ 
+ // academy1
+ #define ANGLEOPEN1 90 //was 80    - 0
+ #define ANGLECLOSE1 5// was 28   - 1
+ #define ANGLEOPEN2 130 // was 5   - 2
+ #define ANGLECLOSE2 168 //was 49     - 3
+ #define ANGLESEMICLOSE2 1 //Harsh: what is this?
+ 
+ 
+ 
+ 
+ // scale
+ #define CELL1 2   
+ #define CELL2 3  
+ #define CELLCALIBRATION 1062 // calibration factor for load cell => strongly dependent on your individual setup
+ HX711 LoadCell;
+ bool scaleOn = false;
+ 
+ // temperature sensor
+ Adafruit_SHT31 sht31 = Adafruit_SHT31();
+ 
+ // led
+ #define LED 12
+ 
+ 
+ // servo1
+ Servo myservo1;
+ int steps1 = abs(ANGLEOPEN1 - ANGLECLOSE1);
+ int delayopen1 = TIMEOPEN1 / steps1;
+ int delayclose1 = TIMECLOSE1 / steps1;
+ int state1 = 0;
+ 
+ // servo2
+ Servo myservo2;
+ int steps2 = abs(ANGLEOPEN2 - ANGLECLOSE2);
+ int delayopen2 = TIMEOPEN2 / steps2;
+ int delayclose2 = TIMECLOSE2 / steps2;
+ int state2 = 0;
+ 
++// servo3 (door3) shares timing with door2
++Servo myservo3;
++
+ // rfid
+ char tag[10];
+ 
+ 
+ void openDoor1()
+ {
+   if (state1 != 1) {
+     state1 = 1;
+     myservo1.attach(SERVOPIN1);
+ 
+     if (ANGLECLOSE1 >= ANGLEOPEN1) {
+       for (int pos = ANGLECLOSE1; pos >= ANGLEOPEN1; pos -= 1) {
+         myservo1.write(pos);
+         delay(delayopen1);
+       }
+     } else {
+       for (int pos = ANGLECLOSE1; pos <= ANGLEOPEN1; pos += 1) {
+         myservo1.write(pos);
+         delay(delayopen1);
+       }
+     }
+     myservo1.detach();
+   }
+ }
+ 
+diff --git a/arduino/tags_and_motors/tags_and_motors.ino b/arduino/tags_and_motors/tags_and_motors.ino
+index 9d9c3e3bfc092bd39c4c5454b5faccf8c83015ff..981f3e098e223ccfbc06b1f68adbdfcd5a7f24f4 100644
+--- a/arduino/tags_and_motors/tags_and_motors.ino
++++ b/arduino/tags_and_motors/tags_and_motors.ino
+@@ -85,141 +91,159 @@ void closeDoor1()
+ {
+   if (state1 != 2) {
+     state1 = 2;
+     myservo1.attach(SERVOPIN1);
+ 
+     if (ANGLEOPEN1 >= ANGLECLOSE1) {
+       for (int pos = ANGLEOPEN1; pos >= ANGLECLOSE1; pos -= 1) {
+         myservo1.write(pos);
+         delay(delayclose1);
+       }
+     } else {
+       for (int pos = ANGLEOPEN1; pos <= ANGLECLOSE1; pos += 1) {
+         myservo1.write(pos);
+         delay(delayclose1);
+       }
+     }
+     myservo1.detach();
+   }
+ }
+ 
+ void openDoor2()
+ {
+   if (state2 != 1) {
+     state2 = 1;
+     myservo2.attach(SERVOPIN2);
++    myservo3.attach(SERVOPIN3);
+ 
+     if (ANGLECLOSE2 >= ANGLEOPEN2) {
+       for (int pos = ANGLECLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
+         myservo2.write(pos);
++        myservo3.write(pos);
+         delay(delayopen2);
+       }
+     } else {
+       for (int pos = ANGLECLOSE2; pos <= ANGLEOPEN2; pos += 1) {
+         myservo2.write(pos);
++        myservo3.write(pos);
+         delay(delayopen2);
+       }
+     }
+     myservo2.detach();
++    myservo3.detach();
+   }
+ }
+ 
+ void closeDoor2()
+ {
+   if (state2 != 2) {
+     state2 = 2;
+     myservo2.attach(SERVOPIN2);
++    myservo3.attach(SERVOPIN3);
+ 
+     if (ANGLEOPEN2 >= ANGLECLOSE2) {
+       for (int pos = ANGLEOPEN2; pos >= ANGLECLOSE2; pos -= 1) {
+         myservo2.write(pos);
++        myservo3.write(pos);
+         delay(delayclose2);
+       }
+     } else {
+       for (int pos = ANGLEOPEN2; pos <= ANGLECLOSE2; pos += 1) {
+         myservo2.write(pos);
++        myservo3.write(pos);
+         delay(delayclose2);
+       }
+     }
+     myservo2.detach();
++    myservo3.detach();
+   }
+ }
+ 
+ void noiseDoor2()
+ {
+ 
+   state2 = 0;
+   myservo2.attach(SERVOPIN2);
++  myservo3.attach(SERVOPIN3);
+ 
+   if (ANGLEOPEN2 >= ANGLESEMICLOSE2) {
+     for (int pos = ANGLEOPEN2; pos >= ANGLESEMICLOSE2; pos -= 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   } else {
+     for (int pos = ANGLEOPEN2; pos <= ANGLESEMICLOSE2; pos += 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   }
+ 
+   if (ANGLESEMICLOSE2 >= ANGLEOPEN2) {
+     for (int pos = ANGLESEMICLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   } else {
+     for (int pos = ANGLESEMICLOSE2; pos <= ANGLEOPEN2; pos += 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   }
+ 
+   if (ANGLEOPEN2 >= ANGLESEMICLOSE2) {
+     for (int pos = ANGLEOPEN2; pos >= ANGLESEMICLOSE2; pos -= 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   } else {
+     for (int pos = ANGLEOPEN2; pos <= ANGLESEMICLOSE2; pos += 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   }
+ 
+   if (ANGLESEMICLOSE2 >= ANGLEOPEN2) {
+     for (int pos = ANGLESEMICLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   } else {
+     for (int pos = ANGLESEMICLOSE2; pos <= ANGLEOPEN2; pos += 1) {
+       myservo2.write(pos);
++      myservo3.write(pos);
+       delay(delayclose2);
+     }
+   }
+   myservo2.detach();
++  myservo3.detach();
+ 
+ }
+ 
+ 
+ void turnLedOn()
+ {
+   digitalWrite(LED, HIGH);
+   LoadCell.tare();
+   scaleOn = false;
+ }
+ 
+ void turnLedOff()
+ {
+   digitalWrite(LED, LOW);
+   LoadCell.tare();
+ }
+ 
+ 
+ 
+ 
+ void tempAndScale()
+ {
+   float t = sht31.readTemperature();
+   float h = sht31.readHumidity();
+   Serial.print("Temperature;"); Serial.print(t); Serial.print("\t");
+
