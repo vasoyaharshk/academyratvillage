@@ -33,6 +33,7 @@ class Probability_WebersLaw_Pre(Task):
         self.substage_bias = 0
 
         # Variables for the task:
+        self.trials_max = 80
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800

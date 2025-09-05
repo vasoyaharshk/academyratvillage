@@ -117,8 +117,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 5.6 #High reward, 140ul
-        self.valve_factor_i = 2.8 #Low reward, 60 ul
+        self.valve_factor_c = 0 #High reward, 140ul
+        #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # --- Training parameters ---
         self.variable_reinforcement = 1
@@ -327,9 +327,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         # current probe for this trial (0 = low, 4 = high)
         self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
 
-        # get mapping from your counterbalance
-        # get mapping from your counterbalance
-        # NEW: get sides from existing mapping, but override shape per subject/group/pair
+        # get sides from existing mapping, but override shape per subject/group/pair
         (high_side, _), (low_side, _) = self.derive_high_low(int(self.group), int(self.pair))
         shape = self.shape_for_pair(self.subject, int(self.group), int(self.pair))
 
@@ -351,12 +349,39 @@ class Cognitive_Bias_Auditory_Training(Task):
         else:
             self.x_correcth, self.x_incorrecth = self.x_correcth_pos[1], self.x_correcth_pos[0]
 
+        # --- Per-trial reward size using ONLY valve_factor_c ---
+        # Large reward = 5.6, Small reward = 2.8
+        pair_i = int(self.pair)  # 1..4
+        group_i = int(self.group)  # 1 or 2
+        is_high_probe = (self.stim_trial == 4)  # 4 = high, 0 = low
+
+        # Mapping from protocol:
+        # Group 1: Pairs 1&3 → High = large; Pairs 2&4 → Low = large
+        # Group 2: opposite
+        if group_i == 1:
+            large_if_high = (pair_i in (1, 3))
+        elif group_i == 2:
+            large_if_high = (pair_i in (2, 4))
+        else:
+            raise ValueError(f"Invalid group: {group_i}")
+
+        self.valve_factor_c = 5.6 if (is_high_probe == large_if_high) else 2.8
+
+        # # --- Partial reinforcement: 1 in 5 correct training trials unrewarded ---
+        # unrewarded_correct = False
+        # if self.variable_reinforcement and self.variable_reinforcement_ratio > 0:
+        #     # simple Bernoulli gate per trial; ratio=0.2 => ~1/5
+        #     unrewarded_correct = (random.random() < self.variable_reinforcement_ratio)
+        # self._unrewarded_correct = unrewarded_correct  # store for after_trial, if needed
+
         print(
             f"Group={self.group} Pair={self.pair} Probe={self.stim_trial} "
             f"Correct_side={self.side} Shape={self.shape} "
             f"Incorrect_side={self.side_incorrect} "
             f"x_correcth={self.x_correcth} x_incorrecth={self.x_incorrecth} "
+            f"valve_factor_c={self.valve_factor_c} "
         )
+
 
         ############ STATE MACHINE ################
         # First trial:
@@ -456,7 +481,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             self.sma.add_state(
                 state_name='After_punish',
-                state_timer=self.valve_time * self.valve_factor_i,
+                state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Exit'},
                 output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 40)])
             # Flips the screen after water port poked in.

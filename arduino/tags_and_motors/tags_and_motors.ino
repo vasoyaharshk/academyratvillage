@@ -15,9 +15,10 @@
 #define TIMECLOSE2 200
 #define SERVOPIN2 10
 
-// servo3 mirrors door2 behaviour
-#define SERVOPIN3 11
-
+// servo3 (NEW: independent timing & angles, but opens/closes with door 2)
+#define TIMEOPEN3 220       // set your preferred speed for door 3
+#define TIMECLOSE3 220
+#define SERVOPIN3 11        // set the actual pin you wired door 3 to
 
 // always 90 degrees from open to close
 
@@ -28,8 +29,9 @@
 #define ANGLECLOSE2 168 //was 49     - 3
 #define ANGLESEMICLOSE2 1 //Harsh: what is this?
 
-
-
+// Door 3: independent angles (change to match your mechanics)
+#define ANGLEOPEN3 120
+#define ANGLECLOSE3 170
 
 // scale
 #define CELL1 2   
@@ -59,8 +61,12 @@ int delayopen2 = TIMEOPEN2 / steps2;
 int delayclose2 = TIMECLOSE2 / steps2;
 int state2 = 0;
 
-// servo3 (door3) shares timing with door2
+// servo3 (NEW)
 Servo myservo3;
+int steps3 = abs(ANGLEOPEN3 - ANGLECLOSE3);
+int delayopen3 = TIMEOPEN3 / steps3;
+int delayclose3 = TIMECLOSE3 / steps3;
+int state3 = 0;
 
 // rfid
 char tag[10];
@@ -113,23 +119,19 @@ void openDoor2()
   if (state2 != 1) {
     state2 = 1;
     myservo2.attach(SERVOPIN2);
-    myservo3.attach(SERVOPIN3);
 
     if (ANGLECLOSE2 >= ANGLEOPEN2) {
       for (int pos = ANGLECLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
         myservo2.write(pos);
-        myservo3.write(pos);
         delay(delayopen2);
       }
     } else {
       for (int pos = ANGLECLOSE2; pos <= ANGLEOPEN2; pos += 1) {
         myservo2.write(pos);
-        myservo3.write(pos);
         delay(delayopen2);
       }
     }
     myservo2.detach();
-    myservo3.detach();
   }
 }
 
@@ -138,23 +140,19 @@ void closeDoor2()
   if (state2 != 2) {
     state2 = 2;
     myservo2.attach(SERVOPIN2);
-    myservo3.attach(SERVOPIN3);
 
     if (ANGLEOPEN2 >= ANGLECLOSE2) {
       for (int pos = ANGLEOPEN2; pos >= ANGLECLOSE2; pos -= 1) {
         myservo2.write(pos);
-        myservo3.write(pos);
         delay(delayclose2);
       }
     } else {
       for (int pos = ANGLEOPEN2; pos <= ANGLECLOSE2; pos += 1) {
         myservo2.write(pos);
-        myservo3.write(pos);
         delay(delayclose2);
       }
     }
     myservo2.detach();
-    myservo3.detach();
   }
 }
 
@@ -163,18 +161,15 @@ void noiseDoor2()
 
   state2 = 0;
   myservo2.attach(SERVOPIN2);
-  myservo3.attach(SERVOPIN3);
 
   if (ANGLEOPEN2 >= ANGLESEMICLOSE2) {
     for (int pos = ANGLEOPEN2; pos >= ANGLESEMICLOSE2; pos -= 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   } else {
     for (int pos = ANGLEOPEN2; pos <= ANGLESEMICLOSE2; pos += 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   }
@@ -182,13 +177,11 @@ void noiseDoor2()
   if (ANGLESEMICLOSE2 >= ANGLEOPEN2) {
     for (int pos = ANGLESEMICLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   } else {
     for (int pos = ANGLESEMICLOSE2; pos <= ANGLEOPEN2; pos += 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   }
@@ -196,13 +189,11 @@ void noiseDoor2()
   if (ANGLEOPEN2 >= ANGLESEMICLOSE2) {
     for (int pos = ANGLEOPEN2; pos >= ANGLESEMICLOSE2; pos -= 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   } else {
     for (int pos = ANGLEOPEN2; pos <= ANGLESEMICLOSE2; pos += 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   }
@@ -210,20 +201,77 @@ void noiseDoor2()
   if (ANGLESEMICLOSE2 >= ANGLEOPEN2) {
     for (int pos = ANGLESEMICLOSE2; pos >= ANGLEOPEN2; pos -= 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   } else {
     for (int pos = ANGLESEMICLOSE2; pos <= ANGLEOPEN2; pos += 1) {
       myservo2.write(pos);
-      myservo3.write(pos);
       delay(delayclose2);
     }
   }
   myservo2.detach();
-  myservo3.detach();
 
 }
+
+
+// -------------------- Door 3 (NEW) --------------------
+void openDoor3()
+{
+  if (state3 != 1) {
+    state3 = 1;
+    myservo3.attach(SERVOPIN3);
+
+    if (ANGLECLOSE3 >= ANGLEOPEN3) {
+      for (int pos = ANGLECLOSE3; pos >= ANGLEOPEN3; pos -= 1) {
+        myservo3.write(pos);
+        delay(delayopen3);
+      }
+    } else {
+      for (int pos = ANGLECLOSE3; pos <= ANGLEOPEN3; pos += 1) {
+        myservo3.write(pos);
+        delay(delayopen3);
+      }
+    }
+    myservo3.detach();
+  }
+}
+
+void closeDoor3()
+{
+  if (state3 != 2) {
+    state3 = 2;
+    myservo3.attach(SERVOPIN3);
+
+    if (ANGLEOPEN3 >= ANGLECLOSE3) {
+      for (int pos = ANGLEOPEN3; pos >= ANGLECLOSE3; pos -= 1) {
+        myservo3.write(pos);
+        delay(delayclose3);
+      }
+    } else {
+      for (int pos = ANGLEOPEN3; pos <= ANGLECLOSE3; pos += 1) {
+        myservo3.write(pos);
+        delay(delayclose3);
+      }
+    }
+    myservo3.detach();
+  }
+}
+
+// Open Door 2 and Door 3 "together" (start back-to-back)
+void openDoor2_and_3()
+{
+  // Start 2, then 3 — the gap is only the function call overhead (a few ms)
+  openDoor2();
+  openDoor3();
+}
+
+// Close Door 2 and Door 3 "together"
+void closeDoor2_and_3()
+{
+  closeDoor2();
+  closeDoor3();
+}
+// ------------------------------------------------------
 
 
 void turnLedOn()
@@ -352,11 +400,13 @@ void serialEvent()
     }
     else if (ch == '2')
     {
-      openDoor2();
+      // OPEN door 2 AND door 3 together (changed)
+      openDoor2_and_3();
     }
     else if (ch == '3')
     {
-      closeDoor2();
+      // CLOSE door 2 AND door 3 together (changed)
+      closeDoor2_and_3();
     }
     else if (ch == '4')
     {
