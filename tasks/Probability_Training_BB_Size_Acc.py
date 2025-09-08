@@ -833,8 +833,6 @@ class Probability_Training_BB_Size_Acc(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)

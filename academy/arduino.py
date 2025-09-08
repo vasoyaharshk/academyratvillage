@@ -13,48 +13,33 @@ class Arduino:
         self.t = Thread(target=self.read_tag, daemon=True)
         self.t.start()
 
-    def open_door1(self):
-        self.arduino.write(b'0')
+    def open_door1(self):  self.arduino.write(b'0')
+    def close_door1(self): self.arduino.write(b'1')
 
-    def close_door1(self):
-        self.arduino.write(b'1')
+    def open_door2(self):  self.arduino.write(b'2')
+    def close_door2(self): self.arduino.write(b'3')
 
-    def open_door2(self):
-        self.arduino.write(b'2')
+    # Door 3 kept separate so you can toggle calls in __main__.py
+    def open_door3(self):  self.arduino.write(b'x')
+    def close_door3(self): self.arduino.write(b'y')
 
-    def close_door2(self):
-        self.arduino.write(b'3')
+    def move_doors_to_go_to_box(self): self.arduino.write(b'4')
+    def move_doors_to_go_home(self):   self.arduino.write(b'5')
 
-    def move_doors_to_go_to_box(self):
-        self.arduino.write(b'4')
+    def turn_led_on(self):   self.arduino.write(b'6')
+    def turn_led_off(self):  self.arduino.write(b'7')
 
-    def move_doors_to_go_home(self):
-        self.arduino.write(b'5')
-
-    def turn_led_on(self):
-        self.arduino.write(b'6')
-
-    def turn_led_off(self):
-        self.arduino.write(b'7')
-
-    def temp_and_scale(self):
-        self.arduino.write(b'8')
-
-    def get_temperature(self):
-        self.arduino.write(b'9')
+    def temp_and_scale(self):   self.arduino.write(b'8')
+    def get_temperature(self):  self.arduino.write(b'9')
 
     def tare_scale(self):
         utils.log('Academy', 'Taring the scale', 'ACTION')
         self.arduino.write(b'a')
 
-    def get_weight(self):
-        self.arduino.write(b'b')
-
-    def noise_door2(self):
-        self.arduino.write(b'c')
+    def get_weight(self):   self.arduino.write(b'b')
+    def noise_door2(self):  self.arduino.write(b'c')
 
     def read_tag(self):
-
         while True:
             tag = self.arduino.readline()
             try:
@@ -65,80 +50,50 @@ class Arduino:
             if tag:
                 if ':' in tag:
                     try:
-                        position = tag.index(':')
-                        weight = str(float(tag[position + 1:]))
-                        value = 'w', weight
-                        queues.tags.put(value)
+                        pos = tag.index(':')
+                        weight = str(float(tag[pos + 1:]))
+                        queues.tags.put(('w', weight))
                     except:
                         pass
-
                 elif '*' in tag:
                     try:
-                        position = tag.index('*')
-                        weight = str(float(tag[position + 1:]))
-                        value = 'p', weight
-                        queues.tags.put(value)
+                        pos = tag.index('*')
+                        weight = str(float(tag[pos + 1:]))
+                        queues.tags.put(('p', weight))
                     except:
                         pass
-
                 elif ';' in tag:
                     print('Temp Here')
                     try:
-                        position = tag.index(';')
-                        print(tag[position + 1:])
-                        temperature = str(tag[position + 1:])
-                        value = 't', temperature
-                        queues.tags.put(value)
+                        pos = tag.index(';')
+                        temperature = str(tag[pos + 1:])
+                        queues.tags.put(('t', temperature))
                     except:
                         pass
-
                 else:
-                    value = 's', tag
                     if utils.reading_tags > 0:
-                        queues.tags.put(value)
-
-
+                        queues.tags.put(('s', tag))
 
 
 class FakeArduino:
     def __init__(self):
         self.connected = False
 
-    def open_door1(self):
-        pass
-
-    def close_door1(self):
-        pass
-
-    def open_door2(self):
-        pass
-
-    def close_door2(self):
-        pass
-
-    def move_doors_to_go_to_box(self):
-        pass
-
-    def move_doors_to_go_home(self):
-        pass
-
-    def turn_led_on(self):
-        pass
-
-    def turn_led_off(self):
-        pass
-
-    def temp_and_scale(self):
-        pass
-
-    def get_temperature(self):
-        pass
-
-    def tare_scale(self):
-        pass
-
-    def get_weight(self):
-        pass
+    def open_door1(self): pass
+    def close_door1(self): pass
+    def open_door2(self): pass
+    def close_door2(self): pass
+    def open_door3(self): pass
+    def close_door3(self): pass
+    def move_doors_to_go_to_box(self): pass
+    def move_doors_to_go_home(self): pass
+    def turn_led_on(self): pass
+    def turn_led_off(self): pass
+    def temp_and_scale(self): pass
+    def get_temperature(self): pass
+    def tare_scale(self): pass
+    def get_weight(self): pass
+    def noise_door2(self): pass
 
 try:
     arduino = Arduino(address=settings.ARDUINO_SERIAL_PORT)

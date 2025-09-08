@@ -390,62 +390,27 @@ void serialEvent()
     char ch = Serial.read();
     Serial.flush();
 
-    if (ch == '0')
-    {
-      openDoor1();
-    }
-    else if (ch == '1')
-    {
-      closeDoor1();
-    }
-    else if (ch == '2')
-    {
-      // OPEN door 2 AND door 3 together (changed)
-      openDoor2_and_3();
-    }
-    else if (ch == '3')
-    {
-      // CLOSE door 2 AND door 3 together (changed)
-      closeDoor2_and_3();
-    }
-    else if (ch == '4')
-    {
-      closeDoor1();
-      openDoor2();
-    }
-    else if (ch == '5')
-    {
-      closeDoor2();
-      openDoor1();
-    }
-    else if (ch == '6')
-    {
-      turnLedOn();
-    }
-    else if (ch == '7')
-    {
-      turnLedOff();
-    }
-    else if (ch == '8')
-    {
-      tempAndScale();
-    }
-    else if (ch == '9')
-    {
-      getTemperature();
-    }
-    else if (ch == 'a')
-    {
-      tareScale();
-    }
-    else if (ch == 'b')
-    {
-      getWeight();
-    }
-     else if (ch == 'c')
-    {
-      noiseDoor2();
-    }
+    if      (ch == '0') { openDoor1(); }
+    else if (ch == '1') { closeDoor1(); }
+
+    else if (ch == '2') { openDoor2(); }     // only Door 2
+    else if (ch == '3') { closeDoor2(); }    // only Door 2
+
+    else if (ch == 'x') { openDoor3(); }     // only Door 3
+    else if (ch == 'y') { closeDoor3(); }    // only Door 3
+
+    else if (ch == '4') { closeDoor1(); openDoor2(); }
+    else if (ch == '5') { closeDoor2(); openDoor1(); }
+
+    else if (ch == '6') { turnLedOn(); }
+    else if (ch == '7') { turnLedOff(); }
+
+    else if (ch == '8') { tempAndScale(); }
+    else if (ch == '9') { getTemperature(); }
+
+    else if (ch == 'a') { tareScale(); }
+    else if (ch == 'b') { getWeight(); }
+    else if (ch == 'c') { noiseDoor2(); }
   }
 }
 

@@ -367,6 +367,8 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         self.valve_factor_c = 5.6 if (is_high_probe == large_if_high) else 2.8
 
+
+
         # # --- Partial reinforcement: 1 in 5 correct training trials unrewarded ---
         # unrewarded_correct = False
         # if self.variable_reinforcement and self.variable_reinforcement_ratio > 0:
@@ -377,8 +379,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         print(
             f"Group={self.group} Pair={self.pair} Probe={self.stim_trial} "
             f"Correct_side={self.side} Shape={self.shape} "
-            f"Incorrect_side={self.side_incorrect} "
-            f"x_correcth={self.x_correcth} x_incorrecth={self.x_incorrecth} "
+            f"Incorrect_side={self.side_incorrect}  "
             f"valve_factor_c={self.valve_factor_c} "
         )
 
@@ -412,7 +413,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Wait_for_fixation',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Port3In: 'Fixation'},
+                state_change_conditions={Bpod.Events.Port4In: 'Fixation'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 234)])  #Draws black screen
 
             self.sma.add_state(
@@ -531,8 +532,8 @@ class Cognitive_Bias_Auditory_Training(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.reward_drunk += self.valve_reward * self.valve_factor_i
-                self.reward = self.valve_reward * self.valve_factor_i
+                self.reward_drunk += self.valve_reward * self.valve_factor_c
+                self.reward = self.valve_reward * self.valve_factor_c
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
                 self.success = 0
@@ -591,7 +592,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('valve_time', self.valve_time)
         self.register_value('valve_reward', self.valve_reward)
         self.register_value('valve_factor_c', self.valve_factor_c)
-        self.register_value('valve_factor_i', self.valve_factor_i)
+
 
         # Counters
         self.register_value('valid_counter', self.valid_counter)

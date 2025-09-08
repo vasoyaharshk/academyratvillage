@@ -84,6 +84,7 @@ def main():
 
         if arg.inside:
             arduino.open_door2()
+            arduino.open_door3()  # open Door 3 with Door 2 (go to box)
             # bpod.open_inner_door()
             utils.state = 6
 
@@ -339,6 +340,7 @@ def main_loop():
                         except:
                             utils.log("Academy", "returning home after relaunch", "ACTION")
                         arduino.move_doors_to_go_home()
+                        arduino.close_door3()
 
                         screen.win.flip()
                         screen.tag = None
@@ -628,6 +630,7 @@ def go_to_state(num):
         utils.task_real_duration = 0
         arduino.close_door1()
         arduino.open_door2()
+        arduino.open_door3()
         arduino.turn_led_off()
         # bpod.close_inner_door()
         utils.task = utils.super_subject.task
@@ -798,6 +801,7 @@ def go_to_state(num):
     elif num == 2:  # before min_time
         utils.subject_trapped = False
         arduino.close_door2()
+        arduino.close_door3()
         utils.log_cam(
             utils.subject.name, "First action in box, closing door 2", "ACTION"
         )
@@ -812,6 +816,7 @@ def go_to_state(num):
             utils.subject_trapped = False
             arduino.close_door1()
         arduino.open_door2()
+        arduino.open_door3()
         utils.log_cam(utils.subject.name, "Opening door2, subject can leave", "ACTION")
         utils.log("Academy", "Go to state 3", "ACTION")
 
@@ -822,6 +827,7 @@ def go_to_state(num):
 
     elif num == 5:  # after max_time, data not saved, animal not back
         arduino.open_door2()
+        arduino.open_door3()
         utils.log("Academy", "Go to state 5", "ACTION")
 
     elif num == 6:  # after max_time, data saved, animal not back
