@@ -128,16 +128,12 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 390.2,
+    'm3': 100.2,
 }
 
 # Pre-generated tone vectors
 rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
 
-#Sound Testing:
-def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
-    tone = pureToneGen_dB(frequency, duration, db, FsOut)
-    soundStream.play(tone, FsOut=FsOut)
 
 #Cognitive Bias Script:
 # 4 pairs × (low_ref, probe25, probe50, probe75, high_ref)

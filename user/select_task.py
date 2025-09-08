@@ -343,7 +343,7 @@ def select_task(df, subject):
             if task_number == 3:
                 # substage = 0  # Current substage within the stage
                 # substage_bias = 0  # Side bias stage for substage behavior
-                task_number = 2  # Each task has a unique number. See RV script guide.
+                # task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # # Needed to create blocks of 40 trials for criterion to be assessed on:
                 # block_size = 40  # The number of trials in a block
@@ -374,36 +374,36 @@ def select_task(df, subject):
                     pass
 
                 #Remove comments for Weber's Law:
-                # stage = 4
-               # task = 'Probability_WebersLaw_Pre'
-               #  block = 12  # This is the number of trials one conditions will remain for
-               #  conditions = []  # Takes the conditions from select task file.
-               #  completed_conditions = []  # To store completed conditions
-               #  current_condition = 0  # To track the current condition in progress
-               #  repetition = 2  # To store how many times the conditions needs to repeat.
-               #  current_repetition = 0  # To store how many times the condition has repeated.
-               #  trial_counter = 0  # Track the number of trials for the current condition
-               #  # Image output stims:
-               #  stim_trial = 0
-               #  stim_trials = []
-               #  stim_trial_counter = 0
+                stage = 4
+                task = 'Probability_WebersLaw_Pre'
+                block = 12  # This is the number of trials one conditions will remain for
+                conditions = []  # Takes the conditions from select task file.
+                completed_conditions = []  # To store completed conditions
+                current_condition = 0  # To track the current condition in progress
+                repetition = 2  # To store how many times the conditions needs to repeat.
+                current_repetition = 0  # To store how many times the condition has repeated.
+                trial_counter = 0  # Track the number of trials for the current condition
+                # Image output stims:
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
 
-                # Cognitive Bias:
-                reward_group = {
-                    'chandler': 1,
-                    'fergus': 1,
-                    'joey': 1,
-                    'innes': 1,
-                    'felix': 2,
-                    'geralt': 2,
-                    'ross': 2,
-                    'pol': 2
-                }
-
-                group = reward_group.get(my_subject.lower(), group)
-                pair = 1  # same for all rats
-
-                print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
+                # # Cognitive Bias:
+                # reward_group = {
+                #     'chandler': 1,
+                #     'fergus': 1,
+                #     'joey': 1,
+                #     'innes': 1,
+                #     'felix': 2,
+                #     'geralt': 2,
+                #     'ross': 2,
+                #     'pol': 2
+                # }
+                #
+                # group = reward_group.get(my_subject.lower(), group)
+                # pair = 1  # same for all rats
+                #
+                # print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
         elif 'Cognitive_Bias_Auditory_Training' in task:
             #Move pair +1 when criterion is met:
@@ -423,7 +423,7 @@ def select_task(df, subject):
                     return n_valid, acc
 
                 # Version 1 (strict):
-                (uncomment this block if you want strict criterion)
+                # (uncomment this block if you want strict criterion)
                 (n1, a1) = session_stats(sessions[-2])
                 (n2, a2) = session_stats(sessions[-1])
                 print(f"[CB] last2 sessions={sessions[-2:]} "
