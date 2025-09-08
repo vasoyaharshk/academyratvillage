@@ -30,8 +30,8 @@
 #define ANGLESEMICLOSE2 1 //Harsh: what is this?
 
 // Door 3: independent angles (change to match your mechanics)
-#define ANGLEOPEN3 120
-#define ANGLECLOSE3 170
+#define ANGLEOPEN3 30
+#define ANGLECLOSE3 180
 
 // scale
 #define CELL1 2   
