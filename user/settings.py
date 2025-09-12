@@ -63,12 +63,12 @@ TIME_BETWEEN_RESPONSES = 0.5
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICECAGE = 150  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 15  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
-NOMICEDOOR2 = 15  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 20  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR2 = 20  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 4000    # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
 #Behavioral Box:
-SEVERALMICE = 1300  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
+SEVERALMICE = 9000  # if area_box > SEVERALMICE, alarm 2 mice inside box # <-- Harsh-Done. Moved the boxes to only see the entrance.
 FLOORMOUSE = 100
 
 THRESHOLD_DAY_CAGE1 = 60                                                  # <-- TO CHANGE
@@ -125,7 +125,7 @@ CAM2_STATES = {
 CAM2_DURATION_VIDEO = 0
 CAM2_NUMBER_OF_VIDEOS = 0
 CAM2_THRESHOLD = 50
-CAM2_DOORS1_ZONE = [1, 2, 1, 2]
+CAM2_DOORS1_ZONE = [10, 630, 140, 470]
 CAM2_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 CAM2_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
 CAM2_FLOOR2_ZONE = [7, 8, 7, 8]
@@ -148,11 +148,11 @@ CAM3_DURATION_VIDEO = 0             # CAM 3 is waterport Camera
 CAM3_NUMBER_OF_VIDEOS = 0
 CAM3_THRESHOLD = 70                         #40 for day. 90 for night
 CAM3_CAGE_ZONE = None
-#CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
+CAM3_DOORS1_ZONE = [1, 2, 1, 2]      # <-- TO CHANGE  left, right, top, down
 CAM3_DOORS2_ZONE = [3, 4, 3, 4]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR1_ZONE = [5, 6, 5, 6]    # <-- TO CHANGE left, right, top, down
 CAM3_FLOOR2_ZONE = [7, 8, 7, 8]    # <-- TO CHANGE left, right, top, down
-CAM3_DOORS1_ZONE = [0, 100, 150, 300]
+#CAM3_DOORS1_ZONE = [0, 100, 150, 300]
 CAM3_FLOOR_ON = False
 CAM3_TRACKING_POSITION = False
 
