@@ -1008,30 +1008,10 @@ class Probability_Handtracking_Yellow(Task):
 
             # Substage trial counters for only videos:
             if self.stage % 2 == 0:
-                if self.substage == 1:
+                if self.substage == 0:
                     self.substage_counter_1 += 1
-                elif self.substage == 2:
+                elif self.substage == 1:
                     self.substage_counter_2 += 1
-                elif self.substage == 3:
-                    self.substage_counter_3 += 1
-                elif self.substage == 4:
-                    self.substage_counter_4 += 1
-                elif self.substage == 5:
-                    self.substage_counter_5 += 1
-                elif self.substage == 6:
-                    self.substage_counter_6 += 1
-                elif self.substage == 7:
-                    self.substage_counter_7 += 1
-                elif self.substage == 8:
-                    self.substage_counter_8 += 1
-                elif self.substage == 9:
-                    self.substage_counter_9 += 1
-                elif self.substage == 10:
-                    self.substage_counter_10 += 1
-                elif self.substage == 11:
-                    self.substage_counter_11 += 1
-                elif self.substage == 12:
-                    self.substage_counter_12 += 1
 
             # Side Bias Breaking formula:
 
@@ -1119,12 +1099,15 @@ class Probability_Handtracking_Yellow(Task):
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
 
-            if self.total_trials >= self.task_end_criteria:
+            if (self.substage_counter_1 >= self.task_end_criteria) or (
+                    self.substage_counter_2 >= self.task_end_criteria):
                 try:
                     message = f"URGENT: {self.subject} has completed 1600 trials in this task."
                     telegram_bot.alarm_finish_session(message, self.subject)
+                    self.task_end = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
+
 
         else:
             print("Task 4 is completed. Task is now 5 which we will decide later")

@@ -731,7 +731,7 @@ def select_task(df, subject):
 
             elif task == 'Probability_Handtracking_Yellow':
                 if task_number == 7: #change to yellow tokens
-                    task = 'Probability_Handtracking_Crossing'
+                    task = 'abc'
                     stage = 1
                     substage = 1
                     block_size = 40  # Every 40 blocks the criteria will be tested.
