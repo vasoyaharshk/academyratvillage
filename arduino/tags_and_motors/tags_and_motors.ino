@@ -16,8 +16,8 @@
 #define SERVOPIN2 10
 
 // servo3 (NEW: independent timing & angles, but opens/closes with door 2)
-#define TIMEOPEN3 220       // set your preferred speed for door 3
-#define TIMECLOSE3 220
+#define TIMEOPEN3 600       // set your preferred speed for door 3
+#define TIMECLOSE3 600
 #define SERVOPIN3 11        // set the actual pin you wired door 3 to
 
 // always 90 degrees from open to close

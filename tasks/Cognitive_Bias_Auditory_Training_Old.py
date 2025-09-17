@@ -7,7 +7,7 @@ import numpy as np
 from academy import telegram_bot
 
 
-class Cognitive_Bias_Auditory_Training(Task):
+class Cognitive_Bias_Auditory_Training_Old(Task):
     def __init__(self):
         super().__init__()
 
@@ -15,55 +15,63 @@ class Cognitive_Bias_Auditory_Training(Task):
         This task trains rats on 4 tone pairs for the cognitive bias tasks. 
 
         ########   TASK INFO   ########
-        Goal:
-            Train discrimination between tones within each of 4 frequency pairs.
-
+        Goal: Train discrimination between tones within each of 4 frequency pairs.
         Procedure:
-            • Rats are pre-assigned to a Group (1–4) and a starting Pair (1–4) in subjects.csv.
-            • Each Pair is defined by a Low and a High reference frequency.
-            • On each trial, the rat touches left or right to indicate the tone (low or high).
-            • Correct touches are rewarded with sucrose water. Reward magnitude depends on:
-                – Which tone is designated the “high-reward” tone for that Group × Pair.
-                – High-reward = 5.6× water, Low-reward = 2.8× water.
-            • For each Group, Table 1 defines:
-                – Whether the High or Low tone is the high-reward tone (HF→HR or LF→HR).
-                – Which side the High tone appears on (left or right).
-                – The High-reward side then follows automatically from those two.
-            • Shapes (triangle, circle, square, star) are also counterbalanced across Groups/Pairs to aid discrimination.
-            • Rats are presented with variably reinforced trials, where approximately one in every ten trials will randomly not be rewarded from the start of training.
-            The non-reinforced trials are pseudorandomised so that no more than two consecutive trials of the same tone type (high or low) are unrewarded.
-
-
-        Criterion:
-            ≥85% correct across 2 consecutive sessions (per Pair).
-
-        Pairs (reference tones):
-            Pair 1:  Low 2000 Hz,   High 3621 Hz
-            Pair 2:  Low 4573 Hz,   High 8281 Hz
-            Pair 3:  Low 10458 Hz,  High 18935 Hz
-            Pair 4:  Low 23913 Hz,  High 43298 Hz
-
-        Group structure:
-            • 4 Groups total (Groups 1–4).
-            • Each Group implements a different counterbalancing of:
-                – Which tone is high-reward (HF vs LF).
-                – Which side is correct for the High tone (Left vs Right).
-                – Thus across all 4 Groups, high-reward side, tone–reward mapping,
-                  and side assignment are fully counterbalanced.
-            • Each rat is assigned to one Group and progresses through all 4 Pairs.
-
-        ########   PORTS INFO   ########
+            Rats begin with Pair 1.
+            Left/right responses (touchscreen) indicate tone identity (low/high); rewards differ in size (20 µL left vs 40 µL right sucrose water).
+            Side and reward counterbalanced across rats.
+            Partial reinforcement is introduced: 1 in 5 training trials is unrewarded.
+            Rats proceed sequentially to Pairs 2, 3, and 4.
+            Each pair uses a different shape to aid discrimination.
+            Rats are split into 2 groups to counterbalance tone-reward mappings across pairs.
+        Criterion: ≥85% correct for 2 consecutive sessions.
+        Pairs:
+        Pair 1:
+            Low reference: 2000 Hz
+            High reference: 3621 Hz
+        Pair 2:
+            Low reference: 4573 Hz
+            High reference: 8281 Hz
+        Pair 3:
+            Low reference: 10458 Hz
+            High reference: 18935 Hz
+        Pair 4:
+            Low reference: 23.913 Hz
+            High reference: 43.298 Hz
+        Training order: All rats follow Pair 1, Pair 2, Pair 3, Pair 4
+        Randomization for Groups:
+            8 rats:
+            chandler, felix, fergus, geralt, joey, ross, innes, pol
+            Stimulus sides:
+                For each rat: randomly counterbalanced →
+                Low tone = Left or Right
+                High tone = Right or Left
+            Reward mapping groups (between-subjects):
+                Reward Group 1:
+                    Pairs 1 & 3: High tone = Large reward
+                    Pairs 2 & 4: Low tone = Large reward
+                Reward Group 2 (opposite):
+                    Pairs 1 & 3: Low tone = Large reward
+                    Pairs 2 & 4: High tone = Large reward
+            So in order to have a full factorial design:
+            Summary of Reward Mapping per Group
+                Group 1 (Pairs 1 & 3: High → large reward, left, triangle; Pairs 2 & 4: Low → large reward, right, triangle):
+                    Rats: chandler, felix, joey, ross
+                Group 2 (Pairs 1 & 3: Low → large reward, right, triangle; Pairs 2 & 4: High → large reward, right, triangle):
+                
+                    Rats: fergus, geralt, innes, pol
+                
+                ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
         Port 3 - PHOTOGATES 3: Photogates 
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED    
+        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
         """
 
-
         # Variables for the task:
-        self.trials_max = 80
+        self.trials_max = 75
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
@@ -101,7 +109,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.stim_trial = None  #probes 0 or 4 for training.
         self.last_stim_trial = 0  # It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.stim = [0, 4]  # defines if correct side is left or right
-        self.block_size = 80
+        self.block_size = 75
         self.stim_trials = []
         self.stim_trial_counter = 0
 
@@ -123,45 +131,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
         self.response_duration = 60
-        
-        # === New Table 1 mapping (group 1..4; pair 1..4) ===
-        # Keys per pair:
-        #   'hr_tone'         → which tone gets LARGE reward ('high' or 'low')
-        #   'high_tone_side'  → correct side for the HIGH tone ('left' or 'right')
-        self.table1 = {
-            1: {  # Group 1 → HR side = RIGHT
-                1: {'hr_tone': 'high', 'high_tone_side': 'right'},
-                2: {'hr_tone': 'low',  'high_tone_side': 'left'},
-                3: {'hr_tone': 'high', 'high_tone_side': 'right'},
-                4: {'hr_tone': 'low',  'high_tone_side': 'left'},
-            },
-            2: {  # Group 2 → HR side = LEFT
-                1: {'hr_tone': 'low',  'high_tone_side': 'right'},
-                2: {'hr_tone': 'high', 'high_tone_side': 'left'},
-                3: {'hr_tone': 'low',  'high_tone_side': 'right'},
-                4: {'hr_tone': 'high', 'high_tone_side': 'left'},
-            },
-            3: {  # Group 3 → HR side = RIGHT
-                1: {'hr_tone': 'high', 'high_tone_side': 'right'},
-                2: {'hr_tone': 'low',  'high_tone_side': 'left'},
-                3: {'hr_tone': 'high', 'high_tone_side': 'right'},
-                4: {'hr_tone': 'low',  'high_tone_side': 'left'},
-            },
-            4: {  # Group 4 → HR side = LEFT
-                1: {'hr_tone': 'low',  'high_tone_side': 'right'},
-                2: {'hr_tone': 'high', 'high_tone_side': 'left'},
-                3: {'hr_tone': 'low',  'high_tone_side': 'right'},
-                4: {'hr_tone': 'high', 'high_tone_side': 'left'},
-            },
-        }
-        
-        
-        # --- Partial reinforcement (PR) control ---
-        self.partial_reinforcement_active = 1     # turn PR on/off
-        self.partial_reinforcement_ratio = 0.1    # 1-in-10
-        self.unrewarded_list = []                 # filled per block; 1 = skip reward on correct
-        self.unrewarded_trial = 0                 # store in after_trial
-
 
 
     def configure_gui(self):
@@ -185,16 +154,47 @@ class Cognitive_Bias_Auditory_Training(Task):
     #Function to map high, low sounds
     def derive_high_low(self, group: int, pair: int):
         """
-        Return (high_side, low_side) from Table 1.
+        Return ((high_side, high_shape), (low_side, low_shape)).
+
+        NEW PROTOCOL:
+          - Side still depends on (group, pair).
+          - Shape depends ONLY on pair:
+              1→triangle, 2→circle, 3→star, 4→square
+          - Both high and low use the same shape for a given pair.
         """
-        group = int(group); pair = int(pair)
-        try:
-            high_side = self.table1[group][pair]['high_tone_side']
-        except KeyError:
-            raise ValueError(f"Invalid (group, pair) in Table1: ({group}, {pair})")
-        low_side = 'left' if high_side == 'right' else 'right'
-        return high_side, low_side
-    
+        # Shape fixed by pair
+        if pair == 1:
+            shape = "triangle"
+        elif pair == 2:
+            shape = "circle"
+        elif pair == 3:
+            shape = "star"
+        elif pair == 4:
+            shape = "square"
+        else:
+            raise ValueError(f"Invalid pair: {pair}")
+
+        # Side mapping unchanged (as before)
+        if group == 1:
+            if pair in (1, 3):  # high on left
+                high_side, low_side = "left", "right"
+            elif pair in (2, 4):  # high on right
+                high_side, low_side = "right", "left"
+            else:
+                raise ValueError(f"Invalid pair: {pair}")
+        elif group == 2:
+            if pair in (1, 3):  # high on right
+                high_side, low_side = "right", "left"
+            elif pair in (2, 4):  # high on left
+                high_side, low_side = "left", "right"
+            else:
+                raise ValueError(f"Invalid pair: {pair}")
+        else:
+            raise ValueError(f"Invalid group: {group}")
+
+        # Same shape returned for both high and low (per-pair)
+        return (high_side, shape), (low_side, shape)
+
 
     # --- Reward mapping lookup function ---
     # def get_reward_mapping(self, subject, pair):
@@ -247,31 +247,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         if pair not in (1, 2, 3, 4):
             raise ValueError(f"Invalid pair: {pair}")
         return seq[pair - 1]
-    
-    
-    def partial_reinforcement_list(self, stim_seq, ratio=0.1):
-        """
-        Create a partial reinforcement list for a sequence of stim trials.
-        1 = unrewarded, 0 = rewarded.
-        Ensures:
-          • About ratio (e.g. 0.1) of trials unrewarded
-          • Not >2 consecutive unrewarded trials of the same tone
-        """
-        n = len(stim_seq)
-        target = max(1, int(round(n * ratio)))
-        lst = [0] * n
-        placed = 0
-        for i in range(n):
-            if placed < target:
-                tone = stim_seq[i]
-                # prevent 3 consecutive unrewarded of same tone
-                if not (i >= 2 and lst[i-1] == lst[i-2] == 1 and
-                        stim_seq[i-1] == stim_seq[i-2] == tone):
-                    if random.random() < (target / n):  # rough spread
-                        lst[i] = 1
-                        placed += 1
-        return lst
-
 
     def main_loop(self):
         print('')
@@ -339,7 +314,6 @@ class Cognitive_Bias_Auditory_Training(Task):
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
             self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
             self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-            
             # print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 # print("Retrying to generate stimulus trials...")
@@ -349,14 +323,12 @@ class Cognitive_Bias_Auditory_Training(Task):
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
             self.stim_trial_counter = 0
-            
-            self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
 
         # current probe for this trial (0 = low, 4 = high)
         self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
 
         # get sides from existing mapping, but override shape per subject/group/pair
-        (high_side), (low_side) = self.derive_high_low(int(self.group), int(self.pair))
+        (high_side, _), (low_side, _) = self.derive_high_low(int(self.group), int(self.pair))
         shape = self.shape_for_pair(self.subject, int(self.group), int(self.pair))
 
         # pick correct side based on probe
@@ -377,23 +349,32 @@ class Cognitive_Bias_Auditory_Training(Task):
         else:
             self.x_correcth, self.x_incorrecth = self.x_correcth_pos[1], self.x_correcth_pos[0]
 
-
-        # --- Per-trial reward size from Table 1 (ONLY valve_factor_c) ---
+        # --- Per-trial reward size using ONLY valve_factor_c ---
         # Large reward = 5.6, Small reward = 2.8
-        mapping = self.table1[int(self.group)][int(self.pair)]
-        hr_tone = mapping['hr_tone']              # 'high' or 'low'
-        is_high_probe = (self.stim_trial == 4)    # 4 = high, 0 = low
+        pair_i = int(self.pair)  # 1..4
+        group_i = int(self.group)  # 1 or 2
+        is_high_probe = (self.stim_trial == 4)  # 4 = high, 0 = low
 
-        large_now = (is_high_probe and hr_tone == 'high') or ((not is_high_probe) and hr_tone == 'low')
-        self.valve_factor_c = 5.6 if large_now else 2.8
+        # Mapping from protocol:
+        # Group 1: Pairs 1&3 → High = large; Pairs 2&4 → Low = large
+        # Group 2: opposite
+        if group_i == 1:
+            large_if_high = (pair_i in (1, 3))
+        elif group_i == 2:
+            large_if_high = (pair_i in (2, 4))
+        else:
+            raise ValueError(f"Invalid group: {group_i}")
+
+        self.valve_factor_c = 5.6 if (is_high_probe == large_if_high) else 2.8
 
 
 
-        if self.partial_reinforcement_active and self.unrewarded_list:
-            if self.unrewarded_list[self.stim_trial_counter] == 1:
-                self.valve_factor_c = 0
-                self.unrewarded_trial = 1
-
+        # # --- Partial reinforcement: 1 in 5 correct training trials unrewarded ---
+        # unrewarded_correct = False
+        # if self.variable_reinforcement and self.variable_reinforcement_ratio > 0:
+        #     # simple Bernoulli gate per trial; ratio=0.2 => ~1/5
+        #     unrewarded_correct = (random.random() < self.variable_reinforcement_ratio)
+        # self._unrewarded_correct = unrewarded_correct  # store for after_trial, if needed
 
         print(
             f"Group={self.group} Pair={self.pair} Probe={self.stim_trial} "
@@ -652,12 +633,5 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('stim_trial_counter', self.stim_trial_counter)
         self.register_value('last_stim_trial', self.last_stim_trial)
         self.register_value('stim', self.stim)
-
-        self.register_value('partial_reinforcement_active', self.partial_reinforcement_active)
-        self.register_value('partial_reinforcement_ratio', self.partial_reinforcement_ratio)
-        self.register_value('unrewarded_list', self.unrewarded_list)
-        self.register_value('unrewarded_trial', self.unrewarded_trial)
-        
-        
 
 

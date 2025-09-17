@@ -228,16 +228,10 @@ class Gui(tk.Frame):
                 self, text="Close door 2", command=self.close_door2, style="red.TButton"
             ).place(x=x1, y=158, height=20, width=160)
             ttk.Button(
-                self,
-                text="Open inner door",
-                command=self.open_inner_door,
-                style="green.TButton",
+                self, text="Open door 3", command=self.open_door3, style="green.TButton"
             ).place(x=x1, y=178, height=20, width=160)
             ttk.Button(
-                self,
-                text="Close inner door",
-                command=self.close_inner_door,
-                style="red.TButton",
+                self, text="Close door 3", command=self.close_door3, style="red.TButton"
             ).place(x=x1, y=198, height=20, width=160)
 
             ttk.Separator(self, orient=tk.HORIZONTAL).place(
@@ -1135,12 +1129,13 @@ class Gui(tk.Frame):
         arduino.close_door2()
 
     @staticmethod
-    def open_inner_door():
-        bpod.open_inner_door(utils.task)
+    @staticmethod
+    def open_door3():
+        arduino.open_door3()
 
     @staticmethod
-    def close_inner_door():
-        bpod.close_inner_door(utils.task)
+    def close_door3():
+        arduino.close_door3()
 
     @staticmethod
     def play_buzzer1():
