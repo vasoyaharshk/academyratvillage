@@ -490,18 +490,17 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
 
-
             elif task == pr_name:
                 if cb_meets(pr_name):
                     order = pair_order_table[int(group)]
                     idx = order.index(int(pair))
-                    new_pair = order[(idx + 1) % len(order)]  #Pair advances based on the list.
-                    if new_pair != pair:
+                    if idx + 1 < len(order):
+                        new_pair = order[idx + 1]
                         old_pair = pair
                         pair = new_pair
-                        task = base_name  # only flip back when pair advances
+                        task = base_name  # go back to baseline for the new pair
                         message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
-                                   f"on two {trials_criteria}-trial sessions). pair {old_pair} → {pair}")
+                                   f"on two {trials_criteria}-trial sessions). From pair {old_pair} to pair {pair}. returning to baseline")
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
@@ -509,7 +508,9 @@ def select_task(df, subject):
                         except:
                             print('Telegram message not sent')
                     else:
-                        print(f"[CB] {my_subject}: already at max pair={pair}, no change.")
+                        # already at the last pair, no wraparound
+                        print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
+                        task = 'Next Task Here'
 
 
         elif 'Probability_Training_BB_Size_Bias' in task:
