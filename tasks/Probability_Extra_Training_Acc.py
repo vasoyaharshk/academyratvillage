@@ -378,7 +378,6 @@ class Probability_Extra_Training_Acc(Task):
             self.x_incorrecth = None
             self.response_x = None
             self.response_y = None
-            self.trial_length = None
             self.trial_result = None
 
 
@@ -550,7 +549,6 @@ class Probability_Extra_Training_Acc(Task):
             self.x_incorrecth = None
             self.response_x = None
             self.response_y = None
-            self.trial_length = None
             self.trial_result = None
             self.task_end = True
 

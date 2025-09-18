@@ -766,7 +766,6 @@ class Probability_Training_BB_Size_Acc(Task):
             self.x_incorrecth = None
             self.response_x = None
             self.response_y = None
-            self.trial_length = None
             self.trial_result = None
 
 
