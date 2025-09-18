@@ -6,7 +6,7 @@ import random
 import numpy as np
 from academy import telegram_bot
 
-class Probability_Extra_Training_Acc(Task):
+class Probability_Extra_Training_Acc_Only_Stage_2(Task):
     def __init__(self):
         super().__init__()
 
@@ -20,11 +20,8 @@ class Probability_Extra_Training_Acc(Task):
         3: Weber's Law Test and Training
         
         Stages:
-        Extra Training 1: a single blue peg - either on left or right, like Indication
         Extra Training 2: a single blue peg vs a single yellow peg - side counterbalanced
-        Extra Training 3: two blue pegs vs two yellow pegs - side counterbalanced
-        Extra Training 4: 5 blue pegs vs 5 yellow pegs - side counterbalanced
-        Extra Training 5: 10 blue pegs vs 10 yellow pegs - side counterbalanced
+
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -42,7 +39,7 @@ class Probability_Extra_Training_Acc(Task):
         self.trials_tired = 5 # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
         self.tired = False
         self.task_number = 1
-        self.stage = 1
+        self.stage = 2
         self.substage = 0
         self.substage_bias = 0 # 1 = 90:10, 2 = 75:25, 3 = 50:50
         self.response_duration = 60
@@ -162,7 +159,7 @@ class Probability_Extra_Training_Acc(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 6:
+            if self.stage == 3:
                 self.task_number = 2
                 self.tired = True
 
@@ -175,7 +172,7 @@ class Probability_Extra_Training_Acc(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 1)
+            new_stage = max(self.stage - 1, 2)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
