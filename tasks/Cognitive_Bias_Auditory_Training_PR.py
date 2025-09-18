@@ -229,35 +229,120 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
     def partial_reinforcement_list(self, stim_seq, ratio=0.1):
         """
-        Create a partial reinforcement list for a sequence of stim trials.
-        1 = unrewarded, 0 = rewarded.
-        Ensures:
-          • Exactly one unrewarded per block, with block = round(1/ratio)
-          • Not >2 consecutive unrewarded trials of the same tone
+        Random, balanced partial reinforcement list (no forced alternation).
+          • Exactly one unrewarded per window (window = round(1/ratio))
+          • Exactly 50–50 high vs low among unrewarded across the whole block
+          • No >=3 consecutive unrewarded of the same tone (in unrewarded-tone stream)
+        Returns a 0/1 list aligned to stim_seq.
         """
+        import random
+
         n = len(stim_seq)
-        # derive window size from ratio (e.g., 0.1→10, 0.2→5). Guard against zeros.
-        block = max(1, int(round(1.0 / float(ratio))))
+        block = max(1, int(round(1.0 / float(ratio))))  # 0.1→10, 0.2→5
+        num_blocks = n // block
         lst = [0] * n
 
-        num_blocks = n // block
-        for b in range(num_blocks):
-            start = b * block
-            end = start + block
-            choices = list(range(start, end))
-            random.shuffle(choices)
-            for idx in choices:
-                tone = stim_seq[idx]
-                # avoid creating 3 consecutive UNREWARDED for the same tone
-                if idx >= 2 and lst[idx - 1] == lst[idx - 2] == 1 and stim_seq[idx - 1] == stim_seq[idx - 2] == tone:
-                    continue
-                lst[idx] = 1
-                break
+        # Collect candidate indices by window, split by tone
+        windows = [(b * block, (b + 1) * block) for b in range(num_blocks)]
+        by_win = []
+        for s, e in windows:
+            highs = [i for i in range(s, e) if stim_seq[i] == 4]
+            lows = [i for i in range(s, e) if stim_seq[i] == 0]
+            by_win.append((highs, lows))
 
-        # If there is a trailing remainder window (<block trials), we leave it fully rewarded.
-        # (With 80 trials and ratios 0.1 or 0.2, n is divisible so this doesn't apply.)
+        # Quotas: exactly half high, half low (when num_blocks even, which it is for 80 trials)
+        target_high = num_blocks // 2
+        target_low = num_blocks - target_high
+
+        # Build a random target tone sequence of length num_blocks with exact quotas
+        # and reject sequences with any run >=3; if needed, repair.
+        target = ['high'] * target_high + ['low'] * target_low
+
+        def has_triple(seq):
+            run = 1
+            for i in range(1, len(seq)):
+                run = run + 1 if seq[i] == seq[i - 1] else 1
+                if run >= 3:
+                    return True
+            return False
+
+        # Try a few random shuffles; if unlucky, repair by local swaps
+        for _ in range(200):
+            random.shuffle(target)
+            if not has_triple(target):
+                break
+        else:
+            # Repair pass: scan and swap with a later different-tone position
+            i = 2
+            while i < len(target):
+                if target[i] == target[i - 1] == target[i - 2]:
+                    # find a later j to swap that breaks the triple
+                    j = i + 1
+                    swapped = False
+                    while j < len(target):
+                        if target[j] != target[i]:
+                            target[i], target[j] = target[j], target[i]
+                            swapped = True
+                            break
+                        j += 1
+                    # if we couldn't swap (extremely unlikely with balanced quotas), leave as-is
+                    i += 1
+                    continue
+                i += 1
+
+        # Now, for each window, pick an index that matches the target tone
+        for b, tone in enumerate(target):
+            s, e = windows[b]
+            highs, lows = by_win[b]
+            if tone == 'high' and highs:
+                idx = random.choice(highs)
+            elif tone == 'low' and lows:
+                idx = random.choice(lows)
+            else:
+                # Fallback if window lacks desired tone (rare); pick any in window
+                idx = random.randrange(s, e)
+            lst[idx] = 1
+
         return lst
 
+
+    #This gives alternating sequeunce:
+    # def partial_reinforcement_list_balanced(stim_seq, ratio=0.1):
+    #     """
+    #     Exactly 1 unrewarded per window (window = round(1/ratio)),
+    #     exact 50–50 high/low among unrewarded across the whole block,
+    #     and no runs ≥3 of same unrewarded tone (achieved by alternating pattern).
+    #     """
+    #     import random
+    #
+    #     n = len(stim_seq)
+    #     block = max(1, int(round(1.0 / float(ratio))))  # 0.1→10, 0.2→5
+    #     num_blocks = n // block
+    #     lst = [0] * n
+    #
+    #     # Build an alternating target sequence of tones for the num_blocks windows.
+    #     # Randomly choose whether to start with 'high' or 'low' so it doesn't always align the same way.
+    #     start_high = bool(random.getrandbits(1))
+    #     target_seq = [('high' if ((i % 2 == 0) == start_high) else 'low') for i in range(num_blocks)]
+    #
+    #     # Ensure exact 50–50 by flipping the last element if needed (only matters when num_blocks is even; here it is).
+    #     if target_seq.count('high') != num_blocks // 2:
+    #         target_seq[-1] = 'high' if target_seq[-1] == 'low' else 'low'
+    #
+    #     # For each window, pick an index matching the target tone.
+    #     for b in range(num_blocks):
+    #         s, e = b * block, (b + 1) * block
+    #         tone = target_seq[b]
+    #         candidates = [i for i in range(s, e) if (stim_seq[i] == 4 if tone == 'high' else stim_seq[i] == 0)]
+    #
+    #         if not candidates:
+    #             # Extremely unlikely with your stim generator; fallback to the opposite tone
+    #             alt = [i for i in range(s, e) if (stim_seq[i] == 0 if tone == 'high' else stim_seq[i] == 4)]
+    #             candidates = alt if alt else list(range(s, e))
+    #
+    #         lst[random.choice(candidates)] = 1
+    #
+    #     return lst
 
     def main_loop(self):
         print('')
