@@ -158,6 +158,13 @@ def select_task(df, subject):
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
 
+    pair_order_table = {
+        1: [1, 2, 3, 4],  # Group 1
+        2: [2, 3, 4, 1],  # Group 2
+        3: [3, 4, 1, 2],  # Group 3
+        4: [4, 1, 2, 3],  # Group 4
+    }
+
     #Danger, only use this when the variables in df but not in defaulted list above are too many:
     # for key, val in last_row.items():
     #     if key not in variable_defaults:
@@ -389,21 +396,25 @@ def select_task(df, subject):
                 stim_trial_counter = 0
 
                 # # Cognitive Bias:
-                # reward_group = {
-                #     'chandler': 1,
-                #     'fergus': 1,
-                #     'joey': 1,
-                #     'innes': 1,
-                #     'felix': 2,
-                #     'geralt': 2,
-                #     'ross': 2,
-                #     'pol': 2
-                # }
-                #
-                # group = reward_group.get(my_subject.lower(), group)
-                # pair = 1  # same for all rats
-                #
-                # print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
+                group_assignment = {
+                    # Group 1
+                    'chandler': 1,
+                    'innes': 1,
+                    # Group 2
+                    'fergus': 2,
+                    'joey': 2,
+                    # Group 3
+                    'geralt': 3,
+                    'ross': 3,
+                    # Group 4
+                    'felix': 4,
+                    'pol': 4,
+                }
+
+                # Set group from table
+                group = group_assignment.get(my_subject.lower())
+                pair = pair_order_table[group][0]
+                print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
         elif 'Cognitive_Bias_Auditory_Training' in task:
             #Move pair +1 when criterion is met:
@@ -431,7 +442,6 @@ def select_task(df, subject):
                 meets = (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
 
 
-
                 # # Version 2 (skip short sessions):
                 # # (uncomment this block if you want skip-short behaviour)
                 # full_sessions = [s for s in sessions if session_stats(s)[0] >= trials_criteria]
@@ -448,7 +458,11 @@ def select_task(df, subject):
 
 
                 if meets:
-                    new_pair = min(int(pair) + 1, 4)
+                    order = pair_order_table[int(group)]
+                    idx = order.index(int(pair))
+                    new_pair = order[(idx + 1) % len(order)]  # wrap around if at end
+
+
                     if new_pair != pair:
                         message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
                                    f"on two 75-trial sessions). pair {pair} → {new_pair}")
