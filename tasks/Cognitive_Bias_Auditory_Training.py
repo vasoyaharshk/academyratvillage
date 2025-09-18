@@ -114,7 +114,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         # --- Training parameters ---
         self.variable_reinforcement = 1
-        self.variable_reinforcement_ratio = 0.2
+        self.variable_reinforcement_ratio = 0.1
         self.partial_reinforcement_trials = []
 
         # Correcth location and size:
@@ -194,52 +194,32 @@ class Cognitive_Bias_Auditory_Training(Task):
             raise ValueError(f"Invalid (group, pair) in Table1: ({group}, {pair})")
         low_side = 'left' if high_side == 'right' else 'right'
         return high_side, low_side
-    
 
-    # --- Reward mapping lookup function ---
-    # def get_reward_mapping(self, subject, pair):
-    #     group = self.reward_group[subject]
-    #     if group == 'A':
-    #         if pair in [1, 3]:
-    #             return {'low': self.reward_small, 'high': self.reward_large}
-    #         else:  # pair in [2, 4]
-    #             return {'low': self.reward_large, 'high': self.reward_small}
-    #     elif group == 'B':
-    #         if pair in [1, 3]:
-    #             return {'low': self.reward_large, 'high': self.reward_small}
-    #         else:  # pair in [2, 4]
-    #             return {'low': self.reward_small, 'high': self.reward_large}
 
     # --- NEW: per-rat/per-group counterbalanced shapes (all four pairs different) ---
-    def shape_for_pair(self, subject: str, group: int, pair: int) -> str:
+    def shape_for_pair(self, subject: str, pair: int) -> str:
         """
-        Return the shape name for a given (subject, group, pair) with a Latin-square-style rotation.
-        Group 1 rats: chandler, felix, joey, ross
-        Group 2 rats: fergus, geralt, innes, pol
-        Pairs are 1..4
+        Return the shape for the given subject and pair, using the Shapes table.
+        Pair is 1..4. No dependency on tone group.
         """
         name = (subject or "").strip().lower()
 
+        # Shapes table (subject : rotation for pairs 1..4)
         rotations = {
-            1: {  # Group 1
-                "chandler": ["triangle", "circle", "square", "star"],
-                "felix": ["circle", "square", "star", "triangle"],
-                "joey": ["square", "star", "triangle", "circle"],
-                "ross": ["star", "triangle", "circle", "square"],
-                "m3": ["star", "triangle", "circle", "square"],
-            },
-            2: {  # Group 2
-                "fergus": ["triangle", "circle", "square", "star"],
-                "geralt": ["circle", "square", "star", "triangle"],
-                "innes": ["square", "star", "triangle", "circle"],
-                "pol": ["star", "triangle", "circle", "square"],
-                "m3": ["triangle", "circle", "square", "star"],
-            },
+            "chand": ["triangle", "circle", "square", "star"],
+            "felix": ["circle", "square", "star", "triangle"],
+            "joey": ["square", "star", "triangle", "circle"],
+            "ross": ["star", "triangle", "circle", "square"],
+            "fergus": ["triangle", "circle", "square", "star"],
+            "geralt": ["circle", "square", "star", "triangle"],
+            "innes": ["square", "star", "triangle", "circle"],
+            "pol": ["star", "triangle", "circle", "square"],
+            "m3": ["triangle", "circle", "square", "star"],  # fallback subject used in your code
         }
 
-        # If subject not listed, fall back to a deterministic rotation
-        seq = rotations.get(group, {}).get(name)
+        seq = rotations.get(name)
         if seq is None:
+            # deterministic fallback rotation for unknown names
             base = ["triangle", "circle", "square", "star"]
             shift = (hash(name) % 4)
             seq = base[shift:] + base[:shift]
@@ -351,13 +331,14 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.stim_trial_counter = 0
             
             self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
+            print(f"Successfully generated unrewarded trials: {self.unrewarded_list}")
 
         # current probe for this trial (0 = low, 4 = high)
         self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
 
         # get sides from existing mapping, but override shape per subject/group/pair
         (high_side), (low_side) = self.derive_high_low(int(self.group), int(self.pair))
-        shape = self.shape_for_pair(self.subject, int(self.group), int(self.pair))
+        self.shape = self.shape_for_pair(self.subject, int(self.pair))
 
         # pick correct side based on probe
         if self.stim_trial == 4:  # HIGH probe
@@ -368,7 +349,6 @@ class Cognitive_Bias_Auditory_Training(Task):
             raise ValueError(f"Unexpected probe (0 or 4 expected): {self.stim_trial}")
 
         # shape is fixed by pair → same for both sides
-        self.shape = shape
         self.side_incorrect = "right" if self.side == "left" else "left"
 
         # x positions
@@ -400,6 +380,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             f"Correct_side={self.side} Shape={self.shape} "
             f"Incorrect_side={self.side_incorrect}  "
             f"valve_factor_c={self.valve_factor_c} "
+            f"unrewarded_trial={self.unrewarded_trial} "
         )
 
 

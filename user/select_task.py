@@ -400,6 +400,7 @@ def select_task(df, subject):
                     # Group 1
                     'chandler': 1,
                     'innes': 1,
+                    'm3': 1,
                     # Group 2
                     'fergus': 2,
                     'joey': 2,
@@ -417,13 +418,52 @@ def select_task(df, subject):
                 print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
         elif 'Cognitive_Bias_Auditory_Training' in task:
-            #Move pair +1 when criterion is met:
-            accuracy_criteria = 0.85
-            trials_criteria = 5
+            if task == 'Cognitive_Bias_Auditory_Training':
+                accuracy_criteria = 0.85
+                trials_criteria = 75
 
-            df_cb = df[df['task'].str.contains('Cognitive_Bias_Auditory_Training', na=False)].copy()
-            if not df_cb.empty:
+                df_cb = df[df['task'] == 'Cognitive_Bias_Auditory_Training'].copy()
+                meets = False  # default to safe
+                if not df_cb.empty:
+                    sessions = sorted(df_cb['session'].unique())
+                    if len(sessions) < 2:
+                        print(f"[CB] baseline has fewer than two sessions, found {len(sessions)}")
+                    else:
+                        def session_stats(sess_id):
+                            s = df_cb[df_cb['session'] == sess_id]
+                            valid = s[s['trial_result'] != 'miss']
+                            n_valid = valid.shape[0]
+                            correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+                            acc = (correct / n_valid) if n_valid > 0 else 0.0
+                            return n_valid, acc
+
+                        (n1, a1) = session_stats(sessions[-2])
+                        (n2, a2) = session_stats(sessions[-1])
+                        print(f"[CB] baseline last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
+                        meets = (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
+                else:
+                    print(f"[CB] no baseline CB sessions found")
+
+                if meets:
+                    task = 'Cognitive_Bias_Auditory_Training_PR'
+                    print(f"[CB] switch to PR with same pair {pair} after two {trials_criteria}-trial sessions at ≥{accuracy_criteria*100:.0f}%")
+
+        elif 'Cognitive_Bias_Auditory_Training' in task:
+            base_name = 'Cognitive_Bias_Auditory_Training'
+            pr_name = 'Cognitive_Bias_Auditory_Training_PR'     #This is the task where partial reinforcement is 1/5
+            accuracy_criteria = 0.85
+            trials_criteria = 75
+
+            def cb_meets(task_name: str) -> bool:       #The function will return a boolean and task name is string.
+                """Return True if last two sessions of task_name each meet trials and accuracy."""
+                df_cb = df[df['task'] == task_name].copy()
+                if df_cb.empty:
+                    print(f"[CB] no {task_name} sessions found")
+                    return False
                 sessions = sorted(df_cb['session'].unique())
+                if len(sessions) < 2:
+                    print(f"[CB] {task_name} has fewer than two sessions, found {len(sessions)}")
+                    return False
 
                 def session_stats(sess_id):
                     s = df_cb[df_cb['session'] == sess_id]
@@ -433,50 +473,43 @@ def select_task(df, subject):
                     acc = (correct / n_valid) if n_valid > 0 else 0.0
                     return n_valid, acc
 
-                # Version 1 (strict):
-                # (uncomment this block if you want strict criterion)
                 (n1, a1) = session_stats(sessions[-2])
                 (n2, a2) = session_stats(sessions[-1])
-                print(f"[CB] last2 sessions={sessions[-2:]} "
-                      f"| s1: valid={n1}, acc={a1:.3f} | s2: valid={n2}, acc={a2:.3f}")
-                meets = (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
+                print(f"[CB] {task_name} last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
+                return (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
+
+            if task == base_name:
+                if cb_meets(base_name):
+                    task = pr_name
+                    message = (f"[CB] switch to PR with same pair {pair} after two "
+                               f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria("CB→PR same pair", my_subject)
+                    except:
+                        print('Telegram message not sent')
 
 
-                # # Version 2 (skip short sessions):
-                # # (uncomment this block if you want skip-short behaviour)
-                # full_sessions = [s for s in sessions if session_stats(s)[0] >= trials_criteria]
-                # if len(full_sessions) >= 2:
-                #     last_two_full = full_sessions[-2:]
-                #     (n1, a1) = session_stats(last_two_full[0])
-                #     (n2, a2) = session_stats(last_two_full[1])
-                #     print(f"[CB] last2 full sessions={last_two_full} "
-                #           f"| s1: valid={n1}, acc={a1:.3f} | s2: valid={n2}, acc={a2:.3f}")
-                #     meets = (a1 >= accuracy_criteria) and (a2 >= accuracy_criteria)
-                # else:
-                #     meets = False
-                #     print(f"[CB] Not enough full 75-trial sessions for {my_subject}")
-
-
-                if meets:
+            elif task == pr_name:
+                if cb_meets(pr_name):
                     order = pair_order_table[int(group)]
                     idx = order.index(int(pair))
-                    new_pair = order[(idx + 1) % len(order)]  # wrap around if at end
-
-
+                    new_pair = order[(idx + 1) % len(order)]  #Pair advances based on the list.
                     if new_pair != pair:
+                        old_pair = pair
+                        pair = new_pair
+                        task = base_name  # only flip back when pair advances
                         message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
-                                   f"on two 75-trial sessions). pair {pair} → {new_pair}")
+                                   f"on two {trials_criteria}-trial sessions). pair {old_pair} → {pair}")
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_completed_criteria(f"CB pair→{new_pair}", my_subject)
+                            telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
                         except:
                             print('Telegram message not sent')
-                        pair = new_pair
                     else:
                         print(f"[CB] {my_subject}: already at max pair={pair}, no change.")
-            else:
-                print(f"[CB] {my_subject}: no CB sessions found; no pair change.")
 
 
         elif 'Probability_Training_BB_Size_Bias' in task:
@@ -529,27 +562,27 @@ def select_task(df, subject):
 
                 if task == "Probability_WebersLaw_Pre":
                     task = 'abc'
-                    stage = 5
+                    # stage = 5
+                    #
+                    # ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
+                    # completed_ror = []
+                    # current_ror = 16.0
+                    # trial_counter_ror = 0
+                    # substage = 0
+                    # trial_counter = 0
+                    # block_size = 40  # Every 40 blocks the criteria will be tested.
+                    # block_trial_counter = 0  # Counter for accuracy.
+                    # block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    # block_number = 1
+                    # ror_change = 0
+                    # block_change = 0
+                    # last_stim_trial = 0
+                    # last_condition_trial = 0
+                    # total_trials = 0
+                    # block_correct_count = 0  # Tracks the number of corrects in the block
+                    # block_valid_count = 0  ##Tracks the number of valid trials in the block
 
-                    ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
-                    completed_ror = []
-                    current_ror = 16.0
-                    trial_counter_ror = 0
-                    substage = 0
-                    trial_counter = 0
-                    block_size = 40  # Every 40 blocks the criteria will be tested.
-                    block_trial_counter = 0  # Counter for accuracy.
-                    block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 1
-                    ror_change = 0
-                    block_change = 0
-                    last_stim_trial = 0
-                    last_condition_trial = 0
-                    total_trials = 0
-                    block_correct_count = 0  # Tracks the number of corrects in the block
-                    block_valid_count = 0  ##Tracks the number of valid trials in the block
-
-                    message = 'PI: Probability_WebersLaw_Pre Test complete, Moving to Webers law Training on next session.'
+                    message = 'PI: Probability_WebersLaw_Pre Test complete, Moving to Cognitive Bias on next session.'
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -557,6 +590,32 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
+
+                    # # Cognitive Bias:
+                    group_assignment = {
+                        # Group 1
+                        'chand': 1,
+                        'innes': 1,
+                        'm3': 1,
+                        # Group 2
+                        'fergus': 2,
+                        'joey': 2,
+                        # Group 3
+                        'geralt': 3,
+                        'ross': 3,
+                        # Group 4
+                        'felix': 4,
+                        'pol': 4,
+                    }
+
+                    # Set group from table
+                    task = 'Cognitive_Bias_Auditory_Training'
+                    group = group_assignment.get(my_subject.lower())
+                    pair = pair_order_table[group][0]
+                    block_size = 80
+                    print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
+
+
                 if task == "Probability_WebersLaw_Post":
                     task = 'Probability_Handtracking_Zoomed'
                     # Weber's Law:
