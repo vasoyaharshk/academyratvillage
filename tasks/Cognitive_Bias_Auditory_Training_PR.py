@@ -161,8 +161,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         self.partial_reinforcement_ratio = 0.1    # 1-in-10
         self.unrewarded_list = []                 # filled per block; 1 = skip reward on correct
         self.unrewarded_trial = 0                 # store in after_trial
-
-
+        self.tone_played = None
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -227,29 +226,36 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         if pair not in (1, 2, 3, 4):
             raise ValueError(f"Invalid pair: {pair}")
         return seq[pair - 1]
-    
-    
+
     def partial_reinforcement_list(self, stim_seq, ratio=0.1):
         """
         Create a partial reinforcement list for a sequence of stim trials.
         1 = unrewarded, 0 = rewarded.
         Ensures:
-          • About ratio (e.g. 0.1) of trials unrewarded
+          • Exactly one unrewarded per block, with block = round(1/ratio)
           • Not >2 consecutive unrewarded trials of the same tone
         """
         n = len(stim_seq)
-        target = max(1, int(round(n * ratio)))
+        # derive window size from ratio (e.g., 0.1→10, 0.2→5). Guard against zeros.
+        block = max(1, int(round(1.0 / float(ratio))))
         lst = [0] * n
-        placed = 0
-        for i in range(n):
-            if placed < target:
-                tone = stim_seq[i]
-                # prevent 3 consecutive unrewarded of same tone
-                if not (i >= 2 and lst[i-1] == lst[i-2] == 1 and
-                        stim_seq[i-1] == stim_seq[i-2] == tone):
-                    if random.random() < (target / n):  # rough spread
-                        lst[i] = 1
-                        placed += 1
+
+        num_blocks = n // block
+        for b in range(num_blocks):
+            start = b * block
+            end = start + block
+            choices = list(range(start, end))
+            random.shuffle(choices)
+            for idx in choices:
+                tone = stim_seq[idx]
+                # avoid creating 3 consecutive UNREWARDED for the same tone
+                if idx >= 2 and lst[idx - 1] == lst[idx - 2] == 1 and stim_seq[idx - 1] == stim_seq[idx - 2] == tone:
+                    continue
+                lst[idx] = 1
+                break
+
+        # If there is a trailing remainder window (<block trials), we leave it fully rewarded.
+        # (With 80 trials and ratios 0.1 or 0.2, n is divisible so this doesn't apply.)
         return lst
 
 
@@ -329,7 +335,8 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
             self.stim_trial_counter = 0
-            
+
+            print(f"Successfully generated stimulus trials: {self.stim_trials}")
             self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
             print(f"Successfully generated unrewarded trials: {self.unrewarded_list}")
 
@@ -343,8 +350,10 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         # pick correct side based on probe
         if self.stim_trial == 4:  # HIGH probe
             self.side = high_side
+            self.tone_played = "High"
         elif self.stim_trial == 0:  # LOW probe
             self.side = low_side
+            self.tone_played = "Low"
         else:
             raise ValueError(f"Unexpected probe (0 or 4 expected): {self.stim_trial}")
 
@@ -376,9 +385,8 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
 
         print(
-            f"Group={self.group} Pair={self.pair} Probe={self.stim_trial} "
+            f"Group={self.group} Pair={self.pair}  Probe={self.stim_trial} Tone Played={self.tone_played} "
             f"Correct_side={self.side} Shape={self.shape} "
-            f"Incorrect_side={self.side_incorrect}  "
             f"valve_factor_c={self.valve_factor_c} "
             f"unrewarded_trial={self.unrewarded_trial} "
         )
@@ -638,7 +646,8 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         self.register_value('partial_reinforcement_ratio', self.partial_reinforcement_ratio)
         self.register_value('unrewarded_list', self.unrewarded_list)
         self.register_value('unrewarded_trial', self.unrewarded_trial)
-        
+        self.register_value('tone_played', self.tone_played)
+
         
 
 
