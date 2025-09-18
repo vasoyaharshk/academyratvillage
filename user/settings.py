@@ -63,7 +63,7 @@ TIME_BETWEEN_RESPONSES = 0.5
 # mouse detection
 #NOMICECAGE = 50  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
 NOMICECAGE = 150  # if area_cage > NOMICECAGE animal can not enter        # <-- TO CHANGE Harsh-Done
-NOMICEDOOR1 = 20  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
+NOMICEDOOR1 = 50  # if area_doors1 > NOMICEDOOR1 animal can not enter    # <-- TO CHANGE Harsh-Done
 NOMICEDOOR2 = 20  # if area_doors2 > NOMICEDOOR2 animal can not exit    # <-- TO CHANGE Harsh-Done
 ONEMOUSE = 4000    # if area_total > ONEMOUSE animal can not enter         # <-- TO CHANGE Harsh-Done;
 
@@ -104,8 +104,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [100, 135, 80, 255]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [80, 175, 255, 320]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [175, 460, 270, 320]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [460, 620, 275, 310]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [175, 460, 273, 320]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_DOORS2_ZONE = [460, 610, 275, 310]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 
