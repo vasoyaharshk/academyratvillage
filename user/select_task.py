@@ -62,7 +62,7 @@ def select_task(df, subject):
     # #Reward duration assigned again after the task:
     # # Map each rat to its duration
     # reward_duration_map = {
-    #     'chandler': 1.0,
+    #     'chand': 1.0,
     #     'felix': 2.0,
     #     'fergus': 1.0,
     #     'geralt': 2.0,
@@ -398,7 +398,7 @@ def select_task(df, subject):
                 # # Cognitive Bias:
                 group_assignment = {
                     # Group 1
-                    'chandler': 1,
+                    'chand': 1,
                     'innes': 1,
                     'm3': 1,
                     # Group 2
@@ -417,36 +417,6 @@ def select_task(df, subject):
                 pair = pair_order_table[group][0]
                 print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
-        elif 'Cognitive_Bias_Auditory_Training' in task:
-            if task == 'Cognitive_Bias_Auditory_Training':
-                accuracy_criteria = 0.85
-                trials_criteria = 75
-
-                df_cb = df[df['task'] == 'Cognitive_Bias_Auditory_Training'].copy()
-                meets = False  # default to safe
-                if not df_cb.empty:
-                    sessions = sorted(df_cb['session'].unique())
-                    if len(sessions) < 2:
-                        print(f"[CB] baseline has fewer than two sessions, found {len(sessions)}")
-                    else:
-                        def session_stats(sess_id):
-                            s = df_cb[df_cb['session'] == sess_id]
-                            valid = s[s['trial_result'] != 'miss']
-                            n_valid = valid.shape[0]
-                            correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-                            acc = (correct / n_valid) if n_valid > 0 else 0.0
-                            return n_valid, acc
-
-                        (n1, a1) = session_stats(sessions[-2])
-                        (n2, a2) = session_stats(sessions[-1])
-                        print(f"[CB] baseline last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
-                        meets = (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
-                else:
-                    print(f"[CB] no baseline CB sessions found")
-
-                if meets:
-                    task = 'Cognitive_Bias_Auditory_Training_PR'
-                    print(f"[CB] switch to PR with same pair {pair} after two {trials_criteria}-trial sessions at ≥{accuracy_criteria*100:.0f}%")
 
         elif 'Cognitive_Bias_Auditory_Training' in task:
             base_name = 'Cognitive_Bias_Auditory_Training'
@@ -510,7 +480,7 @@ def select_task(df, subject):
                     else:
                         # already at the last pair, no wraparound
                         print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
-                        task = 'Next Task Here'
+                        task = 'Next Task Here' #The new task gets here which we will code later
 
 
         elif 'Probability_Training_BB_Size_Bias' in task:
