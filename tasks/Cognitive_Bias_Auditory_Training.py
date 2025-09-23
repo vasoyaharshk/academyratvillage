@@ -163,6 +163,12 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.unrewarded_trial = 0                 # store in after_trial
         self.tone_played = None
 
+        self.pr_carry_pending = 0  # owe an unreward from a missed (incorrect) scheduled index
+        self.pr_carry_tone = None  # 'high' or 'low' we owe
+        self.pr_carry_deadline = -1  # absolute trial index by which we must pay even if tone doesn't match
+        # you can tweak how long we wait to keep the tone exactly:
+        self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
+
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
 
@@ -235,13 +241,10 @@ class Cognitive_Bias_Auditory_Training(Task):
           • No >=3 consecutive unrewarded of the same tone (in unrewarded-tone stream)
         Returns a 0/1 list aligned to stim_seq.
         """
-        import random
-
         n = len(stim_seq)
         block = max(1, int(round(1.0 / float(ratio))))  # 0.1→10, 0.2→5
         num_blocks = n // block
         lst = [0] * n
-
         # Collect candidate indices by window, split by tone
         windows = [(b * block, (b + 1) * block) for b in range(num_blocks)]
         by_win = []
@@ -253,7 +256,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         # Quotas: exactly half high, half low (when num_blocks even, which it is for 80 trials)
         target_high = num_blocks // 2
         target_low = num_blocks - target_high
-
         # Build a random target tone sequence of length num_blocks with exact quotas
         # and reject sequences with any run >=3; if needed, repair.
         target = ['high'] * target_high + ['low'] * target_low
@@ -265,7 +267,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                 if run >= 3:
                     return True
             return False
-
         # Try a few random shuffles; if unlucky, repair by local swaps
         for _ in range(200):
             random.shuffle(target)
@@ -289,7 +290,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                     i += 1
                     continue
                 i += 1
-
         # Now, for each window, pick an index that matches the target tone
         for b, tone in enumerate(target):
             s, e = windows[b]
@@ -302,7 +302,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                 # Fallback if window lacks desired tone (rare); pick any in window
                 idx = random.randrange(s, e)
             lst[idx] = 1
-
         return lst
 
 
@@ -425,6 +424,11 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
             print(f"Successfully generated unrewarded trials: {self.unrewarded_list}")
 
+            # Reset carry when a new block starts
+            self.pr_carry_pending = 0
+            self.pr_carry_tone = None
+            self.pr_carry_deadline = -1
+
         # current probe for this trial (0 = low, 4 = high)
         self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
 
@@ -461,12 +465,30 @@ class Cognitive_Bias_Auditory_Training(Task):
         large_now = (is_high_probe and hr_tone == 'high') or ((not is_high_probe) and hr_tone == 'low')
         self.valve_factor_c = 5.6 if large_now else 2.8
 
+        # --- Partial reinforcement: propose skip (applied ONLY if correct) ---
+        self.skip_proposed = 0
 
+        if self.partial_reinforcement_active:
+            # Window size from ratio (e.g., 0.1→10, 0.2→5)
+            block = max(1, int(round(1.0 / float(self.partial_reinforcement_ratio))))
+            i = self.stim_trial_counter
+            w = i // block
+            tone_now = 'high' if (self.stim_trial == 4) else 'low'
 
-        if self.partial_reinforcement_active and self.unrewarded_list:
-            if self.unrewarded_list[self.stim_trial_counter] == 1:
-                self.valve_factor_c = 0
-                self.unrewarded_trial = 1
+            # A) planned skip at this index?
+            planned_skip = (0 <= i < len(self.unrewarded_list)) and (self.unrewarded_list[i] == 1)
+
+            # B) tone-carry skip? (we owe an unreward of a specific tone)
+            carry_ok = 0
+            if self.pr_carry_pending:
+                # allow if tone matches, OR we've passed the deadline (must pay to keep 1-in-N correct)
+                if (tone_now == self.pr_carry_tone) or (i >= self.pr_carry_deadline):
+                    carry_ok = 1
+
+            # Propose skip if either applies
+            if planned_skip or carry_ok:
+                self.skip_proposed = 1
+                self.valve_factor_c = 0  # only matters if this trial ends up CORRECT
 
 
         print(
@@ -667,6 +689,43 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             # if self.total_trials >= self.trial_end_criteria:
             #     self.stage_backward_change = 1
+
+            # ---- Partial reinforcement bookkeeping (AFTER trial outcome) ----
+            if self.partial_reinforcement_active:
+                block = max(1, int(round(1.0 / float(self.partial_reinforcement_ratio))))
+
+                # Use current index for miss/no-touch; (counter-1) for correct/incorrect
+                if self.trial_result in ('correct', 'incorrect'):
+                    i = self.stim_trial_counter - 1
+                else:
+                    i = self.stim_trial_counter
+
+                # Clamp just in case
+                i = max(0, min(i, len(self.stim_trials) - 1))
+
+                w = i // block
+                was_correct = (self.trial_result == 'correct')
+                tone_this = 'high' if (self.stim_trials[i] == 4) else 'low'
+
+                if was_correct and self.skip_proposed:
+                    if 0 <= i < len(self.unrewarded_list) and self.unrewarded_list[i] == 1:
+                        self.unrewarded_list[i] = 0
+                    self.pr_carry_pending = 0
+                    self.pr_carry_tone = None
+                    self.unrewarded_trial = 1
+
+                elif (not was_correct) and self.skip_proposed:
+                    if 0 <= i < len(self.unrewarded_list) and self.unrewarded_list[i] == 1:
+                        self.unrewarded_list[i] = 0
+                    self.pr_carry_pending = 1
+                    self.pr_carry_tone = tone_this
+                    end_next = min(len(self.stim_trials) - 1, ((w + 1 + self.pr_carry_max_windows) * block) - 1)
+                    self.pr_carry_deadline = end_next
+                    self.unrewarded_trial = 0
+
+                else:
+                    self.unrewarded_trial = 0
+
         else:
             print(
                 "Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")

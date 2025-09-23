@@ -158,7 +158,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         
         # --- Partial reinforcement (PR) control ---
         self.partial_reinforcement_active = 1     # turn PR on/off
-        self.partial_reinforcement_ratio = 0.1    # 1-in-10
+        self.partial_reinforcement_ratio = 0.2    # 1-in-10
         self.unrewarded_list = []                 # filled per block; 1 = skip reward on correct
         self.unrewarded_trial = 0                 # store in after_trial
         self.tone_played = None
