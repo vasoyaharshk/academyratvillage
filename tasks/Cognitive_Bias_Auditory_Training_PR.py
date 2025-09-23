@@ -151,7 +151,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
         # --- Partial reinforcement (PR) control ---
         self.partial_reinforcement_active = 1  # turn PR on/off
-        self.partial_reinforcement_ratio = 0.2  # 1-in-10
+        self.partial_reinforcement_ratio = 0.2  # 1-in-5
         self.unrewarded_list = []  # filled per block; 1 = skip reward on correct
         self.unrewarded_trial = 0  # store in after_trial
         self.tone_played = None
@@ -162,6 +162,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         # you can tweak how long we wait to keep the tone exactly:
         self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
         self.unrewarded_tone = None
+        self.unrewarded_list_planned = []
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -426,8 +427,8 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
             self.stim_trial_counter = 0
 
             print(f"Successfully generated stimulus trials: {self.stim_trials}")
-            self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials,
-                                                                   ratio=self.partial_reinforcement_ratio)
+            self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
+            self.unrewarded_list_planned = self.unrewarded_list.copy()
             print(f"Successfully generated unrewarded trials: {self.unrewarded_list}")
 
             # Reset carry when a new block starts
@@ -797,3 +798,4 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         self.register_value('unrewarded_trial', self.unrewarded_trial)
         self.register_value('unrewarded_tone', self.unrewarded_tone)
         self.register_value('tone_played', self.tone_played)
+        self.register_value('unrewarded_list_planned', self.unrewarded_list_planned)

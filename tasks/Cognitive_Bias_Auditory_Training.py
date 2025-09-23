@@ -164,6 +164,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         # you can tweak how long we wait to keep the tone exactly:
         self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
         self.unrewarded_tone = None
+        self.unrewarded_list_planned = []
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -427,6 +428,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             print(f"Successfully generated stimulus trials: {self.stim_trials}")
             self.unrewarded_list = self.partial_reinforcement_list(self.stim_trials, ratio=self.partial_reinforcement_ratio)
+            self.unrewarded_list_planned = self.unrewarded_list.copy()
             print(f"Successfully generated unrewarded trials: {self.unrewarded_list}")
 
             # Reset carry when a new block starts
@@ -800,3 +802,4 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('unrewarded_trial', self.unrewarded_trial)
         self.register_value('unrewarded_tone', self.unrewarded_tone)
         self.register_value('tone_played', self.tone_played)
+        self.register_value('unrewarded_list_planned', self.unrewarded_list_planned)
