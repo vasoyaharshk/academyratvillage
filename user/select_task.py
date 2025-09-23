@@ -204,12 +204,12 @@ def select_task(df, subject):
                     last_valid_session = previous_non_auto.sort_values(by='session').iloc[-1]
                     task = last_valid_session.task
 
-                    message = f"Completed 2 sessions of Automatic_Water. Reverting to task: {task}, stage: {stage}"
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
+                    # message = f"Completed 2 sessions of Automatic_Water. Reverting to task: {task}, stage: {stage}"
+                    # try:
+                    #     telegram_bot.alarm_finish_session(message, my_subject)
+                    #     telegram_bot.alarm_completed_criteria(task, my_subject)
+                    # except:
+                    #     print('Telegram message not sent')
 
 
         if task == 'Habituation':
@@ -421,8 +421,8 @@ def select_task(df, subject):
         elif 'Cognitive_Bias_Auditory_Training' in task:
             base_name = 'Cognitive_Bias_Auditory_Training'
             pr_name = 'Cognitive_Bias_Auditory_Training_PR'     #This is the task where partial reinforcement is 1/5
-            accuracy_criteria = 0.85
-            trials_criteria = 75
+            accuracy_criteria = 0.5
+            trials_criteria = 10
 
             def cb_meets(task_name: str) -> bool:       #The function will return a boolean and task name is string.
                 """Return True if last two sessions of task_name each meet trials and accuracy."""
@@ -799,11 +799,11 @@ def select_task(df, subject):
         # Assign Automatic Water if needed
         if task != "Automatic_Water" and automatic_water_needed:
             task = "Automatic_Water"
-            try:
-                message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
-                telegram_bot.alarm_finish_session(message, my_subject)
-            except:
-                print('Telegram message not sent')
+            # try:
+            #     message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+            #     telegram_bot.alarm_finish_session(message, my_subject)
+            # except:
+            #     print('Telegram message not sent')
 
         # Debug print (optional)
         print("-----DEBUG: AW CHECK-----")

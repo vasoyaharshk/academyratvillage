@@ -534,7 +534,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Fixation',
                 state_timer=2,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 230)]) #PLayes sound and displays stims
 
             self.sma.add_state(
