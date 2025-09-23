@@ -112,11 +112,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.valve_factor_c = 0 #High reward, 140ul
         #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
-        # --- Training parameters ---
-        self.variable_reinforcement = 1
-        self.variable_reinforcement_ratio = 0.1
-        self.partial_reinforcement_trials = []
-
         # Correcth location and size:
         self.x_correcth_pos = [103, 308]  # Positions of the stim on the screen
         self.y_correcth = 150
