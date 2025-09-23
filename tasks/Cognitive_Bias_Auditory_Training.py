@@ -163,6 +163,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.pr_carry_deadline = -1  # absolute trial index by which we must pay even if tone doesn't match
         # you can tweak how long we wait to keep the tone exactly:
         self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
+        self.unrewarded_tone = None
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -471,6 +472,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         # --- Partial reinforcement: propose skip (applied ONLY if correct) ---
         self.skip_proposed = 0
+        self.unrewarded_tone = None
 
         if self.partial_reinforcement_active:
             # Window size from ratio (e.g., 0.1→10, 0.2→5)
@@ -718,6 +720,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.pr_carry_pending = 0
                     self.pr_carry_tone = None
                     self.unrewarded_trial = 1
+                    self.unrewarded_tone = tone_this
 
                 elif (not was_correct) and self.skip_proposed:
                     if 0 <= i < len(self.unrewarded_list) and self.unrewarded_list[i] == 1:
@@ -795,8 +798,5 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('partial_reinforcement_ratio', self.partial_reinforcement_ratio)
         self.register_value('unrewarded_list', self.unrewarded_list)
         self.register_value('unrewarded_trial', self.unrewarded_trial)
+        self.register_value('unrewarded_tone', self.unrewarded_tone)
         self.register_value('tone_played', self.tone_played)
-
-        
-
-

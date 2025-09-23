@@ -699,7 +699,7 @@ def select_task(df, subject):
             base_name = 'Cognitive_Bias_Auditory_Training'
             pr_name = 'Cognitive_Bias_Auditory_Training_PR'  # This is the task where partial reinforcement is 1/5
             accuracy_criteria = 0.5
-            trials_criteria = 10
+            trials_criteria = 5
 
             print(f"[CB] {task} sessions found")
 
