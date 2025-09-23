@@ -406,6 +406,10 @@ def stop_and_save_task():
             utils.task_manager.save_csvs(weight=utils.task.subject_weight)
         except Exception as e:
             print(f"No data to save, session stopped. Error: {e}")
+            try:
+                telegram_bot.data_not_save()
+            except Exception as e2:
+                print(f"Telegram alert failed. Error: {e2}")
 
     if utils.subject is None:
         name = "None"

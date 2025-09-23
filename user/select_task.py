@@ -193,11 +193,11 @@ def select_task(df, subject):
                     task = last_valid_session.task
                     # Optionally, revert stage as well if you need
                     message = f"Completed 1 session of Automatic_Water. Reverting to task: {task}, stage: {stage}"
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
+                    # try:
+                    #     telegram_bot.alarm_finish_session(message, my_subject)
+                    #     telegram_bot.alarm_completed_criteria(task, my_subject)
+                    # except:
+                    #     print('Telegram message not sent')
 
         if task == 'Habituation':
             wait_seconds = 3600 * 1
@@ -858,7 +858,7 @@ def select_task(df, subject):
             task = "Automatic_Water"
             try:
                 message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
-                telegram_bot.alarm_finish_session(message, my_subject)
+                #telegram_bot.alarm_finish_session(message, my_subject)
             except:
                 print('Telegram message not sent')
 
