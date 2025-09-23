@@ -344,17 +344,26 @@ class Cognitive_Bias_Auditory_Training(Task):
     #     return lst
 
     def main_loop(self):
+        #Reset all tracked variables as session needs to be independent of the previous session:
+        if self.current_trial == 0:
+            # session counters
+            self.accuracy = 0
+            self.valid_counter = 0
+            self.correct_count = 0
+            self.reward_drunk = 0
+            self.reward = 0
+            self.success = 0
+            # stimulus scheduling
+            self.stim = [0, 4]
+            self.stim_trials = []
+            self.stim_trial_counter = 0
+            self.block_size = 80
+
         print('')
         print('stim_trial_counter', self.stim_trial_counter)
-        print('subject', self.subject)
-        print('task', self.task)
+        #print('subject', self.subject)
+        #print('task', self.task)
         print('block_size', self.block_size)
-
-
-        if self.current_trial == 0:
-            self.accuracy = 0
-            self.stim_trial_counter = 0
-            self.stim = [0, 4]
 
         # if self.block_change == 1:
         #     self.block_number += 1
