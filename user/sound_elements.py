@@ -128,7 +128,7 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 100.2,
+    'm3': 100,
 }
 
 # Pre-generated tone vectors
