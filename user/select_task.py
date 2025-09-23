@@ -173,7 +173,7 @@ def select_task(df, subject):
     #         exec(f"{key} = {repr(val)}")
 
     # Check if task does not contain the word 'Probability'
-    if 'Probability' not in task:  #Excludes all the task without the word Probability. Early Training Tasks.
+    if ('Probability' not in task) and ('Cognitive_Bias' not in task):  #Excludes all the task without the word Probability or cognitive bias. Early Training Tasks.
         #dataframes
         last_session = df.session.max()
         df_last14 = df.loc[df['session'] > last_session - 14].copy()  # last 14 sessions
@@ -416,72 +416,6 @@ def select_task(df, subject):
                 group = group_assignment.get(my_subject.lower())
                 pair = pair_order_table[group][0]
                 print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
-
-
-        elif 'Cognitive_Bias_Auditory_Training' in task:
-            base_name = 'Cognitive_Bias_Auditory_Training'
-            pr_name = 'Cognitive_Bias_Auditory_Training_PR'     #This is the task where partial reinforcement is 1/5
-            accuracy_criteria = 0.5
-            trials_criteria = 10
-
-            def cb_meets(task_name: str) -> bool:       #The function will return a boolean and task name is string.
-                """Return True if last two sessions of task_name each meet trials and accuracy."""
-                df_cb = df[df['task'] == task_name].copy()
-                if df_cb.empty:
-                    print(f"[CB] no {task_name} sessions found")
-                    return False
-                sessions = sorted(df_cb['session'].unique())
-                if len(sessions) < 2:
-                    print(f"[CB] {task_name} has fewer than two sessions, found {len(sessions)}")
-                    return False
-
-                def session_stats(sess_id):
-                    s = df_cb[df_cb['session'] == sess_id]
-                    valid = s[s['trial_result'] != 'miss']
-                    n_valid = valid.shape[0]
-                    correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-                    acc = (correct / n_valid) if n_valid > 0 else 0.0
-                    return n_valid, acc
-
-                (n1, a1) = session_stats(sessions[-2])
-                (n2, a2) = session_stats(sessions[-1])
-                print(f"[CB] {task_name} last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
-                return (n1 >= trials_criteria and a1 >= accuracy_criteria) and (n2 >= trials_criteria and a2 >= accuracy_criteria)
-
-            if task == base_name:
-                if cb_meets(base_name):
-                    task = pr_name
-                    message = (f"[CB] switch to PR with same pair {pair} after two "
-                               f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
-                    print(message)
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria("CB→PR same pair", my_subject)
-                    except:
-                        print('Telegram message not sent')
-
-            elif task == pr_name:
-                if cb_meets(pr_name):
-                    order = pair_order_table[int(group)]
-                    idx = order.index(int(pair))
-                    if idx + 1 < len(order):
-                        new_pair = order[idx + 1]
-                        old_pair = pair
-                        pair = new_pair
-                        task = base_name  # go back to baseline for the new pair
-                        message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
-                                   f"on two {trials_criteria}-trial sessions). From pair {old_pair} to pair {pair}. returning to baseline")
-                        print(message)
-                        try:
-                            telegram_bot.alarm_finish_session(message, my_subject)
-                            telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
-                        except:
-                            print('Telegram message not sent')
-                    else:
-                        # already at the last pair, no wraparound
-                        print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
-                        task = 'Next Task Here' #The new task gets here which we will code later
-
 
         elif 'Probability_Training_BB_Size_Bias' in task:
             if moved_back_counter > max_move_backs:
@@ -760,10 +694,78 @@ def select_task(df, subject):
                 completed_ror = str_to_list(completed_ror)
                 print(f"Converted completed_ror to list: {completed_ror}")
 
+    elif 'Cognitive_Bias' in task:
+        if 'Cognitive_Bias_Auditory_Training' in task:
+            base_name = 'Cognitive_Bias_Auditory_Training'
+            pr_name = 'Cognitive_Bias_Auditory_Training_PR'  # This is the task where partial reinforcement is 1/5
+            accuracy_criteria = 0.5
+            trials_criteria = 10
+
+            print(f"[CB] {task} sessions found")
+
+            def cb_meets(task_name: str) -> bool:  # The function will return a boolean and task name is string.
+                """Return True if last two sessions of task_name each meet trials and accuracy."""
+                df_cb = df[df['task'] == task_name].copy()
+                if df_cb.empty:
+                    print(f"[CB] no {task_name} sessions found")
+                    return False
+                sessions = sorted(df_cb['session'].unique())
+                if len(sessions) < 2:
+                    print(f"[CB] {task_name} has fewer than two sessions, found {len(sessions)}")
+                    return False
+
+                def session_stats(sess_id):
+                    s = df_cb[df_cb['session'] == sess_id]
+                    valid = s[s['trial_result'] != 'miss']
+                    n_valid = valid.shape[0]
+                    correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+                    acc = (correct / n_valid) if n_valid > 0 else 0.0
+                    return n_valid, acc
+
+                (n1, a1) = session_stats(sessions[-2])
+                (n2, a2) = session_stats(sessions[-1])
+                print(f"[CB] {task_name} last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
+                return (n1 >= trials_criteria and a1 >= accuracy_criteria) and (
+                            n2 >= trials_criteria and a2 >= accuracy_criteria)
+
+            if task == base_name:
+                if cb_meets(base_name):
+                    task = pr_name
+                    message = (f"[CB] switch to PR with same pair {pair} after two "
+                               f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
+                    print(message)
+                    try:
+                        telegram_bot.alarm_finish_session(message, my_subject)
+                        telegram_bot.alarm_completed_criteria("CB→PR same pair", my_subject)
+                    except:
+                        print('Telegram message not sent')
+
+            elif task == pr_name:
+                if cb_meets(pr_name):
+                    order = pair_order_table[int(group)]
+                    idx = order.index(int(pair))
+                    if idx + 1 < len(order):
+                        new_pair = order[idx + 1]
+                        old_pair = pair
+                        pair = new_pair
+                        task = base_name  # go back to baseline for the new pair
+                        message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
+                                   f"on two {trials_criteria}-trial sessions). From pair {old_pair} to pair {pair}. returning to baseline")
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
+                        except:
+                            print('Telegram message not sent')
+                    else:
+                        # already at the last pair, no wraparound
+                        print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
+                        task = 'Next Task Here'  # The new task gets here which we will code later
+
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
-    # Skip AW logic for subject m2
+    # Skip AW logic for subject m3
     if my_subject == 'm3':
-        print("Subject is m2. no AW")
+        print("Subject is m3. no AW")
     else:
         today_aw = datetime.now().date()
         last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)

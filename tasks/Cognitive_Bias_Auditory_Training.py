@@ -502,10 +502,11 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         print(
             f"Group={self.group} Pair={self.pair}  Probe={self.stim_trial} Tone Played={self.tone_played} "
-            f"Correct_side={self.side} Shape={self.shape} "
+            f" Shape={self.shape} "
             f"valve_factor_c={self.valve_factor_c} "
             f"unrewarded_trial={self.unrewarded_trial} "
         )
+        print(f"Correct_side={self.side}")
 
 
         ############ STATE MACHINE ################
