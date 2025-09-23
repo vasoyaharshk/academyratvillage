@@ -91,7 +91,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         # self.last_backward_stage = 0  ##This is important for the moved_back_counter. Stores the last valaue for the backward pair change
         # self.moved_back_counter = 0  # number of times they have been moved back from one pair to another.
 
-        # Variables for Cognitive_Bias_Auditory_Training Tracked:
+        # Variables for Cognitive_Bias_Auditory_Training_PR Tracked:
         self.group = 0
         self.pair = 0
 
@@ -479,7 +479,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task == "Cognitive_Bias_Auditory_Training":
+        if self.task == "Cognitive_Bias_Auditory_Training_PR":
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -615,7 +615,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
             self.trial_result = None
 
     def after_trial(self):
-        if self.task == "Cognitive_Bias_Auditory_Training":
+        if self.task == "Cognitive_Bias_Auditory_Training_PR":
             self.total_trials += 1  # remove this
 
             ##### COUNT MISSES:
