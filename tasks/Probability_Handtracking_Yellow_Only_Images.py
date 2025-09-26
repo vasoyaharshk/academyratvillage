@@ -629,8 +629,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                         state_timer=0,
                         # the timer is set to 0 meaning it will immediately proceed to the next state when photogate at port 2 has been crossed
                         state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                        output_actions=[(Bpod.OutputChannels.SoftCode,
-                                         self.stim_trial)])  # displays the still image of the first frame of the video
+                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])  # displays the still image of the first frame of the video
                     # Starts task and displays stimuli instanly
 
                     self.sma.add_state(
