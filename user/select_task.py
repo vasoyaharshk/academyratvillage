@@ -188,7 +188,8 @@ def select_task(df, subject):
         n_trials = df_last1[df_last1.trial_result != 'miss'].trial.count()
         n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
-        if task == 'Automatic_Water':
+        #if task == 'Automatic_Water':
+        if task == 'Automatic_Water' and subject != 'geralt':
             # Get last two sessions for this subject
             last2_sessions = df_last2['session'].unique()
 
