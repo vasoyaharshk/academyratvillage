@@ -51,7 +51,7 @@ class Probability_Extra_Training_Acc(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 3.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_c = 1.5  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # counters for trials:
@@ -469,7 +469,8 @@ class Probability_Extra_Training_Acc(Task):
             if self.moved_back_counter > self.max_move_backs:
                 message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
                 try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    print(message)
+                    #telegram_bot.alarm_finish_session(message, self.subject)
                 except:
                     print('Telegram message not sent')
                     pass
