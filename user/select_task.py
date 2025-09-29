@@ -186,9 +186,9 @@ def select_task(df, subject):
     session_length_min = (float(t_end) - float(t_start)) / 60.0
 
     msg = (
-        f"[Session Summary] {my_subject} | Task={task} | "
-        f"Session={last_session} | Trials={n_valid} | Accuracy={acc:.1%} | "
-        f"Length={session_length_min:.1f} min"
+        f"[Session Summary]: {my_subject}, Task= {task} "
+        f"Trials= {n_valid}, Accuracy= {acc:.1%} "
+        f"Length= {session_length_min:.1f} min"
     )
 
     try:
