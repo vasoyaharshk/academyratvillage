@@ -172,6 +172,30 @@ def select_task(df, subject):
     #             val = None
     #         exec(f"{key} = {repr(val)}")
 
+    # Send end-of-session summary: valid trials, accuracy, and session length
+    last_session = int(df['session'].max())
+    df_last1 = df[df['session'] == last_session].copy()
+    valid = df_last1[df_last1['trial_result'] != 'miss']
+    n_valid = int(valid.shape[0])
+    n_correct = int(valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0])
+    acc = (n_correct / n_valid) if n_valid > 0 else 0.0
+
+    # Session length in minutes using TRIAL_START and TRIAL_END
+    t_start = df_last1['TRIAL_START'].iloc[0]
+    t_end   = df_last1['TRIAL_END'].iloc[-1]
+    session_length_min = (float(t_end) - float(t_start)) / 60.0
+
+    msg = (
+        f"[Session Summary] {my_subject} | Task={task} | "
+        f"Session={last_session} | Trials={n_valid} | Accuracy={acc:.1%} | "
+        f"Length={session_length_min:.1f} min"
+    )
+
+    try:
+        telegram_bot.alarm_finish_session(msg, my_subject)
+    except Exception as e:
+        print("Telegram message not sent. Error:", e)
+
     # Check if task does not contain the word 'Probability'
     if ('Probability' not in task) and ('Cognitive_Bias' not in task):  #Excludes all the task without the word Probability or cognitive bias. Early Training Tasks.
         #dataframes

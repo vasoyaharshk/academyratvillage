@@ -107,7 +107,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                                                                   1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
         self.valve_reward = utils.water_calibration.read_last_value('port',
                                                                     1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
-        self.valve_factor_c = 3.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_c = 5.6  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
         # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # Counters for trials:
@@ -456,7 +456,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             self.total_trials = 0
             self.stage_forward_change = 0
             self.last_forward_stage = self.substage  # Save current BEFORE increasing
-            self.substage += 1
+            #self.substage += 1
             message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
