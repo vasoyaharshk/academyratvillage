@@ -139,6 +139,6 @@ reward_frequency_map = {
 rat_tones = {name: pureToneGen_dB(freq, 1800, db=80) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
-def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
+def play_any_frequency(frequency, duration=1, db=80, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
     soundStream.play(tone)
