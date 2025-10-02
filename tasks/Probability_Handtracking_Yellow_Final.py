@@ -25,7 +25,6 @@ class Probability_Handtracking_Yellow_Final(Task):
         
         Substages: Only substages 1 to 5 are covered here. Afterwards there is a different script for the substages:
         Substages: Only the trials for stage 2 are counted for accuracy.
-        Substage 0: 100% stage 1. Only image trials and no video trials
         Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 5.
         Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 5.
         Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 5.
@@ -620,12 +619,6 @@ class Probability_Handtracking_Yellow_Final(Task):
 
             #print("image_path_function: ", self.image_path_function)
             #print("video_path_function: ", self.video_path_function)
-
-            # Decide which port triggers video for this trial
-            if self.substage == 6 or self.substage >= 8:
-                self.fixation_trigger_port = Bpod.Events.Port5In
-            else:
-                self.fixation_trigger_port = Bpod.Events.Port6In
 
         ############ STATE MACHINE ################
         # First trial:

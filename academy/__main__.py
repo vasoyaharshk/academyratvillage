@@ -291,12 +291,12 @@ def main_loop():
                 utils.chrono.get_seconds()
                 >= utils.task_real_duration + utils.alarm_mouse_time
             ):
-                bpod.play_buzzer1()
-                bpod.play_buzzer2()
-                arduino.noise_door2()
-                bpod.play_buzzer1()
-                bpod.play_buzzer2()
-                arduino.noise_door2()
+                #bpod.play_buzzer1()
+                #bpod.play_buzzer2()
+                #arduino.noise_door2()
+                #bpod.play_buzzer1()
+                #bpod.play_buzzer2()
+                #arduino.noise_door2()
                 utils.alarm_mouse_time += 900
 
             if (
