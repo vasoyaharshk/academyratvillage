@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
 
-class Test_Photogate(Task):
+class A_Test_Photogate(Task):
     def __init__(self):
         super().__init__()
 
