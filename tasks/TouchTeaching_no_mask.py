@@ -37,8 +37,8 @@ class TouchTeaching_no_mask(Task):
 
     def init_variables(self):
         # general
-        self.duration_max = 3000  # Maximum duration of the task. 50 mins
-        self.duration_min = 2100  # Minimum duration of the task. 35 mins.
+        self.duration_max = 60  # Maximum duration of the task. 50 mins
+        self.duration_min = 30  # Minimum duration of the task. 35 mins.
         self.duration_tired = 1800  # Duration for the door to open (30 mins) if the animal is inactive. Less than 5 trials.
         self.response_duration = 120  # 2 min
         self.stim_duration = self.response_duration
