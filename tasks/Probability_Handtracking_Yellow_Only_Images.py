@@ -20,10 +20,9 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
 
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
-        Stage 3: Introduction of the yellow tokens:
+        Stage 3: Introduction of the yellow tokens: Only image stage here.
         Here the stimuli is only images in substage 0.
         Substage 0: Only image trials, accuracy criteria 80%.
-        Substage 1: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
 
         if they hit 320 trials, move back one substage
 
@@ -431,7 +430,6 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
 
         self.accuracy_criteria_substage = {
             1: 0.80,
-            2: 0.80,
         }
 
         if self.current_trial == 0:
@@ -456,13 +454,13 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             self.total_trials = 0
             self.stage_forward_change = 0
             self.last_forward_stage = self.substage  # Save current BEFORE increasing
-            #self.substage += 1
+            self.substage += 1
             message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 2:
+            if self.substage == 1:
                 self.task_number = 7
                 self.tired = True
 

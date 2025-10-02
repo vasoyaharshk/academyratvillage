@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking_Zoomed_Mod(Task):
+class Probability_Handtracking_Yellow_Final(Task):
     def __init__(self):
         super().__init__()
 
@@ -18,23 +18,24 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         mixed in.
         
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
-        
-        Substages: Only substages 1 to 5 are covered here. Afterwards there is a different script for the substages:
-        Substages: Only the trials for stage 2 are counted for accuracy.
-        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
-        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 6.
-        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 6.
-        
-        Only stage 2 counted  towards the block after substage 3:
-        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 6.
-        
-        From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
-        and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
-        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 6.
-        
+    
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
         Stage 2 - Videos - starts from open hands and then closes as rat approaches.
+        
+        Substages: Only substages 1 to 5 are covered here. Afterwards there is a different script for the substages:
+        Substages: Only the trials for stage 2 are counted for accuracy.
+        Substage 0: 100% stage 1. Only image trials and no video trials
+        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 5.
+        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 5.
+        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 5.
+        
+        Only stage 2 counted  towards the block after substage 3:
+        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 5.
+        
+        From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
+        and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
+        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
         
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
@@ -185,7 +186,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
         self.substage_counter_11 = 0
         self.substage_counter_12 = 0
 
-        self.fixation_trigger_port = Bpod.Events.Port6In
+        self.fixation_trigger_port = Bpod.Events.Port5In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -327,9 +328,9 @@ class Probability_Handtracking_Zoomed_Mod(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             elif stage == 2:
-                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -390,18 +391,7 @@ class Probability_Handtracking_Zoomed_Mod(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
-            elif stage == 3:
-                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
-            elif stage == 4:
-                if self.substage == 10:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
-                elif self.substage == 11:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
-                elif self.substage == 12:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
-                else:
-                    raise ValueError("Invalid substage for stage 4")
+                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
