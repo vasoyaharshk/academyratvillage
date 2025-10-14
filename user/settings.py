@@ -104,8 +104,8 @@ CAM1_NUMBER_OF_VIDEOS = 100000
 CAM1_THRESHOLD = 0
 CAM1_CAGE_ZONE1 = [100, 135, 80, 255]       # <-- TO CHANGE left, right, top, down
 CAM1_CAGE_ZONE2 = [80, 175, 255, 320]     # <-- TO CHANGE left, right, top, down
-CAM1_DOORS1_ZONE = [175, 460, 273, 320]   # <-- TO CHANGE left, right, top, down Harsh done
-CAM1_DOORS2_ZONE = [460, 610, 275, 310]   # <-- TO CHANGE left, right, top, down
+CAM1_DOORS1_ZONE = [175, 450, 273, 320]   # <-- TO CHANGE left, right, top, down Harsh done
+CAM1_DOORS2_ZONE = [450, 610, 275, 310]   # <-- TO CHANGE left, right, top, down
 CAM1_TEXT_X = 25                         # <-- TO CHANGE
 CAM1_TEXT_Y = 315                         # <-- TO CHANGE
 

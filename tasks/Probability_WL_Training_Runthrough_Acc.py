@@ -55,7 +55,7 @@ class Probability_WL_Training_Runthrough_Acc(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 5.6 # Normal water delivery of 25ul multiplied by this
+        self.valve_factor_c = 2.8 # Normal water delivery of 25ul multiplied by this
 
         # counters for trials:
         self.valid_counter = 0
