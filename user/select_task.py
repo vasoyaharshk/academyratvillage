@@ -842,56 +842,56 @@ def select_task(df, subject):
 
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
-    # Skip AW logic for subject m2
-    if my_subject == 'm2':
-        print("Subject is m2. no AW")
-    else:
-        today_aw = datetime.now().date()
-        last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
-        last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
-
-        df_aw_check = df.copy()
-        df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
-
-        # Check if ANY session in today+last5 is Automatic Water
-        has_aw_session = (
-                df_aw_check[
-                    (df_aw_check['date'].isin(last6_days)) &
-                    (df_aw_check['task'] == 'Automatic_Water')
-                    ].shape[0] > 0
-        )
-
-        # Count corrects in last 5 full days (not including today)
-        df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
-        corrects_last5 = (
-            df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
-            .groupby('date')
-            .size()
-            .reindex(last5_full_days, fill_value=0)
-        )
-        total_corrects_last5 = corrects_last5.sum()
-
-        # Determine if Automatic Water is needed
-        automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
-
-        # (Optional) Annotate entire dataframe with the status for this run
-        df_aw_check['automatic_water'] = automatic_water_needed
-
-        # Assign Automatic Water if needed
-        if task != "Automatic_Water" and automatic_water_needed:
-            task = "Automatic_Water"
-            try:
-                message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
-                #telegram_bot.alarm_finish_session(message, my_subject)
-            except:
-                print('Telegram message not sent')
-
-        # Debug print (optional)
-        print("-----DEBUG: AW CHECK-----")
-        print("Has AW session in last 6 days (inc. today):", has_aw_session)
-        print("Total corrects in last 5 full days:", total_corrects_last5)
-        print("Assign Automatic Water?:", automatic_water_needed)
-        print("-------------------------")
+    # # Skip AW logic for subject m2
+    # if my_subject == 'm2':
+    #     print("Subject is m2. no AW")
+    # else:
+    #     today_aw = datetime.now().date()
+    #     last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
+    #     last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
+    #
+    #     df_aw_check = df.copy()
+    #     df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
+    #
+    #     # Check if ANY session in today+last5 is Automatic Water
+    #     has_aw_session = (
+    #             df_aw_check[
+    #                 (df_aw_check['date'].isin(last6_days)) &
+    #                 (df_aw_check['task'] == 'Automatic_Water')
+    #                 ].shape[0] > 0
+    #     )
+    #
+    #     # Count corrects in last 5 full days (not including today)
+    #     df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
+    #     corrects_last5 = (
+    #         df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
+    #         .groupby('date')
+    #         .size()
+    #         .reindex(last5_full_days, fill_value=0)
+    #     )
+    #     total_corrects_last5 = corrects_last5.sum()
+    #
+    #     # Determine if Automatic Water is needed
+    #     automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
+    #
+    #     # (Optional) Annotate entire dataframe with the status for this run
+    #     df_aw_check['automatic_water'] = automatic_water_needed
+    #
+    #     # Assign Automatic Water if needed
+    #     if task != "Automatic_Water" and automatic_water_needed:
+    #         task = "Automatic_Water"
+    #         try:
+    #             message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+    #             #telegram_bot.alarm_finish_session(message, my_subject)
+    #         except:
+    #             print('Telegram message not sent')
+    #
+    #     # Debug print (optional)
+    #     print("-----DEBUG: AW CHECK-----")
+    #     print("Has AW session in last 6 days (inc. today):", has_aw_session)
+    #     print("Total corrects in last 5 full days:", total_corrects_last5)
+    #     print("Assign Automatic Water?:", automatic_water_needed)
+    #     print("-------------------------")
 
     if my_subject == 'm2':
         wait_seconds = 1
