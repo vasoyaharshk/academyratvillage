@@ -282,7 +282,7 @@ def select_task(df, subject):
 
     #Probability tasks start from here:
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        if task == 'Probability_Extra_Training_Acc':
+        if task == 'Probability_Extra_Training_Acc' or task == 'Probability_Extra_Training_Acc_Incorrect':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -403,7 +403,7 @@ def select_task(df, subject):
                 task_number = 2  # Each task has a unique number. See RV script guide.
 
                 # Needed to create blocks of 40 trials for criterion to be assessed on:
-                block_size = 40  # The number of trials in a block
+                block_size = 0  # The number of trials in a block
                 block_trial_counter = 0  # Trial count within the current block
                 block_accuracy = 0.0  # Accuracy in the current block
                 block_number = 1  # Sequential block number
@@ -431,7 +431,7 @@ def select_task(df, subject):
                     pass
 
                 stage = 4
-                task = 'abc'
+                task = 'Probability_WebersLaw_Pre'
                 block = 12  # This is the number of trials one conditions will remain for
                 conditions = []  # Takes the conditions from select task file.
                 completed_conditions = []  # To store completed conditions
