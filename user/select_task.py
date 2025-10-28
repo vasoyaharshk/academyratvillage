@@ -491,28 +491,38 @@ def select_task(df, subject):
                 stim_trial_counter = 0
 
                 if task == "Probability_WebersLaw_Pre":
-                    task = 'abc'
-                    # stage = 5
-                    #
-                    # ror = [16.0, 12.0, 8.0, 6.0, 4.0, 2.0, 1.5]
-                    # completed_ror = []
-                    # current_ror = 16.0
-                    # trial_counter_ror = 0
-                    # substage = 0
-                    # trial_counter = 0
-                    # block_size = 40  # Every 40 blocks the criteria will be tested.
-                    # block_trial_counter = 0  # Counter for accuracy.
-                    # block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    # block_number = 1
-                    # ror_change = 0
-                    # block_change = 0
-                    # last_stim_trial = 0
-                    # last_condition_trial = 0
-                    # total_trials = 0
-                    # block_correct_count = 0  # Tracks the number of corrects in the block
-                    # block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    task = 'Probability_Handtracking_Yellow_Only_Images'
+                    # Weber's Law:
+                    stage = 1
+                    substage = 0
+                    ror = []
+                    completed_ror = []
+                    current_ror = 0.0
+                    trial_counter_ror = 0
+                    trial_counter = 0
 
-                    message = 'PI: Probability_WebersLaw_Pre Test complete, Moving to Cognitive Bias on next session.'
+                    block_size = 40  # Every 40 blocks the criteria will be tested.
+                    block_trial_counter = 0  # Counter for accuracy.
+                    block_accuracy = 0.0  # Accuracy for that 40 trial block
+                    block_number = 1
+                    ror_change = 0
+                    block_change = 0
+                    stim_trial = 0
+                    stim_trials = []
+                    stim_trial_counter = 0
+                    last_stim_trial = 0
+                    last_condition_trial = 0
+                    total_trials = 0
+                    block_correct_count = 0  # Tracks the number of corrects in the block
+                    block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    moved_back_counter = 0
+                    task_number = 6
+                    stage_forward_change = 0
+                    stage_backward_change = 0
+                    last_forward_stage = 0
+                    last_backward_stage = 0
+
+                    message = 'PI: Probability_WebersLaw_Pre Test complete, Moving to next task on next session.'
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -521,29 +531,29 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
-                    # # Cognitive Bias:
-                    group_assignment = {
-                        # Group 1
-                        'chand': 1,
-                        'innes': 1,
-                        'm3': 1,
-                        # Group 2
-                        'fergus': 2,
-                        'joey': 2,
-                        # Group 3
-                        'geralt': 3,
-                        'ross': 3,
-                        # Group 4
-                        'felix': 4,
-                        'pol': 4,
-                    }
-
-                    # Set group from table
-                    task = 'Cognitive_Bias_Auditory_Training'
-                    group = group_assignment.get(my_subject.lower())
-                    pair = pair_order_table[group][0]
-                    block_size = 80
-                    print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
+                    # # # Cognitive Bias:
+                    # group_assignment = {
+                    #     # Group 1
+                    #     'chand': 1,
+                    #     'innes': 1,
+                    #     'm3': 1,
+                    #     # Group 2
+                    #     'fergus': 2,
+                    #     'joey': 2,
+                    #     # Group 3
+                    #     'geralt': 3,
+                    #     'ross': 3,
+                    #     # Group 4
+                    #     'felix': 4,
+                    #     'pol': 4,
+                    # }
+                    #
+                    # # Set group from table
+                    # task = 'Cognitive_Bias_Auditory_Training'
+                    # group = group_assignment.get(my_subject.lower())
+                    # pair = pair_order_table[group][0]
+                    # block_size = 80
+                    # print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
 
                 if task == "Probability_WebersLaw_Post":
@@ -788,56 +798,56 @@ def select_task(df, subject):
                         task = 'Next Task Here'  # The new task gets here which we will code later
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
-    # Skip AW logic for subject m3
-    if my_subject == 'm3':
-        print("Subject is m3. no AW")
-    else:
-        today_aw = datetime.now().date()
-        last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
-        last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
-
-        df_aw_check = df.copy()
-        df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
-
-        # Check if ANY session in today+last5 is Automatic Water
-        has_aw_session = (
-                df_aw_check[
-                    (df_aw_check['date'].isin(last6_days)) &
-                    (df_aw_check['task'] == 'Automatic_Water')
-                    ].shape[0] > 0
-        )
-
-        # Count corrects in last 5 full days (not including today)
-        df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
-        corrects_last5 = (
-            df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
-            .groupby('date')
-            .size()
-            .reindex(last5_full_days, fill_value=0)
-        )
-        total_corrects_last5 = corrects_last5.sum()
-
-        # Determine if Automatic Water is needed
-        automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
-
-        # (Optional) Annotate entire dataframe with the status for this run
-        df_aw_check['automatic_water'] = automatic_water_needed
-
-        # Assign Automatic Water if needed
-        if task != "Automatic_Water" and automatic_water_needed:
-            task = "Automatic_Water"
-            # try:
-            #     message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
-            #     telegram_bot.alarm_finish_session(message, my_subject)
-            # except:
-            #     print('Telegram message not sent')
-
-        # Debug print (optional)
-        print("-----DEBUG: AW CHECK-----")
-        print("Has AW session in last 6 days (inc. today):", has_aw_session)
-        print("Total corrects in last 5 full days:", total_corrects_last5)
-        print("Assign Automatic Water?:", automatic_water_needed)
-        print("-------------------------")
+    # # Skip AW logic for subject m3
+    # if my_subject == 'm3':
+    #     print("Subject is m3. no AW")
+    # else:
+    #     today_aw = datetime.now().date()
+    #     last5_full_days = [today_aw - timedelta(days=i) for i in range(1, 6)]  # last 5 full days (not today)
+    #     last6_days = [today_aw - timedelta(days=i) for i in range(0, 6)]  # today + last 5 days
+    #
+    #     df_aw_check = df.copy()
+    #     df_aw_check['date'] = pd.to_datetime(df_aw_check['date']).dt.date
+    #
+    #     # Check if ANY session in today+last5 is Automatic Water
+    #     has_aw_session = (
+    #             df_aw_check[
+    #                 (df_aw_check['date'].isin(last6_days)) &
+    #                 (df_aw_check['task'] == 'Automatic_Water')
+    #                 ].shape[0] > 0
+    #     )
+    #
+    #     # Count corrects in last 5 full days (not including today)
+    #     df_aw_valid = df_aw_check[df_aw_check['trial_result'].isin(['correct', 'correct_first'])]
+    #     corrects_last5 = (
+    #         df_aw_valid[df_aw_valid['date'].isin(last5_full_days)]
+    #         .groupby('date')
+    #         .size()
+    #         .reindex(last5_full_days, fill_value=0)
+    #     )
+    #     total_corrects_last5 = corrects_last5.sum()
+    #
+    #     # Determine if Automatic Water is needed
+    #     automatic_water_needed = (not has_aw_session) and (total_corrects_last5 < 250)
+    #
+    #     # (Optional) Annotate entire dataframe with the status for this run
+    #     df_aw_check['automatic_water'] = automatic_water_needed
+    #
+    #     # Assign Automatic Water if needed
+    #     if task != "Automatic_Water" and automatic_water_needed:
+    #         task = "Automatic_Water"
+    #         # try:
+    #         #     message = f"AW Check: {my_subject} has only {total_corrects_last5} correct trials in last 5 full days. Moving to Automatic_Water."
+    #         #     telegram_bot.alarm_finish_session(message, my_subject)
+    #         # except:
+    #         #     print('Telegram message not sent')
+    #
+    #     # Debug print (optional)
+    #     print("-----DEBUG: AW CHECK-----")
+    #     print("Has AW session in last 6 days (inc. today):", has_aw_session)
+    #     print("Total corrects in last 5 full days:", total_corrects_last5)
+    #     print("Assign Automatic Water?:", automatic_water_needed)
+    #     print("-------------------------")
 
     if my_subject == 'm3':
         wait_seconds = 1

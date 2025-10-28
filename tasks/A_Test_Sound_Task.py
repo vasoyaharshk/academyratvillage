@@ -3,7 +3,7 @@ from academy.task_collection import Task
 from user import settings
 import time
 
-class Test_Sound_Task(Task):
+class A_Test_Sound_Task(Task):
     def __init__(self):
         super().__init__()
 
