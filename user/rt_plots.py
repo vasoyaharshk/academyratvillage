@@ -5,18 +5,23 @@ from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.ticker as ticker
 from matplotlib.lines import Line2D
-import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import matplotlib.dates as mdates
-import seaborn as sns
 from academy.utils import utils
 from user import settings
-from academy import aws, queues, telegram_bot
-import matplotlib
+from academy import queues, telegram_bot
 import os
 
 
-matplotlib.use("TkAgg")
+# top of file, before importing pyplot or seaborn
+import matplotlib
+try:
+    matplotlib.use("TkAgg")
+except Exception:
+    matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def unique(my_list):
     unique_list = []
@@ -30,81 +35,68 @@ def read_dataframes(init_time, final_time):
     subjects = utils.subjects.as_df()
     subjects = subjects[~subjects['name'].isin(settings.INACTIVE_SUBJECTS)]
 
-    subjects['date'] = subjects['date'].apply(lambda x: str(x))
-    subjects['date'] = subjects['date'].apply(lambda x: pd.to_datetime(x, format='%Y/%m/%d %H:%M:%S'))
+    # robust dates
+    subjects['date'] = pd.to_datetime(subjects['date'].astype(str), errors='coerce')
 
     subjects['basal_weight'] = 1000000
-    all_subject_names = sorted(subjects.name.unique())
+    all_subject_names = sorted(subjects.name.dropna().unique())
     for name in all_subject_names:
         try:
-            basal = subjects['weight'].loc[(subjects['name'] == name) & (subjects['task'] == 'basal_weight')].iloc[-1]
-            subjects.loc[(subjects['name'] == name, 'basal_weight')] = basal
-        except:
+            basal = subjects.loc[(subjects['name'] == name) & (subjects['task'] == 'basal_weight'), 'weight'].iloc[-1]
+            subjects.loc[(subjects['name'] == name), 'basal_weight'] = basal
+        except Exception:
             pass
-    subjects['water'] = pd.to_numeric(subjects['water'])
-    subjects['weight'] = pd.to_numeric(subjects['weight'])
+
+    subjects['water'] = pd.to_numeric(subjects['water'], errors='coerce')
+    subjects['weight'] = pd.to_numeric(subjects['weight'], errors='coerce')
     subjects['perc_weight'] = subjects['weight'] / subjects['basal_weight'] * 100
 
     events = utils.events.as_df()
     events = events[~events['subject'].isin(settings.INACTIVE_SUBJECTS)]
+    events['date'] = pd.to_datetime(events['date'].astype(str), errors='coerce')
 
-    events['date'] = events['date'].apply(lambda x: str(x))
-    events['date'] = events['date'].apply(lambda x: pd.to_datetime(x, format='%Y/%m/%d %H:%M:%S'))
+    # time windows
+    subjects = subjects[(subjects['date'] > init_time) & (subjects['date'] < final_time)]
+    events   = events[(events['date']  > init_time) & (events['date']  < final_time)]
 
-    subjects = subjects[subjects['date'] > init_time]
-    subjects = subjects[subjects['date'] < final_time]
+    subject_names = sorted(subjects.name.dropna().unique())
 
-    events = events[events['date'] < final_time]
-    events = events[events['date'] > init_time]
+    weight_df = subjects.loc[subjects['task'] != 'manual_water'].drop(columns=['tag', 'water', 'wait_seconds'], errors='ignore')
+    water_df  = subjects.loc[(subjects['task'] != 'control_weight') & (subjects['task'] != 'basal_weight')] \
+                        .drop(columns=['tag', 'weight', 'basal_weight', 'perc_weight', 'wait_seconds'], errors='ignore')
 
-    subject_names = sorted(subjects.name.unique())
+    start_task  = events[events['type'] == 'START']
+    end_task    = events[events['type'] == 'END']
+    missed_task = events[events['description'].astype(str).str.contains('Movement in the|Not allowed to enter until', na=False)]
 
-    weight_df = subjects.loc[subjects['task'] != 'manual_water']
-    weight_df = weight_df.drop(columns=['tag', 'water', 'wait_seconds'])
-    water_df = subjects.loc[(subjects['task'] != 'control_weight') & (subjects['task'] != 'basal_weight')]
-    water_df = water_df.drop(columns=['tag', 'weight', 'basal_weight', 'perc_weight', 'wait_seconds'])
-
-    start_task = events[events['type'] == 'START']
-    end_task = events[events['type'] == 'END']
-    missed_task = events[events['description'].str.contains('Movement in the|Not allowed to enter until')]
-
-    task_df = pd.DataFrame(columns=['subject', 'start_task', 'end_task', 'task_name', 'stage', 'substage'], dtype=object)
+    task_df   = pd.DataFrame(columns=['subject', 'start_task', 'end_task', 'task_name', 'stage', 'substage'], dtype=object)
     missed_df = pd.DataFrame(columns=['subject', 'date'], dtype=object)
 
     try:
         for name in subject_names:
-            start_times = start_task['date'].loc[start_task['subject'] == name].tolist()
-            task_name_total = start_task['description'].loc[start_task['subject'] == name].tolist()
+            start_times = start_task.loc[start_task['subject'] == name, 'date'].tolist()
+            task_name_total = start_task.loc[start_task['subject'] == name, 'description'].astype(str).tolist()
 
             try:
-                task_list = [task.split('-') for task in task_name_total]
-                task_name = [task[0] for task in task_list]
-                stage = [int(task[1]) for task in task_list]
-                substage = [int(task[2]) for task in task_list]
-            except:
+                task_list = [t.split('-') for t in task_name_total]
+                task_name = [t[0] for t in task_list]
+                stage     = [int(t[1]) if len(t) > 1 and t[1].isdigit() else 1 for t in task_list]
+                substage  = [int(t[2]) if len(t) > 2 and t[2].isdigit() else 1 for t in task_list]
+            except Exception:
                 task_name = task_name_total
-                stage = [1]*len(task_name_total)
-                substage = [1]*len(task_name_total)
+                stage     = [1] * len(task_name_total)
+                substage  = [1] * len(task_name_total)
 
-            end_times = end_task['date'].loc[end_task['subject'] == name].tolist()
-            miss_times = missed_task['date'].loc[missed_task['subject'] == name].tolist()
+            end_times = end_task.loc[end_task['subject'] == name, 'date'].tolist()
+            miss_times = missed_task.loc[missed_task['subject'] == name, 'date'].tolist()
 
-            start_times2 = []
-            end_times2 = []
-            task_name2 = []
-            stage2 = []
-            substage2 = []
-            i = 0
-            j = 0
-
+            start_times2, end_times2, task_name2, stage2, substage2 = [], [], [], [], []
+            i = j = 0
             while i < len(start_times) and j < len(end_times):
-
                 if start_times[i] < end_times[j]:
-                    if i + 1 < len(start_times):
-                        if start_times[i + 1] < end_times[j]:
-                            i += 1
-                            continue
-
+                    if i + 1 < len(start_times) and start_times[i + 1] < end_times[j]:
+                        i += 1
+                        continue
                     start_times2.append(start_times[i])
                     end_times2.append(end_times[j])
                     task_name2.append(task_name[i])
@@ -115,30 +107,32 @@ def read_dataframes(init_time, final_time):
                 else:
                     j += 1
 
-            missed_df2 = pd.DataFrame({'subject': name, 'date': miss_times})
+            if miss_times:
+                missed_df = pd.concat([missed_df, pd.DataFrame({'subject': name, 'date': miss_times})], ignore_index=True)
 
-            #missed_df = pd.concat([missed_df, missed_df2])
-            missed_df = pd.concat([df for df in [missed_df, missed_df2] if not df.empty])
+            if start_times2:
+                task_df = pd.concat([task_df, pd.DataFrame({
+                    'subject': name,
+                    'start_task': start_times2,
+                    'end_task': end_times2,
+                    'task_name': task_name2,
+                    'stage': stage2,
+                    'substage': substage2
+                })], ignore_index=True)
 
+        for df_ in (weight_df, water_df, missed_df):
+            if not df_.empty:
+                df_['day'] = df_['date'] - timedelta(hours=8)
+                df_['day'] = df_['day'].dt.normalize() + timedelta(hours=20)
 
-            task_df2 = pd.DataFrame({'subject': name, 'start_task': start_times2, 'end_task': end_times2,
-                               'task_name': task_name2, 'stage': stage2, 'substage': substage2})
+        if not task_df.empty:
+            task_df['day'] = task_df['start_task'] - timedelta(hours=8)
+            task_df['day'] = task_df['day'].dt.normalize() + timedelta(hours=20)
 
-            #task_df = pd.concat([task_df, task_df2])
-            task_df = pd.concat([df for df in [task_df, task_df2] if not df.empty])
-
-        weight_df['day'] = weight_df['date'] - timedelta(hours=8)
-        weight_df['day'] = weight_df['day'].dt.normalize() + timedelta(hours=20)
-        water_df['day'] = water_df['date'] - timedelta(hours=8)
-        water_df['day'] = water_df['day'].dt.normalize() + timedelta(hours=20)
-        missed_df['day'] = missed_df['date'] - timedelta(hours=8)
-        missed_df['day'] = missed_df['day'].dt.normalize() + timedelta(hours=20)
-        task_df['day'] = task_df['start_task'] - timedelta(hours=8)
-        task_df['day'] = task_df['day'].dt.normalize() + timedelta(hours=20)
         weight_df.rename({'name': 'subject'}, axis=1, inplace=True)
         water_df.rename({'name': 'subject'}, axis=1, inplace=True)
-    except:
-        pass
+    except Exception as e:
+        utils.log('Academy', f'Error assembling frames in rt_plots: {e}', 'ACTION')
 
     return all_subject_names, weight_df, water_df, missed_df, task_df
 
@@ -190,9 +184,9 @@ def rt_plot(init_time, final_time):
             days.append(day)
             day += timedelta(days=1)
 
-        days_at_20 = [day + timedelta(hours=12) for day in days]
+        days_at_20 = [d + timedelta(hours=12) for d in days]
         days_at_20.append(days_at_20[-1] + timedelta(days=1))
-        days_at_8 = days
+        days_at_8 = list(days)
         days_at_8.append(days[-1] + timedelta(days=1))
 
         ax1.cla()
