@@ -88,7 +88,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         self.accuracy_criteria = None  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.task_end_criteria = 1600  # Move back criteria. Badly named - this is task end criteria.
-        self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
+        self.max_move_backs = 8  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.probabilities = []  # The probability for left and right in the randomization block. [0.1, 0.9] would mean 10% on left and 90% on right.
 
         # Trial Specific:
@@ -107,7 +107,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                                                                   1).pulse_duration  # The duration the water valve needs to be open for. Takes the value from the water_calibration.csv
         self.valve_reward = utils.water_calibration.read_last_value('port',
                                                                     1).water  # 25ul per trial normal conditions. Takes the value from water_caliberation.csv
-        self.valve_factor_c = 0.8  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_c = 1  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
         # self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # Counters for trials:
