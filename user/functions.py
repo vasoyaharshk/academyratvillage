@@ -1977,10 +1977,11 @@ def function204(): #Touchteaching read touchscreen
     py = settings.PIXELS_PER_MM_Y
 
     print("Stage= ", stage)
-    width = (utils.task.width + 100) * px
-    height = (utils.task.height + 100) * py
-    x_correct = utils.task.x_correcth_pos * px
-    y = utils.task.y_correcth_pos * py
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
+    x_correct = utils.task.x_correcth * px
+    # x_incorrect = utils.task.x_incorrecth * px
+    y = utils.task.y_correcth * py
 
     touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, None, y, width, height)
 
@@ -1994,7 +1995,7 @@ def function211():  # touchteaching stage 2 - 'stimulus' is smaller
     py = settings.PIXELS_PER_MM
 
     x = int(utils.task.x_correcth * px)
-    y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
+    y = int(-utils.task.y_correcth * py)  # flipped Y axis
     width = int(utils.task.width * px)
     height = int(utils.task.height * py)
 
@@ -2018,7 +2019,7 @@ def function212():  # touchteaching stage 2 - 'stimulus' is smaller
     py = settings.PIXELS_PER_MM
 
     x = int(utils.task.x_correcth * px)
-    y = int(-utils.task.y_correcth_pos * py)  # flipped Y axis
+    y = int(-utils.task.y_correcth * py)  # flipped Y axis
     width = int(utils.task.width * px)
     height = int(utils.task.height * py)
 
