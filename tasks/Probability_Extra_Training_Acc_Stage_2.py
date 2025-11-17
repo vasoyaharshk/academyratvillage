@@ -1,3 +1,5 @@
+from metapensiero.pj.testing import ast_dump_file
+
 from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 from academy.utils import utils
@@ -50,7 +52,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_c = 1.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # counters for trials:
@@ -178,6 +180,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
+            self.prev_block_accuracy = -1.0
             self.block_accuracy = 0.0
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
@@ -252,130 +255,259 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
-            if self.current_trial == 0:
-                self.sma.add_state(
-                    state_name='Start_task',
-                    state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-                # Starts task and displays stimuli instanly
+            if self.stage == 1:
+                if self.current_trial == 0:
+                    self.sma.add_state(
+                        state_name='Start_task',
+                        state_timer=0,
+                        state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                    # Starts task and displays stimuli instanly
+
+                    self.sma.add_state(
+                        state_name='Real_start',
+                        state_timer=self.valve_time * 2,
+                        state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                        output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
+                    # Closes corridor door 2 and delivers initial 50ul water.
+
+                # Other Trials:
+                else:
+                    self.sma.add_state(
+                        state_name='Start_task',
+                        state_timer=0,
+                        state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                        output_actions=[])
 
                 self.sma.add_state(
-                    state_name='Real_start',
-                    state_timer=self.valve_time * 2,
-                    state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
-                    output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
-                # Closes corridor door 2 and delivers initial 50ul water.
-
-            # Other Trials:
-            else:
-                self.sma.add_state(
-                    state_name='Start_task',
+                    state_name='Wait_for_fixation',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                    state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                     output_actions=[])
+                # Does Nothing. Make it close door 3 later when Duncan has fixed it.
 
-            self.sma.add_state(
-                state_name='Wait_for_fixation',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Fixation'},
-                output_actions=[])
-            # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+                self.sma.add_state(
+                    state_name='Fixation',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
-            self.sma.add_state(
-                state_name='Fixation',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
-            # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
+                self.sma.add_state(
+                    state_name='Response_window',
+                    state_timer=self.response_duration,
+                    state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Punish',
+                                             'SoftCode4': 'Punish',
+                                             Bpod.Events.Tup: 'No_Touch'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
+                # Starts to read the touchscreen with one touch processing
 
-            self.sma.add_state(
-                state_name='Response_window',
-                state_timer=self.response_duration,
-                state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
-                                         Bpod.Events.Tup: 'No_Touch'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
-            # Starts to read the touchscreen with one touch processing
+                self.sma.add_state(
+                    state_name='Correct',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
+                # Turns on Water port LED and plays correct sound
 
-            self.sma.add_state(
-                state_name='Correct',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
-            # Turns on Water port LED and plays correct sound
+                self.sma.add_state(
+                    state_name='Correct_image_display',
+                    state_timer=self.image_display,
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward',
+                                             Bpod.Events.Tup: 'Flip_screen_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 55)])
+                # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
-            self.sma.add_state(
-                state_name='Correct_image_display',
-                state_timer=self.image_display,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 55)])
-            # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
+                self.sma.add_state(
+                    state_name='Correct_reward',
+                    state_timer=self.valve_time * self.valve_factor_c,
+                    state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
+                # Delivers Water and stops the reward sound and flips the screen
 
-            self.sma.add_state(
-                state_name='Correct_reward',
-                state_timer=self.valve_time * self.valve_factor_c,
-                state_change_conditions={Bpod.Events.Tup: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
-            # Delivers Water and stops the reward sound and flips the screen
+                self.sma.add_state(
+                    state_name='Flip_screen_reward',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
+                # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
-            self.sma.add_state(
-                state_name='Flip_screen_reward',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
-            # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+                self.sma.add_state(
+                    state_name='Touch_Outside',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                    output_actions=[])
+                # Goes back to response window in case of touch outside the two jar areas
 
-            self.sma.add_state(
-                state_name='Touch_Outside',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                output_actions=[])
-            # Goes back to response window in case of touch outside the two jar areas
+                self.sma.add_state(
+                    state_name='Punish',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 39)])
+                # Turns on Global LED and water port LED on
 
-            self.sma.add_state(
-                state_name='Punish',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 39)])
-            # Turns on Global LED and water port LED on
+                self.sma.add_state(
+                    state_name='Punish_image_display',
+                    state_timer=self.image_display,
+                    state_change_conditions={Bpod.Events.Port1In: 'After_punish',
+                                             Bpod.Events.Tup: 'Flip_screen_no_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 56)])
+                # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
-            self.sma.add_state(
-                state_name='Punish_image_display',
-                state_timer=self.image_display,
-                state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 56)])
-            # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
+                self.sma.add_state(
+                    state_name='After_punish',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+                # Flips the screen after water port poked in.
 
-            self.sma.add_state(
-                state_name='After_punish',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
-            # Flips the screen after water port poked in.
+                self.sma.add_state(
+                    state_name='Flip_screen_no_reward',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 40)])
+                # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
-            self.sma.add_state(
-                state_name='Flip_screen_no_reward',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 40)])
-            # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+                self.sma.add_state(
+                    state_name='No_Touch',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 37)])
+                # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
 
-            self.sma.add_state(
-                state_name='No_Touch',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 37)])
-            # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
+                self.sma.add_state(
+                    state_name='Exit',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'exit'},
+                    output_actions=[])
+            else:
+                if self.current_trial == 0:
+                    self.sma.add_state(
+                        state_name='Start_task',
+                        state_timer=0,
+                        state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
+                        output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                    # Starts task and displays stimuli instanly
 
-            self.sma.add_state(
-                state_name='Exit',
-                state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'exit'},
-                output_actions=[])
+                    self.sma.add_state(
+                        state_name='Real_start',
+                        state_timer=self.valve_time * 2,
+                        state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
+                        output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
+                    # Closes corridor door 2 and delivers initial 50ul water.
+
+                # Other Trials:
+                else:
+                    self.sma.add_state(
+                        state_name='Start_task',
+                        state_timer=0,
+                        state_change_conditions={Bpod.Events.Port2In: 'Wait_for_fixation'},
+                        output_actions=[])
+
+                self.sma.add_state(
+                    state_name='Wait_for_fixation',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Fixation'},
+                    output_actions=[])
+                # Does Nothing. Make it close door 3 later when Duncan has fixed it.
+
+                self.sma.add_state(
+                    state_name='Fixation',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port6In: 'Response_window'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
+                # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
+
+                self.sma.add_state(
+                    state_name='Response_window',
+                    state_timer=self.response_duration,
+                    state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
+                                             Bpod.Events.Tup: 'No_Touch'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 34)])
+                # Starts to read the touchscreen with one touch processing
+
+                self.sma.add_state(
+                    state_name='Correct',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Correct_image_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 220)])
+                # Turns on Water port LED and plays correct sound
+
+                self.sma.add_state(
+                    state_name='Correct_image_display',
+                    state_timer=self.image_display,
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 55)])
+                # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
+
+                self.sma.add_state(
+                    state_name='Correct_reward',
+                    state_timer=self.valve_time * self.valve_factor_c,
+                    state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.Valve, 1), (Bpod.OutputChannels.SoftCode, 17)])
+                # Delivers Water and stops the reward sound and flips the screen
+
+                self.sma.add_state(
+                    state_name='Flip_screen_reward',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.SoftCode, 40)])
+                # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+
+                self.sma.add_state(
+                    state_name='Touch_Outside',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                    output_actions=[])
+                # Goes back to response window in case of touch outside the two jar areas
+
+                self.sma.add_state(
+                    state_name='Punish',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 39)])
+                # Turns on Global LED and water port LED on
+
+                self.sma.add_state(
+                    state_name='Punish_image_display',
+                    state_timer=self.image_display,
+                    state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 56)])
+                # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
+
+                self.sma.add_state(
+                    state_name='After_punish',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.SoftCode, 40)])
+                # Flips the screen after water port poked in.
+
+                self.sma.add_state(
+                    state_name='Flip_screen_no_reward',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 40)])
+                # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
+
+                self.sma.add_state(
+                    state_name='No_Touch',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 37)])
+                # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
+
+                self.sma.add_state(
+                    state_name='Exit',
+                    state_timer=0,
+                    state_change_conditions={Bpod.Events.Tup: 'exit'},
+                    output_actions=[])
         else:
             print("Task 1 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
             self.trial_length = 0.1

@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 # Examples of functions to calculate new task and stage
 # If the function fails to return, new task and stage will be previous task and previous stage
-# df is the session dataframe for the subject
+# df is the session dataframe for the animal
 
 
 def select_task(df, subject):
@@ -43,7 +43,7 @@ def select_task(df, subject):
         'm2': 200.5,
     }
 
-    # Assign frequency based on subject
+    # Assign frequency based on animal
     reward_frequency = reward_frequency_map.get(my_subject)
 
     # Double check the value for frequency from the above table
@@ -52,7 +52,7 @@ def select_task(df, subject):
     if reward_frequency_subjects == reward_frequency:
         print("the reward frequencies match")
     else:
-        message = f"Reward frequency mismatch for subject. Reward frequency map {reward_frequency}, Reward freuquency in subjects {reward_frequency_subjects}"
+        message = f"Reward frequency mismatch for animal. Reward frequency map {reward_frequency}, Reward freuquency in subjects {reward_frequency_subjects}"
         try:
             telegram_bot.alarm_finish_session(message, my_subject)
         except:
@@ -73,7 +73,7 @@ def select_task(df, subject):
     #     'pol': 2.0,
     # }
     #
-    # # Assign duration based on subject
+    # # Assign duration based on animal
     # reward_duration = reward_duration_map.get(my_subject)
     #
     # # Double check the value for duration from the above table
@@ -81,7 +81,7 @@ def select_task(df, subject):
     # if reward_duration_subjects == reward_duration:
     #     print("the reward duration match")
     # else:
-    #     message = f"Reward duration mismatch for subject '{my_subject}'"
+    #     message = f"Reward duration mismatch for animal '{my_subject}'"
     #     try:
     #         telegram_bot.alarm_finish_session(message, my_subject)
     #     except:
@@ -292,9 +292,32 @@ def select_task(df, subject):
                 block_number = 1
                 prev_block_accuracy = -1.0
                 last_block_accuracy = 0.0
-                message = f"URGENT: Stage moved forward to {stage} for {subject} in {task}. Email ALEX."
+
+                # Needed to create blocks of 40 trials for criterion to be assessed on:
+                block_trial_counter = 0  # Trial count within the current block
+                block_accuracy = 0.0  # Accuracy in the current block
+                ror_change = 0  # If it is 1, ROR will change on the next trial.
+                block_change = 0  # If it is 1, a new block will start on the next trial
+                total_trials = 0  # Total trials across the task.
+                block_correct_count = 0  # Number of correct responses in the block
+                block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                condition_trial_counter = 0  # Counter for randomising conditions
+                last_forward_stage = 0  # The stage moved forward from after a forward change
+                last_backward_stage = 0  # The stage moved backward to after the last backward change
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
+                stage_forward_change = 0  # Whether stage move forward on the next trial
+                stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                # Left Right Function Randomisation variables:
+                stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                stim_trials = []  # List of correct stimulus function randomised.
+                stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+
+                message = f"URGENT: Stage moved forward to {stage} for {my_subject} in {task}. Email ALEX."
                 try:
-                    telegram_bot.alarm_finish_session(message, subject)
+                    telegram_bot.alarm_finish_session(message, my_subject)
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
@@ -328,7 +351,7 @@ def select_task(df, subject):
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
-                moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
                 stage_forward_change = 0  # Whether stage move forward on the next trial
                 stage_backward_change = 0  # Whether stage move backward on the next trial
 
@@ -387,7 +410,7 @@ def select_task(df, subject):
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
-                moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
                 stage_forward_change = 0  # Whether stage move forward on the next trial
                 stage_backward_change = 0  # Whether stage move backward on the next trial
 
@@ -433,7 +456,7 @@ def select_task(df, subject):
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
-                moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
                 stage_forward_change = 0  # Whether stage move forward on the next trial
                 stage_backward_change = 0  # Whether stage move backward on the next trial
 
@@ -608,7 +631,7 @@ def select_task(df, subject):
             condition_trial_counter = last_row['condition_trial_counter']
             conditions = last_row['conditions']
 
-            message = f"PI: ROR {current_ror} and Block {block_number} for subject {my_subject}. Total Trials in ROR are {trial_counter_ror}"
+            message = f"PI: ROR {current_ror} and Block {block_number} for animal {my_subject}. Total Trials in ROR are {trial_counter_ror}"
             print(f'{message}')
             try:
                 telegram_bot.alarm_finish_session(message, my_subject)
@@ -860,7 +883,7 @@ def select_task(df, subject):
 
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
-    # # Skip AW logic for subject m2
+    # # Skip AW logic for animal m2
     # if my_subject == 'm2':
     #     print("Subject is m2. no AW")
     # else:
@@ -1025,7 +1048,7 @@ def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_crite
         accuracy_forward_criteria (float): Minimum required accuracy per session.
 
     Returns:
-        bool: True if the subject meets the move forward criteria, False otherwise.
+        bool: True if the animal meets the move forward criteria, False otherwise.
     """
     for session in sessions:
         session_data = df_last2[df_last2['session'] == session]
