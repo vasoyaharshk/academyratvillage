@@ -18,8 +18,8 @@ class A_TouchTeaching_incorrect(Task):
         Rats learn to touch the screen during the response window to obtain the reward.
         
         Stages:
-        Stage 1: A white rectangle the saem size and same location as the pegs. Rat has to touch the white square but also can touch anywhere else.
-        Stage 2: A white rectangle the saem size and same location as the pegs. Rat has to touch the white square but if touches anywhere else is incorrect.
+        Stage 1: A white rectangle the same size and same location as the pegs. Rat has to touch the white square but also can touch anywhere else.
+        Stage 2: A white rectangle the same size and same location as the pegs. Rat has to touch the white square but if touches anywhere else is incorrect.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -239,6 +239,8 @@ class A_TouchTeaching_incorrect(Task):
 
         print('Stimulus trial: ', self.stim_trial)
         print('Stimulus Trial Counter', self.stim_trial_counter)
+        print('prev_block_accuracy', self.prev_block_accuracy)
+        print('last_block_accuracy', self.last_block_accuracy)
 
         ############ STATE MACHINE ################
         # First trial:

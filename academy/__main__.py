@@ -713,6 +713,8 @@ def go_to_state(num):
         utils.subject.substage_counter_10 = int(utils.subject.substage_counter_10)  #Cast to int
         utils.subject.substage_counter_11 = int(utils.subject.substage_counter_11)  #Cast to int
 
+        utils.subject.prev_block_accuracy = float(utils.subject.prev_block_accuracy)  # Cast to float
+        utils.subject.last_block_accuracy = float(utils.subject.last_block_accuracy)  # Cast to float
 
         #NEXT:
         #From subject to task:
@@ -774,6 +776,9 @@ def go_to_state(num):
         utils.task.substage_counter_9 = utils.subject.substage_counter_9
         utils.task.substage_counter_10 = utils.subject.substage_counter_10
         utils.task.substage_counter_11 = utils.subject.substage_counter_11
+
+        utils.task.prev_block_accuracy = utils.subject.prev_block_accuracy
+        utils.task.last_block_accuracy = utils.subject.last_block_accuracy
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

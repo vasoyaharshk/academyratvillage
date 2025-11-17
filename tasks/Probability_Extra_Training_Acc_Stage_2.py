@@ -23,6 +23,8 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         Extra Training 1: a single blue peg - either on left or right, like Indication
         Extra Training 2: a single blue peg vs a single yellow peg - side counterbalanced
 
+        Criteria for moving on is 80% for 2 consecutive blocks.
+        
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -96,6 +98,9 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         self.block_correct_count = 0  # Tracks the number of corrects in the block
         self.block_valid_count = 0  ##Tracks the number of valid trials in the block
 
+        self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
+        self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
+
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
@@ -110,7 +115,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
 
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -152,6 +157,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
@@ -449,9 +455,6 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
@@ -459,11 +462,19 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                    if self.prev_block_accuracy >= self.accuracy_criteria:
+                        self.stage_forward_change = 1
+                        print("Two consecutive blocks >= criterion. Advancing stage.")
+                    else:
+                        self.prev_block_accuracy = self.block_accuracy
+                        print("Good block. One more needed.")
                 else:
-                    print("Accuracy criteria not met.")
-                #Trial limit check (set backward ONLY if forward is NOT happening)
+                    print("Block failed. Resetting previous block.")
+                    self.prev_block_accuracy = -1.0
+
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
@@ -645,3 +656,6 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
 
         self.register_value('last_forward_stage', self.last_forward_stage)
         self.register_value('last_backward_stage', self.last_backward_stage)
+
+        self.register_value('prev_block_accuracy', self.prev_block_accuracy)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)

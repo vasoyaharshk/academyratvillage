@@ -90,6 +90,8 @@ class Task(object):
         self.substage_counter_9 = 0
         self.substage_counter_10 = 0
         self.substage_counter_11 = 0
+        self.prev_block_accuracy = -1.0
+        self.last_block_accuracy = 0.0
         self.task_end = False
 
 
