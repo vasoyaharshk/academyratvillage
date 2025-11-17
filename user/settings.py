@@ -157,13 +157,7 @@ CAM3_FLOOR_ON = False
 CAM3_TRACKING_POSITION = False
 
 # telegram
-TELEGRAM_TOKEN = "7993554392:AAGAEavqtwrbsQOLixDN3AHfGjZm7-Rri9w"  # <-- TO CHANGE
-TELEGRAM_CHAT = "-1002605821629"  # <-- TO CHANGE
-TELEGRAM_USERS = {  # dictionary of users that can send telegram messages
-    'Harsh': '5842767043',
-    'Donna': '6811118356',
-    'Duncan': '6925304996'
-}
+
 
 #AWS
 OPERATION_TABLE = "operation_times"  # <-- TO CHANGE
