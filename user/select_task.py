@@ -152,8 +152,8 @@ def select_task(df, subject):
     substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
     substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
 
-    group  = get_val_from_df_or_default('group', 0)
-    pair  = get_val_from_df_or_default('pair', 0)
+    prev_block_accuracy  = get_val_from_df_or_default('prev_block_accuracy', -1.0)
+    last_block_accuracy  = get_val_from_df_or_default('last_block_accuracy', 0.0)
 
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
@@ -294,9 +294,47 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
+        elif task == 'A_TouchTeaching_incorrect':
+            if task_number == 2:
+                task = 'Probability_Extra_Training_Acc_Stage_2'
+                stage = 1.0
+                task_number = 1
+                block_size = 40
+                block_number = 1
+                prev_block_accuracy = -1.0
+                last_block_accuracy = 0.0
+
+                # Needed to create blocks of 40 trials for criterion to be assessed on:
+                block_trial_counter = 0  # Trial count within the current block
+                block_accuracy = 0.0  # Accuracy in the current block
+                ror_change = 0  # If it is 1, ROR will change on the next trial.
+                block_change = 0  # If it is 1, a new block will start on the next trial
+                total_trials = 0  # Total trials across the task.
+                block_correct_count = 0  # Number of correct responses in the block
+                block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                condition_trial_counter = 0  # Counter for randomising conditions
+                last_forward_stage = 0  # The stage moved forward from after a forward change
+                last_backward_stage = 0  # The stage moved backward to after the last backward change
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
+                stage_forward_change = 0  # Whether stage move forward on the next trial
+                stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                # Left Right Function Randomisation variables:
+                stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                stim_trials = []  # List of correct stimulus function randomised.
+                stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+
+                message = f"URGENT: Stage moved forward to {stage} for {my_subject} in {task}. Email ALEX."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
     #Probability tasks start from here:
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        if task == 'Probability_Extra_Training_Acc':
+        if task == 'Probability_Extra_Training_Acc' or task == 'Probability_Extra_Training_Acc_Incorrect':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
@@ -854,7 +892,7 @@ def select_task(df, subject):
         block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair, prev_block_accuracy, last_block_accuracy
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
