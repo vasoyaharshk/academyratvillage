@@ -280,6 +280,19 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
+        elif task == 'A_TouchTeaching_incorrect':
+            if task_number == 2:
+                task = 'Probability_Extra_Training_Acc_Stage_2'
+                stage = 1.0
+                task_number = 1
+                block_size = 40
+                block_number = 1
+                message = f"URGENT: Stage moved forward to {self.stage} for {self.subject} in {self.task}. Email ALEX."
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
     #Probability tasks start from here:
     elif 'Probability' in task:     #Includes all the task without the word Probability
         if task == 'Probability_Extra_Training_Acc' or task == 'Probability_Extra_Training_Acc_Incorrect':

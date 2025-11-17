@@ -171,6 +171,11 @@ class A_TouchTeaching_incorrect(Task):
             if self.stage == 3:
                 self.task_number = 2
                 self.tired = True
+                message = f"URGENT: Stage moved forward to {self.stage} for {self.subject} in {self.task}. Email ALEX."
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
 
         if self.stage_backward_change == 1:
             self.total_trials = 0
