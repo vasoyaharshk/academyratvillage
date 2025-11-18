@@ -152,6 +152,9 @@ def select_task(df, subject):
     substage_counter_10  = get_val_from_df_or_default('substage_counter_10', 0)
     substage_counter_11  = get_val_from_df_or_default('substage_counter_11', 0)
 
+    group  = get_val_from_df_or_default('group', 0)
+    pair  = get_val_from_df_or_default('pair', 0)
+
     prev_block_accuracy  = get_val_from_df_or_default('prev_block_accuracy', -1.0)
     last_block_accuracy  = get_val_from_df_or_default('last_block_accuracy', 0.0)
 

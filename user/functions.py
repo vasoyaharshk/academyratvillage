@@ -1024,6 +1024,28 @@ def loop56(timing):
     else:
         window.flip()
 
+def function57(): #For A_TouchTeaching_incorrect, punish doenst display image
+    global last_function_called
+
+    rat = utils.task.subject.lower()
+
+    if rat in ['m2', 'ciri', 'gal', 'joy', 'luna', 'sorrel', 'sparky']:
+        soundStream.play(soundVec3)
+    elif rat in ['monika', 'phoebe', 'rachel']:
+        soundStream.play(soundVec4)
+    else:
+        message = f"Incorrect sound for {rat} not found"
+        print(message)
+        try:
+            telegram_bot.alarm_finish_session(message, rat)
+        except:
+            print("Telegram message not sent.")
+
+
+    cam2.put_state("Punish")
+    cam3.put_state("Punish")
+    print("Punish, Punish Sound played")
+
 
 ## FUNCTIONS FROM 60 TO 70 ARE FOR WEBER'S LAW TRAINING.
 def function61():  # When the correct answer is on left
