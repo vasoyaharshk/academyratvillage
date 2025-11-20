@@ -1930,7 +1930,7 @@ def loop122(timing):
 
 # Functions from 201 on wards for the audiorats:
 def function201(): # touchteaching stage 1 - 'stimulus' is entire screen
-    square.pos = (int(utils.task.x_correcth_pos), int(utils.task.y_correcth_pos))
+    square.pos = (int(utils.task.x_correcth), int(utils.task.y_correcth))
     square.width = int(utils.task.width)
     square.height = int(utils.task.height)
 

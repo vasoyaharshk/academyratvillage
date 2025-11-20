@@ -18,6 +18,7 @@ class A_TouchTeaching_incorrect(Task):
         Rats learn to touch the screen during the response window to obtain the reward.
         
         Stages:
+        Stage 0: A white rectangle the same size as the screen.
         Stage 1: A white rectangle the same size and same location as the pegs. Rat has to touch the white square but also can touch anywhere else.
         Stage 2: A white rectangle the same size and same location as the pegs. Rat has to touch the white square but if touches anywhere else is incorrect.
 
@@ -162,7 +163,10 @@ class A_TouchTeaching_incorrect(Task):
             self.stage_forward_change = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            self.stage += 1
+            if self.stage == 0:
+                self.stage += 2
+            else:
+                self.stage += 1
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
@@ -186,7 +190,7 @@ class A_TouchTeaching_incorrect(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 1)
+            new_stage = max(self.stage - 1, 0)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -207,28 +211,33 @@ class A_TouchTeaching_incorrect(Task):
         # Choose x positions:
         self.stim = [211, 212]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
-        if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-            # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-            self.last_stim_trial = self.stim_trials[
-                self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-            # print(f"Stimulus trials after first attempt: {self.stim_trials}")
-            while self.stim_trials is None:
-                # print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-                if self.stim_trials is None:
-                    print("generate_random_trials returned None. Retrying...")
-                else:
-                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
-            self.stim_trial_counter = 0
-
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.stim_trial_counter]
+        if self.stage == 0:
+            self.stim_trial = 201
+            self.x_correcth = settings.CENTRE_SCREEN[0]  # 640 = center of the screen. Screen width is 401mmm
+            self.y_correcth = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
+            self.width = settings.WIN_RESOLUTION[0]
+            self.height = settings.WIN_RESOLUTION[1]
         else:
-            self.stim_trial = self.last_stim_trial
+            if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+                # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+                self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
+                self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+                # print(f"Stimulus trials after first attempt: {self.stim_trials}")
+                while self.stim_trials is None:
+                    # print("Retrying to generate stimulus trials...")
+                    self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+                    if self.stim_trials is None:
+                        print("generate_random_trials returned None. Retrying...")
+                    else:
+                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
+                self.stim_trial_counter = 0
 
+            if self.bias_breaking == 0:
+                self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            else:
+                self.stim_trial = self.last_stim_trial
 
-        # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
+            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 211:
             self.x_correcth = self.x_correcth_pos[0]
             self.x_incorrecth = None  # No incorrect area in stage 1
@@ -238,6 +247,7 @@ class A_TouchTeaching_incorrect(Task):
             self.x_incorrecth = None  # No incorrect area in stage 1
             # print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
 
+        print('Stage: ', self.stage)
         print('Stimulus trial: ', self.stim_trial)
         print('Stimulus Trial Counter', self.stim_trial_counter)
         print('prev_block_accuracy', self.prev_block_accuracy)
