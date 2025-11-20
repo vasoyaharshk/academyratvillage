@@ -11,13 +11,22 @@ REFERENCE_DB = 85.8           # Measured SPL reference
 
 class SoundR:
     def __init__(self):
-        try:
-            device = self.getDevice()
-        except Exception as e:
-            print(f"❌ Error in sound device detection: {e}")
-            device = 1  # fallback device index
+        target_devices = ['dx3', 'UACDemoV1.0']
+        available = [d['name'] for d in sd.query_devices()]
 
-        sd.default.device = 'dx3'
+        selected = None
+        for name in target_devices:
+            if any(name.lower() in dev.lower() for dev in available):
+                selected = name
+                break
+
+        if selected is None:
+            print("❌ Neither dx3 nor UACDemoV1.0 found. Using default device index 1.")
+            selected = 1
+
+        print(f"🎧 Using audio output device: {selected}")
+
+        sd.default.device = selected
         sd.default.samplerate = DEFAULT_FS
 
     @staticmethod
@@ -132,10 +141,10 @@ reward_frequency_map = {
 }
 
 # Pre-generated tone vectors
-rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=20, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
-def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
+def play_any_frequency(frequency, duration=1, db=20, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
     soundStream.play(tone, FsOut=FsOut)
 
