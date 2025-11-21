@@ -9,7 +9,7 @@ import re
 from academy import telegram_bot
 
 
-class Probability_Handtracking_Yellow_Only_Images_Darkened(Task):
+class Probability_Handtracking_Yellow_Darkened(Task):
     def __init__(self):
         super().__init__()
 
@@ -17,6 +17,7 @@ class Probability_Handtracking_Yellow_Only_Images_Darkened(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
+        In this script, the pegs are darker
 
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
         
