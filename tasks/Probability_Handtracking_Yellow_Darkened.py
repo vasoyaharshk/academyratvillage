@@ -455,6 +455,7 @@ class Probability_Handtracking_Yellow_Darkened(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.substage  # Save current BEFORE increasing
             self.substage += 1
             message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
@@ -977,7 +978,7 @@ class Probability_Handtracking_Yellow_Darkened(Task):
                 self.tired_counter = 0
 
             # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+            # self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (
@@ -987,11 +988,19 @@ class Probability_Handtracking_Yellow_Darkened(Task):
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                    if self.prev_block_accuracy >= self.accuracy_criteria:
+                        self.stage_forward_change = 1
+                        print("Two consecutive blocks >= criterion. Advancing stage.")
                 else:
-                    print("Accuracy criteria not met.")
-                # Trial limit check (set backward ONLY if forward is NOT happening)
+                        self.prev_block_accuracy = self.block_accuracy
+                        print("Good block. One more needed.")
+                else:
+                    print("Block failed. Resetting previous block.")
+                    self.prev_block_accuracy = -1.0
+
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
