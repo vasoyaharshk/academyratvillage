@@ -26,12 +26,21 @@ class A_Test_Sound_Task(Task):
             output_actions=[]
         )
 
+
         self.sma.add_state(
             state_name='Play_Reward_Tone',
             state_timer=2.0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 225)]
         )
+
+        # # For calliberation for the mix for reference DB
+        # self.sma.add_state(
+        #     state_name='Play_Reward_Tone',
+        #     state_timer=2.0,
+        #     state_change_conditions={Bpod.Events.Tup: 'Exit'},
+        #     output_actions=[(Bpod.OutputChannels.SoftCode, 223)]
+        # )
 
         self.sma.add_state(
             state_name='Exit',

@@ -2162,7 +2162,7 @@ def function220():
     freq = reward_frequency_map.get(rat)
 
     if tone is not None:
-        soundStream.play(tone)
+        soundStream.play(tone, FsOut=DEFAULT_FS, freq=freq)
         message = f"Playing tone for '{rat}': freq = {freq} Hz"
         #print(message)
         # if utils.task.current_trial == 0:
@@ -2216,6 +2216,9 @@ def function222():
 def loop222(timing):
     window.flip()
 
+def function223():  # For calliberation for the mix for reference DB
+    soundStream.play_amp1(450, duration=5.0)
+
 #Test for drawing 4 squares on each side of the screen:
 # def function223():  # Tone pair 4, negative reinforcement
 #     p = settings.PIXELS_PER_MM
@@ -2258,74 +2261,74 @@ def loop222(timing):
 #
 #     print('Stimuli positioned in all four corners')
 
-def function223():
-    p = settings.PIXELS_PER_MM
-    w_mm, h_mm = settings.WIN_SIZE  # 400 x 250 mm
-    size_mm = 40
-    margin_mm = 40
-
-    size_px = int(size_mm * p)
-
-    # Usable area inside margins
-    usable_w = w_mm - 2 * margin_mm
-    usable_h = h_mm - 2 * margin_mm
-
-    # Horizontal positions (left and right)
-    x1_mm = margin_mm + usable_w * 0.25
-    x2_mm = margin_mm + usable_w * 0.75
-
-    # Vertical positions (top and bottom)
-    y1_mm = margin_mm + usable_h * 0.25
-    y2_mm = margin_mm + usable_h * 0.75
-
-    # Convert mm to pixels
-    x1 = int(x1_mm * p)
-    x2 = int(x2_mm * p)
-    # Flip Y direction for PsychoPy
-    y1 = int(-y1_mm * p)
-    y2 = int(-y2_mm * p)
-
-    # Top-left (red)
-    square.pos = (x1, y1)
-    square.width = size_px
-    square.height = size_px
-    square.fillColor = "red"
-    square.lineColor = "red"
-
-    # Top-right (blue)
-    square2.pos = (x2, y1)
-    square2.width = size_px
-    square2.height = size_px
-    square2.fillColor = "blue"
-    square2.lineColor = "blue"
-
-    # Bottom-left (green)
-    square3.pos = (x1, y2)
-    square3.width = size_px
-    square3.height = size_px
-    square3.fillColor = "green"
-    square3.lineColor = "green"
-
-    # Bottom-right (yellow)
-    square4.pos = (x2, y2)
-    square4.width = size_px
-    square4.height = size_px
-    square4.fillColor = "yellow"
-    square4.lineColor = "yellow"
-
-    print("Squares positioned at 4 central points, 40mm from edges")
-
-    print("Square 1 position (px):", square.pos)
-    print("Square 2 position (px):", square2.pos)
-    print("Square 3 position (px):", square3.pos)
-    print("Square 4 position (px):", square4.pos)
-
-def loop223(timing):
-    square.draw()
-    square2.draw()
-    square3.draw()
-    square4.draw()
-    window.flip()
+# def function223():
+#     p = settings.PIXELS_PER_MM
+#     w_mm, h_mm = settings.WIN_SIZE  # 400 x 250 mm
+#     size_mm = 40
+#     margin_mm = 40
+#
+#     size_px = int(size_mm * p)
+#
+#     # Usable area inside margins
+#     usable_w = w_mm - 2 * margin_mm
+#     usable_h = h_mm - 2 * margin_mm
+#
+#     # Horizontal positions (left and right)
+#     x1_mm = margin_mm + usable_w * 0.25
+#     x2_mm = margin_mm + usable_w * 0.75
+#
+#     # Vertical positions (top and bottom)
+#     y1_mm = margin_mm + usable_h * 0.25
+#     y2_mm = margin_mm + usable_h * 0.75
+#
+#     # Convert mm to pixels
+#     x1 = int(x1_mm * p)
+#     x2 = int(x2_mm * p)
+#     # Flip Y direction for PsychoPy
+#     y1 = int(-y1_mm * p)
+#     y2 = int(-y2_mm * p)
+#
+#     # Top-left (red)
+#     square.pos = (x1, y1)
+#     square.width = size_px
+#     square.height = size_px
+#     square.fillColor = "red"
+#     square.lineColor = "red"
+#
+#     # Top-right (blue)
+#     square2.pos = (x2, y1)
+#     square2.width = size_px
+#     square2.height = size_px
+#     square2.fillColor = "blue"
+#     square2.lineColor = "blue"
+#
+#     # Bottom-left (green)
+#     square3.pos = (x1, y2)
+#     square3.width = size_px
+#     square3.height = size_px
+#     square3.fillColor = "green"
+#     square3.lineColor = "green"
+#
+#     # Bottom-right (yellow)
+#     square4.pos = (x2, y2)
+#     square4.width = size_px
+#     square4.height = size_px
+#     square4.fillColor = "yellow"
+#     square4.lineColor = "yellow"
+#
+#     print("Squares positioned at 4 central points, 40mm from edges")
+#
+#     print("Square 1 position (px):", square.pos)
+#     print("Square 2 position (px):", square2.pos)
+#     print("Square 3 position (px):", square3.pos)
+#     print("Square 4 position (px):", square4.pos)
+#
+# def loop223(timing):
+#     square.draw()
+#     square2.draw()
+#     square3.draw()
+#     square4.draw()
+#     window.flip()
 
 
 def function255():  # When the correct answer is on left
@@ -2373,7 +2376,7 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
-        soundStream.play(tone, FsOut=CB_FS)  # <— only change
+        soundStream.play(tone, FsOut=CB_FS, freq=freq)
         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
         # Select objects by shape (no helper)
