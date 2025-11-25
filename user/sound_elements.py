@@ -5,49 +5,48 @@ import time
 from scipy.signal import firwin, lfilter
 
 DEFAULT_FS = 48000
-CB_FS = 384000 # or 192000 if that’s your device limit. This is essential for the high tones.
+CB_FS = 192000 # or 192000 if that’s your device limit. This is essential for the high tones. # high rate for ultrasonic part
 DEFAULT_RAMP_DURATION = 0.01  # 10 ms
 REFERENCE_DB = 85.8           # Measured SPL reference
 
+# ------------------ Babyface Pro FS multichannel SoundR ------------------
+N_BABYFACE_OUT = 12
+ULTRA_CH_INDEX = 0      # CH1 ultrasonic
+NORMAL_L_CH_INDEX = 2   # CH3 normal
+NORMAL_R_CH_INDEX = 3   # CH4 normal
+CROSSOVER_HZ = 10000    #
+
 class SoundR:
     def __init__(self):
-        target_devices = ['dx3', 'UACDemoV1.0']
-        available = [d['name'] for d in sd.query_devices()]
+        devices = sd.query_devices()
+        self.device_index = None
 
-        selected = None
-        for name in target_devices:
-            if any(name.lower() in dev.lower() for dev in available):
-                selected = name
+        for idx, dev in enumerate(devices):
+            if "babyface" in dev["name"].lower() and dev["max_output_channels"] >= N_BABYFACE_OUT:
+                self.device_index = idx
                 break
 
-        if selected is None:
-            print("❌ Neither dx3 nor UACDemoV1.0 found. Using default device index 1.")
-            selected = 1
+        if self.device_index is None:
+            raise RuntimeError("Babyface Pro FS not found.")
 
-        print(f"🎧 Using audio output device: {selected}")
+        print(f"Using Babyface Pro FS device index {self.device_index}")
 
-        sd.default.device = selected
-        sd.default.samplerate = DEFAULT_FS
+    def _blank(self, n_samples):
+        return np.zeros((n_samples, N_BABYFACE_OUT), dtype=np.float32)
 
-    @staticmethod
-    def list_devices():
-        print("\n Available audio output devices:")
-        for idx, dev in enumerate(sd.query_devices()):
-            print(f"{idx}: {dev['name']} | max_output_channels = {dev['max_output_channels']}")
+    def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
+        # allow interface: detect freq based on tone length / ramp
+        print("freq se: ", freq)
+        n = len(soundVec)
+        out = self._blank(n)
 
-    @staticmethod
-    def getDevice():
-        return 'dx3'
+        if freq is not None and freq > CROSSOVER_HZ:        #Here is freq = None, then it will automatically go to normal speakers. Useful for punish sounds.
+            out[:, ULTRA_CH_INDEX] = soundVec
+        else:
+            out[:, NORMAL_L_CH_INDEX] = soundVec
+            out[:, NORMAL_R_CH_INDEX] = soundVec
 
-    # def play(self, soundVec):
-    #     sd.play(soundVec)
-
-    # Replace SoundR.play with this version (single change point for all calls)
-    def play(self, soundVec, FsOut=DEFAULT_FS):
-        data = np.asarray(soundVec, dtype=np.float32)
-        if data.ndim == 1:  # force stereo L=R for your crossover
-            data = np.column_stack([data, data])
-        sd.play(data, samplerate=FsOut)
+        sd.play(out, samplerate=FsOut, device=self.device_index)
 
     def stop(self):
         sd.stop()
@@ -137,16 +136,16 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 100,
+    'm3': 11000,
 }
 
 # Pre-generated tone vectors
-rat_tones = {name: pureToneGen_dB(freq, 1800, db=20, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
-def play_any_frequency(frequency, duration=1, db=20, FsOut=DEFAULT_FS):
+def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
-    soundStream.play(tone, FsOut=FsOut)
+    soundStream.play(tone, FsOut=FsOut, freq=frequency)
 
 #Cognitive Bias Script:
 # 4 pairs × (low_ref, probe25, probe50, probe75, high_ref)

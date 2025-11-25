@@ -2162,7 +2162,7 @@ def function220():
     freq = reward_frequency_map.get(rat)
 
     if tone is not None:
-        soundStream.play(tone)
+        soundStream.play(tone, FsOut=DEFAULT_FS, freq=freq)
         message = f"Playing tone for '{rat}': freq = {freq} Hz"
         #print(message)
         # if utils.task.current_trial == 0:
@@ -2373,7 +2373,7 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
-        soundStream.play(tone, FsOut=CB_FS)  # <— only change
+        soundStream.play(tone, FsOut=CB_FS, freq=freq)
         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
         # Select objects by shape (no helper)
