@@ -994,7 +994,7 @@ class Probability_Handtracking_Yellow_Darkened(Task):
                     if self.prev_block_accuracy >= self.accuracy_criteria:
                         self.stage_forward_change = 1
                         print("Two consecutive blocks >= criterion. Advancing stage.")
-                else:
+                    else:
                         self.prev_block_accuracy = self.block_accuracy
                         print("Good block. One more needed.")
                 else:
