@@ -30,6 +30,10 @@ import traceback
 # when softcode n is called, function n runs once
 # then loop n runs until another softcode is called
 
+# Peg colours in PsychoPy space (-1 to 1)
+BLUE   = [-0.8980, -0.2078, 0.0667]   # #0D6588
+YELLOW = [0.5529,  0.5059, -0.6863]   # #C6C028
+
 # Global sets for function call groups. All odd numbers are for left and even numbers for right
 LEFT_FUNCTIONS = {31, 41, 43, 45, 51, 61, 81, 83, 85, 101, 103, 105, 107, 111, 113, 115, 117}
 RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104, 106, 108, 112, 114, 116, 118}
@@ -2002,16 +2006,19 @@ def function204(): #Touchteaching read touchscreen
     width = (utils.task.width + 50) * px
     height = (utils.task.height + 75) * py
     x_correct = utils.task.x_correcth * px
-    # x_incorrect = utils.task.x_incorrecth * px
+    if utils.task.x_incorrecth is not None:
+        x_incorrect = utils.task.x_incorrecth * px
+    else:
+        x_incorrect = None
     y = utils.task.y_correcth * py
 
-    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, None, y, width, height)
+    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
     print('Resp Win 1')
 
-#211 and 212 is for new touchteaching
+#211 and 212 is for new touchteaching, white squares
 def function211():  # touchteaching stage 2 - 'stimulus' is smaller
     px = settings.PIXELS_PER_MM
     py = settings.PIXELS_PER_MM
@@ -2059,66 +2066,75 @@ def loop212(timing):
     window.flip()
 
 
-# def function213():  # Tone pair 2, negative reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec6)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop213(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function214():  # Tone pair 2, positive reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec7)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop214(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function215():  # Tone pair 3, negative reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec8)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop215(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
+
+#213 and 214 is for new touchteaching, blue squares
+def function213():  # TouchTeaching: draw blue (and optional yellow) square(s)
+    px = settings.PIXELS_PER_MM
+    py = settings.PIXELS_PER_MM
+    stage = utils.task.stage
+
+    # Correct (blue) square
+    x = int(utils.task.x_correcth * px)
+    y = int(-utils.task.y_correcth * py)  # flipped Y axis
+    width = int(utils.task.width * px)
+    height = int(utils.task.height * py)
+
+    square.pos = (x, y)
+    square.width = width
+    square.height = height
+    square.fillColor = BLUE
+    square.lineColor = BLUE
+
+    # In Stage 3, draw the incorrect (yellow) square as well
+    if stage == 3 and utils.task.x_incorrecth is not None:
+        x_inc = int(utils.task.x_incorrecth * px)
+        square2.pos = (x_inc, y)
+        square2.width = width
+        square2.height = height
+        square2.fillColor = YELLOW
+        square2.lineColor = YELLOW
+    print('Stimulus Shown (function213)')
+
+
+def loop213(timing):
+    square.draw()
+    if utils.task.stage == 3 and utils.task.x_incorrecth is not None:
+        square2.draw()
+    window.flip()
+
+
+def function214():  # Same as 211, other side counterbalanced via x_correcth / x_incorrecth
+    px = settings.PIXELS_PER_MM
+    py = settings.PIXELS_PER_MM
+    stage = utils.task.stage
+
+    x = int(utils.task.x_correcth * px)
+    y = int(-utils.task.y_correcth * py)  # flipped Y axis
+    width = int(utils.task.width * px)
+    height = int(utils.task.height * py)
+
+    square.pos = (x, y)
+    square.width = width
+    square.height = height
+    square.fillColor = BLUE
+    square.lineColor = BLUE
+
+    if stage == 3 and utils.task.x_incorrecth is not None:
+        x_inc = int(utils.task.x_incorrecth * px)
+        square2.pos = (x_inc, y)
+        square2.width = width
+        square2.height = height
+        square2.fillColor = YELLOW
+        square2.lineColor = YELLOW
+    print('Stimulus Shown (function214)')
+
+
+def loop214(timing):
+    square.draw()
+    if utils.task.stage == 3 and utils.task.x_incorrecth is not None:
+        square2.draw()
+    window.flip()
+
 # def function216():  # Tone pair 3, positive reinforcement
 #     if isinstance(soundStream, SoundR):
 #         soundStream.play(soundVec9)
