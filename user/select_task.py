@@ -283,10 +283,10 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
-        elif task == 'A_TouchTeaching_incorrect':
+        elif task == 'A_TouchTeaching_incorrect' or task == 'A_TouchTeaching_blue':
             if task_number == 2:
                 task = 'Probability_Extra_Training_Acc_Stage_2'
-                stage = 1.0
+                stage = 2.0
                 task_number = 1
                 block_size = 40
                 block_number = 1

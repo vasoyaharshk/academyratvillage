@@ -104,12 +104,14 @@ correct_border = visual.Rect(win=window,
 #                                 pos=(x_positions[i], y_positions)))
 
 
-white_screen = visual.Rect(win=window,
-                           width=settings.WIN_RESOLUTION[0],
-                           height=settings.WIN_RESOLUTION[1],
-                           units='pix',
-                           fillColor=[1, 1, 1],
-                           pos=(int(settings.WIN_RESOLUTION[0] / 2), int(settings.WIN_RESOLUTION[1] / 2)))
+white_screen = visual.Rect(
+    win=window,
+    width=settings.WIN_RESOLUTION[0],
+    height=settings.WIN_RESOLUTION[1],
+    units='pix',
+    fillColor=[1, 1, 1],
+    pos=(settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+)
 
 
 image_jar_left = visual.ImageStim(win=window, image=None)  # Image will be set dynamically
