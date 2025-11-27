@@ -66,8 +66,11 @@ class A_TouchTeaching_incorrect(Task):
         # self.y_correcth = 110
         # self.width = 160  # Stimulus width in mm. Original size for peg is 120mm.
         # self.height = 235  # Stimulus height in mm. Original size for jar is 110mm.
-        self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
-        self.y_correcth = 195  # Vertical Coordinates for left and right for Jars
+        # self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
+        # self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
+        # self.y_correcth = 195  # Vertical Coordinates for left and right for Jars
+        self.x_correcth_pos = [65, 315]  # Horizontal Coordinates for left and right for Jars
+        self.y_correcth = 210  # Vertical Coordinates for left and right for Jars
         self.x_incorrecth = None
         self.width = 100  # Stimulus width in mm. Original size for jar is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.

@@ -2097,6 +2097,7 @@ def function213():  # TouchTeaching: draw blue (and optional yellow) square(s)
 
 
 def loop213(timing):
+    white_screen.draw()
     square.draw()
     if utils.task.stage == 3 and utils.task.x_incorrecth is not None:
         square2.draw()
@@ -2130,6 +2131,7 @@ def function214():  # Same as 211, other side counterbalanced via x_correcth / x
 
 
 def loop214(timing):
+    white_screen.draw()
     square.draw()
     if utils.task.stage == 3 and utils.task.x_incorrecth is not None:
         square2.draw()
