@@ -693,7 +693,10 @@ class Cognitive_Bias_Auditory_Training(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
+            # Check accuracy for every block of 40 trials
+            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            print("Block Accuracy: ", self.block_accuracy)
+            
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
