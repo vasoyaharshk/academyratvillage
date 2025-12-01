@@ -821,3 +821,6 @@ class A_TouchTeaching_blob(Task):
 
         self.register_value('prev_block_accuracy', self.prev_block_accuracy)
         self.register_value('last_block_accuracy', self.last_block_accuracy)
+
+        self.register_value('session_first_stim', self.session_first_stim)
+        self.register_value('last_two_stim', self.last_two_stim)
