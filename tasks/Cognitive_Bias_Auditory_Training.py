@@ -694,11 +694,34 @@ class Cognitive_Bias_Auditory_Training(Task):
                 self.tired_counter = 0
 
             # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-            print("Accuracy: ", self.accuracy)
+            # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
+            if self.block_trial_counter == self.block_size:
+                self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
 
-            # if self.total_trials >= self.trial_end_criteria:
-            #     self.stage_backward_change = 1
+                if self.block_accuracy >= self.accuracy_criteria:
+                    if self.prev_block_accuracy >= self.accuracy_criteria:
+                        self.stage_forward_change = 1
+                        print("Two consecutive blocks >= criterion. Advancing stage.")
+                    else:
+                        self.prev_block_accuracy = self.block_accuracy
+                        print("Good block. One more needed.")
+                else:
+                    print("Block failed. Resetting previous block.")
+                    self.prev_block_accuracy = -1.0
+
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
+                    self.stage_backward_change = 1
+
+            # Assign in pass what to do when the rat is moved back more than 5 times.
+            if self.moved_back_counter > self.max_move_backs:
+                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+                try:
+                    print(message)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
 
             # ---- Partial reinforcement bookkeeping (AFTER trial outcome) ----
             if self.partial_reinforcement_active:
