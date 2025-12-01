@@ -602,8 +602,9 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                output_actions=[])
+                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 232)])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -673,8 +674,6 @@ class Cognitive_Bias_Auditory_Training(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.reward = self.valve_reward * self.valve_factor_c
                 self.valid_counter += 1
                 self.stim_trial_counter += 1
                 self.success = 0
@@ -691,9 +690,13 @@ class Cognitive_Bias_Auditory_Training(Task):
                 # print('Correct_count: ', self.correct_count)
                 self.success = 1
 
-            # ##### COUNT Touches outside the jar areas :
+            # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.status = 'Touch_Outside'
+                self.trial_result = 'touch_outside'
+                self.valid_counter += 1
+                self.stim_trial_counter += 1
+                self.success = 0
+                print('Acc Valid_count: ', self.block_valid_count)
 
             # End-trial calculations
             # self.last_x = self.x
