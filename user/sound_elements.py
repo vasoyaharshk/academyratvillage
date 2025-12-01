@@ -20,31 +20,41 @@ class SoundR:
     def __init__(self):
         devices = sd.query_devices()
         self.device_index = None
+        self.n_out = None
 
+        # first try Babyface Pro FS
         for idx, dev in enumerate(devices):
-            if "babyface" in dev["name"].lower() and dev["max_output_channels"] >= N_BABYFACE_OUT:
+            if "babyface" in dev["name"].lower():
                 self.device_index = idx
+                self.n_out = dev["max_output_channels"]
+                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}")
                 break
 
+        # if no Babyface, try UACDemoV1.0
         if self.device_index is None:
-            raise RuntimeError("Babyface Pro FS not found.")
+            for idx, dev in enumerate(devices):
+                if "uacdemo" in dev["name"].lower():
+                    self.device_index = idx
+                    self.n_out = 2
+                    print(f"Babyface not found. Using UACDemoV1.0, device index {idx}, channels 2")
+                    break
 
-        print(f"Using Babyface Pro FS device index {self.device_index}")
-
-    def _blank(self, n_samples):
-        return np.zeros((n_samples, N_BABYFACE_OUT), dtype=np.float32)
+        # if still nothing, error
+        if self.device_index is None:
+            raise RuntimeError("No Babyface Pro FS or UACDemoV1.0 audio device found.")
 
     def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
-        # allow interface: detect freq based on tone length / ramp
-        print("freq se: ", freq)
-        n = len(soundVec)
-        out = self._blank(n)
+        out = np.zeros((len(soundVec), self.n_out), dtype=np.float32)
 
-        if freq is not None and freq > CROSSOVER_HZ:        #Here is freq = None, then it will automatically go to normal speakers. Useful for punish sounds.
-            out[:, ULTRA_CH_INDEX] = soundVec
-        else:
-            out[:, NORMAL_L_CH_INDEX] = soundVec
-            out[:, NORMAL_R_CH_INDEX] = soundVec
+        if self.n_out >= 4:
+            if freq is not None and freq > CROSSOVER_HZ:
+                out[:, ULTRA_CH_INDEX] = soundVec
+            else:
+                out[:, NORMAL_L_CH_INDEX] = soundVec
+                out[:, NORMAL_R_CH_INDEX] = soundVec
+        else:  # 2-channel fallback mode
+            out[:, 0] = soundVec
+            out[:, 1] = soundVec
 
         sd.play(out, samplerate=FsOut, device=self.device_index)
 
