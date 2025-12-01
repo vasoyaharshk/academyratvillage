@@ -417,6 +417,20 @@ class Gui(tk.Frame):
                 utils.log("Academy", " not created in rt_plots", "ERROR")
                 pass
 
+            # tasks
+            self.task_buttons = []
+            y = 20
+            for task in task_collection.tasks:
+                button = ttk.Button(
+                    self,
+                    text=task.task,
+                    command=partial(self.task_action, task.task),
+                    style="blue.TButton",
+                )
+                button.place(x=x2, y=y, height=20, width=160)
+                self.task_buttons.append(button)
+                y += 20
+
         else:  # setting task
 
             # first row in 8 parts
