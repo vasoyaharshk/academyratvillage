@@ -58,7 +58,9 @@ class Cognitive_Bias_Auditory_Training(Task):
         Port 3 - PHOTOGATES 3: Photogates 
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED    
+        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED
+
+        Task Number = 1
         """
 
 
@@ -379,53 +381,33 @@ class Cognitive_Bias_Auditory_Training(Task):
         else:
             self.forced_choice_trial = 0
 
-        # if self.block_change == 1:
-        #     self.block_number += 1
-        #     self.block_change = 0
-        #     self.block_accuracy = 0.0
-        #     self.block_trial_counter = 0  # Reset the counter after the block
-        #     self.block_correct_count = 0
-        #     self.block_valid_count = 0
-        #     self.stim_trial_counter = 0
+        if self.block_change == 1:
+            self.block_number += 1
+            self.block_change = 0
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
+            self.stim_trial_counter = 0
 
-        # if self.stage_forward_change == 1:
-        #     self.total_trials = 0
-        #     self.stage_forward_change = 0
-        #     self.last_forward_stage = self.pair  # Save current BEFORE increasing
-        #     self.pair += 1
-        #     message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
-        #     try:
-        #         telegram_bot.alarm_finish_session(message, self.subject)
-        #     except Exception as e:
-        #         print(f"Telegram message not sent. Error: {e}")
-        #     if self.pair == 6:
-        #         self.task_number = 2
-        #         self.tired = True
+        if self.stage_forward_change == 1:
+            self.total_trials = 0
+            self.stage_forward_change = 0
+            self.task_number = 2
+            self.tired = True
+            message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except Exception as e:
+                print(f"Telegram message not sent. Error: {e}")
 
-        # if self.stage_backward_change == 1:
-        #     self.total_trials = 0
-        #     self.stage_backward_change = 0
-        #     self.block_accuracy = 0.0
-        #     self.block_trial_counter = 0  # Reset the counter after the block
-        #     self.block_correct_count = 0
-        #     self.block_valid_count = 0
-        #     self.stim_trial_counter = 0
-        #     new_stage = max(self.pair - 1, 1)
-        #     if new_stage == self.last_forward_stage:
-        #         if self.last_backward_stage == new_stage:
-        #             self.moved_back_counter += 1
-        #         else:
-        #             self.moved_back_counter = 1
-        #             self.last_backward_stage = new_stage
-        #     else:
-        #         self.moved_back_counter = 1
-        #         self.last_backward_stage = new_stage
-        #     self.pair = new_stage
-        #     message = f"Stage moved backward to {self.pair} for {self.subject} in {self.task}"
-        #     try:
-        #         telegram_bot.alarm_finish_session(message, self.subject)
-        #     except:
-        #         print("Telegram message not sent")
+
+        if self.stage_backward_change == 1:
+            message = f"URGENT Stage moved backward to {self.pair} for {self.subject} in {self.task}"
+            try:
+                 telegram_bot.alarm_finish_session(message, self.subject)
+             except:
+                 print("Telegram message not sent")
 
         #Probe Generation:
         if self.stim_trial_counter % self.block_size == 0:  # Re-randomize every 75 trials
@@ -527,7 +509,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task == "Cognitive_Bias_Auditory_Training":
+        if self.task_number == 1:
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -651,8 +633,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print(
-                "Task 1 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
@@ -664,7 +645,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.trial_result = None
 
     def after_trial(self):
-        if self.task == "Cognitive_Bias_Auditory_Training":
+        if self.task_number == 1:
             self.total_trials += 1  # remove this
 
             ##### COUNT MISSES:
@@ -757,8 +738,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.unrewarded_trial = 0
 
         else:
-            print(
-                "Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
 
         ############ REGISTER VALUES ################
         # Task-related
