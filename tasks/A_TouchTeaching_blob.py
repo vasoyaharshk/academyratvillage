@@ -118,6 +118,8 @@ class A_TouchTeaching_blob(Task):
 
         self.task_end = False
 
+        self.session_first_stim = None  # first stim of this session (left or right)
+
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
@@ -139,6 +141,7 @@ class A_TouchTeaching_blob(Task):
     def main_loop(self):
         ### Randomizing the stimulus positions for both the images:
         print('')
+        self.bias_breaking = 0
         ### Randomizing the stimulus positions for both the images:
 
         if self.current_trial == 0:
@@ -232,10 +235,22 @@ class A_TouchTeaching_blob(Task):
                         print(f"Successfully generated stimulus trials: {self.stim_trials}")
                 self.stim_trial_counter = 0
 
-            if self.bias_breaking == 0:
-                self.stim_trial = self.stim_trials[self.stim_trial_counter]
-            else:
-                self.stim_trial = self.last_stim_trial
+            # --- session-local logic for first two trials. either left or right. ---
+            if self.current_trial == 0: #first trial
+                # first trial in this session: random 213 / 214
+                self.session_first_stim = random.choice(self.stim)  # 213 or 214
+                self.stim_trial = self.session_first_stim
+            elif self.current_trial == 1: #second trial
+                # second trial: opposite of first
+                if self.session_first_stim == 213:
+                    self.stim_trial = 214
+                elif self.session_first_stim == 214:
+                    self.stim_trial = 213
+            else: # from 3rd trial onwards: normal block / bias-breaking logic
+                if self.bias_breaking == 0:
+                    self.stim_trial = self.stim_trials[self.stim_trial_counter]
+                else:
+                    self.stim_trial = self.last_stim_trial
 
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 213:

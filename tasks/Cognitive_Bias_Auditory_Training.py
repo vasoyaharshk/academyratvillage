@@ -113,8 +113,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # Correcth location and size:
-        self.x_correcth_pos = [103, 308]  # Positions of the stim on the screen
-        self.y_correcth = 150
+        self.x_correcth_pos = [90, 320]  # Positions of the stim on the screen
+        self.y_correcth = 155
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
         self.response_duration = 60
@@ -165,6 +165,12 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
         self.unrewarded_tone = None
         self.unrewarded_list_planned = []
+
+        # Forced-choice logic
+        # free-choice = 0 (two stimuli), forced-choice = 1 (correction trial with single stimulus)
+        self.forced_choice_trial = 0  # type of the current trial
+        self.forced_choice_pending = 0  # whether the NEXT trial should be forced-choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -341,6 +347,8 @@ class Cognitive_Bias_Auditory_Training(Task):
     #     return lst
 
     def main_loop(self):
+
+
         #Reset all tracked variables as session needs to be independent of the previous session:
         if self.current_trial == 0:
             # session counters
@@ -355,12 +363,21 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.stim_trials = []
             self.stim_trial_counter = 0
             self.block_size = 80
+            self.forced_choice_pending = 0
 
         print('')
-        print('stim_trial_counter', self.stim_trial_counter)
+        print('stim_trial_counter', self.stim_tria
+        l_counter)
         #print('subject', self.subject)
         #print('task', self.task)
         print('block_size', self.block_size)
+
+        # --- Decide if this trial is free-choice or forced-choice ---
+        if getattr(self, "forced_choice_pending", 0):
+            # We owe a forced-choice correction trial repeating the same probe
+            self.forced_choice_trial = 1
+        else:
+            self.forced_choice_trial = 0
 
         # if self.block_change == 1:
         #     self.block_number += 1
