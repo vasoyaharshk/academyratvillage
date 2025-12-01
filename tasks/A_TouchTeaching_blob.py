@@ -119,6 +119,7 @@ class A_TouchTeaching_blob(Task):
         self.task_end = False
 
         self.session_first_stim = None  # first stim of this session (left or right)
+        self.last_two_stim = []         # history of last two stim_trial values across sessions
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
@@ -235,22 +236,31 @@ class A_TouchTeaching_blob(Task):
                         print(f"Successfully generated stimulus trials: {self.stim_trials}")
                 self.stim_trial_counter = 0
 
-            # --- session-local logic for first two trials. either left or right. ---
-            if self.current_trial == 0: #first trial
-                # first trial in this session: random 213 / 214
-                self.session_first_stim = random.choice(self.stim)  # 213 or 214
-                self.stim_trial = self.session_first_stim
-            elif self.current_trial == 1: #second trial
-                # second trial: opposite of first
+            # --- session-local logic for first two trials in this session ---
+            if self.current_trial == 0:
+                # first trial in this session: random left/right
+                candidate = random.choice(self.stim)  # 213 or 214
+                self.session_first_stim = candidate
+            elif self.current_trial == 1:
+                # second trial in this session: forced opposite of first
                 if self.session_first_stim == 213:
-                    self.stim_trial = 214
-                elif self.session_first_stim == 214:
-                    self.stim_trial = 213
-            else: # from 3rd trial onwards: normal block / bias-breaking logic
-                if self.bias_breaking == 0:
-                    self.stim_trial = self.stim_trials[self.stim_trial_counter]
+                    candidate = 214
                 else:
-                    self.stim_trial = self.last_stim_trial
+                    candidate = 213
+            else:
+                # from 3rd trial onwards: normal block / bias-breaking logic
+                if self.bias_breaking == 0:
+                    candidate = self.stim_trials[self.stim_trial_counter]
+                else:
+                    candidate = self.last_stim_trial
+
+            # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
+            if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
+                # flip side
+                candidate = 213 if candidate == 214 else 214
+
+            self.stim_trial = candidate
+
 
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 213:
@@ -648,6 +658,11 @@ class A_TouchTeaching_blob(Task):
             print(f"Bias Accuracy (last 5 trials): {self.bias_accuracy}")
 
             self.last_stim_trial = self.stim_trial
+            
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
 
             try:
                 # Try converting response_x directly to a float
