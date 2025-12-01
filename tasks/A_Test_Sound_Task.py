@@ -10,7 +10,7 @@ class A_Test_Sound_Task(Task):
         # SOUND PARAMETERS (used by functions.py softcode logic)
         self.reward_frequency = 250.0     # Hz, float allowed
         self.reward_db = 70           # dB SPL
-        self.fs = 48000           # 48000 or 384000
+        self.fs = 192000           # 48000 or 384000
 
     def configure_gui(self):
         self.gui_input = ['reward_frequency', 'reward_db', 'fs']
@@ -29,7 +29,7 @@ class A_Test_Sound_Task(Task):
 
         self.sma.add_state(
             state_name='Play_Reward_Tone',
-            state_timer=2.0,
+            state_timer=10.0,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 225)]
         )
@@ -44,7 +44,7 @@ class A_Test_Sound_Task(Task):
 
         self.sma.add_state(
             state_name='Exit',
-            state_timer=5.0,
+            state_timer=2.0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
             output_actions=[(Bpod.OutputChannels.SoftCode, 222)]
         )

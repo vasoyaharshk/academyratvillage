@@ -41,7 +41,7 @@ class A_Test_Pump(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
-        self.valve_factor_c = 1 # 300ul for 1 trial.
+        self.valve_factor_c = 1.4 # 300ul for 1 trial.
 
         # counters
         self.miss_acc_counter = 0
