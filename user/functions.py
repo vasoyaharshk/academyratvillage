@@ -2406,7 +2406,7 @@ def function230():
         # Play tone
         tone = cb_tones[pair][probe]
         freq = cb_tones_hz[pair][probe]     # REQUIRED FOR ULTRASONIC ROUTING
-        soundStream.play(tone, FsOut=CB_FS, freq=freq)
+        #soundStream.play(tone, FsOut=CB_FS, freq=freq)
         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
         # Select objects by shape (no helper)
@@ -2474,7 +2474,7 @@ def function231(): #Touchteaching read touchscreen
     x_incorrect = utils.task.x_incorrecth * px
     y = utils.task.y_correcth * py
 
-    touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
+    #touch.start_reading_probability_touch_accurate(utils.task.response_duration, x_correct, x_incorrect, y, width, height)
 
     cam2.put_state("Resp Win")
     cam3.put_state("Resp Win")
