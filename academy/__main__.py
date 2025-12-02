@@ -721,6 +721,18 @@ def go_to_state(num):
         utils.subject.prev_block_accuracy = float(utils.subject.prev_block_accuracy)  # Cast to float
         utils.subject.last_block_accuracy = float(utils.subject.last_block_accuracy)  # Cast to float
 
+        if isinstance(utils.subject.last_two_stim, str):
+            utils.subject.last_two_stim = ast.literal_eval(utils.subject.last_two_stim)
+        utils.subject.last_two_stim = list(map(int, utils.subject.last_two_stim))
+
+        if isinstance(utils.subject.unrewarded_list, str):
+            utils.subject.unrewarded_list = ast.literal_eval(utils.subject.unrewarded_list)
+        utils.subject.unrewarded_list = list(map(int, utils.subject.unrewarded_list))
+
+        utils.subject.pr_carry_tone = str(utils.subject.pr_carry_tone)
+        utils.subject.pr_carry_pending = int(utils.subject.pr_carry_pending)  #Cast to int
+        utils.subject.consecutive_good_blocks = int(utils.subject.consecutive_good_blocks)  #Cast to int
+
         #NEXT:
         #From subject to task:
         utils.task.stage = utils.subject.stage
@@ -787,6 +799,12 @@ def go_to_state(num):
 
         utils.task.prev_block_accuracy = utils.subject.prev_block_accuracy
         utils.task.last_block_accuracy = utils.subject.last_block_accuracy
+
+        utils.task.last_two_stim = utils.subject.last_two_stim
+        utils.task.unrewarded_list = utils.subject.unrewarded_list
+        utils.task.pr_carry_tone = utils.subject.pr_carry_tone
+        utils.task.pr_carry_pending = utils.subject.pr_carry_pending
+        utils.task.consecutive_good_blocks = utils.subject.consecutive_good_blocks
 
         utils.task_manager = TaskManager(utils.subject)
         utils.gui_name = utils.subject.name + " - " + utils.task.task

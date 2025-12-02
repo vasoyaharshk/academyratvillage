@@ -2030,46 +2030,74 @@ def loop212(timing):
     square.draw()
     window.flip()
 
+#For white blobs:
+def function213():  # When the blue jar is on left
+    global last_function_called, image_path
+    last_function_called = 213  # Track that function31 was called
 
-# def function213():  # Tone pair 2, negative reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec6)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop213(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function214():  # Tone pair 2, positive reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec7)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop214(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
+    stage = utils.task.stage
+    left_images = []
+    try:
+        # Get all the images based on the stages
+        image_folder = '/home/ratvillage02/academy/stimuli/touchteaching_blob/'
+        left_images = [f for f in os.listdir(image_folder) if
+                           os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
+
+        if not left_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the left_images list.
+        random_image_path_left = os.path.join(image_folder, random.choice(left_images))     #This needs to be balanced
+
+        image_jar_left.image = random_image_path_left
+        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage: ', utils.task.stage)
+        print('Correct answer on left: ', random_image_path_left)
+
+        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+def loop213(timing):
+    image_jar_left.draw()
+    window.flip()
+
+
+# Functions for Probability Inference Tasks for different stages where the correct answer is right:
+def function214():  # When the blue jar is on right
+    global last_function_called, image_path
+    last_function_called = 214  # Track that function31 was called
+
+    stage = utils.task.stage
+    right_images = []
+    try:
+        # Get all the images based on the stages
+        image_folder = '/home/ratvillage02/academy/stimuli/touchteaching_blob/'
+        right_images = [f for f in os.listdir(image_folder) if
+                            os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
+        if not right_images:
+            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
+
+        # Choose a random image from the right_images list
+        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        image_jar_right.image = random_image_path_right
+        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+
+        print('Stage:', utils.task.stage)
+        print('Correct answer on right:', random_image_path_right)
+
+        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop214(timing):
+    image_jar_right.draw()
+    window.flip()
 #
 # def function215():  # Tone pair 3, negative reinforcement
 #     if isinstance(soundStream, SoundR):
@@ -2364,6 +2392,7 @@ def function230():
         pair   = int(utils.task.pair)
         probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
         shape  = str(utils.task.shape).strip().lower()
+        forced_choice_trial = int(utils.task.forced_choice_trial)
 
         # Geometry (mm → px; PsychoPy Y down)
         px = settings.PIXELS_PER_MM
@@ -2376,6 +2405,7 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
+        freq = cb_tones_hz[pair][probe]     # REQUIRED FOR ULTRASONIC ROUTING
         soundStream.play(tone, FsOut=CB_FS, freq=freq)
         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
@@ -2392,11 +2422,17 @@ def function230():
             print(f"[230] Unknown shape: {shape}")
             return
 
-        # Position & size
+        # Position and size for the correct stimulus
         obj_correct.pos  = (x_correct, y)
         obj_correct.size = (width, height)
-        obj_incorrect.pos  = (x_incorrect, y)
-        obj_incorrect.size = (width, height)
+
+        if forced_choice_trial == 1:
+            # Forced choice trial, hide incorrect stimulus
+            obj_incorrect.size = (0, 0)
+        else:
+            # Free choice trial, show incorrect stimulus on its side
+            obj_incorrect.pos  = (x_incorrect, y)
+            obj_incorrect.size = (width, height)
 
     except Exception as e:
         print(f"[230] Error: {e}")
@@ -2405,6 +2441,7 @@ def function230():
 def loop230(timing):
     try:
         shape = str(utils.task.shape).strip().lower()
+        forced_choice_trial = int(utils.task.forced_choice_trial)
 
         if shape == "triangle":
             obj_correct, obj_incorrect = triangle1, triangle2
@@ -2418,8 +2455,11 @@ def loop230(timing):
             print(f"[230] Unknown shape in loop: {shape}")
             return
 
+        # Always draw the correct stimulus
         obj_correct.draw()
-        obj_incorrect.draw()
+        # Only draw the incorrect stimulus on free choice trials
+        if forced_choice_trial == 0:
+            obj_incorrect.draw()
         window.flip()
     except Exception as e:
         print(f"[230] loop error: {e}")
@@ -2428,8 +2468,8 @@ def function231(): #Touchteaching read touchscreen
     px = settings.PIXELS_PER_MM_X
     py = settings.PIXELS_PER_MM_Y
 
-    width = (utils.task.width + 50) * px
-    height = (utils.task.height + 50) * py
+    width = (utils.task.width + 30) * px
+    height = (utils.task.height + 30) * py
     x_correct = utils.task.x_correcth * px
     x_incorrect = utils.task.x_incorrecth * px
     y = utils.task.y_correcth * py

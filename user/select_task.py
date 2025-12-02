@@ -158,6 +158,12 @@ def select_task(df, subject):
     prev_block_accuracy  = get_val_from_df_or_default('prev_block_accuracy', -1.0)
     last_block_accuracy  = get_val_from_df_or_default('last_block_accuracy', 0.0)
 
+    last_two_stim  = get_val_from_df_or_default('last_two_stim', [])
+    unrewarded_list  = get_val_from_df_or_default('unrewarded_list', [])
+    pr_carry_tone  = get_val_from_df_or_default('pr_carry_tone', "")
+    pr_carry_pending  = get_val_from_df_or_default('pr_carry_pending', 0)
+    consecutive_good_blocks  = get_val_from_df_or_default('consecutive_good_blocks', 0)
+
     #Not tracked:
     max_move_backs = get_val_from_df_or_default('max_move_backs', 0)
 
@@ -328,10 +334,66 @@ def select_task(df, subject):
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-
                 message = f"URGENT: Stage moved forward to {stage} for {my_subject} in {task}. Email ALEX."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
+        elif task == 'A_TouchTeaching_blob':
+            if task_number == 2:
+                task = 'Cognitive_Bias_Auditory_Training'
+                stage = 1.0
+                task_number = 1
+                block_size = 40
+                block_number = 1
+                prev_block_accuracy = -1.0
+                last_block_accuracy = 0.0
+
+                # Needed to create blocks of 40 trials for criterion to be assessed on:
+                block_trial_counter = 0  # Trial count within the current block
+                block_accuracy = 0.0  # Accuracy in the current block
+                ror_change = 0  # If it is 1, ROR will change on the next trial.
+                block_change = 0  # If it is 1, a new block will start on the next trial
+                total_trials = 0  # Total trials across the task.
+                block_correct_count = 0  # Number of correct responses in the block
+                block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                condition_trial_counter = 0  # Counter for randomising conditions
+                last_forward_stage = 0  # The stage moved forward from after a forward change
+                last_backward_stage = 0  # The stage moved backward to after the last backward change
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
+                stage_forward_change = 0  # Whether stage move forward on the next trial
+                stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                # Left Right Function Randomisation variables:
+                stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                stim_trials = []  # List of correct stimulus function randomised.
+                stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+                group_assignment = {
+                    # Group 1
+                    'chand': 1,
+                    'innes': 1,
+                    'm3': 1,
+                    # Group 2
+                    'fergus': 2,
+                    'joey': 2,
+                    # Group 3
+                    'geralt': 3,
+                    'ross': 3,
+                    # Group 4
+                    'felix': 4,
+                    'pol': 4,
+                }
+
+                # Set group from table
+                group = group_assignment.get(my_subject.lower())
+                pair = pair_order_table[group][0]
+                message = f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}"
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
@@ -783,38 +845,39 @@ def select_task(df, subject):
         if 'Cognitive_Bias_Auditory_Training' in task:
             base_name = 'Cognitive_Bias_Auditory_Training'
             pr_name = 'Cognitive_Bias_Auditory_Training_PR'  # This is the task where partial reinforcement is 1/5
-            accuracy_criteria = 0.5
-            trials_criteria = 5
 
-            print(f"[CB] {task} sessions found")
-
-            def cb_meets(task_name: str) -> bool:  # The function will return a boolean and task name is string.
-                """Return True if last two sessions of task_name each meet trials and accuracy."""
-                df_cb = df[df['task'] == task_name].copy()
-                if df_cb.empty:
-                    print(f"[CB] no {task_name} sessions found")
-                    return False
-                sessions = sorted(df_cb['session'].unique())
-                if len(sessions) < 2:
-                    print(f"[CB] {task_name} has fewer than two sessions, found {len(sessions)}")
-                    return False
-
-                def session_stats(sess_id):
-                    s = df_cb[df_cb['session'] == sess_id]
-                    valid = s[s['trial_result'] != 'miss']
-                    n_valid = valid.shape[0]
-                    correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
-                    acc = (correct / n_valid) if n_valid > 0 else 0.0
-                    return n_valid, acc
-
-                (n1, a1) = session_stats(sessions[-2])
-                (n2, a2) = session_stats(sessions[-1])
-                print(f"[CB] {task_name} last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
-                return (n1 >= trials_criteria and a1 >= accuracy_criteria) and (
-                            n2 >= trials_criteria and a2 >= accuracy_criteria)
-
+            # For block wise progression:
             if task == base_name:
-                if cb_meets(base_name):
+                if task_number == 2:
+                    # Needed to create blocks of 40 trials for criterion to be assessed on:
+                    block_size = 40  # The number of trials in a block
+                    block_trial_counter = 0  # Trial count within the current block
+                    block_accuracy = 0.0  # Accuracy in the current block
+                    block_number = 1  # Sequential block number
+                    ror_change = 0  # If it is 1, ROR will change on the next trial.
+                    block_change = 0  # If it is 1, a new block will start on the next trial
+                    total_trials = 0  # Total trials across the task.
+                    block_correct_count = 0  # Number of correct responses in the block
+                    block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                    condition_trial_counter = 0  # Counter for randomising conditions
+                    last_forward_stage = 0  # The stage moved forward from after a forward change
+                    last_backward_stage = 0  # The stage moved backward to after the last backward change
+                    moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                    stage_forward_change = 0  # Whether stage move forward on the next trial
+                    stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                    # Left Right Function Randomisation variables:
+                    stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                    stim_trials = []  # List of correct stimulus function randomised.
+                    stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                    last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+                    last_two_stim = []
+                    unrewarded_list = []
+                    pr_carry_tone = ""
+                    pr_carry_pending = 0
+                    consecutive_good_blocks = 0
+
                     task = pr_name
                     message = (f"[CB] switch to PR with same pair {pair} after two "
                                f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
@@ -825,8 +888,38 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
 
-            elif task == pr_name:
-                if cb_meets(pr_name):
+            if task == pr_name:
+                if task_number == 3:
+                    # Needed to create blocks of 40 trials for criterion to be assessed on:
+                    block_size = 40  # The number of trials in a block
+                    block_trial_counter = 0  # Trial count within the current block
+                    block_accuracy = 0.0  # Accuracy in the current block
+                    block_number = 1  # Sequential block number
+                    ror_change = 0  # If it is 1, ROR will change on the next trial.
+                    block_change = 0  # If it is 1, a new block will start on the next trial
+                    total_trials = 0  # Total trials across the task.
+                    block_correct_count = 0  # Number of correct responses in the block
+                    block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                    condition_trial_counter = 0  # Counter for randomising conditions
+                    last_forward_stage = 0  # The stage moved forward from after a forward change
+                    last_backward_stage = 0  # The stage moved backward to after the last backward change
+                    moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                    stage_forward_change = 0  # Whether stage move forward on the next trial
+                    stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                    # Left Right Function Randomisation variables:
+                    stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                    stim_trials = []  # List of correct stimulus function randomised.
+                    stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                    last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+                    last_two_stim = []
+                    unrewarded_list = []
+                    pr_carry_tone = ""
+                    pr_carry_pending = 0
+                    consecutive_good_blocks = 0
+
+                    task_number = 2
                     order = pair_order_table[int(group)]
                     idx = order.index(int(pair))
                     if idx + 1 < len(order):
@@ -846,6 +939,71 @@ def select_task(df, subject):
                         # already at the last pair, no wraparound
                         print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
                         task = 'Next Task Here'  # The new task gets here which we will code later
+
+        # For Session wise progression:
+            # accuracy_criteria = 0.5
+            # trials_criteria = 5
+            #
+            # print(f"[CB] {task} sessions found")
+            #
+            # def cb_meets(task_name: str) -> bool:  # The function will return a boolean and task name is string.
+            #     """Return True if last two sessions of task_name each meet trials and accuracy."""
+            #     df_cb = df[df['task'] == task_name].copy()
+            #     if df_cb.empty:
+            #         print(f"[CB] no {task_name} sessions found")
+            #         return False
+            #     sessions = sorted(df_cb['session'].unique())
+            #     if len(sessions) < 2:
+            #         print(f"[CB] {task_name} has fewer than two sessions, found {len(sessions)}")
+            #         return False
+            #
+            #     def session_stats(sess_id):
+            #         s = df_cb[df_cb['session'] == sess_id]
+            #         valid = s[s['trial_result'] != 'miss']
+            #         n_valid = valid.shape[0]
+            #         correct = valid[valid['trial_result'].isin(['correct', 'correct_first'])].shape[0]
+            #         acc = (correct / n_valid) if n_valid > 0 else 0.0
+            #         return n_valid, acc
+            #
+            #     (n1, a1) = session_stats(sessions[-2])
+            #     (n2, a2) = session_stats(sessions[-1])
+            #     print(f"[CB] {task_name} last2={sessions[-2:]} | s1 valid={n1} acc={a1:.3f} | s2 valid={n2} acc={a2:.3f}")
+            #     return (n1 >= trials_criteria and a1 >= accuracy_criteria) and (
+            #                 n2 >= trials_criteria and a2 >= accuracy_criteria)
+            #
+            # if task == base_name:
+            #     if cb_meets(base_name):
+            #         task = pr_name
+            #         message = (f"[CB] switch to PR with same pair {pair} after two "
+            #                    f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
+            #         print(message)
+            #         try:
+            #             telegram_bot.alarm_finish_session(message, my_subject)
+            #             telegram_bot.alarm_completed_criteria("CB→PR same pair", my_subject)
+            #         except:
+            #             print('Telegram message not sent')
+            #
+            # elif task == pr_name:
+            #     if cb_meets(pr_name):
+            #         order = pair_order_table[int(group)]
+            #         idx = order.index(int(pair))
+            #         if idx + 1 < len(order):
+            #             new_pair = order[idx + 1]
+            #             old_pair = pair
+            #             pair = new_pair
+            #             task = base_name  # go back to baseline for the new pair
+            #             message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
+            #                        f"on two {trials_criteria}-trial sessions). From pair {old_pair} to pair {pair}. returning to baseline")
+            #             print(message)
+            #             try:
+            #                 telegram_bot.alarm_finish_session(message, my_subject)
+            #                 telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
+            #             except:
+            #                 print('Telegram message not sent')
+            #         else:
+            #             # already at the last pair, no wraparound
+            #             print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
+            #             task = 'Next Task Here'  # The new task gets here which we will code later
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
     # # Skip AW logic for subject m3
@@ -904,7 +1062,7 @@ def select_task(df, subject):
         block_size = 10
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair, prev_block_accuracy, last_block_accuracy
+    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair, prev_block_accuracy, last_block_accuracy, last_two_stim, unrewarded_list, pr_carry_tone, pr_carry_pending, consecutive_good_blocks
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""

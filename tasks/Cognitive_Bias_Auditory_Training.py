@@ -34,8 +34,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             The non-reinforced trials are pseudorandomised so that no more than two consecutive trials of the same tone type (high or low) are unrewarded.
 
 
-        Criterion:
-            ≥85% correct across 2 consecutive sessions (per Pair).
+        Criterion: ≥80% correct across 3 consecutive blocks (per Pair).
 
         Pairs (reference tones):
             Pair 1:  Low 2000 Hz,   High 3621 Hz
@@ -58,11 +57,14 @@ class Cognitive_Bias_Auditory_Training(Task):
         Port 3 - PHOTOGATES 3: Photogates 
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED    
+        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED
+
+        Task Number = 1
         """
 
 
         # Variables for the task:
+        self.task_number = 1
         self.trials_max = 80
         self.duration_max = 3000
         self.duration_min = 2100
@@ -75,35 +77,50 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.reward_drunk = 0
         self.reward = 0
         self.correct_count = 0
-        self.accuracy = 0
-        self.total_trials = 0  # Total number of trials in the current pair
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
+        self.trial_end_criteria = 320
+        self.accuracy_criteria = 0.80
+        self.consecutive_good_blocks_criteria = 3
+        self.consecutive_good_blocks = 0
+        self.max_move_backs = 5
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
-        # self.block_accuracy = 0.0  # Accuracy for that 40 trial block
-        # self.block_number = 1
-        # self.block_change = 0
-        # self.block_correct_count = 0  # Tracks the number of corrects in the block
-        # self.block_valid_count = 0  ##Tracks the number of valid trials in the block
-        # self.stage_forward_change = 0  # they've met criterion to move forward to next pair
-        # self.stage_backward_change = 0  # they've met poor performance criterion to move back a pair
-        # self.last_forward_stage = 0  # This is important for the moved_back_counter. Stores the last valaue for the forward pair change
-        # self.last_backward_stage = 0  ##This is important for the moved_back_counter. Stores the last valaue for the backward pair change
-        # self.moved_back_counter = 0  # number of times they have been moved back from one pair to another.
+        self.block_size = 40  # Every 40 blocks the criteria will be tested.
+        self.block_trial_counter = 0  # Counter for block
+        self.block_accuracy = 0.0  # Accuracy for that 40 trial block
+        self.block_number = 1
+        self.block_change = 0
+        self.last_stim_trial = 0  # It stores the correct side (L, R) of the last trial of the previous randomisation block
+        self.total_trials = 0  # Total number of trials in that ROR irrespective of conditions
+        self.block_correct_count = 0  # Tracks the number of corrects in the block
+        self.block_valid_count = 0  ##Tracks the number of valid trials in the block
+
+        self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
+        self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
+
+        self.stim_trial = None
+        self.stim_trials = []
+        self.stim_trial_counter = 0
+
+        self.stage_forward_change = 0  # they've met criterion to move forward to next stage
+        self.stage_backward_change = 0  # they've met poor performance criterion to move back a stage
+        self.last_forward_stage = 0  # This is important for the moved_back_counter. Stores the last valaue for the forward stage change
+        self.last_backward_stage = 0  ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
+        self.moved_back_counter = 0  # number of times they have been moved back from one stage to another. It needs to
+
+        self.last_two_stim = []         # history of last two stim_trial values across sessions. Tracked.
 
         # Variables for Cognitive_Bias_Auditory_Training Tracked:
         self.group = 0
         self.pair = 0
 
         #Untracked:
+        self.session_first_stim = None  # first stim of this session (left or right)
+        self.task_end = False
+
         self.side = None
         self.shape = None
-        self.stim_trial = None  #probes 0 or 4 for training.
-        self.last_stim_trial = 0  # It stores the correct side (L, R) of the last trial of the previous randomisation block
         self.stim = [0, 4]  # defines if correct side is left or right
-        self.block_size = 80
-        self.stim_trials = []
-        self.stim_trial_counter = 0
 
         # --- Reward volumes (µL) ---
         # pumps
@@ -113,8 +130,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # Correcth location and size:
-        self.x_correcth_pos = [103, 308]  # Positions of the stim on the screen
-        self.y_correcth = 150
+        self.x_correcth_pos = [90, 320]  # Positions of the stim on the screen
+        self.y_correcth = 155
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
         self.response_duration = 60
@@ -159,12 +176,16 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.tone_played = None
 
         self.pr_carry_pending = 0  # owe an unreward from a missed (incorrect) scheduled index
-        self.pr_carry_tone = None  # 'high' or 'low' we owe
+        self.pr_carry_tone = ""  # 'high' or 'low' we owe
         self.pr_carry_deadline = -1  # absolute trial index by which we must pay even if tone doesn't match
         # you can tweak how long we wait to keep the tone exactly:
         self.pr_carry_max_windows = 1  # wait up to 1 extra window to match tone before falling back
         self.unrewarded_tone = None
         self.unrewarded_list_planned = []
+
+        # Forced-choice logic
+        self.forced_choice_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
@@ -341,85 +362,57 @@ class Cognitive_Bias_Auditory_Training(Task):
     #     return lst
 
     def main_loop(self):
+
         #Reset all tracked variables as session needs to be independent of the previous session:
         if self.current_trial == 0:
             # session counters
-            self.accuracy = 0
-            self.valid_counter = 0
-            self.correct_count = 0
-            self.reward_drunk = 0
-            self.reward = 0
-            self.success = 0
             # stimulus scheduling
             self.stim = [0, 4]
-            self.stim_trials = []
-            self.stim_trial_counter = 0
-            self.block_size = 80
+            self.block_size = 40
+            self.forced_choice_trial = 0
 
         print('')
-        print('stim_trial_counter', self.stim_trial_counter)
-        #print('subject', self.subject)
-        #print('task', self.task)
+        print('Stimulus Trial Counter', self.stim_trial_counter)
         print('block_size', self.block_size)
 
-        # if self.block_change == 1:
-        #     self.block_number += 1
-        #     self.block_change = 0
-        #     self.block_accuracy = 0.0
-        #     self.block_trial_counter = 0  # Reset the counter after the block
-        #     self.block_correct_count = 0
-        #     self.block_valid_count = 0
-        #     self.stim_trial_counter = 0
+        if self.block_change == 1:
+            self.block_number += 1
+            self.block_change = 0
+            self.block_accuracy = 0.0
+            self.block_trial_counter = 0  # Reset the counter after the block
+            self.block_correct_count = 0
+            self.block_valid_count = 0
+            self.stim_trial_counter = 0
 
-        # if self.stage_forward_change == 1:
-        #     self.total_trials = 0
-        #     self.stage_forward_change = 0
-        #     self.last_forward_stage = self.pair  # Save current BEFORE increasing
-        #     self.pair += 1
-        #     message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
-        #     try:
-        #         telegram_bot.alarm_finish_session(message, self.subject)
-        #     except Exception as e:
-        #         print(f"Telegram message not sent. Error: {e}")
-        #     if self.pair == 6:
-        #         self.task_number = 2
-        #         self.tired = True
+        if self.stage_forward_change == 1:
+            self.total_trials = 0
+            self.stage_forward_change = 0
+            self.task_number = 2
+            self.tired = True
+            message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
+            try:
+                telegram_bot.alarm_finish_session(message, self.subject)
+            except Exception as e:
+                print(f"Telegram message not sent. Error: {e}")
 
-        # if self.stage_backward_change == 1:
-        #     self.total_trials = 0
-        #     self.stage_backward_change = 0
-        #     self.block_accuracy = 0.0
-        #     self.block_trial_counter = 0  # Reset the counter after the block
-        #     self.block_correct_count = 0
-        #     self.block_valid_count = 0
-        #     self.stim_trial_counter = 0
-        #     new_stage = max(self.pair - 1, 1)
-        #     if new_stage == self.last_forward_stage:
-        #         if self.last_backward_stage == new_stage:
-        #             self.moved_back_counter += 1
-        #         else:
-        #             self.moved_back_counter = 1
-        #             self.last_backward_stage = new_stage
-        #     else:
-        #         self.moved_back_counter = 1
-        #         self.last_backward_stage = new_stage
-        #     self.pair = new_stage
-        #     message = f"Stage moved backward to {self.pair} for {self.subject} in {self.task}"
-        #     try:
-        #         telegram_bot.alarm_finish_session(message, self.subject)
-        #     except:
-        #         print("Telegram message not sent")
+        if self.stage_backward_change == 1:
+            self.stage_backward_change = 0
+            message = f"URGENT Stage moved backward to {self.pair} for {self.subject} in {self.task}"
+            try:
+                 telegram_bot.alarm_finish_session(message, self.subject)
+            except:
+                 print("Telegram message not sent")
 
         #Probe Generation:
         if self.stim_trial_counter % self.block_size == 0:  # Re-randomize every 75 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-            self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+            last_trial = self.last_stim_trial if len(self.stim_trials) > 0 else None
+            self.stim_trials = self.generate_random_trials(last_trial)
             
             # print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 # print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+                self.stim_trials = self.generate_random_trials(last_trial)
                 if self.stim_trials is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
@@ -433,11 +426,37 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             # Reset carry when a new block starts
             self.pr_carry_pending = 0
-            self.pr_carry_tone = None
+            self.pr_carry_tone = ""
             self.pr_carry_deadline = -1
 
-        # current probe for this trial (0 = low, 4 = high)
-        self.stim_trial = self.stim_trials[self.stim_trial_counter]  # already 0 or 4
+        # --- session-local logic for first two trials in this session ---
+        if self.current_trial == 0:
+            # first trial in this session: random left/right
+            candidate = random.choice(self.stim)  # 0 or 4
+            self.session_first_stim = candidate
+        elif self.current_trial == 1:
+            # second trial in this session: forced opposite of first
+            if self.session_first_stim == 0:
+                candidate = 4
+            else:
+                candidate = 0
+        else:
+            # from 3rd trial onwards: normal block / bias-breaking logic
+            candidate = self.stim_trials[self.stim_trial_counter]
+
+        # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
+        if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
+            # flip side
+            candidate = 0 if candidate == 4 else 4
+
+        if self.forced_choice_trial == 0:
+            self.stim_trial = candidate
+        else:
+            self.stim_trial = self.forced_choice_probe
+
+        # keep stimulus schedule aligned with actual delivered probe
+        if self.forced_choice_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+            self.stim_trials[self.stim_trial_counter] = self.stim_trial
 
         # get sides from existing mapping, but override shape per subject/group/pair
         (high_side), (low_side) = self.derive_high_low(int(self.group), int(self.pair))
@@ -462,21 +481,24 @@ class Cognitive_Bias_Auditory_Training(Task):
         else:
             self.x_correcth, self.x_incorrecth = self.x_correcth_pos[1], self.x_correcth_pos[0]
 
+        # In forced-choice trials, disable the incorrect side completely
+        if self.forced_choice_trial == 1:
+            self.x_incorrecth = None
 
         # --- Per-trial reward size from Table 1 (ONLY valve_factor_c) ---
-        # Large reward = 5.6, Small reward = 2.8
+        # Large reward = 1.4, Small reward = 0.7
         mapping = self.table1[int(self.group)][int(self.pair)]
         hr_tone = mapping['hr_tone']              # 'high' or 'low'
         is_high_probe = (self.stim_trial == 4)    # 4 = high, 0 = low
 
         large_now = (is_high_probe and hr_tone == 'high') or ((not is_high_probe) and hr_tone == 'low')
-        self.valve_factor_c = 5.6 if large_now else 2.8
+        self.valve_factor_c = 1.4 if large_now else 0.7
 
         # --- Partial reinforcement: propose skip (applied ONLY if correct) ---
         self.skip_proposed = 0
         self.unrewarded_tone = None
 
-        if self.partial_reinforcement_active:
+        if self.partial_reinforcement_active and self.forced_choice_trial == 0:
             # Window size from ratio (e.g., 0.1→10, 0.2→5)
             block = max(1, int(round(1.0 / float(self.partial_reinforcement_ratio))))
             i = self.stim_trial_counter
@@ -506,11 +528,13 @@ class Cognitive_Bias_Auditory_Training(Task):
             f"unrewarded_trial={self.unrewarded_trial} "
         )
         print(f"Correct_side={self.side}")
+        print(f"forced_choice_trial={self.forced_choice_trial}")
+        print(f"forced_choice_probe={self.forced_choice_probe}")
 
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task == "Cognitive_Bias_Auditory_Training":
+        if self.task_number == 1:
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -521,7 +545,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
                 self.sma.add_state(
                     state_name='Real_start',
-                    state_timer=self.valve_time * 2,
+                    state_timer=self.valve_time * 0.5,
                     state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # Closes corridor door 2 and delivers initial 50ul water.
@@ -585,8 +609,9 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                output_actions=[])
+                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 232)])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -633,8 +658,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print(
-                "Task 1 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
@@ -642,12 +666,9 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.x_incorrecth = None
             self.response_x = None
             self.response_y = None
-            self.trial_length = None
-            self.trial_result = None
 
     def after_trial(self):
-        if self.task == "Cognitive_Bias_Auditory_Training":
-            self.total_trials += 1  # remove this
+        if self.task_number == 1:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -656,30 +677,54 @@ class Cognitive_Bias_Auditory_Training(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.reward = self.valve_reward * self.valve_factor_c
-                self.valid_counter += 1
-                self.stim_trial_counter += 1
-                self.success = 0
+                if self.forced_choice_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    self.stim_trial_counter += 1
+
+                self.forced_choice_trial = 1
+                self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
-                self.trial_result = 'correct'
-                self.valid_counter += 1
-                self.stim_trial_counter += 1
-                self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.reward = self.valve_reward * self.valve_factor_c
-                self.correct_count += 1
-                # print('Correct_count: ', self.correct_count)
-                self.success = 1
+                if self.forced_choice_trial == 0:
+                    self.trial_result = 'correct'
+                    self.valid_counter += 1
+                    self.stim_trial_counter += 1
+                    self.reward_drunk += self.valve_reward * self.valve_factor_c
+                    self.reward = self.valve_reward * self.valve_factor_c
+                    self.correct_count += 1
+                    # print('Correct_count: ', self.correct_count)
+                    self.block_correct_count += 1
+                    self.block_valid_count += 1
+                    self.block_trial_counter += 1
+                    self.success = 1
+                    self.total_trials += 1
 
-            # ##### COUNT Touches outside the jar areas :
+                self.forced_choice_trial = 0
+                self.forced_choice_probe = None
+
+
+            # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.status = 'Touch_Outside'
+                self.trial_result = 'touch_outside'
+                if self.forced_choice_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    self.stim_trial_counter += 1
+
+                self.forced_choice_trial = 1
+                self.forced_choice_probe = self.stim_trial
+                print('Acc Valid_count: ', self.block_valid_count)
 
             # End-trial calculations
-            # self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
 
@@ -692,12 +737,46 @@ class Cognitive_Bias_Auditory_Training(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-            print("Accuracy: ", self.accuracy)
+            # Check accuracy for every block of 40 trials
+            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            print("Block Accuracy: ", self.block_accuracy)
 
-            # if self.total_trials >= self.trial_end_criteria:
-            #     self.stage_backward_change = 1
+            # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
+            if self.block_trial_counter == self.block_size:
+                self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
+                # update consecutive good blocks
+                if self.block_accuracy >= self.accuracy_criteria:
+                    self.consecutive_good_blocks += 1
+                else:
+                    self.consecutive_good_blocks = 0
+
+                # forward criterion: 3 consecutive good blocks
+                if self.consecutive_good_blocks >= self.consecutive_good_blocks_criteria:
+                    self.stage_forward_change = 1
+
+                # backward rule if many trials and still no forward move
+                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
+                    self.stage_backward_change = 1
+
+            # Assign in pass what to do when the rat is moved back more than 5 times.
+            if self.moved_back_counter > self.max_move_backs:
+                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+                try:
+                    print(message)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
+                except:
+                    print('Telegram message not sent')
+                    pass
+
+            self.last_stim_trial = self.stim_trial
+
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
+
 
             # ---- Partial reinforcement bookkeeping (AFTER trial outcome) ----
             if self.partial_reinforcement_active:
@@ -720,7 +799,7 @@ class Cognitive_Bias_Auditory_Training(Task):
                     if 0 <= i < len(self.unrewarded_list) and self.unrewarded_list[i] == 1:
                         self.unrewarded_list[i] = 0
                     self.pr_carry_pending = 0
-                    self.pr_carry_tone = None
+                    self.pr_carry_tone = ""
                     self.unrewarded_trial = 1
                     self.unrewarded_tone = tone_this
 
@@ -737,15 +816,13 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.unrewarded_trial = 0
 
         else:
-            print(
-                "Task 2 ended because Extra training completed. Task is now 3 so will move to Urn training in next session.")
+            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
 
         ############ REGISTER VALUES ################
         # Task-related
         self.register_value('duration_max', self.duration_max)
         self.register_value('duration_min', self.duration_min)
         self.register_value('duration_tired', self.duration_tired)
-        self.register_value('trials_tired', self.trials_tired)
         self.register_value('tired', self.tired)
         self.register_value('task_number', self.task_number)
         self.register_value('response_duration', self.response_duration)
@@ -762,7 +839,6 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('reward_drunk', self.reward_drunk)
         self.register_value('reward', self.reward)
         self.register_value('correct_count', self.correct_count)
-        self.register_value('accuracy', self.accuracy)
         self.register_value('success', self.success)
 
         # Stimulus-related
@@ -772,7 +848,31 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('width', self.width)
         self.register_value('height', self.height)
 
+        # Criteria
+        self.register_value('accuracy_criteria', self.accuracy_criteria)
+        self.register_value('trial_end_criteria', self.trial_end_criteria)
+        self.register_value('max_move_backs', self.max_move_backs)
+
+        # Trial/block tracking
+        self.register_value('success', self.success)
+        self.register_value('block_size', self.block_size)
+        self.register_value('block_trial_counter', self.block_trial_counter)
+        self.register_value('block_accuracy', self.block_accuracy)
+        self.register_value('block_number', self.block_number)
+        self.register_value('block_change', self.block_change)
+        self.register_value('last_stim_trial', self.last_stim_trial)
+        self.register_value('total_trials', self.total_trials)
+        self.register_value('block_correct_count', self.block_correct_count)
+        self.register_value('block_valid_count', self.block_valid_count)
+
+        # Stimulus trial control
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
+
         # Stage changes
+        self.register_value('stage_forward_change', self.stage_forward_change)
+        self.register_value('stage_backward_change', self.stage_backward_change)
         self.register_value('moved_back_counter', self.moved_back_counter)
 
         # Corecth location:
@@ -796,6 +896,22 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('last_stim_trial', self.last_stim_trial)
         self.register_value('stim', self.stim)
 
+        self.register_value('last_forward_stage', self.last_forward_stage)
+        self.register_value('last_backward_stage', self.last_backward_stage)
+
+        self.register_value('prev_block_accuracy', self.prev_block_accuracy)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)
+
+        self.register_value('session_first_stim', self.session_first_stim)
+        self.register_value('forced_choice_trial', self.forced_choice_trial)
+        self.register_value('forced_choice_probe', self.forced_choice_probe)
+
+
+        self.register_value('last_two_stim', self.last_two_stim)
+        self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
+        self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+
+        #Partial Reinforcement:
         self.register_value('partial_reinforcement_active', self.partial_reinforcement_active)
         self.register_value('partial_reinforcement_ratio', self.partial_reinforcement_ratio)
         self.register_value('unrewarded_list', self.unrewarded_list)
@@ -803,3 +919,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('unrewarded_tone', self.unrewarded_tone)
         self.register_value('tone_played', self.tone_played)
         self.register_value('unrewarded_list_planned', self.unrewarded_list_planned)
+
+        self.register_value('pr_carry_pending', self.pr_carry_pending)
+        self.register_value('pr_carry_tone', self.pr_carry_tone)
+        self.register_value('pr_carry_deadline', self.pr_carry_deadline)
+        self.register_value('pr_carry_max_windows', self.pr_carry_max_windows)

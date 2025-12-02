@@ -96,6 +96,12 @@ class Task(object):
         self.last_block_accuracy = 0.0
         self.task_end = False
 
+        self.last_two_stim = []
+        self.unrewarded_list = []
+        self.pr_carry_tone = ""
+        self.pr_carry_pending = 0
+        self.consecutive_good_blocks = 0
+
 
         self.checksum = None
         self.subject_class = None
