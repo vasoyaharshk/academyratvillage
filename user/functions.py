@@ -2476,7 +2476,10 @@ def function230():
         px = settings.PIXELS_PER_MM
         py = settings.PIXELS_PER_MM
         x_correct   = utils.task.x_correcth   * px
-        x_incorrect = utils.task.x_incorrecth * px
+        if forced_choice_trial == 1:
+            x_incorrect = None
+        else:
+            x_incorrect = utils.task.x_incorrecth * px
         y           = -utils.task.y_correcth  * py
         width       = utils.task.width        * px
         height      = utils.task.height       * py
