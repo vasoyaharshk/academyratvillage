@@ -2392,6 +2392,7 @@ def function230():
         pair   = int(utils.task.pair)
         probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
         shape  = str(utils.task.shape).strip().lower()
+        forced_choice_trial = int(utils.task.forced_choice_trial)
 
         # Geometry (mm → px; PsychoPy Y down)
         px = settings.PIXELS_PER_MM
@@ -2420,11 +2421,17 @@ def function230():
             print(f"[230] Unknown shape: {shape}")
             return
 
-        # Position & size
+        # Position and size for the correct stimulus
         obj_correct.pos  = (x_correct, y)
         obj_correct.size = (width, height)
-        obj_incorrect.pos  = (x_incorrect, y)
-        obj_incorrect.size = (width, height)
+
+        if forced_choice_trial == 1:
+            # Forced choice trial, hide incorrect stimulus
+            obj_incorrect.size = (0, 0)
+        else:
+            # Free choice trial, show incorrect stimulus on its side
+            obj_incorrect.pos  = (x_incorrect, y)
+            obj_incorrect.size = (width, height)
 
     except Exception as e:
         print(f"[230] Error: {e}")
@@ -2433,6 +2440,7 @@ def function230():
 def loop230(timing):
     try:
         shape = str(utils.task.shape).strip().lower()
+        forced_choice_trial = int(utils.task.forced_choice_trial)
 
         if shape == "triangle":
             obj_correct, obj_incorrect = triangle1, triangle2
@@ -2446,8 +2454,11 @@ def loop230(timing):
             print(f"[230] Unknown shape in loop: {shape}")
             return
 
+        # Always draw the correct stimulus
         obj_correct.draw()
-        obj_incorrect.draw()
+        # Only draw the incorrect stimulus on free choice trials
+        if forced_choice_trial == 0:
+            obj_incorrect.draw()
         window.flip()
     except Exception as e:
         print(f"[230] loop error: {e}")
@@ -2456,8 +2467,8 @@ def function231(): #Touchteaching read touchscreen
     px = settings.PIXELS_PER_MM_X
     py = settings.PIXELS_PER_MM_Y
 
-    width = (utils.task.width + 50) * px
-    height = (utils.task.height + 50) * py
+    width = (utils.task.width + 30) * px
+    height = (utils.task.height + 30) * py
     x_correct = utils.task.x_correcth * px
     x_incorrect = utils.task.x_incorrecth * px
     y = utils.task.y_correcth * py
