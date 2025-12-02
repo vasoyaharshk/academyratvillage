@@ -2212,7 +2212,7 @@ def function220():
     print(f"Reward Sound played at {freq} Hz")
 
     task_freq = getattr(utils.task, "reward_frequency", None)
-    if task_freq is not None and task_freq != freq:
+    if task_freq is not None and task_freq != freq and rat != "m3":
         message = f"URGENT FREQ MISMATCH for {rat}: tone = {freq} Hz, task = {task_freq} Hz"
         print(message)
         try:
@@ -2386,13 +2386,90 @@ def function225():
 def function226():  #test photogate
     print('Photogate working')
 
+# For white stimuli in black background:
+# def function230():
+#     try:
+#         pair   = int(utils.task.pair)
+#         probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
+#         shape  = str(utils.task.shape).strip().lower()
+#         forced_choice_trial = int(utils.task.forced_choice_trial)
+#
+#         # Geometry (mm → px; PsychoPy Y down)
+#         px = settings.PIXELS_PER_MM
+#         py = settings.PIXELS_PER_MM
+#         x_correct   = utils.task.x_correcth   * px
+#         x_incorrect = utils.task.x_incorrecth * px
+#         y           = -utils.task.y_correcth  * py
+#         width       = utils.task.width        * px
+#         height      = utils.task.height       * py
+#
+#         # Play tone
+#         tone = cb_tones[pair][probe]
+#         freq = cb_tones_hz[pair][probe]     # REQUIRED FOR ULTRASONIC ROUTING
+#         soundStream.play(tone, FsOut=CB_FS, freq=freq)
+#         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
+#
+#         # Select objects by shape (no helper)
+#         if shape == "triangle":
+#             obj_correct, obj_incorrect = triangle1, triangle2
+#         elif shape == "circle":
+#             obj_correct, obj_incorrect = circle1, circle2
+#         elif shape == "star":
+#             obj_correct, obj_incorrect = star1, star2
+#         elif shape == "square":
+#             obj_correct, obj_incorrect = square1, square2
+#         else:
+#             print(f"[230] Unknown shape: {shape}")
+#             return
+#
+#         # Position and size for the correct stimulus
+#         obj_correct.pos  = (x_correct, y)
+#         obj_correct.size = (width, height)
+#
+#         if forced_choice_trial == 1:
+#             # Forced choice trial, hide incorrect stimulus
+#             obj_incorrect.size = (0, 0)
+#         else:
+#             # Free choice trial, show incorrect stimulus on its side
+#             obj_incorrect.pos  = (x_incorrect, y)
+#             obj_incorrect.size = (width, height)
+#
+#     except Exception as e:
+#         print(f"[230] Error: {e}")
+#
+#
+# def loop230(timing):
+#     try:
+#         shape = str(utils.task.shape).strip().lower()
+#         forced_choice_trial = int(utils.task.forced_choice_trial)
+#
+#         if shape == "triangle":
+#             obj_correct, obj_incorrect = triangle1, triangle2
+#         elif shape == "circle":
+#             obj_correct, obj_incorrect = circle1, circle2
+#         elif shape == "star":
+#             obj_correct, obj_incorrect = star1, star2
+#         elif shape == "square":
+#             obj_correct, obj_incorrect = square1, square2
+#         else:
+#             print(f"[230] Unknown shape in loop: {shape}")
+#             return
+#
+#         # Always draw the correct stimulus
+#         obj_correct.draw()
+#         # Only draw the incorrect stimulus on free choice trials
+#         if forced_choice_trial == 0:
+#             obj_incorrect.draw()
+#         window.flip()
+#     except Exception as e:
+#         print(f"[230] loop error: {e}")
 
+# For black stimuli in white background:
 def function230():
     try:
         pair   = int(utils.task.pair)
         probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
         shape  = str(utils.task.shape).strip().lower()
-        forced_choice_trial = int(utils.task.forced_choice_trial)
 
         # Geometry (mm → px; PsychoPy Y down)
         px = settings.PIXELS_PER_MM
@@ -2405,11 +2482,13 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
-        freq = cb_tones_hz[pair][probe]     # REQUIRED FOR ULTRASONIC ROUTING
+        freq = cb_tones_hz[pair][probe]
         soundStream.play(tone, FsOut=CB_FS, freq=freq)
-        #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 
-        # Select objects by shape (no helper)
+        # White background
+        window.color = [1, 1, 1]
+
+        # Select objects by shape
         if shape == "triangle":
             obj_correct, obj_incorrect = triangle1, triangle2
         elif shape == "circle":
@@ -2422,21 +2501,20 @@ def function230():
             print(f"[230] Unknown shape: {shape}")
             return
 
-        # Position and size for the correct stimulus
+        # Make stimuli black
+        obj_correct.lineColor = [-1, -1, -1]
+        obj_correct.fillColor = [-1, -1, -1]
+        obj_incorrect.lineColor = [-1, -1, -1]
+        obj_incorrect.fillColor = [-1, -1, -1]
+
+        # Position & size
         obj_correct.pos  = (x_correct, y)
         obj_correct.size = (width, height)
-
-        if forced_choice_trial == 1:
-            # Forced choice trial, hide incorrect stimulus
-            obj_incorrect.size = (0, 0)
-        else:
-            # Free choice trial, show incorrect stimulus on its side
-            obj_incorrect.pos  = (x_incorrect, y)
-            obj_incorrect.size = (width, height)
+        obj_incorrect.pos  = (x_incorrect, y)
+        obj_incorrect.size = (width, height)
 
     except Exception as e:
         print(f"[230] Error: {e}")
-
 
 def loop230(timing):
     try:
