@@ -2405,6 +2405,7 @@ def function230():
 
         # Play tone
         tone = cb_tones[pair][probe]
+        freq = cb_tones_hz[pair][probe]     # REQUIRED FOR ULTRASONIC ROUTING
         soundStream.play(tone, FsOut=CB_FS, freq=freq)
         #print(f"Playing CB tone: pair {pair}, probe {probe}, {cb_tones_hz[pair][probe]} Hz, shape={shape}")
 

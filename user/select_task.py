@@ -330,10 +330,66 @@ def select_task(df, subject):
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-
                 message = f"URGENT: Stage moved forward to {stage} for {my_subject} in {task}. Email ALEX."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
+        elif task == 'A_TouchTeaching_blob':
+            if task_number == 2:
+                task = 'Cognitive_Bias_Auditory_Training'
+                stage = 1.0
+                task_number = 1
+                block_size = 40
+                block_number = 1
+                prev_block_accuracy = -1.0
+                last_block_accuracy = 0.0
+
+                # Needed to create blocks of 40 trials for criterion to be assessed on:
+                block_trial_counter = 0  # Trial count within the current block
+                block_accuracy = 0.0  # Accuracy in the current block
+                ror_change = 0  # If it is 1, ROR will change on the next trial.
+                block_change = 0  # If it is 1, a new block will start on the next trial
+                total_trials = 0  # Total trials across the task.
+                block_correct_count = 0  # Number of correct responses in the block
+                block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                condition_trial_counter = 0  # Counter for randomising conditions
+                last_forward_stage = 0  # The stage moved forward from after a forward change
+                last_backward_stage = 0  # The stage moved backward to after the last backward change
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
+                stage_forward_change = 0  # Whether stage move forward on the next trial
+                stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                # Left Right Function Randomisation variables:
+                stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                stim_trials = []  # List of correct stimulus function randomised.
+                stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+                group_assignment = {
+                    # Group 1
+                    'chand': 1,
+                    'innes': 1,
+                    'm3': 1,
+                    # Group 2
+                    'fergus': 2,
+                    'joey': 2,
+                    # Group 3
+                    'geralt': 3,
+                    'ross': 3,
+                    # Group 4
+                    'felix': 4,
+                    'pol': 4,
+                }
+
+                # Set group from table
+                group = group_assignment.get(my_subject.lower())
+                pair = pair_order_table[group][0]
+                message = f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}"
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
