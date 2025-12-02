@@ -410,7 +410,7 @@ class StageTraining_RatB_V1(Task):
 
             self.sma.add_state(
                 state_name='Real_start',
-                state_timer=self.valve_time * 2,
+                state_timer=self.valve_time * 0.5,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation1'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # close corridor 2 door, and deliver water when animal enter to behav box

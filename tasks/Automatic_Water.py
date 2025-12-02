@@ -122,7 +122,7 @@ class Automatic_Water(Task):
 
             self.sma.add_state(
                 state_name='Real_start',
-                state_timer=self.valve_time * 2,
+                state_timer=self.valve_time * 0.5,
                 state_change_conditions={Bpod.Events.Tup: 'Fixation'},
                 output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
         else:

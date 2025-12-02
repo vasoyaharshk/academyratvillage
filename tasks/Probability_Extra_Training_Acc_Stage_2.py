@@ -266,7 +266,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
 
                     self.sma.add_state(
                         state_name='Real_start',
-                        state_timer=self.valve_time * 2,
+                        state_timer=self.valve_time * 0.5,
                         state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                         output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                     # Closes corridor door 2 and delivers initial 50ul water.
@@ -394,7 +394,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
 
                     self.sma.add_state(
                         state_name='Real_start',
-                        state_timer=self.valve_time * 2,
+                        state_timer=self.valve_time * 0.5,
                         state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                         output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                     # Closes corridor door 2 and delivers initial 50ul water.
