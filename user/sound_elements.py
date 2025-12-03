@@ -3,6 +3,9 @@ import sounddevice as sd
 import numpy as np
 import time
 from scipy.signal import firwin, lfilter
+import os
+import json
+
 
 DEFAULT_FS = 48000
 CB_FS = 192000 # or 192000 if that’s your device limit. This is essential for the high tones. # high rate for ultrasonic part
@@ -16,35 +19,80 @@ NORMAL_L_CH_INDEX = 2   # CH3 normal
 NORMAL_R_CH_INDEX = 3   # CH4 normal
 CROSSOVER_HZ = 10000    #
 
+# -------------------------------------------------------------
+# SPL calibration loading (from spl_calibration.json)
+# -------------------------------------------------------------
+CALIBRATION_FILE = "spl_calibration.json"
+
+FREQ_GAIN = {}
+
+calib_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CALIBRATION_FILE)
+
+try:
+    with open(calib_path, "r", encoding="utf-8") as f:
+        _calib_raw = json.load(f)
+    # JSON structure: { "freq_str": { "measured_db": ..., "gain": ... }, ... }
+    FREQ_GAIN = {
+        str(k): float(v.get("gain", 1.0))
+        for k, v in _calib_raw.items()
+    }
+    print(f"[sound_elements] Loaded SPL calibration for {len(FREQ_GAIN)} freqs from {calib_path}")
+except FileNotFoundError:
+    print(f"[sound_elements] No {CALIBRATION_FILE} found, using unity gain.")
+except Exception as e:
+    print(f"[sound_elements] Error loading {CALIBRATION_FILE}: {e}. Using unity gain.")
+
+def apply_calibration_gain(tone: np.ndarray, freq: float) -> np.ndarray:
+    """
+    Multiply tone by precomputed gain for this frequency, if available.
+    freq must match what was used in calibration_standalone (same float value).
+    """
+    key = str(float(freq))
+    gain = FREQ_GAIN.get(key, 1.0)
+    if gain != 1.0:
+        tone = tone * gain
+    return tone.astype(np.float32)
+
+
 class SoundR:
     def __init__(self):
         devices = sd.query_devices()
         self.device_index = None
+        self.n_out = None
 
+        # first try Babyface Pro FS
         for idx, dev in enumerate(devices):
-            if "babyface" in dev["name"].lower() and dev["max_output_channels"] >= N_BABYFACE_OUT:
+            if "babyface" in dev["name"].lower():
                 self.device_index = idx
+                self.n_out = dev["max_output_channels"]
+                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}")
                 break
 
+        # if no Babyface, try UACDemoV1.0
         if self.device_index is None:
-            raise RuntimeError("Babyface Pro FS not found.")
+            for idx, dev in enumerate(devices):
+                if "uacdemo" in dev["name"].lower():
+                    self.device_index = idx
+                    self.n_out = 2
+                    print(f"Babyface not found. Using UACDemoV1.0, device index {idx}, channels 2")
+                    break
 
-        print(f"Using Babyface Pro FS device index {self.device_index}")
-
-    def _blank(self, n_samples):
-        return np.zeros((n_samples, N_BABYFACE_OUT), dtype=np.float32)
+        # if still nothing, error
+        if self.device_index is None:
+            raise RuntimeError("No Babyface Pro FS or UACDemoV1.0 audio device found.")
 
     def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
-        # allow interface: detect freq based on tone length / ramp
-        print("freq se: ", freq)
-        n = len(soundVec)
-        out = self._blank(n)
+        out = np.zeros((len(soundVec), self.n_out), dtype=np.float32)
 
-        if freq is not None and freq > CROSSOVER_HZ:        #Here is freq = None, then it will automatically go to normal speakers. Useful for punish sounds.
-            out[:, ULTRA_CH_INDEX] = soundVec
-        else:
-            out[:, NORMAL_L_CH_INDEX] = soundVec
-            out[:, NORMAL_R_CH_INDEX] = soundVec
+        if self.n_out >= 4:
+            if freq is not None and freq > CROSSOVER_HZ:
+                out[:, ULTRA_CH_INDEX] = soundVec
+            else:
+                out[:, NORMAL_L_CH_INDEX] = soundVec
+                out[:, NORMAL_R_CH_INDEX] = soundVec
+        else:  # 2-channel fallback mode
+            out[:, 0] = soundVec
+            out[:, 1] = soundVec
 
         sd.play(out, samplerate=FsOut, device=self.device_index)
 
@@ -141,15 +189,20 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 200.0,
+    'm3': 100,
 }
 
 # Pre-generated tone vectors
-rat_tones = {name: pureToneGen_dB(freq, 180, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
+rat_tones = {}
+for name, freq in reward_frequency_map.items():
+    base_tone = pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS)
+    rat_tones[name] = apply_calibration_gain(base_tone, freq)
+
 
 #Sound Testing:
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
+    tone = apply_calibration_gain(tone, frequency)
     soundStream.play(tone, FsOut=FsOut, freq=frequency)
 
 #Function to set the reference db:
@@ -170,4 +223,8 @@ cb_tones_hz = {
 # Pre-generate 2s tones with ramp
 cb_tones = {}
 for pair, freqs in cb_tones_hz.items():
-    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=70, FsOut=CB_FS) for f in freqs]
+    tones = []
+    for f in freqs:
+        base_tone = pureToneGen_dB(f, 2.0, db=70, FsOut=CB_FS)
+        tones.append(apply_calibration_gain(base_tone, f))
+    cb_tones[pair] = tones
