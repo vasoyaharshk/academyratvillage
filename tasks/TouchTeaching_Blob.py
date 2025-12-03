@@ -7,7 +7,7 @@ import numpy as np
 from academy import telegram_bot
 
 
-class A_TouchTeaching_blob(Task):
+class TouchTeaching_Blob(Task):
     def __init__(self):
         super().__init__()
 
@@ -18,7 +18,7 @@ class A_TouchTeaching_blob(Task):
         Rats learn to touch the screen during the response window to obtain the reward.
         
         Stages:
-        Stage 3: A white irregular blob the same size as the screen.
+        Stage 0: A white irregular blob the same size as the screen.
         Stage 1: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but also can touch anywhere else.
         Stage 2: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but if touches anywhere else is incorrect.
 

@@ -340,10 +340,10 @@ def select_task(df, subject):
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
-        elif task == 'A_TouchTeaching_blob':
+        elif task == 'TouchTeaching_blob':
             if task_number == 2:
-                task = 'Cognitive_Bias_Auditory_Training'
-                stage = 1.0
+                task = 'xyz'
+                stage = 0
                 task_number = 1
                 block_size = 40
                 block_number = 1
@@ -370,6 +370,12 @@ def select_task(df, subject):
                 stim_trials = []  # List of correct stimulus function randomised.
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+                last_two_stim = []
+                unrewarded_list = []
+                pr_carry_tone = ""
+                pr_carry_pending = 0
+                consecutive_good_blocks = 0
 
                 group_assignment = {
                     # Group 1
@@ -642,30 +648,6 @@ def select_task(df, subject):
                     except:
                         print('Telegram message not sent')
                         pass
-
-                    # # # Cognitive Bias:
-                    # group_assignment = {
-                    #     # Group 1
-                    #     'chand': 1,
-                    #     'innes': 1,
-                    #     'm3': 1,
-                    #     # Group 2
-                    #     'fergus': 2,
-                    #     'joey': 2,
-                    #     # Group 3
-                    #     'geralt': 3,
-                    #     'ross': 3,
-                    #     # Group 4
-                    #     'felix': 4,
-                    #     'pol': 4,
-                    # }
-                    #
-                    # # Set group from table
-                    # task = 'Cognitive_Bias_Auditory_Training'
-                    # group = group_assignment.get(my_subject.lower())
-                    # pair = pair_order_table[group][0]
-                    # block_size = 80
-                    # print(f"Cognitive Bias: Subject={my_subject} → group={group}, pair={pair}")
 
 
                 if task == "Probability_WebersLaw_Post":
