@@ -18,6 +18,7 @@ ULTRA_CH_INDEX = 0      # CH1 ultrasonic
 NORMAL_L_CH_INDEX = 2   # CH3 normal
 NORMAL_R_CH_INDEX = 3   # CH4 normal
 CROSSOVER_HZ = 10000    #
+FORCED_OUTPUT_CHANNELS = 4  #We are not using all 12 channels
 
 # -------------------------------------------------------------
 # SPL calibration loading (from spl_calibration.json)
@@ -65,7 +66,9 @@ class SoundR:
             if "babyface" in dev["name"].lower():
                 self.device_index = idx
                 self.n_out = dev["max_output_channels"]
-                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}")
+                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}") \
+
+                self.n_out = FORCED_OUTPUT_CHANNELS
                 break
 
         # if no Babyface, try UACDemoV1.0
@@ -81,7 +84,11 @@ class SoundR:
         if self.device_index is None:
             raise RuntimeError("No Babyface Pro FS or UACDemoV1.0 audio device found.")
 
-    def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
+    def route_to_channels(self, soundVec, freq=None):
+        """
+        Take a 1-D mono vector and route it into a multichannel buffer
+        according to freq and Babyface channel layout.
+        """
         out = np.zeros((len(soundVec), self.n_out), dtype=np.float32)
 
         if self.n_out >= 4:
@@ -93,6 +100,21 @@ class SoundR:
         else:  # 2-channel fallback mode
             out[:, 0] = soundVec
             out[:, 1] = soundVec
+
+        return out.astype(np.float32)
+
+    def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
+        """
+        If soundVec is already multichannel with correct width, send it as-is.
+        Otherwise, treat it as mono and route it.
+        """
+        # If soundVec is 2-D and already matches the output channel count,
+        # avoid rebuilding the multichannel buffer.
+        if isinstance(soundVec, np.ndarray) and soundVec.ndim == 2 and soundVec.shape[1] == self.n_out:
+            out = soundVec
+        else:
+            # assume mono 1-D and route
+            out = self.route_to_channels(soundVec, freq=freq)
 
         sd.play(out, samplerate=FsOut, device=self.device_index)
 
@@ -196,9 +218,12 @@ reward_frequency_map = {
 # Pre-generated tone vectors
 rat_tones = {}
 for name, freq in reward_frequency_map.items():
+    # 1) generate mono tone at target dB
     base_tone = pureToneGen_dB(freq, 180, db=70, FsOut=DEFAULT_FS)
-    rat_tones[name] = apply_calibration_gain(base_tone, freq)
-
+    # 2) apply calibration gain for this frequency
+    calibrated = apply_calibration_gain(base_tone, freq)
+    # 3) expand to multichannel ONCE using the routing logic
+    rat_tones[name] = soundStream.route_to_channels(calibrated, freq=freq)
 
 #Sound Testing:
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
