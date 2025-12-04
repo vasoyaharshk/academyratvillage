@@ -29,7 +29,7 @@ def alarm_mice(area):
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
         message = 'ALARM: 2 rats in box, area ' + str(int(area))
         utils.alarms.add_new_item({'message': message})
-        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT_2, 'text': message})
 
         request.urlopen(url, data.encode('utf-8'))
 
@@ -87,6 +87,16 @@ def alarm_session_time(seconds, subject_name):
     except:
         pass
 
+def alarm_short_session(seconds, subject_name):
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+        message = 'ALARM: URGENT: short session: ' + str(int(seconds)) + ' seconds in the box' + ', subject: ' + str(subject_name)
+        utils.alarms.add_new_item({'message': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+
+        request.urlopen(url, data.encode('utf-8'))
+    except:
+        pass
 
 def alarm_mouse(my_list):
     try:
@@ -183,6 +193,16 @@ def alarm_finish_session(message, subject_name):
         message = 'ALARM: Status: ' + str(message) + ', subject: ' + str(subject_name)
         utils.alarms.add_new_item({'message': message})
         data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+        request.urlopen(url, data.encode('utf-8'))
+    except:
+        pass
+
+def alarm_finish_session_details(message, subject_name):
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+        message = 'ALARM: Status: ' + str(message) + ', subject: ' + str(subject_name)
+        utils.alarms.add_new_item({'message': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT_2, 'text': message})
         request.urlopen(url, data.encode('utf-8'))
     except:
         pass
