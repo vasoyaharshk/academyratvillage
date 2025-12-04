@@ -397,6 +397,12 @@ def stop_and_save_task():
         pass
     utils.task.my_bpod = None
 
+    # Session duration (for short-session alarm)
+    try:
+        session_duration = utils.chrono.get_seconds()
+    except Exception:
+        session_duration = None
+
     # Ensure reward_drunk exists before saving
     if not hasattr(utils.task, 'reward_drunk'):
         utils.task.reward_drunk = 0.0
@@ -415,6 +421,13 @@ def stop_and_save_task():
         name = "None"
     else:
         name = utils.subject.name
+
+    # Telegram alarm for short sessions (< 30 minutes = 1800 s)
+    if session_duration is not None and session_duration < 1800:
+        try:
+            telegram_bot.alarm_short_session(session_duration, name)
+        except Exception as e:
+            print(f"Telegram short-session alert failed. Error: {e}")
 
     name_task = (
         utils.task.task

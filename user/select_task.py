@@ -186,7 +186,7 @@ def select_task(df, subject):
     )
 
     try:
-        telegram_bot.alarm_finish_session(msg, my_subject)
+        telegram_bot.alarm_finish_session_details(msg, my_subject)
     except Exception as e:
         print("Telegram message not sent. Error:", e)
 
