@@ -196,7 +196,7 @@ reward_frequency_map = {
 # Pre-generated tone vectors
 rat_tones = {}
 for name, freq in reward_frequency_map.items():
-    base_tone = pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS)
+    base_tone = pureToneGen_dB(freq, 180, db=70, FsOut=DEFAULT_FS)
     rat_tones[name] = apply_calibration_gain(base_tone, freq)
 
 
