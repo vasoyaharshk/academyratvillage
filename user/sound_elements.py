@@ -18,7 +18,7 @@ ULTRA_CH_INDEX = 0      # CH1 ultrasonic
 NORMAL_L_CH_INDEX = 2   # CH3 normal
 NORMAL_R_CH_INDEX = 3   # CH4 normal
 CROSSOVER_HZ = 10000    #
-FORCED_OUTPUT_CHANNELS = 4  #We are not using all 12 channels
+FORCED_OUTPUT_CHANNELS = 12  #We are not using all 12 channels
 
 # -------------------------------------------------------------
 # SPL calibration loading (from spl_calibration.json)
