@@ -18,7 +18,6 @@ ULTRA_CH_INDEX = 0      # CH1 ultrasonic
 NORMAL_L_CH_INDEX = 2   # CH3 normal
 NORMAL_R_CH_INDEX = 3   # CH4 normal
 CROSSOVER_HZ = 10000    #
-FORCED_OUTPUT_CHANNELS = 12  #We are not using all 12 channels
 
 # -------------------------------------------------------------
 # SPL calibration loading (from spl_calibration.json)
@@ -66,9 +65,7 @@ class SoundR:
             if "babyface" in dev["name"].lower():
                 self.device_index = idx
                 self.n_out = dev["max_output_channels"]
-                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}") \
-
-                self.n_out = FORCED_OUTPUT_CHANNELS
+                print(f"Using Babyface Pro FS, device index {idx}, channels {self.n_out}")
                 break
 
         # if no Babyface, try UACDemoV1.0
@@ -246,11 +243,14 @@ cb_tones_hz = {
     4: [23913.0, 27739.0, 32177.0, 37326.0, 43298.0]
 }
 
-# Pre-generate 2s tones with ramp
+# Pre-generate 2s tones with ramp, calibrated and routed to channels once
 cb_tones = {}
 for pair, freqs in cb_tones_hz.items():
     tones = []
     for f in freqs:
         base_tone = pureToneGen_dB(f, 2.0, db=70, FsOut=CB_FS)
-        tones.append(apply_calibration_gain(base_tone, f))
+        calibrated = apply_calibration_gain(base_tone, f)
+        # pre-spread to multichannel using the same routing logic
+        routed = soundStream.route_to_channels(calibrated, freq=f)
+        tones.append(routed)
     cb_tones[pair] = tones
