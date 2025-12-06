@@ -8,13 +8,15 @@ Purpose:
 - Uses the same routing and gains as RatVillage (via sound_elements).
 - Does NOT modify spl_calibration.json.
 
-Workflow:
+Workflow:69.9
 1. Open REW -> SPL Meter -> Weighting = Z, Slow.
 2. Place UMIK-1 at rat position.
 3. Run this script in Spyder.
 4. After each calibrated tone, read the SPL and type it (or skip).
 """
 
+import os
+import json
 import sound_elements as se  # must be in same folder
 import pandas as pd
 from datetime import datetime
@@ -24,15 +26,21 @@ TONE_DURATION = 5.0
 
 # Same list as current calibration_standalone.py
 FREQUENCIES_TO_TEST = [
-    # 100, 1368.5
+    # 100, 1368.5,
     # 250.0, 290.0, 336.4, 390.2, 452.7, 525.1, 609.1, 706.6,      # Rat reward tones
 
     # 2000.0, 2320.0, 2691.0, 3122.0, 3621.0,                      # CB Pair 1
     # 4573.0, 5305.0, 6154.0, 7138.0, 8281.0,                      # CB Pair 2
-    #10458.0, 12131.0, 14072.0, 16323.0, 18935.0,                 # CB Pair 3
+    # 10458.0, 12131.0, 14072.0, 16323.0, 18935.0,                 # CB Pair 3
     # 23913.0, 27739.0, 32177.0, 37326.0, 43298.0                  # CB Pair 4
+    27739, 32177
 ]
 
+# Directory where sound_elements.py and spl_calibration.json live
+CALIB_DIR = os.path.dirname(os.path.abspath(se.__file__))
+CALIB_JSON = os.path.join(CALIB_DIR, se.CALIBRATION_FILE)
+AFTER_TEST_JSON = os.path.join(CALIB_DIR, "spl_calibration_after_test.json")
+CB_FREQS = {f for freqs in se.cb_tones_hz.values() for f in freqs}
 
 
 def play_calibrated_tone(freq):
@@ -44,7 +52,12 @@ def play_calibrated_tone(freq):
     - CB_FS for freqs > CROSSOVER_HZ
     - pureToneGen_dB + apply_calibration_gain + Babyface routing
     """
-    Fs = se.CB_FS if freq > se.CROSSOVER_HZ else se.DEFAULT_FS
+    
+    if freq in CB_FREQS:
+        Fs = se.CB_FS      # all CB tones at CB_FS
+    else:
+        Fs = se.DEFAULT_FS # rat freqs and any others at DEFAULT_FS
+        
     # This helper already calls pureToneGen_dB + apply_calibration_gain + soundStream.play
     se.play_any_frequency(freq, duration=TONE_DURATION, db=TARGET_DB, FsOut=Fs)
 
@@ -128,8 +141,19 @@ def main():
     print(f"\nSummary saved to Excel: {output_file}")
     print("Note: This script does NOT modify spl_calibration.json.")
 
+    # Save a copy of the current calibration JSON with the same structure,
+    # so it can be used as a drop-in replacement if desired.
+    try:
+        with open(CALIB_JSON, "r", encoding="utf-8") as f_in:
+            calib_data = json.load(f_in)
 
+        with open(AFTER_TEST_JSON, "w", encoding="utf-8") as f_out:
+            json.dump(calib_data, f_out, indent=2)
 
+        print(f"\nSaved copy of current calibration JSON to:\n  {AFTER_TEST_JSON}\n")
+        print("You can rename this file to 'spl_calibration.json' if you want to replace the calibration.")
+    except Exception as e:
+        print(f"\nWarning: could not write {AFTER_TEST_JSON}: {e}")
 
 if __name__ == "__main__":
     main()

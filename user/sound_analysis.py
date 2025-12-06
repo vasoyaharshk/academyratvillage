@@ -370,7 +370,7 @@ def main():
     
 
     SPL_REF = 70.0              # dB SPL for 14072_70.wav
-    REF_FILE = "14072_70.wav"   # your reference filename
+    REF_FILE = "14072_calib.wav"   # your reference filename
     
     df = pd.read_csv("results.csv")
     

@@ -32,24 +32,32 @@ OUTPUT_JSON = "spl_calibration.json"
 # EDIT THIS LIST MANUALLY
 # ---------------------------------------------------------------
 FREQUENCIES_TO_TEST = [
-    # 100, 1368.5
+    # 100, 1368.5,
     # 250.0, 290.0, 336.4, 390.2, 452.7, 525.1, 609.1, 706.6,      # Rat reward tones
 
     # 2000.0, 2320.0, 2691.0, 3122.0, 3621.0,                     # CB Pair 1
     # 4573.0, 5305.0, 6154.0, 7138.0, 8281.0,                     # CB Pair 2
     # 10458.0, 12131.0, 14072.0, 16323.0, 18935.0,                # CB Pair 3
-    # 23913.0, 27739.0, 32177.0, 37326.0, 43298.0                 # CB Pair 4
+    23913.0, 27739.0, 32177.0
+    #37326.0, 43298.0                 # CB Pair 4
 ]
 
 # If True: merge with existing JSON (recommended)
 # If False: overwrite JSON with only this run's freqs (original behaviour)
 MERGE_MODE = True
+CB_FREQS = {f for freqs in se.cb_tones_hz.values() for f in freqs}
+
 # ---------------------------------------------------------------
 
 
 def play_tone(freq):
     """Play a single tone using the same routing as RatVillage."""
-    Fs = se.CB_FS if freq > se.CROSSOVER_HZ else se.DEFAULT_FS
+    
+    if freq in CB_FREQS:
+        Fs = se.CB_FS      # all CB tones at CB_FS
+    else:
+        Fs = se.DEFAULT_FS # rat freqs and any others at DEFAULT_FS
+
     tone = se.pureToneGen_dB(freq, TONE_DURATION, db=TARGET_DB, FsOut=Fs)
     se.soundStream.play(tone, FsOut=Fs, freq=freq)
 
@@ -156,6 +164,34 @@ def main():
     # Save
     with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
         json.dump(final_calibration, fp, indent=2)
+        
+    try:
+        import openpyxl
+        from openpyxl import Workbook
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Calibration"
+
+        # Header
+        ws.append(["frequency_hz", "measured_db", "gain"])
+
+        # Sort by frequency
+        for freq_str in sorted(final_calibration.keys(), key=lambda x: float(x)):
+            entry = final_calibration[freq_str]
+            ws.append([
+                float(freq_str),
+                entry.get("measured_db", None),
+                entry.get("gain", None),
+            ])
+
+        excel_name = "spl_calibration.xlsx"
+        wb.save(excel_name)
+        print(f"Excel exported to {excel_name}")
+
+    except Exception as e:
+        print(f"Could not export Excel file: {e}")
+
 
     print("\nCalibration saved to:", OUTPUT_JSON)
     print(f"Total freqs in file: {len(final_calibration)}")
