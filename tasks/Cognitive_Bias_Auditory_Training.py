@@ -684,15 +684,16 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
-
                 self.forced_choice_trial = 1
                 self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
+                self.forced_choice_trial = 0
+                self.forced_choice_probe = None
+                self.trial_result = 'correct'
                 if self.forced_choice_trial == 0:
-                    self.trial_result = 'correct'
                     self.valid_counter += 1
                     self.stim_trial_counter += 1
                     self.reward_drunk += self.valve_reward * self.valve_factor_c
@@ -705,9 +706,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.success = 1
                     self.total_trials += 1
 
-                self.forced_choice_trial = 0
-                self.forced_choice_probe = None
-
 
             # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
@@ -719,7 +717,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
-
                 self.forced_choice_trial = 1
                 self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
