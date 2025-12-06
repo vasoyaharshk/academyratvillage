@@ -340,7 +340,7 @@ def select_task(df, subject):
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
-        elif task == 'TouchTeaching_blob':
+        elif task == 'TouchTeaching_Blob':
             if task_number == 2:
                 task = 'xyz'
                 stage = 0
