@@ -188,6 +188,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
         self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
+        self.touchoutside = None
+
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max']
 
@@ -710,7 +712,8 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.trial_result = 'touch_outside'
+                self.trial_result = 'incorrect'
+                self.touchoutside = 1
                 if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.block_valid_count += 1
@@ -887,6 +890,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         # Trial Information:
         self.register_value('trial_length', self.trial_length)
         self.register_value('trial_result', self.trial_result)
+        self.register_value('touchoutside', self.touchoutside)
 
         # Stimulus trial control
         self.register_value('group', self.group)
