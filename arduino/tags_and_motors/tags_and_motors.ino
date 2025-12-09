@@ -21,8 +21,8 @@
 // academy1
 #define ANGLEOPEN1 65
 #define ANGLECLOSE1 109
-#define ANGLEOPEN2 160
-#define ANGLECLOSE2 30
+#define ANGLEOPEN2 130
+#define ANGLECLOSE2 60
 #define ANGLESEMICLOSE2 55 //Harsh: what is this?
 
 
