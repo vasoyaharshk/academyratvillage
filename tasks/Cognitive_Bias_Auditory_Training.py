@@ -729,10 +729,11 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
 
-            # === ACTUAL FORCED CHOICE FLAG ===
-            # The current trial was forced-choice if the incorrect side was disabled
-            # Which is exactly when forced_choice_next_trial == 1 at the START of the trial
-            forced_choice_actual_trial = 1 if self.forced_choice_next_trial == 1 else 0
+            # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
+            if self.x_incorrecth is None:
+                forced_choice_actual_trial = 1
+            else:
+                forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
