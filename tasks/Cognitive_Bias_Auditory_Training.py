@@ -911,7 +911,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('last_block_accuracy', self.last_block_accuracy)
 
         self.register_value('session_first_stim', self.session_first_stim)
-        self.register_value('forced_choice_actual_trial', forced_choice_actual_trial)
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
         self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
         self.register_value('forced_choice_probe', self.forced_choice_probe)
 
