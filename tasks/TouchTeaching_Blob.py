@@ -18,7 +18,7 @@ class TouchTeaching_Blob(Task):
         Rats learn to touch the screen during the response window to obtain the reward.
         
         Stages:
-        Stage 0: A white irregular blob the same size as the screen.
+        Stage 0: A white irregular blob half the size of the screen.
         Stage 1: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but also can touch anywhere else.
         Stage 2: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but if touches anywhere else is incorrect.
 
@@ -31,6 +31,8 @@ class TouchTeaching_Blob(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
 
         NOTE: FOR NEW SOUNDS, FUNCTION38 NEEDS TO BE REPLACED WITH 220 EVERYWHERE.
+        
+        Here, correction trial means the same trial is repeated after an incorrect. 
         """
 
         # Variables for the task:
@@ -122,8 +124,9 @@ class TouchTeaching_Blob(Task):
         self.last_two_stim = []         # history of last two stim_trial values across sessions. Tracked.
 
         # Forced-choice logic
-        self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
-        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
+        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice. Forced choice trial here is the incorrect being repeated at the same location as previously till they get it correct.
+        self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # Stimulus to repeat on forced-choice trials
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
@@ -262,6 +265,8 @@ class TouchTeaching_Blob(Task):
             if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
                 # flip side
                 candidate = 213 if candidate == 214 else 214
+
+            self.forced_choice_actual_trial = self.forced_choice_next_trial
 
             if self.forced_choice_next_trial == 0:
                 self.stim_trial = candidate
@@ -559,6 +564,7 @@ class TouchTeaching_Blob(Task):
     def after_trial(self):
         if self.task_number == 1:
             # self.block_trial_counter += 1  # For counting the blocks
+            was_forced = (self.forced_choice_actual_trial == 1)
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -572,7 +578,11 @@ class TouchTeaching_Blob(Task):
                 self.success = 0
                 self.block_trial_counter += 1
                 self.total_trials += 1
-                if self.bias_breaking == 0:
+
+                self.forced_choice_next_trial = 1
+                self.forced_choice_probe = self.stim_trial
+
+                if self.bias_breaking == 0 and not was_forced:
                     self.stim_trial_counter += 1
 
                 print('Acc Valid_count: ', self.block_valid_count)
@@ -589,7 +599,11 @@ class TouchTeaching_Blob(Task):
                 self.block_trial_counter += 1
                 self.success = 1
                 self.total_trials += 1
-                if self.bias_breaking == 0:
+
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
+
+                if self.bias_breaking == 0 and not was_forced:
                     self.stim_trial_counter += 1
 
                 print('Acc Correct_count: ', self.block_correct_count)
@@ -612,6 +626,8 @@ class TouchTeaching_Blob(Task):
             # self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
+
+            self.forced_choice_actual_trial = int(was_forced)
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -703,7 +719,7 @@ class TouchTeaching_Blob(Task):
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
                 all_left_side = all(
-                    0 < x < 205 for x in self.response_x_array)  # Check if all the reponses fall on left
+                    1 < x < 205 for x in self.response_x_array)  # Check if all the reponses fall on left
                 all_right_side = all(
                     205 < x < 410 for x in self.response_x_array)  # Check if all the reponses fall on right
 
@@ -837,3 +853,7 @@ class TouchTeaching_Blob(Task):
 
         self.register_value('session_first_stim', self.session_first_stim)
         self.register_value('last_two_stim', self.last_two_stim)
+
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
+        self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
+        self.register_value('forced_choice_probe', self.forced_choice_probe)

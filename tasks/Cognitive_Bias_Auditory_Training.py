@@ -689,18 +689,15 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.stim_trial_counter += 1
                 self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
-                print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
-                self.forced_choice_next_trial = 0
-                self.forced_choice_probe = None
                 self.trial_result = 'correct'
+                self.reward_drunk += self.valve_reward * self.valve_factor_c
+                self.reward = self.valve_reward * self.valve_factor_c
                 if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.stim_trial_counter += 1
-                    self.reward_drunk += self.valve_reward * self.valve_factor_c
-                    self.reward = self.valve_reward * self.valve_factor_c
                     self.correct_count += 1
                     # print('Correct_count: ', self.correct_count)
                     self.block_correct_count += 1
@@ -708,7 +705,8 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.success = 1
                     self.total_trials += 1
-
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
 
             # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
@@ -723,7 +721,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.stim_trial_counter += 1
                 self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
-                print('Acc Valid_count: ', self.block_valid_count)
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
@@ -731,9 +728,9 @@ class Cognitive_Bias_Auditory_Training(Task):
 
             # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
             if self.x_incorrecth is None:
-                forced_choice_actual_trial = 1
+                self.forced_choice_actual_trial = 1
             else:
-                forced_choice_actual_trial = 0
+                self.forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -911,7 +908,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('last_block_accuracy', self.last_block_accuracy)
 
         self.register_value('session_first_stim', self.session_first_stim)
-        self.register_value('forced_choice_actual_trial', forced_choice_actual_trial)
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
         self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
         self.register_value('forced_choice_probe', self.forced_choice_probe)
 
