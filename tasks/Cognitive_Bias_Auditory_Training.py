@@ -184,7 +184,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.unrewarded_list_planned = []
 
         # Forced-choice logic
-        self.forced_choice_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_actual_trial = 0
+        self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
         self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
     def configure_gui(self):
@@ -369,7 +370,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             # stimulus scheduling
             self.stim = [0, 4]
             self.block_size = 40
-            self.forced_choice_trial = 0
+            self.forced_choice_next_trial = 0
 
         print('')
         print('Stimulus Trial Counter', self.stim_trial_counter)
@@ -449,13 +450,13 @@ class Cognitive_Bias_Auditory_Training(Task):
             # flip side
             candidate = 0 if candidate == 4 else 4
 
-        if self.forced_choice_trial == 0:
+        if self.forced_choice_next_trial == 0:
             self.stim_trial = candidate
         else:
             self.stim_trial = self.forced_choice_probe
 
         # keep stimulus schedule aligned with actual delivered probe
-        if self.forced_choice_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+        if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
             self.stim_trials[self.stim_trial_counter] = self.stim_trial
 
         # get sides from existing mapping, but override shape per subject/group/pair
@@ -482,7 +483,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.x_correcth, self.x_incorrecth = self.x_correcth_pos[1], self.x_correcth_pos[0]
 
         # In forced-choice trials, disable the incorrect side completely
-        if self.forced_choice_trial == 1:
+        if self.forced_choice_next_trial == 1:
             self.x_incorrecth = None
 
         # --- Per-trial reward size from Table 1 (ONLY valve_factor_c) ---
@@ -498,7 +499,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.skip_proposed = 0
         self.unrewarded_tone = None
 
-        if self.partial_reinforcement_active and self.forced_choice_trial == 0:
+        if self.partial_reinforcement_active and self.forced_choice_next_trial == 0:
             # Window size from ratio (e.g., 0.1→10, 0.2→5)
             block = max(1, int(round(1.0 / float(self.partial_reinforcement_ratio))))
             i = self.stim_trial_counter
@@ -528,7 +529,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             f"unrewarded_trial={self.unrewarded_trial} "
         )
         print(f"Correct_side={self.side}")
-        print(f"forced_choice_trial={self.forced_choice_trial}")
+        print(f"forced_choice_next_trial={self.forced_choice_next_trial}")
         print(f"forced_choice_probe={self.forced_choice_probe}")
 
 
@@ -677,23 +678,23 @@ class Cognitive_Bias_Auditory_Training(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                if self.forced_choice_trial == 0:
+                if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.block_valid_count += 1
                     self.success = 0
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
-                self.forced_choice_trial = 1
+                self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
-                self.forced_choice_trial = 0
+                self.forced_choice_next_trial = 0
                 self.forced_choice_probe = None
                 self.trial_result = 'correct'
-                if self.forced_choice_trial == 0:
+                if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.stim_trial_counter += 1
                     self.reward_drunk += self.valve_reward * self.valve_factor_c
@@ -710,20 +711,25 @@ class Cognitive_Bias_Auditory_Training(Task):
             # ##### COUNT Touches outside the shape areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
                 self.trial_result = 'touch_outside'
-                if self.forced_choice_trial == 0:
+                if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.block_valid_count += 1
                     self.success = 0
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
-                self.forced_choice_trial = 1
+                self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
+
+            # === ACTUAL FORCED CHOICE FLAG ===
+            # The current trial was forced-choice if the incorrect side was disabled
+            # Which is exactly when forced_choice_next_trial == 1 at the START of the trial
+            forced_choice_actual_trial = 1 if self.forced_choice_next_trial == 1 else 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -900,7 +906,8 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('last_block_accuracy', self.last_block_accuracy)
 
         self.register_value('session_first_stim', self.session_first_stim)
-        self.register_value('forced_choice_trial', self.forced_choice_trial)
+        self.register_value('forced_choice_actual_trial', forced_choice_actual_trial)
+        self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
         self.register_value('forced_choice_probe', self.forced_choice_probe)
 
 

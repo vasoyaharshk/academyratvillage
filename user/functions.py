@@ -2386,13 +2386,13 @@ def function230():
         pair   = int(utils.task.pair)
         probe  = int(utils.task.stim_trial)  # 0 (low) or 4 (high)
         shape  = str(utils.task.shape).strip().lower()
-        forced_choice_trial = int(utils.task.forced_choice_trial)
+        forced_choice_next_trial = int(utils.task.forced_choice_next_trial)
 
         # Geometry (mm → px; PsychoPy Y down)
         px = settings.PIXELS_PER_MM
         py = settings.PIXELS_PER_MM
         x_correct   = utils.task.x_correcth   * px
-        if forced_choice_trial == 1:
+        if forced_choice_next_trial == 1:
             x_incorrect = None
         else:
             x_incorrect = utils.task.x_incorrecth * px
@@ -2423,7 +2423,7 @@ def function230():
         obj_correct.pos  = (x_correct, y)
         obj_correct.size = (width, height)
 
-        if forced_choice_trial == 1:
+        if forced_choice_next_trial == 1:
             # Forced choice trial, hide incorrect stimulus
             obj_incorrect.size = (0, 0)
         else:
@@ -2446,7 +2446,7 @@ def function230():
 def loop230(timing):
     try:
         shape = str(utils.task.shape).strip().lower()
-        forced_choice_trial = int(utils.task.forced_choice_trial)
+        forced_choice_next_trial = int(utils.task.forced_choice_next_trial)
 
         if shape == "triangle":
             obj_correct, obj_incorrect = triangle1, triangle2
@@ -2463,7 +2463,7 @@ def loop230(timing):
         # Always draw the correct stimulus
         obj_correct.draw()
         # Only draw the incorrect stimulus on free choice trials
-        if forced_choice_trial == 0:
+        if forced_choice_next_trial == 0:
             obj_incorrect.draw()
         window.flip()
     except Exception as e:
@@ -2472,12 +2472,12 @@ def loop230(timing):
 def function231(): #Touchteaching read touchscreen
     px = settings.PIXELS_PER_MM_X
     py = settings.PIXELS_PER_MM_Y
-    forced_choice_trial = int(utils.task.forced_choice_trial)
+    forced_choice_next_trial = int(utils.task.forced_choice_next_trial)
 
     width = (utils.task.width + 30) * px
     height = (utils.task.height + 30) * py
     x_correct = utils.task.x_correcth * px
-    if forced_choice_trial == 1:
+    if forced_choice_next_trial == 1:
         x_incorrect = None
     else:
         x_incorrect = utils.task.x_incorrecth * px

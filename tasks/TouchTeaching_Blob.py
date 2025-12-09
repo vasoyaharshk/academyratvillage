@@ -121,6 +121,10 @@ class TouchTeaching_Blob(Task):
         self.session_first_stim = None  # first stim of this session (left or right)
         self.last_two_stim = []         # history of last two stim_trial values across sessions. Tracked.
 
+        # Forced-choice logic
+        self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
+
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
@@ -148,9 +152,9 @@ class TouchTeaching_Blob(Task):
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
-            # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
+            self.forced_choice_next_trial = 0
 
-        print('Bias Breaking: ', self.bias_breaking)
+            # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
         # print('stim_trials: ', self.stim_trials)
 
         if self.block_change == 1:
@@ -259,7 +263,14 @@ class TouchTeaching_Blob(Task):
                 # flip side
                 candidate = 213 if candidate == 214 else 214
 
-            self.stim_trial = candidate
+            if self.forced_choice_next_trial == 0:
+                self.stim_trial = candidate
+            else:
+                self.stim_trial = self.forced_choice_probe
+
+            # keep stimulus schedule aligned with actual delivered probe
+            if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+                self.stim_trials[self.stim_trial_counter] = self.stim_trial
 
 
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
@@ -277,6 +288,8 @@ class TouchTeaching_Blob(Task):
         print('Stimulus Trial Counter', self.stim_trial_counter)
         print('prev_block_accuracy', self.prev_block_accuracy)
         print('last_block_accuracy', self.last_block_accuracy)
+        print(f"forced_choice_next_trial={self.forced_choice_next_trial}")
+        print(f"forced_choice_probe={self.forced_choice_probe}")
 
         ############ STATE MACHINE ################
         # First trial:
@@ -690,9 +703,9 @@ class TouchTeaching_Blob(Task):
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
                 # Check if all responses fall into one of the two defined categories
                 all_left_side = all(
-                    45 < x < 145 for x in self.response_x_array)  # Check if all the reponses fall on left
+                    0 < x < 205 for x in self.response_x_array)  # Check if all the reponses fall on left
                 all_right_side = all(
-                    231 < x < 331 for x in self.response_x_array)  # Check if all the reponses fall on right
+                    205 < x < 410 for x in self.response_x_array)  # Check if all the reponses fall on right
 
                 if all_left_side:
                     self.sameside = 'left'
