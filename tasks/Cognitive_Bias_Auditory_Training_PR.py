@@ -392,7 +392,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
             self.stage_forward_change = 0
             self.task_number = 3
             self.tired = True
-            message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
+            message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}. Task back to normal"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
@@ -660,7 +660,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
                 state_change_conditions={Bpod.Events.Tup: 'exit'},
                 output_actions=[])
         else:
-            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
+            print("Cognitive_Bias_Auditory_Training_PR ended because training completed. Task is now 3 so will move to base in next session.")
             self.trial_length = 0.1
             self.trial_result = None
             self.last_stim_trial = 0
@@ -819,7 +819,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
                     self.unrewarded_trial = 0
 
         else:
-            print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
+            print("Cognitive_Bias_Auditory_Training_PR ended because training completed. Task is now 3 so will move to base in next session.")
             self.task_end = True
 
         ############ REGISTER VALUES ################

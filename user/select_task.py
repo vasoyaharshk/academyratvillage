@@ -900,7 +900,7 @@ def select_task(df, subject):
                     pr_carry_pending = 0
                     consecutive_good_blocks = 0
 
-                    task_number = 2
+                    task_number = 1
                     order = pair_order_table[int(group)]
                     idx = order.index(int(pair))
                     if idx + 1 < len(order):
