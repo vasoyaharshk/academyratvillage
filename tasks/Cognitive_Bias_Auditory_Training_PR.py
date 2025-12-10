@@ -820,6 +820,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
         else:
             print("Task 1 ended because training completed. Task is now 2 so will move to Pr in next session.")
+            self.task_end = True
 
         ############ REGISTER VALUES ################
         # Task-related
