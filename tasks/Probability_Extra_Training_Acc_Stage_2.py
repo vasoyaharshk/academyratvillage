@@ -186,7 +186,7 @@ class Probability_Extra_Training_Acc_Stage_2(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 1)
+            new_stage = max(self.stage - 1, 2)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
