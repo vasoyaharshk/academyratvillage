@@ -63,7 +63,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
         """
 
         # Variables for the task:
-        self.task_number = 1
+        self.task_number = 2
         self.trials_max = 80
         self.duration_max = 3000
         self.duration_min = 2100
@@ -536,7 +536,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 1:
+        if self.task_number == 2:
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -670,7 +670,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
             self.response_y = None
 
     def after_trial(self):
-        if self.task_number == 1:
+        if self.task_number == 2:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
