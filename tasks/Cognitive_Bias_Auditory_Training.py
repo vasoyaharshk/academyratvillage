@@ -188,10 +188,10 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
         self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
-        self.touchoutside = None
+        self.touchoutside = 0
 
     def configure_gui(self):
-        self.gui_input = ['group', 'pair', 'duration_max']
+        self.gui_input = ['group', 'pair', 'duration_max', 'block_size']
 
     def generate_random_trials(self,last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -365,13 +365,14 @@ class Cognitive_Bias_Auditory_Training(Task):
     #     return lst
 
     def main_loop(self):
+        self.touchoutside = 0
 
         #Reset all tracked variables as session needs to be independent of the previous session:
         if self.current_trial == 0:
             # session counters
             # stimulus scheduling
             self.stim = [0, 4]
-            self.block_size = 40
+            #self.block_size = 40
             self.forced_choice_next_trial = 0
 
         print('')
