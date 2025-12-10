@@ -861,8 +861,7 @@ def select_task(df, subject):
                     consecutive_good_blocks = 0
 
                     task = pr_name
-                    message = (f"[CB] switch to PR with same pair {pair} after two "
-                               f"{trials_criteria}-trial sessions at ≥{accuracy_criteria * 100:.0f}%")
+                    message = (f"[CB Urgent] switch to {task} with same pair {pair} in group {group}")
                     print(message)
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -909,8 +908,7 @@ def select_task(df, subject):
                         old_pair = pair
                         pair = new_pair
                         task = base_name  # go back to baseline for the new pair
-                        message = (f"[CB] {my_subject}: criterion met (≥{accuracy_criteria * 100:.0f}% "
-                                   f"on two {trials_criteria}-trial sessions). From pair {old_pair} to pair {pair}. returning to baseline")
+                        message = (f"[CB URGENT] {my_subject}: From pair {old_pair} to pair {pair} in group {group}. returning to {task}")
                         print(message)
                         try:
                             telegram_bot.alarm_finish_session(message, my_subject)
