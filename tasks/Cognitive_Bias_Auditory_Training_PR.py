@@ -64,7 +64,7 @@ class Cognitive_Bias_Auditory_Training_PR(Task):
 
         # Variables for the task:
         self.task_number = 2
-        self.trials_max = 80
+        self.trials_max = 800
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
