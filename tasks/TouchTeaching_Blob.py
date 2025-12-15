@@ -201,7 +201,8 @@ class TouchTeaching_Blob(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 0)
+            #new_stage = max(self.stage - 1, 0)
+            new_stage = 0 if self.stage >= 2 else max(self.stage - 1, 0)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
