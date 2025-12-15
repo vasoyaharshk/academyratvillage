@@ -223,60 +223,59 @@ class TouchTeaching_Blob(Task):
         self.stim = [213, 214]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
         if self.stage == 0:
-            self.stim_trial = 215
-            self.x_correcth = settings.CENTRE_SCREEN[0]  # 640 = center of the screen. Screen width is 401mmm
-            self.y_correcth = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
-            self.width = settings.WIN_RESOLUTION[0]
-            self.height = settings.WIN_RESOLUTION[1]
+            self.width = 200
+            self.height = 200
         else:
-            if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-                # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
+            self.width = 100
+            self.height = 100
+
+        if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
+            # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
+            self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
+            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+            # print(f"Stimulus trials after first attempt: {self.stim_trials}")
+            while self.stim_trials is None:
+                # print("Retrying to generate stimulus trials...")
                 self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-                # print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                while self.stim_trials is None:
-                    # print("Retrying to generate stimulus trials...")
-                    self.stim_trials = self.generate_random_trials(self.last_stim_trial)
-                    if self.stim_trials is None:
-                        print("generate_random_trials returned None. Retrying...")
-                    else:
-                        print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                self.stim_trial_counter = 0
-
-            # --- session-local logic for first two trials in this session ---
-            if self.current_trial == 0:
-                # first trial in this session: random left/right
-                candidate = random.choice(self.stim)  # 213 or 214
-                self.session_first_stim = candidate
-            elif self.current_trial == 1:
-                # second trial in this session: forced opposite of first
-                if self.session_first_stim == 213:
-                    candidate = 214
+                if self.stim_trials is None:
+                    print("generate_random_trials returned None. Retrying...")
                 else:
-                    candidate = 213
+                    print(f"Successfully generated stimulus trials: {self.stim_trials}")
+            self.stim_trial_counter = 0
+
+        # --- session-local logic for first two trials in this session ---
+        if self.current_trial == 0:
+            # first trial in this session: random left/right
+            candidate = random.choice(self.stim)  # 213 or 214
+            self.session_first_stim = candidate
+        elif self.current_trial == 1:
+            # second trial in this session: forced opposite of first
+            if self.session_first_stim == 213:
+                candidate = 214
             else:
-                # from 3rd trial onwards: normal block / bias-breaking logic
-                if self.bias_breaking == 0:
-                    candidate = self.stim_trials[self.stim_trial_counter]
-                else:
-                    candidate = self.last_stim_trial
-
-            # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
-            if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
-                # flip side
-                candidate = 213 if candidate == 214 else 214
-
-            self.forced_choice_actual_trial = self.forced_choice_next_trial
-
-            if self.forced_choice_next_trial == 0:
-                self.stim_trial = candidate
+                candidate = 213
+        else:
+            # from 3rd trial onwards: normal block / bias-breaking logic
+            if self.bias_breaking == 0:
+                candidate = self.stim_trials[self.stim_trial_counter]
             else:
-                self.stim_trial = self.forced_choice_probe
+                candidate = self.last_stim_trial
 
-            # keep stimulus schedule aligned with actual delivered probe
-            if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
-                self.stim_trials[self.stim_trial_counter] = self.stim_trial
+        # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
+        if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
+            # flip side
+            candidate = 213 if candidate == 214 else 214
 
+        self.forced_choice_actual_trial = self.forced_choice_next_trial
+
+        if self.forced_choice_next_trial == 0:
+            self.stim_trial = candidate
+        else:
+            self.stim_trial = self.forced_choice_probe
+
+        # keep stimulus schedule aligned with actual delivered probe
+        if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+            self.stim_trials[self.stim_trial_counter] = self.stim_trial
 
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 213:
