@@ -26,6 +26,8 @@ class Probability_Extra_Training_Acc(Task):
         Extra Training 4: 5 blue pegs vs 5 yellow pegs - side counterbalanced
         Extra Training 5: 10 blue pegs vs 10 yellow pegs - side counterbalanced
 
+        Criteria for moving on is 80% for 2 consecutive blocks.
+
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
@@ -51,7 +53,7 @@ class Probability_Extra_Training_Acc(Task):
         # pumps
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
+        self.valve_factor_c = 1.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
         #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # counters for trials:
@@ -99,6 +101,9 @@ class Probability_Extra_Training_Acc(Task):
         self.block_correct_count = 0  # Tracks the number of corrects in the block
         self.block_valid_count = 0  ##Tracks the number of valid trials in the block
 
+        self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
+        self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
+
         self.stim_trial = 0
         self.stim_trials = []
         self.stim_trial_counter = 0
@@ -113,7 +118,7 @@ class Probability_Extra_Training_Acc(Task):
 
 
     def configure_gui(self):
-        self.gui_input = ['stage', 'substage', 'duration_max']
+        self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
     def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
@@ -155,6 +160,7 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
@@ -170,12 +176,13 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_backward_change == 1:
             self.total_trials = 0
             self.stage_backward_change = 0
+            self.prev_block_accuracy = -1.0
             self.block_accuracy = 0.0
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.stage - 1, 1)
+            new_stage = max(self.stage - 1, 2)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -447,9 +454,6 @@ class Probability_Extra_Training_Acc(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
-            # Accuracy for running trials:
-            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
-
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
@@ -457,11 +461,19 @@ class Probability_Extra_Training_Acc(Task):
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                    if self.prev_block_accuracy >= self.accuracy_criteria:
+                        self.stage_forward_change = 1
+                        print("Two consecutive blocks >= criterion. Advancing stage.")
+                    else:
+                        self.prev_block_accuracy = self.block_accuracy
+                        print("Good block. One more needed.")
                 else:
-                    print("Accuracy criteria not met.")
-                #Trial limit check (set backward ONLY if forward is NOT happening)
+                    print("Block failed. Resetting previous block.")
+                    self.prev_block_accuracy = -1.0
+
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
@@ -643,3 +655,6 @@ class Probability_Extra_Training_Acc(Task):
 
         self.register_value('last_forward_stage', self.last_forward_stage)
         self.register_value('last_backward_stage', self.last_backward_stage)
+
+        self.register_value('prev_block_accuracy', self.prev_block_accuracy)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)
