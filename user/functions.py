@@ -854,17 +854,12 @@ def function51():  # When the blue jar is on left
             image_folder = '/home/harsh/academy/stimuli/urn_training/0_extra_training/1_1_indication'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
-        # elif stage == 2:
-        #     image_folder = '/home/harsh/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1'
-        #     left_images = [f for f in os.listdir(image_folder) if
-        #                    os.path.isfile(os.path.join(image_folder, f)) and
-        #                    ('left' in f.lower() and 'both' in f.lower())]
-
         elif stage == 2:
-            image_folder = '/home/harsh/academy/stimuli/Pegs'
+            image_folder = '/home/harsh/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1'
             left_images = [f for f in os.listdir(image_folder) if
                            os.path.isfile(os.path.join(image_folder, f)) and
                            ('left' in f.lower() and 'both' in f.lower())]
+
         elif stage == 3:
             image_folder = '/home/harsh/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2'
             left_images = [f for f in os.listdir(image_folder) if

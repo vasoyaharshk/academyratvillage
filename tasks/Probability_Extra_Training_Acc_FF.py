@@ -105,8 +105,8 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.response_duration = 60
 
         # Forced-choice logic
-        self.forced_choice_actual_trial = 0
-        self.forced_choice_next_trial = 0  # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
         self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
 
         self.touchoutside = 0
@@ -238,7 +238,7 @@ class Probability_Extra_Training_Acc_FF(Task):
             # flip side
             candidate = 51 if candidate == 52 else 52
 
-        self.forced_choice_actual_trial = self.forced_choice_next_trial
+        # self.forced_choice_actual_trial = self.forced_choice_next_trial
 
         if self.forced_choice_next_trial == 0:
             self.stim_trial = candidate
@@ -549,13 +549,22 @@ class Probability_Extra_Training_Acc_FF(Task):
 
             # Process response_x for side bias detection
             try:
-                response_x_list = [float(x) for x in str(self.response_x).split(",")]
-                self.response_x_bias = response_x_list[-1]
-            except Exception:
-                self.response_x_bias = None
+                # Try converting response_x directly to a float
+                self.response_x_bias = float(self.response_x)
+            except ValueError:
+                print(f"No response_x value or response other: {self.response_x}")
 
-            if self.response_x_bias is not None:
-                self.response_x_array.append(self.response_x_bias)
+                # Split the string by commas and convert it to a list of floats
+                try:
+                    # First, check if the response_x is a string and split it
+                    response_x_list = [float(x) for x in self.response_x.split(",")]
+
+                    # Use the last element of the list as response_x_bias
+                    self.response_x_bias = response_x_list[-1]
+                    print(f"Using last value from response_x array: {self.response_x_bias}")
+                except Exception as e:
+                    #print(f"Failed to process response_x as array. Error: {e}")
+                    return  # Handle this case if needed
 
             # Append the response to the array:
             self.response_x_array.append(self.response_x_bias)
