@@ -172,6 +172,7 @@ class TouchTeaching_Blob(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             if self.stage == 0:
