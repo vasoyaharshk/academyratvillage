@@ -111,6 +111,20 @@ class Probability_Extra_Training_Acc_FF(Task):
 
         self.touchoutside = 0
 
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
+        self.status = None              #Stores the Touch outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+
+        self.bias_accuracy_trials = []
+        self.bias_accuracy = 0
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
@@ -698,10 +712,10 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.register_value('touchoutside', self.touchoutside)
 
         # Stimulus trial control
-        self.register_value('group', self.group)
-        self.register_value('pair', self.pair)
-        self.register_value('side', self.side)
-        self.register_value('shape', self.shape)
+        # self.register_value('group', self.group)
+        # self.register_value('pair', self.pair)
+        # self.register_value('side', self.side)
+        # self.register_value('shape', self.shape)
         self.register_value('stim_trial', self.stim_trial)
         self.register_value('stim_trials', self.stim_trials)
         self.register_value('stim_trial_counter', self.stim_trial_counter)
