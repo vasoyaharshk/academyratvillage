@@ -79,6 +79,7 @@ def update_image_path_size_position(correct=True):
 
 def update_image_path_position(correct=True):
     global image_path
+    image_path = utils.task.image_path_function
     if image_path and "both" in image_path:
         return image_path.replace("both", "correct" if correct else "incorrect")
     return None
@@ -859,121 +860,23 @@ def loop46(timing):
 
 ## FUNCTIONS FROM 50 TO 56 ARE FOR EASY TRAINING.
 # Functions for Probability Inference Tasks for different stages where the correct answer is left:
-def function51():  # When the blue jar is on left
+def function51():
     global last_function_called, image_path
-    last_function_called = 51  # Track that function31 was called
-
-    stage = utils.task.stage
-    left_images = []
-    try:
-        # Get all the images based on the stages
-        if stage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and 'left' in f.lower()]
-        elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 4:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-        elif stage == 5:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4'
-            left_images = [f for f in os.listdir(image_folder) if
-                           os.path.isfile(os.path.join(image_folder, f)) and
-                           ('left' in f.lower() and 'both' in f.lower())]
-
-        if not left_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the left_images list.
-        random_image_path_left = os.path.join(image_folder, random.choice(left_images))     #This needs to be balanced
-
-        # Forced choice display: show only the correct option
-        if utils.task.x_incorrecth is None and 'both' in random_image_path_left:
-            random_image_path_left = random_image_path_left.replace('both', 'correct')
-
-        image_jar_left.image = random_image_path_left
+    last_function_called = 51
+    image_path = utils.task.image_path_function
+    image_jar_left.image = image_path
         image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage: ', utils.task.stage)
-        print('Correct answer on left: ', random_image_path_left)
-
-        image_path = random_image_path_left     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
 
 def loop51(timing):
     image_jar_left.draw()
     window.flip()
 
-
-# Functions for Probability Inference Tasks for different stages where the correct answer is right:
-def function52():  # When the blue jar is on right
+def function52():
     global last_function_called, image_path
-    last_function_called = 52  # Track that function31 was called
-
-    stage = utils.task.stage
-    right_images = []
-    try:
-        # Get all the images based on the stages
-        if stage == 1:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and 'right' in f.lower()]
-        elif stage == 2:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 3:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 4:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-        elif stage == 5:
-            image_folder = '/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4'
-            right_images = [f for f in os.listdir(image_folder) if
-                            os.path.isfile(os.path.join(image_folder, f)) and
-                           ('right' in f.lower() and 'both' in f.lower())]
-
-        if not right_images:
-            raise ValueError(f"No images found in {image_folder} for stage {stage}.")
-
-        # Choose a random image from the right_images list
-        random_image_path_right = os.path.join(image_folder, random.choice(right_images))
-
-        # Forced choice display: show only the correct option
-        if utils.task.x_incorrecth is None and 'both' in random_image_path_right:
-            random_image_path_right = random_image_path_right.replace('both', 'correct')
-
-
-        image_jar_right.image = random_image_path_right
+    last_function_called = 52
+    image_path = utils.task.image_path_function
+    image_jar_right.image = image_path
         image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
-
-        print('Stage:', utils.task.stage)
-        print('Correct answer on right:', random_image_path_right)
-
-        image_path = random_image_path_right     #Used in Function 35 or function 36 afterwards.
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-
 
 def loop52(timing):
     image_jar_right.draw()
@@ -981,32 +884,35 @@ def loop52(timing):
 
 
 #Display camera correct, play correct sound and display correct stimuli for EASY TRAINING:.
+# functions.py
+
 def function55():
     global last_function_called
 
     cam2.put_state("Correct")
     cam3.put_state("Correct")
 
-    substage = utils.task.substage
-    if substage != 1:
+    stage = utils.task.stage
+    if stage != 1:
         image_path_replaced = update_image_path_position(correct=True)
-        if image_path_replaced:
+
+        # Fallback for forced choice images that are already "correct"
+        if not image_path_replaced:
+            image_path_replaced = utils.task.image_path_function
+
             if last_function_called in LEFT_FUNCTIONS:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = settings.CENTRE_SCREEN
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Correct image path: {image_path_replaced}")
-        else:
-            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
 
 
 def loop55(timing):
     global last_function_called
 
-    substage = utils.task.substage
-    if substage != 1:
+    stage = utils.task.stage
+    if stage != 1:
         if last_function_called in LEFT_FUNCTIONS:
             image_jar_left.draw()
         elif last_function_called in RIGHT_FUNCTIONS:
@@ -1038,26 +944,26 @@ def function56():
     cam3.put_state("Punish")
     print("Punish, Punish Sound played")
 
-    substage = utils.task.substage
-    if substage != 1:
+    stage = utils.task.stage
+    if stage != 1:
         image_path_replaced = update_image_path_position(correct=False)
-        if image_path_replaced:
+
+        # Fallback: if no "both" exists (forced choice), keep current stimulus
+        if not image_path_replaced:
+            image_path_replaced = utils.task.image_path_function
+
             if last_function_called in LEFT_FUNCTIONS:
                 image_jar_left.image = image_path_replaced
                 image_jar_left.pos = settings.CENTRE_SCREEN
             elif last_function_called in RIGHT_FUNCTIONS:
                 image_jar_right.image = image_path_replaced
                 image_jar_right.pos = settings.CENTRE_SCREEN
-            #print(f"Incorrect image path: {image_path_replaced}")
-        else:
-            print("Warning: image_path is None or does not contain 'both'. No image will be updated.")
-
 
 def loop56(timing):
     global last_function_called
 
-    substage = utils.task.substage
-    if substage != 1:
+    stage = utils.task.stage
+    if stage != 1:
         if last_function_called in LEFT_FUNCTIONS:
             image_jar_left.draw()
         elif last_function_called in RIGHT_FUNCTIONS:
@@ -1673,7 +1579,7 @@ def loop88(timing):
 def function101():  # When the correct stimuli is on left and small
     global last_function_called
     last_function_called = 101  # Track that function101 was called
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1684,7 +1590,7 @@ def loop101(timing):
 def function102():  # When the correct stimuli is on right and small
     global last_function_called
     last_function_called = 102  # Track that function102 was called
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1695,7 +1601,7 @@ def loop102(timing):
 def function103():  # When the correct stimuli is on left and big
     global last_function_called
     last_function_called = 103  # Track that function103 was called
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1706,7 +1612,7 @@ def loop103(timing):
 def function104():  # When the correct stimuli is on right and big
     global last_function_called
     last_function_called = 104  # Track that function104 was called
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1718,7 +1624,7 @@ def loop104(timing):
 def function105():  # When the correct stimuli is on left, small, with spacer
     global last_function_called
     last_function_called = 105
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1729,7 +1635,7 @@ def loop105(timing):
 def function106():  # When the correct stimuli is on right, small, with spacer
     global last_function_called
     last_function_called = 106
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1740,7 +1646,7 @@ def loop106(timing):
 def function107():  # When the correct stimuli is on left, big, with spacer
     global last_function_called
     last_function_called = 107
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1751,7 +1657,7 @@ def loop107(timing):
 def function108():  # When the correct stimuli is on right, big, with spacer
     global last_function_called
     last_function_called = 108
-    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
+    image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
