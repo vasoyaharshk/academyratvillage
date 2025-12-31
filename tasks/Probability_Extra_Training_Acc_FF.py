@@ -59,6 +59,7 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.consecutive_good_blocks_criteria = 2
         self.consecutive_good_blocks = 0
         self.max_move_backs = 5
+        self.accuracy = 0
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
         self.block_size = 40  # Every 40 blocks the criteria will be tested.
@@ -100,8 +101,8 @@ class Probability_Extra_Training_Acc_FF(Task):
         # Correcth location and size:
         self.x_correcth_pos = [75, 345]  # Positions of the stim on the screen
         self.y_correcth = 155
-        self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
-        self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
+        self.width = 160  # Stimulus width in mm. Original size for peg is 120mm.
+        self.height = 235  # Stimulus height in mm. Original size for jar is 110mm.
         self.response_duration = 60
 
         # Forced-choice logic
@@ -111,6 +112,19 @@ class Probability_Extra_Training_Acc_FF(Task):
 
         self.touchoutside = 0
 
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
+        self.status = None              #Stores the Touch outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+
+        self.bias_accuracy_trials = []
+        self.bias_accuracy = 0
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
@@ -137,6 +151,7 @@ class Probability_Extra_Training_Acc_FF(Task):
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.forced_choice_next_trial = 0
+            self.accuracy = 0
 
         print('')
         print('Stimulus Trial Counter', self.stim_trial_counter)
@@ -154,6 +169,7 @@ class Probability_Extra_Training_Acc_FF(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
@@ -493,6 +509,8 @@ class Probability_Extra_Training_Acc_FF(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
+            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
@@ -654,6 +672,7 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.register_value('side_bias_trigger', self.side_bias_trigger)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('status', self.status)
+        self.register_value('accuracy', self.accuracy)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
@@ -698,10 +717,10 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.register_value('touchoutside', self.touchoutside)
 
         # Stimulus trial control
-        self.register_value('group', self.group)
-        self.register_value('pair', self.pair)
-        self.register_value('side', self.side)
-        self.register_value('shape', self.shape)
+        # self.register_value('group', self.group)
+        # self.register_value('pair', self.pair)
+        # self.register_value('side', self.side)
+        # self.register_value('shape', self.shape)
         self.register_value('stim_trial', self.stim_trial)
         self.register_value('stim_trials', self.stim_trials)
         self.register_value('stim_trial_counter', self.stim_trial_counter)
