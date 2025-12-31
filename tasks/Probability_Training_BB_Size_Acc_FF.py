@@ -132,8 +132,10 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         self.consecutive_good_blocks = 0
         self.consecutive_good_blocks_criteria = 2
 
-    def flip_side(stim_val: int) -> int:
-        # flips within a pair: 101<->102, 103<->104, 105<->106, 107<->108
+        self.session_first_stim = None
+        self.last_two_stim = []
+
+    def flip_side(self, stim_val: int) -> int:
         return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
 
     def configure_gui(self):
@@ -609,27 +611,25 @@ class Probability_Training_BB_Size_Acc_FF(Task):
                             print(f"Successfully generated stimulus trials: {self.stim_trials}")
                     self.stim_trial_counter = 0
 
-        # --- session-local logic for first two trials in this session ---
-        if self.current_trial == 0:
-            candidate = random.choice(self.stim)
-            self.session_first_stim = candidate
-        elif self.current_trial == 1:
-            candidate = flip_side(self.session_first_stim)
-        else:
-            # from 3rd trial onwards: normal block / bias-breaking logic
-            if self.bias_breaking == 0:
-                candidate = self.stim_trials[self.stim_trial_counter]
+            # --- session-local logic for first two trials in this session ---
+            if self.current_trial == 0:
+                candidate = random.choice(self.stim)
+                self.session_first_stim = candidate
+            elif self.current_trial == 1:
+                candidate = self.flip_side(self.session_first_stim)
             else:
-                candidate = self.last_stim_trial
+                # from 3rd trial onwards: normal block / bias-breaking logic
+                if self.bias_breaking == 0:
+                    candidate = self.stim_trials[self.stim_trial_counter]
+                else:
+                    candidate = self.last_stim_trial
 
             # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
-            if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
-                # flip side
-                if (candidate % 2 == self.last_two_stim[-1] % 2
-                        and candidate % 2 == self.last_two_stim[-2] % 2):
-                    candidate = flip_side(candidate)
+            if len(self.last_two_stim) >= 2:
+                if (candidate % 2 == self.last_two_stim[-1] % 2) and (candidate % 2 == self.last_two_stim[-2] % 2):
+                    candidate = self.flip_side(candidate)
 
-            # self.forced_choice_actual_trial = self.forced_choice_next_trial
+                # self.forced_choice_actual_trial = self.forced_choice_next_trial
 
             if self.forced_choice_next_trial == 0:
                 self.stim_trial = candidate
@@ -662,8 +662,8 @@ class Probability_Training_BB_Size_Acc_FF(Task):
                     self.x_incorrecth = self.x_correcth_pos[0]
                     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-            if self.forced_choice_next_trial == 1:
-                self.x_incorrecth = None
+                if self.forced_choice_next_trial == 1:
+                    self.x_incorrecth = None
 
             if self.task_number == 2:
                 self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
@@ -676,7 +676,9 @@ class Probability_Training_BB_Size_Acc_FF(Task):
             print('Stimulus trial: ', self.stim_trial)
             print('Stimulus Trial Counter', self.stim_trial_counter)
             print('Stage before Bpod', self.stage)
-            print('Forced Choice Next Trial', self.forced_choice_next_trial
+            print('Forced Choice Next Trial', self.forced_choice_next_trial)
+            print("candidate", candidate, "stim_trial", self.stim_trial, "forced_next", self.forced_choice_next_trial,
+                  "forced_probe", self.forced_choice_probe)
 
         ############ STATE MACHINE ################
         #First trial:
@@ -965,6 +967,11 @@ class Probability_Training_BB_Size_Acc_FF(Task):
 
             self.last_stim_trial = self.stim_trial
 
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
+
             try:
                 # Try converting response_x directly to a float
                 self.response_x_bias = float(self.response_x)
@@ -985,7 +992,7 @@ class Probability_Training_BB_Size_Acc_FF(Task):
 
             # Append the response to the array:
             self.response_x_array.append(self.response_x_bias)
-                #print(f"Responses so far: {self.response_x_array}")
+            #print(f"Responses so far: {self.response_x_array}")
 
             #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
