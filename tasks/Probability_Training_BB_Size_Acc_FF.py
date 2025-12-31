@@ -1112,6 +1112,7 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         self.register_value('last_two_stim', self.last_two_stim)
         self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
         self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)
 
 
 
