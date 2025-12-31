@@ -41,6 +41,23 @@ RIGHT_FUNCTIONS = {32, 42, 44, 46, 52, 62, 82, 84, 86, 102, 104, 106, 108, 112, 
 last_function_called = None  # Global variable to track the last function called
 image_path = None  # Global variable to store the image path
 
+#Stage dependent:
+def forced_choice_only_correct_stage(path: str) -> str:
+    # Apply forced-choice visual only from stage 2 onwards
+    if (
+        utils.task.stage > 1
+        and utils.task.x_incorrecth is None
+        and "both" in path
+    ):
+        return path.replace("both", "correct")
+    return path
+
+#Stage independent:
+def forced_choice_only_correct(path: str) -> str:
+    # If forced choice is active, hide the incorrect option by swapping file naming convention
+    if utils.task.x_incorrecth is None and "both" in path:
+        return path.replace("both", "correct")
+    return path
 
 def update_image_path_size_position(correct=True):
     global image_path
@@ -1656,7 +1673,7 @@ def loop88(timing):
 def function101():  # When the correct stimuli is on left and small
     global last_function_called
     last_function_called = 101  # Track that function101 was called
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1667,7 +1684,7 @@ def loop101(timing):
 def function102():  # When the correct stimuli is on right and small
     global last_function_called
     last_function_called = 102  # Track that function102 was called
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1678,7 +1695,7 @@ def loop102(timing):
 def function103():  # When the correct stimuli is on left and big
     global last_function_called
     last_function_called = 103  # Track that function103 was called
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1689,7 +1706,7 @@ def loop103(timing):
 def function104():  # When the correct stimuli is on right and big
     global last_function_called
     last_function_called = 104  # Track that function104 was called
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1701,7 +1718,7 @@ def loop104(timing):
 def function105():  # When the correct stimuli is on left, small, with spacer
     global last_function_called
     last_function_called = 105
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1712,7 +1729,7 @@ def loop105(timing):
 def function106():  # When the correct stimuli is on right, small, with spacer
     global last_function_called
     last_function_called = 106
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1723,7 +1740,7 @@ def loop106(timing):
 def function107():  # When the correct stimuli is on left, big, with spacer
     global last_function_called
     last_function_called = 107
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1734,7 +1751,7 @@ def loop107(timing):
 def function108():  # When the correct stimuli is on right, big, with spacer
     global last_function_called
     last_function_called = 108
-    image_path = utils.task.image_path_function
+    image_path = forced_choice_only_correct_stage(utils.task.image_path_function)
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 

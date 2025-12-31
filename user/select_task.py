@@ -301,7 +301,7 @@ def select_task(df, subject):
 
         elif task == 'A_TouchTeaching_incorrect' or task == 'A_TouchTeaching_blue':
             if task_number == 2:
-                task = 'Probability_Extra_Training_Acc_Stage_2'
+                task = 'Probability_Extra_Training_Acc_FF'
                 stage = 2.0
                 task_number = 1
                 block_size = 40
@@ -339,25 +339,15 @@ def select_task(df, subject):
 
     #Probability tasks start from here:
     elif 'Probability' in task:     #Includes all the task without the word Probability
-        if task == 'Probability_Extra_Training_Acc_Stage_2':
+        if task == 'Probability_Extra_Training_Acc_FF':
             if task_number == 2:
-                task = 'xyz'
+                task = 'Probability_Training_BB_Size_Acc_FF'
                 message = f"URGENT: Stage moved forward to {stage} for {my_subject} in {task}. No Task assigned."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
-        if task == 'Probability_Extra_Training_Acc' or task == 'Probability_Extra_Training_Acc_Incorrect':
-            if moved_back_counter > max_move_backs:
-                message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
-                try:
-                    telegram_bot.alarm_finish_session(message, my_subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
-
-            if task_number == 2:
                 stage = 1  # Current stage within the task
                 substage = 0  # Current substage within the stage
                 substage_bias = 0  # Side bias stage for substage behavior
@@ -386,7 +376,7 @@ def select_task(df, subject):
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-                task = 'Probability_Training_BB_Size_Acc'
+                task = 'Probability_Training_BB_Size_Acc_FF'
                 message = 'Advance from Etra training to Core training'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -415,7 +405,7 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        elif task == 'Probability_Extra_Training_Acc_Only_Stage_2':
+        elif task == 'Probability_Extra_Training_Acc_FF_2':
             if task_number == 2:
                 stage = 1  # Current stage within the task
                 substage = 0  # Current substage within the stage
@@ -445,7 +435,7 @@ def select_task(df, subject):
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-                task = 'Probability_Handtracking_Yellow_Only_Images'
+                task = 'xyz'
                 message = 'Advance from Etra training to Probability_Handtracking_Yellow_Only_Images'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -454,7 +444,7 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        elif task == 'Probability_Training_BB_Size_Acc':
+        elif task == 'Probability_Training_BB_Size_Acc_FF':
             if moved_back_counter > max_move_backs:
                 message = f"URGENT: Moved back {moved_back_counter} FOR {my_subject}. CHECK DATA."
                 try:
