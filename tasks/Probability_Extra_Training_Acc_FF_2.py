@@ -148,8 +148,6 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         return trials
 
     def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
-        image_path = None
-
         if stim_trial == 51:
             position = "left"
         elif stim_trial == 52:
@@ -175,39 +173,34 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         else:
             raise ValueError(f"Invalid stage value: {stage}.")
 
-        if suffix is None:
-            candidates = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                   and position in f.lower()
-            ]
-        else:
-            candidates = []
-            suffix_token = f"_{suffix}."  # prevents correct matching incorrect
-            for f in os.listdir(image_folder):
-                fp = os.path.join(image_folder, f)
-                if not os.path.isfile(fp):
+        candidates = []
+
+        for f in os.listdir(image_folder):
+            fp = os.path.join(image_folder, f)
+            if not os.path.isfile(fp):
+                continue
+
+            fl = f.lower()
+
+            if position not in fl:
+                continue
+
+            if suffix is not None:
+                # STRICT token match – this is the critical fix
+                if f"_{suffix}.png" not in fl:
                     continue
 
-                fl = f.lower()
-
-                if position not in fl:
-                    continue
-
-                # strict token match: "_both." or "_correct."
-                if suffix_token not in fl:
-                    continue
-
-                candidates.append(f)
+            candidates.append(f)
 
         if not candidates:
             raise ValueError(
-                f"No images found in {image_folder} for stage {stage}, position {position}, suffix {suffix}."
+                f"No images found in {image_folder} for stage {stage}, "
+                f"position {position}, suffix {suffix}"
             )
 
         image_path = os.path.join(image_folder, random.choice(candidates))
 
-        # authoritative path used by functions 51/52 and 55/56
+        # authoritative fields for functions 51/52 and 55/56
         self.image_path = image_path
         self.image_path_function = image_path
 
