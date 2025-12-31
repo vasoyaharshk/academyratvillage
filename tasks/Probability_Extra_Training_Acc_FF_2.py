@@ -60,6 +60,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         self.consecutive_good_blocks_criteria = 2
         self.consecutive_good_blocks = 0
         self.max_move_backs = 5
+        self.accuracy = 0
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
         self.block_size = 40  # Every 40 blocks the criteria will be tested.
@@ -152,6 +153,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.forced_choice_next_trial = 0
+            self.accuracy = 0
 
         print('')
         print('Stimulus Trial Counter', self.stim_trial_counter)
@@ -169,6 +171,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
@@ -508,6 +511,8 @@ class Probability_Extra_Training_Acc_FF_2(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
+            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
@@ -669,6 +674,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         self.register_value('side_bias_trigger', self.side_bias_trigger)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('status', self.status)
+        self.register_value('accuracy', self.accuracy)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
