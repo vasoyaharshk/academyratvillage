@@ -881,6 +881,10 @@ def function51():  # When the blue jar is on left
         # Choose a random image from the left_images list.
         random_image_path_left = os.path.join(image_folder, random.choice(left_images))     #This needs to be balanced
 
+        # Forced choice display: show only the correct option
+        if utils.task.x_incorrecth is None and 'both' in random_image_path_left:
+            random_image_path_left = random_image_path_left.replace('both', 'correct')
+
         image_jar_left.image = random_image_path_left
         image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -936,6 +940,11 @@ def function52():  # When the blue jar is on right
 
         # Choose a random image from the right_images list
         random_image_path_right = os.path.join(image_folder, random.choice(right_images))
+
+        # Forced choice display: show only the correct option
+        if utils.task.x_incorrecth is None and 'both' in random_image_path_right:
+            random_image_path_right = random_image_path_right.replace('both', 'correct')
+
 
         image_jar_right.image = random_image_path_right
         image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
