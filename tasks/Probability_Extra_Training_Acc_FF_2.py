@@ -148,14 +148,8 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         return trials
 
     def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
-        image_path = None
 
-        if stim_trial == 51:
-            position = "left"
-        elif stim_trial == 52:
-            position = "right"
-        else:
-            raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
+        position = "left" if stim_trial == 51 else "right"
 
         if stage == 1:
             image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication"
@@ -173,25 +167,19 @@ class Probability_Extra_Training_Acc_FF_2(Task):
             image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
-            raise ValueError(f"Invalid stage value: {stage}.")
+            raise ValueError(f"Invalid stage {stage}")
 
         if suffix is None:
             candidates = [
                 f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                   and position in f.lower()
+                if position in f.lower()
             ]
         else:
             candidates = [
                 f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                   and position in f.lower()
-                   and suffix in f.lower()
+                if position in f.lower()
+                   and f"_{suffix}.png" in f.lower()
             ]
-
-        if not candidates:
-            raise ValueError(
-                f"No images found in {image_folder} for stage {stage}, position {position}, suffix {suffix}.")
 
         image_path = os.path.join(image_folder, random.choice(candidates))
 
