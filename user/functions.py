@@ -865,7 +865,7 @@ def function51():
     last_function_called = 51
     image_path = utils.task.image_path_function
     image_jar_left.image = image_path
-        image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop51(timing):
     image_jar_left.draw()
@@ -876,7 +876,7 @@ def function52():
     last_function_called = 52
     image_path = utils.task.image_path_function
     image_jar_right.image = image_path
-        image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
+    image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
 def loop52(timing):
     image_jar_right.draw()
