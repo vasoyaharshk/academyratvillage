@@ -144,6 +144,47 @@ class Probability_Extra_Training_Acc_FF(Task):
                 trials.append(candidate)
         return trials
 
+    def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
+
+        position = "left" if stim_trial == 51 else "right"
+
+        if stage == 1:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication"
+            suffix = None
+        elif stage == 2:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 3:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 4:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 5:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        else:
+            raise ValueError(f"Invalid stage {stage}")
+
+        if suffix is None:
+            candidates = [
+                f for f in os.listdir(image_folder)
+                if position in f.lower()
+            ]
+        else:
+            candidates = [
+                f for f in os.listdir(image_folder)
+                if position in f.lower()
+                   and f"_{suffix}.png" in f.lower()
+            ]
+
+        image_path = os.path.join(image_folder, random.choice(candidates))
+
+        self.image_path = image_path
+        self.image_path_function = image_path
+
+        return image_path
+
     def main_loop(self):
         self.touchoutside = 0
 
