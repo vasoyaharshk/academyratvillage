@@ -391,6 +391,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.task_number = 2
             self.tired = True
             message = f"Stage moved forward to {self.pair} for {self.subject} in {self.task}"
