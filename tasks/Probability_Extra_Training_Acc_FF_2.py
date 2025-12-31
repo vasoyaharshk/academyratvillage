@@ -182,19 +182,32 @@ class Probability_Extra_Training_Acc_FF_2(Task):
                    and position in f.lower()
             ]
         else:
-            candidates = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                   and position in f.lower()
-                   and suffix in f.lower()
-            ]
+            candidates = []
+            suffix_token = f"_{suffix}."  # prevents correct matching incorrect
+            for f in os.listdir(image_folder):
+                fp = os.path.join(image_folder, f)
+                if not os.path.isfile(fp):
+                    continue
+
+                fl = f.lower()
+
+                if position not in fl:
+                    continue
+
+                # strict token match: "_both." or "_correct."
+                if suffix_token not in fl:
+                    continue
+
+                candidates.append(f)
 
         if not candidates:
             raise ValueError(
-                f"No images found in {image_folder} for stage {stage}, position {position}, suffix {suffix}.")
+                f"No images found in {image_folder} for stage {stage}, position {position}, suffix {suffix}."
+            )
 
         image_path = os.path.join(image_folder, random.choice(candidates))
 
+        # authoritative path used by functions 51/52 and 55/56
         self.image_path = image_path
         self.image_path_function = image_path
 
