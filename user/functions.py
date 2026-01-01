@@ -1035,20 +1035,16 @@ def function63():
     if stage != 1:
         image_path_replaced = update_image_path_size_position(correct=True)
 
+        # Fallback for forced choice images that are already "correct"
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-        if image_path_replaced:
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Correct image path: {image_path_replaced}")
-        else:
-            print("Warning: image_path is None or could not be processed. No image will be updated.")
-
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 def loop63(timing):
     global last_function_called
@@ -1078,20 +1074,16 @@ def function64():
     if stage != 1:
         image_path_replaced = update_image_path_size_position(correct=False)
 
+        # Fallback: if no "both" exists (forced choice), keep current stimulus
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-        if image_path_replaced:
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
-            print(f"Incorrect image path: {image_path_replaced}")
-        else:
-            print("Warning: image_path is None or could not be processed. No image will be updated.")
-
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 def loop64(timing):
     global last_function_called
