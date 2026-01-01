@@ -335,7 +335,7 @@ class Probability_Extra_Training_Acc_FF(Task):
         print(f"Stage: {self.stage}")
         print(f"Stimulus trial: {self.stim_trial}")
         print(f"Forced Choice Next Trial {self.forced_choice_next_trial}")
-        print(f"Image path: {self.image_path}")
+        print(f"Image path: {self.image_path_function}")
         print('Stimulus Trial Counter', self.stim_trial_counter)
         print('Forced Choice Next Trial', self.forced_choice_next_trial)
 
