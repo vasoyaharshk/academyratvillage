@@ -116,6 +116,8 @@ class Probability_Extra_Training_Acc(Task):
 
         self.task_end = False
 
+        self.image_path_function = None
+
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']

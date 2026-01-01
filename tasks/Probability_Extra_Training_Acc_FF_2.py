@@ -128,6 +128,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
 
+        self.image_path_function = None
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
