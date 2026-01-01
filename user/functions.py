@@ -1034,6 +1034,10 @@ def function63():
     stage = utils.task.stage
     if stage != 1:
         image_path_replaced = update_image_path_size_position(correct=True)
+
+        if not image_path_replaced:
+            image_path_replaced = utils.task.image_path_function
+
         if image_path_replaced:
             if last_function_called in LEFT_FUNCTIONS:
                 image_jar_left.image = image_path_replaced
@@ -1073,6 +1077,10 @@ def function64():
     stage = utils.task.stage
     if stage != 1:
         image_path_replaced = update_image_path_size_position(correct=False)
+
+        if not image_path_replaced:
+            image_path_replaced = utils.task.image_path_function
+
         if image_path_replaced:
             if last_function_called in LEFT_FUNCTIONS:
                 image_jar_left.image = image_path_replaced
