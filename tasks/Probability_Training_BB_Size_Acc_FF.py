@@ -135,6 +135,10 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         self.session_first_stim = None
         self.last_two_stim = []
 
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
+
     def flip_side(self, stim_val: int) -> int:
         return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
 
@@ -1112,7 +1116,6 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         self.register_value('last_two_stim', self.last_two_stim)
         self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
         self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
-        self.register_value('last_block_accuracy', self.last_block_accuracy)
 
 
 

@@ -5,6 +5,7 @@ from user import settings
 import random
 import numpy as np
 from academy import telegram_bot
+import os
 
 class Probability_Extra_Training_Acc_FF(Task):
     def __init__(self):
@@ -126,6 +127,10 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
 
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
+
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
@@ -145,8 +150,12 @@ class Probability_Extra_Training_Acc_FF(Task):
         return trials
 
     def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
-
-        position = "left" if stim_trial == 51 else "right"
+        if stim_trial == 51:
+            position = "left"
+        elif stim_trial == 52:
+            position = "right"
+        else:
+            raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
 
         if stage == 1:
             image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication"
@@ -179,9 +188,6 @@ class Probability_Extra_Training_Acc_FF(Task):
             ]
 
         image_path = os.path.join(image_folder, random.choice(candidates))
-
-        self.image_path = image_path
-        self.image_path_function = image_path
 
         return image_path
 
@@ -319,8 +325,17 @@ class Probability_Extra_Training_Acc_FF(Task):
         if self.forced_choice_next_trial == 1:
             self.x_incorrecth = None
 
+        if self.task_number == 1:
+            self.image_path_function = self.get_stim_image_path(self.stim_trial, int(self.stage), self.forced_choice_next_trial)
 
-        print('Stimulus trial: ', self.stim_trial)
+            directory, filename = os.path.split(self.image_path_function)
+            self.image_displayed = filename
+            self.image_directory = directory
+
+        print(f"Stage: {self.stage}")
+        print(f"Stimulus trial: {self.stim_trial}")
+        print(f"Forced Choice Next Trial {self.forced_choice_next_trial}")
+        print(f"Image path: {self.image_path_function}")
         print('Stimulus Trial Counter', self.stim_trial_counter)
         print('Forced Choice Next Trial', self.forced_choice_next_trial)
 
@@ -783,3 +798,5 @@ class Probability_Extra_Training_Acc_FF(Task):
         self.register_value('last_two_stim', self.last_two_stim)
         self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
         self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+        self.register_value('image_displayed', self.image_displayed)
+        self.register_value('image_directory', self.image_directory)
