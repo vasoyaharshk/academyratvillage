@@ -467,52 +467,70 @@ class Probability_Training_BB_Size_Acc_FF(Task):
             print(f"Error in generating trial stims: {e}")
             return None
 
+    def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
+        if stim_trial in [101, 105]:
+            position, size = "left", "small"
+        elif stim_trial in [102, 106]:
+            position, size = "right", "small"
+        elif stim_trial in [103, 107]:
+            position, size = "left", "big"
+        elif stim_trial in [104, 108]:
+            position, size = "right", "big"
+        else:
+            raise ValueError(f"Invalid stim_trial value: {stim_trial}")
 
-    def get_stim_image_path(self, stim_trial, stage):
-        image_path = None
-        image_folder = None
-        try:
-            if stim_trial in [101, 105]:
-                position = 'left'
-                size = 'small'
-            elif stim_trial in [102, 106]:
-                position = 'right'
-                size = 'small'
-            elif stim_trial in [103, 107]:
-                position = 'left'
-                size = 'big'
-            elif stim_trial in [104, 108]:
-                position = 'right'
-                size = 'big'
+        spacer = "spacer" if stim_trial in [105, 106, 107, 108] else None
+
+        stage = int(stage)
+
+        if stage == 1:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/1_indication"
+            suffix = None
+        elif stage == 2:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_a"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 3:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_b"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 4:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        else:
+            raise ValueError(f"Invalid stage value: {stage}")
+
+        candidates = []
+        for f in os.listdir(image_folder):
+            fp = os.path.join(image_folder, f)
+            if not os.path.isfile(fp):
+                continue
+
+            fl = f.lower()
+
+            if position not in fl:
+                continue
+            if size not in fl:
+                continue
+
+            if spacer is None:
+                if "spacer" in fl:
+                    continue
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
+                if "spacer" not in fl:
+                    continue
 
-            spacer = 'spacer' if stim_trial in [105, 106, 107, 108] else ''
+            if suffix is not None:
+                if f"_{suffix}_" not in fl:
+                    continue
 
-            if stage == 1:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/1_indication'
-            elif stage == 2:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_a'
-            elif stage == 3:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_b'
-            elif stage == 4:
-                image_folder = '/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c'
-            else:
-                raise ValueError(f"Invalid stage value: {stage}.")
+            candidates.append(f)
 
-            images = [f for f in os.listdir(image_folder) if
-                      os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower() and size in f.lower() and (
-                          spacer in f.lower() if spacer else True))]
-            if not images:
-                raise ValueError(
-                    f"No images found in {image_folder} for stage {stage}, position {position}, size {size}, and spacer {spacer}.")
+        if not candidates:
+            raise ValueError(
+                f"No images found in {image_folder} for stage {stage}, "
+                f"position {position}, size {size}, spacer {spacer}, suffix {suffix}"
+            )
 
-            image_path = os.path.join(image_folder, random.choice(images))
-            print(f'Stage in function: {stage}')
-            print(f'Correct answer on {position}, {size}, {spacer} jar: {image_path}')
-        except Exception as e:
-            print(f"Error occurred: {e}")
+        image_path = os.path.join(image_folder, random.choice(candidates))
         return image_path
 
     def main_loop(self):
@@ -670,7 +688,8 @@ class Probability_Training_BB_Size_Acc_FF(Task):
                     self.x_incorrecth = None
 
             if self.task_number == 2:
-                self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+                self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage, self.forced_choice_next_trial)
+
                 print("image_path_function: ", self.image_path_function)
 
                 directory, filename = os.path.split(self.image_path_function)
