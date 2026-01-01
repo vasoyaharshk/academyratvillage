@@ -468,7 +468,6 @@ class Probability_Training_BB_Size_Acc_FF(Task):
             return None
 
     def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
-        # Map trial id to position, size, spacer
         if stim_trial in [101, 105]:
             position, size = "left", "small"
         elif stim_trial in [102, 106]:
@@ -482,7 +481,8 @@ class Probability_Training_BB_Size_Acc_FF(Task):
 
         spacer = "spacer" if stim_trial in [105, 106, 107, 108] else None
 
-        # Stage folder
+        stage = int(stage)
+
         if stage == 1:
             image_folder = "/home/ratvillage01/academy/stimuli/urn_training/1_indication"
             suffix = None
@@ -498,7 +498,6 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         else:
             raise ValueError(f"Invalid stage value: {stage}")
 
-        # Build candidate list with safe suffix matching
         candidates = []
         for f in os.listdir(image_folder):
             fp = os.path.join(image_folder, f)
@@ -506,19 +505,24 @@ class Probability_Training_BB_Size_Acc_FF(Task):
                 continue
 
             fl = f.lower()
+
             if position not in fl:
                 continue
             if size not in fl:
                 continue
-            if spacer and spacer not in fl:
-                continue
 
-            if suffix is None:
-                candidates.append(f)
+            if spacer is None:
+                if "spacer" in fl:
+                    continue
             else:
-                # critical: "_correct.png" must not match "_incorrect.png"
-                if f"_{suffix}.png" in fl:
-                    candidates.append(f)
+                if "spacer" not in fl:
+                    continue
+
+            if suffix is not None:
+                if f"_{suffix}_" not in fl:
+                    continue
+
+            candidates.append(f)
 
         if not candidates:
             raise ValueError(
