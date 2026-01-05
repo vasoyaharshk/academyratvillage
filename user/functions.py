@@ -900,12 +900,12 @@ def function55():
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 
 def loop55(timing):
@@ -952,12 +952,12 @@ def function56():
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 def loop56(timing):
     global last_function_called

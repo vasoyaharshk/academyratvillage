@@ -465,6 +465,11 @@ class Probability_WL_Training_Runthrough_Acc(Task):
             self.accuracy = 0
             #print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
             self.block_wlt = self.block_size  # This is for presenting equal number of trial types every x trials.
+            self.duration_max = 3000
+            self.duration_min = 2100
+            self.duration_tired = 1800
+            self.trials_tired = 5
+            self.tired = False
 
         print('Bias Breaking: ', self.bias_breaking)
         #print('stim_trials: ', self.stim_trials)

@@ -276,6 +276,15 @@ class Probability_WebersLaw_Post(Task):
         print('Trial: ' + str(self.current_trial))
         print('Total Accuracy for session: ', self.accuracy)
 
+        if self.current_trial == 0:
+            self.bias_breaking = 0
+            self.accuracy = 0
+            self.duration_max = 3000
+            self.duration_min = 2100
+            self.duration_tired = 1800
+            self.trials_tired = 5
+            self.tired = False
+
         if not self.conditions and self.current_repetition == 0:
             while True:  # Retry until a valid sequence is generated
                 self.conditions = self.generate_alternating_conditions()
