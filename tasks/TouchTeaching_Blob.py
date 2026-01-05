@@ -156,6 +156,11 @@ class TouchTeaching_Blob(Task):
             self.bias_breaking = 0
             self.accuracy = 0
             self.forced_choice_next_trial = 0
+            self.duration_max = 3000
+            self.duration_min = 2100
+            self.duration_tired = 1800
+            self.trials_tired = 5  # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
+            self.tired = False
 
             # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
         # print('stim_trials: ', self.stim_trials)

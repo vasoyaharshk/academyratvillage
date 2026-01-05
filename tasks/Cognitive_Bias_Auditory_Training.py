@@ -374,6 +374,12 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.stim = [0, 4]
             #self.block_size = 40
             self.forced_choice_next_trial = 0
+            self.duration_max = 3000
+            self.duration_min = 2100
+            self.duration_tired = 1800
+            self.trials_tired = 5  # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
+            self.tired = False
+            self.trials_max = 800
 
         print('')
         print('Stimulus Trial Counter', self.stim_trial_counter)
