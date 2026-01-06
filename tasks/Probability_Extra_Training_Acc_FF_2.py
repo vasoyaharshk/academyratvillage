@@ -230,9 +230,9 @@ class Probability_Extra_Training_Acc_FF_2(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 3:
-                self.task_number = 2
-                self.tired = True
+            # if self.stage == 3:
+                # self.task_number = 2
+                # self.tired = True
 
 
         if self.stage_backward_change == 1:

@@ -405,7 +405,8 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
-        elif task == 'Probability_Extra_Training_Acc_FF_2':
+        elif task == 'abc':
+        # elif task == 'Probability_Extra_Training_Acc_FF_2':
             if task_number == 2:
                 stage = 1  # Current stage within the task
                 substage = 0  # Current substage within the stage
