@@ -224,7 +224,7 @@ class Probability_Extra_Training_Acc_FF_2(Task):
             self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            self.stage += 1
+            #self.stage += 1
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
