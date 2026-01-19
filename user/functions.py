@@ -72,7 +72,7 @@ def update_image_path_size_position(correct=True):
             filename = re.sub(r'_\d+(?=\.png)', '', filename)
         filename = filename.replace("both", "correct" if correct else "incorrect")
         image_path_replaced = os.path.join(directory, filename)
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Modified image path: {image_path_replaced}")
         return image_path_replaced
     return None
 
@@ -96,7 +96,7 @@ def update_image_path_size_position_wl(correct=True):
             filename = re.sub(r'_\d+(?=\.png)', '', filename)
         filename = filename.replace("both", "correct" if correct else "incorrect")
         image_path_replaced = os.path.join(directory, filename)
-        #print(f"Modified image path: {image_path_replaced}")
+        print(f"Modified image path: {image_path_replaced}")
         return image_path_replaced
     return None
 
@@ -1040,12 +1040,12 @@ def function63():
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 def loop63(timing):
     global last_function_called
@@ -1079,12 +1079,12 @@ def function64():
         if not image_path_replaced:
             image_path_replaced = utils.task.image_path_function
 
-            if last_function_called in LEFT_FUNCTIONS:
-                image_jar_left.image = image_path_replaced
-                image_jar_left.pos = settings.CENTRE_SCREEN
-            elif last_function_called in RIGHT_FUNCTIONS:
-                image_jar_right.image = image_path_replaced
-                image_jar_right.pos = settings.CENTRE_SCREEN
+        if last_function_called in LEFT_FUNCTIONS:
+            image_jar_left.image = image_path_replaced
+            image_jar_left.pos = settings.CENTRE_SCREEN
+        elif last_function_called in RIGHT_FUNCTIONS:
+            image_jar_right.image = image_path_replaced
+            image_jar_right.pos = settings.CENTRE_SCREEN
 
 def loop64(timing):
     global last_function_called
