@@ -18,9 +18,13 @@ class TouchTeaching_Blob(Task):
         Rats learn to touch the screen during the response window to obtain the reward.
         
         Stages:
-        Stage 0: A white irregular blob half the size of the screen.
-        Stage 1: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but also can touch anywhere else.
-        Stage 2: A white irregular blob the same size and same location as the pegs. Rat has to touch the white blob but if touches anywhere else is incorrect.
+        Stage 1: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but also can touch anywhere else.
+        Stage 2: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but if touches anywhere else is incorrect.
+        
+        If rats struggle:
+        Stage 3: A white irregular blob half the size of the screen. 150*150
+        Stage 4: A white irregular blob reduced by 63%. 130*130
+        Stage 5: A white irregular blob reduced by 33%. 110*110
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -180,16 +184,23 @@ class TouchTeaching_Blob(Task):
             self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            if self.stage == 0:
-                self.stage += 2
+            if self.stage == 2:
+                self.stage = 6
+            if self.stage == 3:
+                self.stage = 4
+            elif self.stage == 4:
+                self.stage = 5
+            elif self.stage == 5:
+                self.stage = 2
             else:
-                self.stage += 1
+                self.stage = self.stage
+
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
             try:
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 3:
+            if self.stage == 6:
                 self.task_number = 2
                 self.tired = True
                 message = f"URGENT: Stage moved forward to {self.stage} for {self.subject} in {self.task}. Email ALEX."
@@ -208,7 +219,7 @@ class TouchTeaching_Blob(Task):
             self.block_valid_count = 0
             self.stim_trial_counter = 0
             #new_stage = max(self.stage - 1, 0)
-            new_stage = 0 if self.stage >= 2 else max(self.stage - 1, 0)
+            new_stage = 3 if self.stage >= 2 else max(self.stage - 1, 0)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -229,12 +240,19 @@ class TouchTeaching_Blob(Task):
         # Choose x positions:
         self.stim = [213, 214]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
-        if self.stage == 0:
-            self.width = 200
-            self.height = 200
-        else:
-            self.width = 100
-            self.height = 100
+        blob_px_by_stage = {
+            1: 90,
+            2: 90,
+            3: 150,
+            4: 130,
+            5: 110,
+        }
+
+        blob_px = blob_px_by_stage.get(self.stage, 90)
+
+        # Touch window is blob size + 10 mm
+        self.width = blob_px + 10
+        self.height = blob_px + 10
 
         if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
