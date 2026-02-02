@@ -2031,31 +2031,33 @@ def loop212(timing):
     window.flip()
 
 #For white blobs:
-def function213():  # When the blue jar is on left
+def function213():  # Blob on left
     global last_function_called, image_path
-    last_function_called = 213  # Track that function31 was called
+    last_function_called = 213
 
     stage = utils.task.stage
+
     try:
         image_folder = "/home/ratvillage02/academy/stimuli/touchteaching_blob/"
 
-        if stage == 0:
-            left_images = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                and "left" in f.lower()
-                and "large" in f.lower()
-            ]
-        else:
-            left_images = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                and "left" in f.lower()
-                and "small" in f.lower()
-            ]
+        size_tag_by_stage = {
+            1: "90",
+            2: "90",
+            3: "150",
+            4: "130",
+            5: "110",
+        }
+        size_tag = size_tag_by_stage.get(stage, "90")
+
+        left_images = [
+            f for f in os.listdir(image_folder)
+            if os.path.isfile(os.path.join(image_folder, f))
+            and "left" in f.lower()
+            and size_tag in f
+        ]
 
         if not left_images:
-            raise ValueError(f"No blob images found for stage {stage} in {image_folder}")
+            raise ValueError(f"No blob LEFT images found for stage {stage} (size {size_tag}) in {image_folder}")
 
         random_image_path_left = os.path.join(image_folder, random.choice(left_images))
 
@@ -2077,31 +2079,33 @@ def loop213(timing):
 
 
 # Functions for Probability Inference Tasks for different stages where the correct answer is right:
-def function214():  # right
+def function214():  # Blob on right
     global last_function_called, image_path
     last_function_called = 214
 
     stage = utils.task.stage
+
     try:
         image_folder = "/home/ratvillage02/academy/stimuli/touchteaching_blob/"
 
-        if stage == 0:
-            right_images = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                and "right" in f.lower()
-                and "large" in f.lower()
-            ]
-        else:
-            right_images = [
-                f for f in os.listdir(image_folder)
-                if os.path.isfile(os.path.join(image_folder, f))
-                and "right" in f.lower()
-                and "small" in f.lower()
-            ]
+        size_tag_by_stage = {
+            1: "90",
+            2: "90",
+            3: "150",
+            4: "130",
+            5: "110",
+        }
+        size_tag = size_tag_by_stage.get(stage, "90")
+
+        right_images = [
+            f for f in os.listdir(image_folder)
+            if os.path.isfile(os.path.join(image_folder, f))
+            and "right" in f.lower()
+            and size_tag in f
+        ]
 
         if not right_images:
-            raise ValueError(f"No blob images found for stage {stage} in {image_folder}")
+            raise ValueError(f"No blob RIGHT images found for stage {stage} (size {size_tag}) in {image_folder}")
 
         random_image_path_right = os.path.join(image_folder, random.choice(right_images))
 
