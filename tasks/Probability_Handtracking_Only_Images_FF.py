@@ -337,16 +337,40 @@ class Probability_Handtracking_Only_Images_FF(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_1_only_Images'
             elif stage == 2:
-                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+                image_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_video/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
             # Get relevant images based on position
-            images = [f for f in os.listdir(image_folder) if
-                      os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower() and 'open' in f.lower())]
+            mode_correction = (self.forced_choice_next_trial == 1)
+
+            def is_valid_image(fname: str) -> bool:
+                f = fname.lower()
+
+                # Keep left right rule exactly as before
+                if position not in f:
+                    return False
+
+                # Keep existing core filters
+                if "both" not in f:
+                    return False
+                if "open" not in f:
+                    return False
+
+                # Split normal vs correction pools
+                has_correction = ("correction" in f)
+
+                if mode_correction:
+                    return has_correction
+                else:
+                    return (not has_correction)
+
+            images = [
+                f for f in os.listdir(image_folder)
+                if os.path.isfile(os.path.join(image_folder, f)) and is_valid_image(f)
+            ]
 
             if not images:
                 raise ValueError(f"No images found in {image_folder} for position {position}.")
