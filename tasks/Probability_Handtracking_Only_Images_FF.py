@@ -23,13 +23,11 @@ class Probability_Handtracking_Only_Images_FF(Task):
         Stage 3: Introduction of the yellow tokens:
         Here the stimuli is only images in substage 0.
         Substage 1: Only image trials, accuracy criteria 80%.
-        Substage 2: This is actually stage 3.1 where we introduce the yellow token. The photogate that triggers the video is 5. Stage 1 and stage 2 trials interleaved. 87.5% stage 2 and 12.5% stage 1 , accuracy criteria 80%.
 
         if they hit 320 trials, move back one substage
 
         Stages:
         stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
-        stage 2 - Videos - starts from open hands and then closes as rat approaches.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump. 
