@@ -98,7 +98,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
         self.trials_tired = 5  # if they do 5 trials of long duration (more than 45 seconds), the door will open after 30 mins rather than 35
         self.tired = False  # The door 2 opens whenever this is true. Used to end the task.
         self.response_duration = 60  # The response time after the last photogate has been crossed in secs.
-        self.image_display = 3  # Number of seconds the image will display after correct and incorrect
+        self.image_display = 0  # Number of seconds the image will display after correct and incorrect
         self.trial_length = 0  # time from when a trial starts until next trial starts
         self.trial_result = None  # Result of the trial, correct, incorrect or miss
 
@@ -121,7 +121,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
         self.stim = [0]  # Lists which defines both the functions for left and right.
 
         # Correcth location and size:
-        self.x_correcth_pos = [95, 281]  # Horizontal Coordinates for left and right for Jars
+        self.x_correcth_pos = [130, 250]  # Horizontal Coordinates for left and right for Jars
         self.y_correcth = 110  # Vertical Coordinates for left and right for Jars
         self.width = 100  # Stimulus width in mm. Original size for jar is 120mm.
         self.height = 190  # Stimulus height in mm. Original size for jar is 110mm.
@@ -160,8 +160,8 @@ class Probability_Handtracking_Only_Images_FF(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            0: {1: 1.0, 2: 0.0},
-            1: {1: 0.125, 2: 0.875}
+            1: {1: 1.0, 2: 0.0},
+            2: {1: 0.125, 2: 0.875}
         }
 
         self.stage_sequence_counter = 0
