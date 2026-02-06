@@ -657,7 +657,8 @@ def select_task(df, subject):
 
             if task == "Probability_WL_Training_Acc":
                 if stage == 4: # when Probability_WL_Training_Acc is complete, it changes stage to 4
-                    task = 'Probability_WL_Training_Runthrough_Acc'
+                    #task = 'Probability_WL_Training_Runthrough_Acc'
+                    task = 'xyz'
                     stage = 5
                     # if isinstance(completed_ror, str):
                     #     completed_ror = str_to_list(completed_ror)
