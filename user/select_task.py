@@ -435,8 +435,8 @@ def select_task(df, subject):
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
-                task = 'xyz'
-                message = 'Advance from Etra training to Probability_Handtracking_Yellow_Only_Images'
+                task = 'Probability_Handtracking_Only_Images_FF'
+                message = 'Advance from Etra training to Probability_Handtracking_Only_Images_FF'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
                     telegram_bot.alarm_completed_criteria(task, my_subject)
@@ -753,11 +753,11 @@ def select_task(df, subject):
                 print(f"Converted completed_ror to list: {completed_ror}")
 
         elif 'Probability_Handtracking' in task:
-            if task == 'Probability_Handtracking_Zoomed_Mod':
-                if task_number == 5: #change to yellow tokens
-                    task = 'Probability_Handtracking_PG5'
+            if task == 'Probability_Handtracking_Only_Images_FF':
+                if task_number == 7: #change to videos
+                    task = 'xyz'
                     stage = 1
-                    substage = 2    #MOST IMPORTANT THAT THEY MOVE TO SUBSTAGE 2
+                    substage = 1    #MOST IMPORTANT THAT THEY MOVE TO SUBSTAGE 2
                     block_size = 40  # Every 40 blocks the criteria will be tested.
                     block_trial_counter = 0  # Counter for accuracy.
                     block_accuracy = 0.0  # Accuracy for that 40 trial block
@@ -792,7 +792,7 @@ def select_task(df, subject):
                     condition_trial_counter = 0
                     stage_sequence = []
                     last_stage_trial = 0
-                    message = f"PI: Probability_Handtracking_Zoomed_Mod complete, Moving to {task}."
+                    message = f"PI: Probability_Handtracking_Only_Images_FF complete, Moving to {task}."
                     print(f'{message}')
                     try:
                         telegram_bot.alarm_finish_session(message, my_subject)
@@ -801,101 +801,6 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
-            elif task == 'Probability_Handtracking_PG5':
-                if task_number == 6: #change to yellow tokens
-                    task = 'Probability_Handtracking_Yellow'
-                    stage = 1
-                    substage = 1    #MOST IMPORTANT THAT THEY MOVE TO SUBSTAGE 1
-                    block_size = 40  # Every 40 blocks the criteria will be tested.
-                    block_trial_counter = 0  # Counter for accuracy.
-                    block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 1
-                    ror_change = 0
-                    block_change = 0
-                    stim_trial = 0
-                    stim_trials = []
-                    stim_trial_counter = 0
-                    last_stim_trial = 0
-                    last_condition_trial = 0
-                    total_trials = 0
-                    block_correct_count = 0  # Tracks the number of corrects in the block
-                    block_valid_count = 0  ##Tracks the number of valid trials in the block
-                    moved_back_counter = 0
-                    stage_forward_change = 0
-                    stage_backward_change = 0
-                    last_forward_stage = 0
-                    last_backward_stage = 0
-                    stage_sequence_counter = 0
-                    substage_counter_1 = 0
-                    substage_counter_2 = 0
-                    substage_counter_3 = 0
-                    substage_counter_4 = 0
-                    substage_counter_5 = 0
-                    substage_counter_6 = 0
-                    substage_counter_7 = 0
-                    substage_counter_8 = 0
-                    substage_counter_9 = 0
-                    substage_counter_10 = 0
-                    substage_counter_11 = 0
-                    condition_trial_counter = 0
-                    stage_sequence = []
-                    last_stage_trial = 0
-                    message = f"PI: Probability_Handtracking_PG5 complete, Moving to {task}."
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
-
-            elif task == 'Probability_Handtracking_Yellow':
-                if task_number == 7: #change to yellow tokens
-                    task = 'abc'
-                    stage = 1
-                    substage = 1
-                    block_size = 40  # Every 40 blocks the criteria will be tested.
-                    block_trial_counter = 0  # Counter for accuracy.
-                    block_accuracy = 0.0  # Accuracy for that 40 trial block
-                    block_number = 1
-                    ror_change = 0
-                    block_change = 0
-                    stim_trial = 0
-                    stim_trials = []
-                    stim_trial_counter = 0
-                    last_stim_trial = 0
-                    last_condition_trial = 0
-                    total_trials = 0
-                    block_correct_count = 0  # Tracks the number of corrects in the block
-                    block_valid_count = 0  ##Tracks the number of valid trials in the block
-                    moved_back_counter = 0
-                    stage_forward_change = 0
-                    stage_backward_change = 0
-                    last_forward_stage = 0
-                    last_backward_stage = 0
-                    stage_sequence_counter = 0
-                    substage_counter_1 = 0
-                    substage_counter_2 = 0
-                    substage_counter_3 = 0
-                    substage_counter_4 = 0
-                    substage_counter_5 = 0
-                    substage_counter_6 = 0
-                    substage_counter_7 = 0
-                    substage_counter_8 = 0
-                    substage_counter_9 = 0
-                    substage_counter_10 = 0
-                    substage_counter_11 = 0
-                    condition_trial_counter = 0
-                    stage_sequence = []
-                    last_stage_trial = 0
-                    message = f"PI: Probability_Handtracking_Yellow complete, Moving to {task}."
-                    print(f'{message}')
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(task, my_subject)
-                    except:
-                        print('Telegram message not sent')
-                        pass
 
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
