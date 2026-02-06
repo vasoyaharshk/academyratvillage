@@ -5,14 +5,16 @@ from user import settings
 import random
 import numpy as np
 from academy import telegram_bot
+import os
 
-class Probability_Extra_Training_Acc(Task):
+class Probability_Extra_Training_Acc_FF(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is for the extra training if rats are struggling to discriminate between stimuli.
-        
+        It has free choice - force choice paradigm.
+                
         ########   TASK INFO   ########
         Task Numbers:
         1: Extra training
@@ -20,7 +22,6 @@ class Probability_Extra_Training_Acc(Task):
         3: Weber's Law Test and Training
         
         Stages:
-        Extra Training 1: a single blue peg - either on left or right, like Indication
         Extra Training 2: a single blue peg vs a single yellow peg - side counterbalanced
         Extra Training 3: two blue pegs vs two yellow pegs - side counterbalanced
         Extra Training 4: 5 blue pegs vs 5 yellow pegs - side counterbalanced
@@ -34,61 +35,32 @@ class Probability_Extra_Training_Acc(Task):
         Port 3 - PHOTOGATES 3: Photogates 
         Port 4 - PHOTOGATES 4: Photogates 
         Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen , global LED    
+        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED
+
+        Task Number = 1
         """
 
+
         # Variables for the task:
+        self.task_number = 1
         self.duration_max = 3000
         self.duration_min = 2100
         self.duration_tired = 1800
-        self.trials_tired = 5 # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
         self.tired = False
-        self.task_number = 1
-        self.stage = 1
-        self.substage = 0
-        self.substage_bias = 0 # 1 = 90:10, 2 = 75:25, 3 = 50:50
-        self.response_duration = 60
-        self.image_display = 3        #Number of seconds the image will display after correct and incorrect
-
-        # pumps
-        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
-        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
-        self.valve_factor_c = 1.0  # Normal water delivery must be a multiple of 25ul. 2.0 is 2 x 25 = 50uL. E.g., if you set it to 1.8, this would be 1.8 x 25 = 45uL
-        #self.valve_factor_i = 0.6  # Water delivery for incorrects/punish - only if want to give water if they do an incorrect trial (only used for scripts that allow correction)
 
         # counters for trials:
         self.valid_counter = 0
         self.tired_counter = 0
         self.reward_drunk = 0
+        self.reward = 0
         self.correct_count = 0
-        self.accuracy = 0
-
-        # Image output stims:
-        self.stim = [0]  # defines if correct side is left or right
-
-        # Correcth location and size:
-        self.x_correcth_pos = [75, 315]  # Positions of the stim on the screen
-        self.y_correcth = 110
-        self.width = 160    # Stimulus width in mm. Original size for peg is 120mm.
-        self.height = 235   # Stimulus height in mm. Original size for jar is 110mm.
-
-        #Bias breaking variables:
-        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
-        self.response_x_array = []      #Stores responses for x till 3 values
-        self.sameside_counter = 0       #Counts number of times on same side
-        self.sameside = None             # To track which side is being triggered
-        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
-        self.side_bias_trigger_acc = 0.8
-        self.status = None              #Stores the Touch outside condition
-        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
-        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
-
-        self.bias_accuracy_trials = []
-        self.bias_accuracy = 0
-        self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 320 # Move back criteria. Badly named - this is task end criteria.
-        self.max_move_backs = 5 # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
+        self.trial_end_criteria = 320
+        self.accuracy_criteria = 0.80
+        self.consecutive_good_blocks_criteria = 2
+        self.consecutive_good_blocks = 0
+        self.max_move_backs = 5
+        self.accuracy = 0
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
         self.block_size = 40  # Every 40 blocks the criteria will be tested.
@@ -104,20 +76,65 @@ class Probability_Extra_Training_Acc(Task):
         self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
         self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
 
-        self.stim_trial = 0
+        self.stim_trial = None
         self.stim_trials = []
         self.stim_trial_counter = 0
 
-        self.stage_forward_change = 0 # they've met criterion to move forward to next stage
-        self.stage_backward_change = 0 # they've met poor performance criterion to move back a stage
-        self.last_forward_stage = 0     #This is important for the moved_back_counter. Stores the last valaue for the forward stage change
-        self.last_backward_stage = 0       ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
-        self.moved_back_counter = 0 # number of times they have been moved back from one stage to another. It needs to
+        self.stage_forward_change = 0  # they've met criterion to move forward to next stage
+        self.stage_backward_change = 0  # they've met poor performance criterion to move back a stage
+        self.last_forward_stage = 0  # This is important for the moved_back_counter. Stores the last valaue for the forward stage change
+        self.last_backward_stage = 0  ##This is important for the moved_back_counter. Stores the last valaue for the backward stage change
+        self.moved_back_counter = 0  # number of times they have been moved back from one stage to another. It needs to
 
+        self.last_two_stim = []         # history of last two stim_trial values across sessions. Tracked.
+
+        #Untracked:
+        self.session_first_stim = None  # first stim of this session (left or right)
         self.task_end = False
 
+<<<<<<<< HEAD:tasks/Old/Probability_Extra_Training_Acc.py
         self.image_path_function = None
 
+========
+        # --- Reward volumes (µL) ---
+        # pumps
+        self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
+        self.valve_reward = utils.water_calibration.read_last_value('port', 1).water  # 25ul per trial normal conditions
+        self.valve_factor_c = 1 #High reward, 140ul
+        #self.valve_factor_i = 2.8 #Low reward, 60 ul
+
+        # Correcth location and size:
+        self.x_correcth_pos = [75, 345]  # Positions of the stim on the screen
+        self.y_correcth = 155
+        self.width = 160  # Stimulus width in mm. Original size for peg is 120mm.
+        self.height = 235  # Stimulus height in mm. Original size for jar is 110mm.
+        self.response_duration = 60
+
+        # Forced-choice logic
+        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
+
+        self.touchoutside = 0
+
+        #Bias breaking variables:
+        self.bias_breaking = 0        #If subject chooses same side for 5 trials in a row, bias breaking becomes active
+        self.response_x_array = []      #Stores responses for x till 3 values
+        self.sameside_counter = 0       #Counts number of times on same side
+        self.sameside = None             # To track which side is being triggered
+        self.side_bias_trigger = 5      #After how many trials does side_bias trigger
+        self.side_bias_trigger_acc = 0.8
+        self.status = None              #Stores the Touch outside condition
+        self.biased_consecutive_corrects_counter = 0       #This is the counter for counting the number of corrects when bias breaking is active
+        self.biased_consecutive_corrects = 3                ##This is the number of corrrects the rat needs to do to end bias breaking
+
+        self.bias_accuracy_trials = []
+        self.bias_accuracy = 0
+
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
+>>>>>>>> origin/laptop_rv1:tasks/Probability_Extra_Training_Acc_FF.py
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
@@ -126,7 +143,7 @@ class Probability_Extra_Training_Acc(Task):
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < 1000:
+        while len(trials) < self.block_size:
             # Use random.choices to select a candidate with 50% probability for each stimulus
             candidate = random.choices(self.stim, probabilities)[0]
             # Ensure no repetition more than twice in sequence
@@ -137,18 +154,60 @@ class Probability_Extra_Training_Acc(Task):
                 trials.append(candidate)
         return trials
 
-    def main_loop(self):
-        ### Randomizing the stimulus positions for both the images:
-        print('')
-        ### Randomizing the stimulus positions for both the images:
+    def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
+        if stim_trial == 51:
+            position = "left"
+        elif stim_trial == 52:
+            position = "right"
+        else:
+            raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
 
+        if stage == 1:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication"
+            suffix = None
+        elif stage == 2:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 3:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 4:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 5:
+            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        else:
+            raise ValueError(f"Invalid stage {stage}")
+
+        if suffix is None:
+            candidates = [
+                f for f in os.listdir(image_folder)
+                if position in f.lower()
+            ]
+        else:
+            candidates = [
+                f for f in os.listdir(image_folder)
+                if position in f.lower()
+                   and f"_{suffix}.png" in f.lower()
+            ]
+
+        image_path = os.path.join(image_folder, random.choice(candidates))
+
+        return image_path
+
+    def main_loop(self):
+        self.touchoutside = 0
+
+        #Reset all tracked variables as session needs to be independent of the previous session:
         if self.current_trial == 0:
             self.bias_breaking = 0
+            self.forced_choice_next_trial = 0
             self.accuracy = 0
-            # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
 
-        print('Bias Breaking: ', self.bias_breaking)
-        # print('stim_trials: ', self.stim_trials)
+        print('')
+        print('Stimulus Trial Counter', self.stim_trial_counter)
+        print('block_size', self.block_size)
 
         if self.block_change == 1:
             self.block_number += 1
@@ -162,6 +221,7 @@ class Probability_Extra_Training_Acc(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
@@ -208,47 +268,81 @@ class Probability_Extra_Training_Acc(Task):
 
         if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-            self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+            last_trial = self.last_stim_trial if len(self.stim_trials) > 0 else None
+            self.stim_trials = self.generate_random_trials(last_trial)
+
             # print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 # print("Retrying to generate stimulus trials...")
-                self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+                self.stim_trials = self.generate_random_trials(last_trial)
                 if self.stim_trials is None:
                     print("generate_random_trials returned None. Retrying...")
                 else:
                     print(f"Successfully generated stimulus trials: {self.stim_trials}")
             self.stim_trial_counter = 0
 
-        if self.bias_breaking == 0:
-            self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            print(f"Successfully generated stimulus trials: {self.stim_trials}")
+
+        # --- session-local logic for first two trials in this session ---
+        if self.current_trial == 0:
+            # first trial in this session: random left/right
+            candidate = random.choice(self.stim)  # 51 or 52
+            self.session_first_stim = candidate
+        elif self.current_trial == 1:
+            # second trial in this session: forced opposite of first
+            if self.session_first_stim == 51:
+                candidate = 52
+            else:
+                candidate = 51
         else:
-            self.stim_trial = self.last_stim_trial
+            # from 3rd trial onwards: normal block / bias-breaking logic
+            if self.bias_breaking == 0:
+                candidate = self.stim_trials[self.stim_trial_counter]
+            else:
+                candidate = self.last_stim_trial
 
-        if self.stage == 1:  # We have only one stimuli in stage 1
-            # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-            self.image_display = 0
-            if self.stim_trial == 51:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                #print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-            elif self.stim_trial == 52:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = None  # No incorrect area in stage 1
-                #print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-        else:  # We have two stimuli after stage 1 with correct and incorrect areas
-            self.image_display = 3
-            if self.stim_trial == 51:
-                self.x_correcth = self.x_correcth_pos[0]
-                self.x_incorrecth = self.x_correcth_pos[1]
-                #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-            elif self.stim_trial == 52:
-                self.x_correcth = self.x_correcth_pos[1]
-                self.x_incorrecth = self.x_correcth_pos[0]
-                #print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',self.x_incorrecth)
+        # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
+        if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
+            # flip side
+            candidate = 51 if candidate == 52 else 52
 
-        print('Stimulus trial: ', self.stim_trial)
+        # self.forced_choice_actual_trial = self.forced_choice_next_trial
+
+        if self.forced_choice_next_trial == 0:
+            self.stim_trial = candidate
+        else:
+            self.stim_trial = self.forced_choice_probe
+
+        # keep stimulus schedule aligned with actual delivered probe
+        if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+            self.stim_trials[self.stim_trial_counter] = self.stim_trial
+
+        self.image_display = 3
+        if self.stim_trial == 51:
+            self.x_correcth = self.x_correcth_pos[0]
+            self.x_incorrecth = self.x_correcth_pos[1]
+            #print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+        elif self.stim_trial == 52:
+            self.x_correcth = self.x_correcth_pos[1]
+            self.x_incorrecth = self.x_correcth_pos[0]
+            #print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ',self.x_incorrecth)
+
+        if self.forced_choice_next_trial == 1:
+            self.x_incorrecth = None
+
+        if self.task_number == 1:
+            self.image_path_function = self.get_stim_image_path(self.stim_trial, int(self.stage), self.forced_choice_next_trial)
+
+            directory, filename = os.path.split(self.image_path_function)
+            self.image_displayed = filename
+            self.image_directory = directory
+
+        print(f"Stage: {self.stage}")
+        print(f"Stimulus trial: {self.stim_trial}")
+        print(f"Forced Choice Next Trial {self.forced_choice_next_trial}")
+        print(f"Image path: {self.image_path_function}")
         print('Stimulus Trial Counter', self.stim_trial_counter)
+        print('Forced Choice Next Trial', self.forced_choice_next_trial)
 
         ############ STATE MACHINE ################
         # First trial:
@@ -329,8 +423,9 @@ class Probability_Extra_Training_Acc(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                output_actions=[])
+                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 39)])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -391,8 +486,6 @@ class Probability_Extra_Training_Acc(Task):
 
     def after_trial(self):
         if self.task_number == 1:
-            # self.block_trial_counter += 1  # For counting the blocks
-
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -401,31 +494,36 @@ class Probability_Extra_Training_Acc(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.valid_counter += 1
-                self.block_valid_count += 1
-                self.success = 0
-                self.block_trial_counter += 1
-                self.total_trials += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
-
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 1
+                self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
-                self.valid_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.correct_count += 1
-                #print('Correct_count: ', self.correct_count)
-                self.block_correct_count += 1
-                self.block_valid_count += 1
-                self.block_trial_counter += 1
-                self.success = 1
-                self.total_trials += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
-
+                self.reward = self.valve_reward * self.valve_factor_c
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.correct_count += 1
+                    #print('Correct_count: ', self.correct_count)
+                    self.block_correct_count += 1
+                    self.block_valid_count += 1
+                    self.block_trial_counter += 1
+                    self.success = 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
@@ -440,12 +538,28 @@ class Probability_Extra_Training_Acc(Task):
 
             # ##### COUNT Touches outside the jar areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.status = 'Touch_Outside'
+                self.trial_result = 'incorrect'
+                self.touchoutside = 1
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 1
+                self.forced_choice_probe = self.stim_trial
 
             # End-trial calculations
-            #self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
+
+            # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
+            if self.x_incorrecth is None:
+                self.forced_choice_actual_trial = 1
+            else:
+                self.forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -456,6 +570,8 @@ class Probability_Extra_Training_Acc(Task):
             else:  # reset the counter
                 self.tired_counter = 0
 
+            self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
+
             # Check accuracy for every block of 40 trials
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
@@ -465,26 +581,26 @@ class Probability_Extra_Training_Acc(Task):
                 self.block_change = 1
                 self.last_block_accuracy = self.block_accuracy
 
+                # update consecutive good blocks
                 if self.block_accuracy >= self.accuracy_criteria:
-                    if self.prev_block_accuracy >= self.accuracy_criteria:
-                        self.stage_forward_change = 1
-                        print("Two consecutive blocks >= criterion. Advancing stage.")
-                    else:
-                        self.prev_block_accuracy = self.block_accuracy
-                        print("Good block. One more needed.")
+                    self.consecutive_good_blocks += 1
                 else:
-                    print("Block failed. Resetting previous block.")
-                    self.prev_block_accuracy = -1.0
+                    self.consecutive_good_blocks = 0
 
+                # forward criterion: 3 consecutive good blocks
+                if self.consecutive_good_blocks >= self.consecutive_good_blocks_criteria:
+                    self.stage_forward_change = 1
+
+                # backward rule if many trials and still no forward move
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
-            #Assign in pass what to do when the rat is moved back more than 5 times.
+            # Assign in pass what to do when the rat is moved back more than 5 times.
             if self.moved_back_counter > self.max_move_backs:
                 message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
                 try:
                     print(message)
-                    #telegram_bot.alarm_finish_session(message, self.subject)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
                 except:
                     print('Telegram message not sent')
                     pass
@@ -505,6 +621,12 @@ class Probability_Extra_Training_Acc(Task):
 
             self.last_stim_trial = self.stim_trial
 
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
+
+            # Process response_x for side bias detection
             try:
                 # Try converting response_x directly to a float
                 self.response_x_bias = float(self.response_x)
@@ -569,13 +691,11 @@ class Probability_Extra_Training_Acc(Task):
             self.trial_result = None
             self.task_end = True
 
-
         ############ REGISTER VALUES ################
         # Task-related
         self.register_value('duration_max', self.duration_max)
         self.register_value('duration_min', self.duration_min)
         self.register_value('duration_tired', self.duration_tired)
-        self.register_value('trials_tired', self.trials_tired)
         self.register_value('tired', self.tired)
         self.register_value('task_number', self.task_number)
         self.register_value('stage', self.stage)
@@ -588,15 +708,15 @@ class Probability_Extra_Training_Acc(Task):
         self.register_value('valve_time', self.valve_time)
         self.register_value('valve_reward', self.valve_reward)
         self.register_value('valve_factor_c', self.valve_factor_c)
-        # self.register_value('valve_factor_i', self.valve_factor_i)  # Uncomment if used
+
 
         # Counters
         self.register_value('valid_counter', self.valid_counter)
         self.register_value('tired_counter', self.tired_counter)
         self.register_value('reward_drunk', self.reward_drunk)
-        # self.register_value('running_window', self.running_window)  # Uncomment if used
+        self.register_value('reward', self.reward)
         self.register_value('correct_count', self.correct_count)
-        self.register_value('accuracy', self.accuracy)
+        self.register_value('success', self.success)
 
         # Stimulus-related
         self.register_value('stim', self.stim)
@@ -613,6 +733,7 @@ class Probability_Extra_Training_Acc(Task):
         self.register_value('side_bias_trigger', self.side_bias_trigger)
         self.register_value('side_bias_trigger_acc', self.side_bias_trigger_acc)
         self.register_value('status', self.status)
+        self.register_value('accuracy', self.accuracy)
         self.register_value('biased_consecutive_corrects_counter', self.biased_consecutive_corrects_counter)
         self.register_value('biased_consecutive_corrects', self.biased_consecutive_corrects)
         self.register_value('bias_accuracy_trials', self.bias_accuracy_trials)
@@ -645,18 +766,42 @@ class Probability_Extra_Training_Acc(Task):
         self.register_value('stage_backward_change', self.stage_backward_change)
         self.register_value('moved_back_counter', self.moved_back_counter)
 
-        #Corecth location:
+        # Corecth location:
         self.register_value('correct_th', self.x_correcth)
         self.register_value('incorrect_th', self.x_incorrecth)
         self.register_value('response_x', self.response_x)
         self.register_value('response_y', self.response_y)
 
-        #Trial Information:
+        # Trial Information:
         self.register_value('trial_length', self.trial_length)
         self.register_value('trial_result', self.trial_result)
+        self.register_value('touchoutside', self.touchoutside)
+
+        # Stimulus trial control
+        # self.register_value('group', self.group)
+        # self.register_value('pair', self.pair)
+        # self.register_value('side', self.side)
+        # self.register_value('shape', self.shape)
+        self.register_value('stim_trial', self.stim_trial)
+        self.register_value('stim_trials', self.stim_trials)
+        self.register_value('stim_trial_counter', self.stim_trial_counter)
+        self.register_value('last_stim_trial', self.last_stim_trial)
+        self.register_value('stim', self.stim)
 
         self.register_value('last_forward_stage', self.last_forward_stage)
         self.register_value('last_backward_stage', self.last_backward_stage)
 
         self.register_value('prev_block_accuracy', self.prev_block_accuracy)
         self.register_value('last_block_accuracy', self.last_block_accuracy)
+
+        self.register_value('session_first_stim', self.session_first_stim)
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
+        self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
+        self.register_value('forced_choice_probe', self.forced_choice_probe)
+
+
+        self.register_value('last_two_stim', self.last_two_stim)
+        self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
+        self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+        self.register_value('image_displayed', self.image_displayed)
+        self.register_value('image_directory', self.image_directory)

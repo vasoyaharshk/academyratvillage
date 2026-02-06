@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Handtracking_PG5(Task):
+class Probability_Handtracking_Zoomed_Mod_FF(Task):
     def __init__(self):
         super().__init__()
 
@@ -16,17 +16,21 @@ class Probability_Handtracking_PG5(Task):
         self.info = """
         This task is for Bastos and Taylor for Probabilistic Inference training and test. This task has the zoomed in stimuli and substages where the stages are
         mixed in.
-        This script is for stage 6 onwwards where the photogate that triggers the video is 5.
         
         ALL ODD STAGES ARE IMAGE TRIALS AND EVEN STAGES ARE VIDEO TRIALS.
-        THIS TASK STARTS WITH SUBSTAGE 2 AND THE RATS GET MOVED BACK ONLY WHEN THEY DO NOT MEET CRITERIA AFTER 320 TRIALS TO SUBSTAGE 1.
         
-        Substages: Substages 1 to 5 are covered in another script "Probability_Handtracking_Zoomed_Mod".
+        Substages: Only substages 1 to 5 are covered here. Afterwards there is a different script for the substages:
+        Substages: Only the trials for stage 2 are counted for accuracy.
+        Substage 1: 10% stage 2 and 90% stage 1, accuracy criteria 75%. The photogate that triggers the video is 6.
+        Substage 2: 25% stage 2 and 75% stage 1, accuracy criteria 60%. The photogate that triggers the video is 6.
+        Substage 3: 50% stage 2 and 50% stage 1, accuracy criteria 65%. The photogate that triggers the video is 6.
+        
+        Only stage 2 counted  towards the block after substage 3:
+        Substage 4: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 6.
         
         From substage 5 onwards, only video trials are counted towards the block and all further substages have 87.5% video trials 
         and 12.5% additional image trials interleaved. The accuracy criteria remains 80% and the images interleaved are the open hands in all the substages. 
-        Substage 1: 75% stage 2 and 25% stage 1 , accuracy criteria 80%. The photogate that triggers the video is 5.
-        Substage 2: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 5.
+        Substage 5: 87.5% stage 2 and 12.5% stage 1, accuracy criteria 80%. The photogate that triggers the video is 6.
         
         Stages:
         Stage 1 - Image of 2 open hands, 1 hand with peg and 1 hand empty. 
@@ -42,7 +46,7 @@ class Probability_Handtracking_PG5(Task):
         
         IMPORTANT NOTE: Condition trial counter here tracks the total number of trials in this task.
         
-        Task Number = 5
+        Task Number = 4
         """
 
         # ==============================
@@ -52,7 +56,7 @@ class Probability_Handtracking_PG5(Task):
         self.stage = 1  # Current stage within the task
         self.substage = 1  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
-        self.task_number = 5  # Each task has a unique number. See RV script guide.
+        self.task_number = 4  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
         self.block_size = 40  # The number of trials in a block
@@ -160,8 +164,11 @@ class Probability_Handtracking_PG5(Task):
         self.alert_sent = False
 
         self.substage_stage_map = {
-            1: {1: 0.25, 2: 0.75},
-            2: {1: 0.125, 2: 0.875}
+            1: {1: 0.90, 2: 0.10},
+            2: {1: 0.75, 2: 0.25},
+            3: {1: 0.50, 2: 0.50},
+            4: {1: 0.25, 2: 0.75},
+            5: {1: 0.125, 2: 0.875},
         }
 
         self.stage_sequence_counter = 0
@@ -178,8 +185,7 @@ class Probability_Handtracking_PG5(Task):
         self.substage_counter_11 = 0
         self.substage_counter_12 = 0
 
-
-        self.fixation_trigger_port = Bpod.Events.Port5In
+        self.fixation_trigger_port = Bpod.Events.Port6In
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -357,6 +363,17 @@ class Probability_Handtracking_PG5(Task):
 
         return image_path, image_name  # EDITED
 
+            #     # Choose a random image
+        #     image_path = os.path.join(image_folder, random.choice(images))
+        #     image_name = os.path.splitext(os.path.basename(image_path))[0]
+        #     print(f'XXXXX{image_name}')
+        #     print(f'Stage: {stage}')
+        #     print(f'Image Correct answer on {position}: {image_path}')
+        #
+        # except Exception as e:
+        #     print(f"Error occurred: {e}")
+        #
+        # return image_path, image_name # EDITED
 
     def get_stim_video_path(self, stim_trial, stage, image_name):
         """
@@ -374,6 +391,20 @@ class Probability_Handtracking_PG5(Task):
             # Define video folder based on stage
             if stage == 2:
                 video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+<<<<<<<< HEAD:tasks/Old/Probability_Handtracking_PG5.py
+========
+            elif stage == 3:
+                video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
+            elif stage == 4:
+                if self.substage == 10:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
+                elif self.substage == 11:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
+                elif self.substage == 12:
+                    video_folder = '/home/harsh/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
+                else:
+                    raise ValueError("Invalid substage for stage 4")
+>>>>>>>> origin/laptop_rv1:tasks/Probability_Handtracking_Zoomed_Mod_FF.py
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
@@ -419,8 +450,11 @@ class Probability_Handtracking_PG5(Task):
         ### Randomizing the stimulus positions for both the images:
 
         self.accuracy_criteria_substage = {
-            1: 0.80,
-            2: 0.80,
+            1: 0.75,
+            2: 0.60,
+            3: 0.65,
+            4: 0.80,
+            5: 0.80,
         }
 
         if self.current_trial == 0:
@@ -451,8 +485,8 @@ class Probability_Handtracking_PG5(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.substage == 3:
-                self.task_number = 6
+            if self.substage == 6:
+                self.task_number = 5
                 self.tired = True
 
         if self.stage_backward_change == 1:
@@ -486,9 +520,7 @@ class Probability_Handtracking_PG5(Task):
 
         ### Randomizing the stimulus positions for image and the videos:
         # Stage Assignment:
-        if self.task_number == 5:
-            # Generate the sequence on the first block (or whenever you want),
-            # but DO NOT regenerate later — we'll fall back to stage 2 instead.
+        if self.task_number == 4:
             if self.stage_sequence_counter == 0:
                 if self.substage <= 3:
                     self.stage_sequence = self.get_stage_sequence(
@@ -502,20 +534,17 @@ class Probability_Handtracking_PG5(Task):
                         substage=self.substage,
                         last_stage_trial=self.last_stage_trial
                     )
+                self.stage_sequence_counter = 0
                 self.last_stage_trial = self.stage_sequence[-1]
                 print("stage_sequence = ", self.stage_sequence)
 
-            # Use planned sequence while available; once consumed, fill with stage 2
-            if self.stage_sequence_counter < len(self.stage_sequence):
-                self.stage = self.stage_sequence[self.stage_sequence_counter]
-            else:
-                self.stage = 2  # fallback: keep using stage 2 for all remaining trials
+            self.stage = self.stage_sequence[self.stage_sequence_counter]
 
         #REMINDER: HERE THE LAST STAGE TRIAL IS THE STAGE IN THE LAST TRIAL OF BLOCK.
         
         ### IMAGE Randomisation
         self.stim = [121, 122] # function 121 is image where the left hand is correct and 122 is where right is correct
-        if self.task_number == 5:
+        if self.task_number == 4:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
@@ -606,11 +635,14 @@ class Probability_Handtracking_PG5(Task):
             #print("video_path_function: ", self.video_path_function)
 
             # Decide which port triggers video for this trial
-            self.fixation_trigger_port = Bpod.Events.Port5In
+            if self.substage == 6 or self.substage >= 8:
+                self.fixation_trigger_port = Bpod.Events.Port5In
+            else:
+                self.fixation_trigger_port = Bpod.Events.Port6In
 
         ############ STATE MACHINE ################
         # First trial:
-        if self.task_number == 5:
+        if self.task_number == 4:
             if self.stage % 2 == 1 :
                 # First trial:
                 if self.current_trial == 0:
@@ -894,7 +926,7 @@ class Probability_Handtracking_PG5(Task):
             self.response_y = None
 
     def after_trial(self):
-        if self.task_number == 5:
+        if self.task_number == 4:
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
@@ -906,9 +938,11 @@ class Probability_Handtracking_PG5(Task):
                 self.valid_counter += 1
                 self.stage_sequence_counter += 1 # Always advance in the sequence if it was a valid trial
                 # Block trial counter logic
-                if self.stage % 2 == 0:
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                 self.success = 0
                 self.condition_trial_counter += 1
@@ -924,9 +958,11 @@ class Probability_Handtracking_PG5(Task):
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
                 self.correct_count += 1
                 # Block trial counter logic
-                if self.stage % 2 == 0:
+                if self.substage < 4 or self.stage % 2 == 0:
                     self.block_trial_counter += 1
                     self.total_trials += 1
+                # Count only if video trial
+                if self.stage % 2 == 0:
                     self.block_valid_count += 1
                     self.block_correct_count += 1
                     self.success = 1

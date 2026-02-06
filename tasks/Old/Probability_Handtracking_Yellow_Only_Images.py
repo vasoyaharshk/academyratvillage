@@ -9,7 +9,7 @@ import re
 from academy import telegram_bot
 
 
-class Probability_Handtracking_Yellow_Only_Images(Task):
+class Probability_Handtracking_Only_Images_FF(Task):
     def __init__(self):
         super().__init__()
 
@@ -49,8 +49,8 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.stage = 1  # Current stage within the task
-        self.substage = 1  # Current substage within the stage
+        self.stage = 0  # Current stage within the task
+        self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
         self.task_number = 6  # Each task has a unique number. See RV script guide.
 
@@ -179,6 +179,22 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         self.substage_counter_12 = 0
 
         self.fixation_trigger_port = Bpod.Events.Port5In
+
+        # Forced-choice logic
+        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
+
+        self.touchoutside = 0
+
+        self.consecutive_good_blocks = 0
+        self.consecutive_good_blocks_criteria = 2
+
+        self.session_first_stim = None
+        self.last_two_stim = []
+
+    def flip_side(self, stim_val: int) -> int:
+        return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max']
@@ -425,6 +441,8 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         return video_path
 
     def main_loop(self):
+        self.touchoutside = 0
+
         print('')
         ### Randomizing the stimulus positions for both the images:
 
@@ -436,7 +454,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
-            self.stim_trial_counter = 0
+            self.forced_choice_next_trial = 0
 
         print('Bias Breaking: ', self.bias_breaking)
         # print('stim_trials: ', self.stim_trials)
@@ -454,6 +472,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.last_forward_stage = self.substage  # Save current BEFORE increasing
             self.substage += 1
             message = f"Substage moved forward to {self.substage} for {self.subject} in {self.task}"
@@ -541,11 +560,35 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                         print(f"Successfully generated stimulus trials: {self.stim_trials}")
                 self.stim_trial_counter = 0
 
-            if self.bias_breaking == 0:
-                self.stim_trial = self.stim_trials[self.stim_trial_counter]
+            # --- session-local logic for first two trials in this session ---
+            if self.current_trial == 0:
+                candidate = random.choice(self.stim)
+                self.session_first_stim = candidate
+            elif self.current_trial == 1:
+                candidate = self.flip_side(self.session_first_stim)
             else:
-                self.stim_trial = self.last_stim_trial
-                print('last_stim_trial', self.last_stim_trial)
+                # from 3rd trial onwards: normal block / bias-breaking logic
+                if self.bias_breaking == 0:
+                    candidate = self.stim_trials[self.stim_trial_counter]
+                else:
+                    candidate = self.last_stim_trial
+
+            # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
+            if len(self.last_two_stim) >= 2:
+                if (candidate % 2 == self.last_two_stim[-1] % 2) and (candidate % 2 == self.last_two_stim[-2] % 2):
+                    candidate = self.flip_side(candidate)
+
+                # self.forced_choice_actual_trial = self.forced_choice_next_trial
+
+            if self.forced_choice_next_trial == 0:
+                self.stim_trial = candidate
+            else:
+                self.stim_trial = self.forced_choice_probe
+
+            # keep stimulus schedule aligned with actual delivered probe
+            if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+                self.stim_trials[self.stim_trial_counter] = self.stim_trial
+
 
             print("Stage: ", self.stage)
             print("Substage: ", self.substage)
@@ -616,6 +659,9 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
 
             # Decide which port triggers video for this trial
             self.fixation_trigger_port = Bpod.Events.Port5In
+
+            if self.forced_choice_next_trial == 1:
+                self.x_incorrecth = None
 
         ############ STATE MACHINE ################
         # First trial:
@@ -702,8 +748,9 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                 self.sma.add_state(
                     state_name='Touch_Outside',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                    output_actions=[])
+                    state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 39)])
                 # Goes back to response window in case of touch outside the two jar areas
 
                 self.sma.add_state(
@@ -846,8 +893,9 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
                 self.sma.add_state(
                     state_name='Touch_Outside',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                    output_actions=[])
+                    state_change_conditions={Bpod.Events.Tup: 'Punish_video_display'},
+                    output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                    (Bpod.OutputChannels.SoftCode, 39)])
                 # Goes back to response window in case of touch outside the two jar areas
 
                 self.sma.add_state(
@@ -915,36 +963,44 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.valid_counter += 1
-                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
-                # Block trial counter logic
-                if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
-                    self.block_trial_counter += 1
-                    self.total_trials += 1
-                    self.block_valid_count += 1
-                self.success = 0
-                self.condition_trial_counter += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
-                print('Acc Valid_count: ', self.block_valid_count)
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
+                    # Block trial counter logic
+                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                        self.block_trial_counter += 1
+                        self.total_trials += 1
+                        self.block_valid_count += 1
+                    self.success = 0
+                    self.condition_trial_counter += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                    self.forced_choice_next_trial = 1
+                    self.forced_choice_probe = self.stim_trial
+                    print('Acc Valid_count: ', self.block_valid_count)
 
                 ##### COUNT CORRECTS POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
-                self.valid_counter += 1
-                self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.correct_count += 1
-                # Block trial counter logic
-                if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
-                    self.block_trial_counter += 1
-                    self.total_trials += 1
-                    self.block_valid_count += 1
-                    self.block_correct_count += 1
-                    self.success = 1
-                self.condition_trial_counter += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
+                self.reward = self.valve_reward * self.valve_factor_c
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
+                    self.reward_drunk += self.valve_reward * self.valve_factor_c
+                    self.correct_count += 1
+                    # Block trial counter logic
+                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                        self.block_trial_counter += 1
+                        self.total_trials += 1
+                        self.block_valid_count += 1
+                        self.block_correct_count += 1
+                        self.success = 1
+                    self.condition_trial_counter += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
@@ -959,12 +1015,34 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
 
             # ##### COUNT Touches outside the jar areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.status = 'Touch_Outside'
+                self.trial_result = 'incorrect'
+                self.touchoutside = 1
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
+                    # Block trial counter logic
+                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                        self.block_trial_counter += 1
+                        self.total_trials += 1
+                        self.block_valid_count += 1
+                    self.success = 0
+                    self.condition_trial_counter += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                    self.forced_choice_next_trial = 1
+                    self.forced_choice_probe = self.stim_trial
+                    print('Acc Valid_count: ', self.block_valid_count)
 
             # End-trial calculations
             # self.last_x = self.x
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
+
+            # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
+            if self.x_incorrecth is None:
+                self.forced_choice_actual_trial = 1
+            else:
+                self.forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -979,18 +1057,25 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             self.accuracy = self.correct_count / self.valid_counter if self.current_trial > 0 else 0
 
             # Check accuracy for every block of 40 trials
-            self.block_accuracy = (
-                self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
+                # update consecutive good blocks
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                    self.consecutive_good_blocks += 1
                 else:
-                    print("Accuracy criteria not met.")
-                # Trial limit check (set backward ONLY if forward is NOT happening)
+                    self.consecutive_good_blocks = 0
+
+                # forward criterion: 3 consecutive good blocks
+                if self.consecutive_good_blocks >= self.consecutive_good_blocks_criteria:
+                    self.stage_forward_change = 1
+
+                # backward rule if many trials and still no forward move
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
@@ -998,12 +1083,13 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             if self.moved_back_counter > self.max_move_backs:
                 message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
                 try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    print(message)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
                 except:
                     print('Telegram message not sent')
                     pass
 
-            if self.substage > self.last_backward_stage + 1:
+            if self.stage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
 
             # Substage trial counters for only videos:
@@ -1026,6 +1112,11 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
             print(f"Bias Accuracy (last 5 trials): {self.bias_accuracy}")
 
             self.last_stim_trial = self.stim_trial
+
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
 
             try:
                 # Try converting response_x directly to a float
@@ -1212,7 +1303,7 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         self.register_value('video_path_function', self.video_path_function)
         self.register_value('video_displayed', self.video_displayed)
         self.register_value('video_directory', self.video_directory)
-        self.register_value('image_number', self.image_name)
+        self.register_value('image_name', self.image_name)
         self.register_value('stage_sequence', self.stage_sequence)
         self.register_value('last_stage_trial', self.last_stage_trial)
         self.register_value('substage_counter_1', self.substage_counter_1)
@@ -1227,3 +1318,19 @@ class Probability_Handtracking_Yellow_Only_Images(Task):
         self.register_value('substage_counter_10', self.substage_counter_10)
         self.register_value('substage_counter_11', self.substage_counter_11)
         self.register_value('substage_counter_12', self.substage_counter_12)
+
+        self.register_value('touchoutside', self.touchoutside)
+
+        self.register_value('session_first_stim', self.session_first_stim)
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
+        self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
+        self.register_value('forced_choice_probe', self.forced_choice_probe)
+
+        self.register_value('last_two_stim', self.last_two_stim)
+        self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
+        self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)
+
+        self.register_value('fixation_trigger_port', str(self.fixation_trigger_port))
+
+
