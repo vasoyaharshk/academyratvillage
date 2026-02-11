@@ -41,7 +41,7 @@ class A_Test_Photogate_RV3(Task):
                                      'PA1_Port1Out': 'Waiting',         #Port5Out with port module is PA1_Port1Out
                                      'PA1_Port2Out': 'Waiting',         #Port6Out with port module is PA1_Port2Out
                                     Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 226)])
+            output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 4), (Bpod.OutputChannels.SoftCode, 226)])
 
     def after_trial(self):
         self.register_value('animal_crossed', self.animal_crossed)
