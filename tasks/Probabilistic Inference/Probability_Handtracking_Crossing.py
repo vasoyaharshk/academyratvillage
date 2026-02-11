@@ -328,9 +328,9 @@ class Probability_Handtracking_Crossing(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
+                image_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_1_image_single_peg'
             elif stage == 2:
-                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
+                image_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -390,16 +390,16 @@ class Probability_Handtracking_Crossing(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
+                video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_2_hand_tracking_video/videos'
             elif stage == 3:
-                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
+                video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token'
             elif stage == 4:
                 if self.substage == 10:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
+                    video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_4_1_hand_tracking_video_crossing_1_hand'
                 elif self.substage == 11:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
+                    video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_4_2_hand_tracking_video_crossing_2_hands_yellow_token'
                 elif self.substage == 12:
-                    video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
+                    video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_4_3_hand_tracking_video_crossing_2_hands_empty'
                 else:
                     raise ValueError("Invalid substage for stage 4")
             else:
