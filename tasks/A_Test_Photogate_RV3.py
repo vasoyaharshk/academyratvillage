@@ -2,7 +2,7 @@ from academy.task_collection import Task
 from pybpodapi.protocol import Bpod
 
 
-class A_Test_Photogate(Task):
+class A_Test_Photogate_RV3(Task):
     def __init__(self):
         super().__init__()
 
@@ -26,8 +26,8 @@ class A_Test_Photogate(Task):
                                      'Port2In': 'Cross_corridor',
                                      'Port3In': 'Cross_corridor',
                                      'Port4In': 'Cross_corridor',
-                                     'Port5In': 'Cross_corridor',
-                                     'Port6In': 'Cross_corridor',
+                                     'PA1_Port1In': 'Cross_corridor',      #Port5In with port module is PA1_Port1In
+                                     'PA1_Port2In': 'Cross_corridor',       #Port6In with port module is PA1_Port2In
                                      Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
@@ -38,8 +38,8 @@ class A_Test_Photogate(Task):
                                      'Port2Out': 'Waiting',
                                      'Port3Out': 'Waiting',
                                      'Port4Out': 'Waiting',
-                                     'Port5Out': 'Waiting',
-                                     'Port6Out': 'Waiting',
+                                     'PA1_Port1Out': 'Waiting',         #Port5Out with port module is PA1_Port1Out
+                                     'PA1_Port2Out': 'Waiting',         #Port6Out with port module is PA1_Port2Out
                                     Bpod.Events.Tup: 'exit'},
             output_actions=[(Bpod.OutputChannels.LED, 1), (Bpod.OutputChannels.LED, 6), (Bpod.OutputChannels.SoftCode, 226)])
 
