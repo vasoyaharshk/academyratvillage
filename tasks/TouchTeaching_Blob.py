@@ -94,7 +94,7 @@ class TouchTeaching_Blob(Task):
         self.bias_accuracy_trials = []
         self.bias_accuracy = 0
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
-        self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
+        self.trial_end_criteria = 120  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
 
