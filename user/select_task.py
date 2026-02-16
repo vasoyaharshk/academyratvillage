@@ -604,7 +604,7 @@ def select_task(df, subject):
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
                     moved_back_counter = 0
-                    task_number = 4
+                    task_number = 2
                     stage_forward_change = 0
                     stage_backward_change = 0
                     last_forward_stage = 0

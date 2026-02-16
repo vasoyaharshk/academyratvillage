@@ -513,7 +513,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            new_stage = max(self.substage - 1, 0)
+            new_stage = max(self.substage - 1, 1)
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -988,7 +988,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
                     self.valid_counter += 1
                     self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                     # Block trial counter logic
-                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                    if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0):
                         self.block_trial_counter += 1
                         self.total_trials += 1
                         self.block_valid_count += 1
@@ -1011,7 +1011,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
                     self.reward_drunk += self.valve_reward * self.valve_factor_c
                     self.correct_count += 1
                     # Block trial counter logic
-                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                    if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0):
                         self.block_trial_counter += 1
                         self.total_trials += 1
                         self.block_valid_count += 1
@@ -1042,7 +1042,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
                     self.valid_counter += 1
                     self.stage_sequence_counter += 1  # Always advance in the sequence if it was a valid trial
                     # Block trial counter logic
-                    if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
+                    if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0):
                         self.block_trial_counter += 1
                         self.total_trials += 1
                         self.block_valid_count += 1
@@ -1114,10 +1114,10 @@ class Probability_Handtracking_Only_Images_FF(Task):
                 self.moved_back_counter = 0
 
             # Substage trial counters for only videos:
-            if (self.substage == 0) or (self.substage == 1 and self.stage % 2 == 0):
-                if self.substage == 0:
+            if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0):
+                if self.substage == 1:
                     self.substage_counter_1 += 1
-                elif self.substage == 1:
+                elif self.substage == 2:
                     self.substage_counter_2 += 1
 
             # Side Bias Breaking formula:
