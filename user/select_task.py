@@ -408,7 +408,7 @@ def select_task(df, subject):
         elif task == 'Probability_Extra_Training_Acc_FF_2':
             if task_number == 2:
                 stage = 1  # Current stage within the task
-                substage = 0  # Current substage within the stage
+                substage = 1  # Current substage within the stage
                 substage_bias = 0  # Side bias stage for substage behavior
                 task_number = 6  # Each task has a unique number. See RV script guide.
 

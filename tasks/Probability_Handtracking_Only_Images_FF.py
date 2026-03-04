@@ -1215,8 +1215,8 @@ class Probability_Handtracking_Only_Images_FF(Task):
                     self.substage_counter_2 >= self.task_end_criteria):
                 try:
                     message = f"URGENT: {self.subject} has completed 1600 trials in this task."
-                    telegram_bot.alarm_finish_session(message, self.subject)
-                    self.task_end = True
+                    #telegram_bot.alarm_finish_session(message, self.subject)
+                    #self.task_end = True
                 except Exception as e:
                     print("Telegram message not sent. Error:", e)
 
