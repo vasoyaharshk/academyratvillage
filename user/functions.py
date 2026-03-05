@@ -2046,6 +2046,9 @@ def function213():  # Blob on left
             3: "150",
             4: "130",
             5: "110",
+            6: "105",    # 105 cm
+            7: "100",   # 10 cm
+            8: "95",    # 9.5 cm
         }
         size_tag = size_tag_by_stage.get(stage, "90")
 
@@ -2094,6 +2097,9 @@ def function214():  # Blob on right
             3: "150",
             4: "130",
             5: "110",
+            6: "105",    # 105 cm
+            7: "100",   # 10 cm
+            8: "95",    # 9.5 cm
         }
         size_tag = size_tag_by_stage.get(stage, "90")
 
