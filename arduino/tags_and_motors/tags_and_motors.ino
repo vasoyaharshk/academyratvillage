@@ -27,7 +27,7 @@
 #define ANGLECLOSE1 5// was 28   - 1
 #define ANGLEOPEN2 130 // was 5   - 2
 #define ANGLECLOSE2 168 //was 49     - 3
-#define ANGLESEMICLOSE2 1 //Harsh: what is this?
+#define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
 
 // Door 3: independent angles (change to match your mechanics)
 #define ANGLEOPEN3 30
