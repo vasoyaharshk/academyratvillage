@@ -185,12 +185,19 @@ class TouchTeaching_Blob(Task):
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             if self.stage == 2:
-                self.stage = 6
+                self.stage = 9
             if self.stage == 3:
                 self.stage = 4
             elif self.stage == 4:
                 self.stage = 5
             elif self.stage == 5:
+                self.stage = 6
+            # Extra stages only
+            elif self.stage == 6:
+                self.stage = 7
+            elif self.stage == 7:
+                self.stage = 8
+            elif self.stage == 8:
                 self.stage = 2
             else:
                 self.stage = self.stage
@@ -200,7 +207,7 @@ class TouchTeaching_Blob(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 6:
+            if self.stage == 9:
                 self.task_number = 2
                 self.tired = True
                 message = f"URGENT: Stage moved forward to {self.stage} for {self.subject} in {self.task}. Email ALEX."
@@ -219,7 +226,14 @@ class TouchTeaching_Blob(Task):
             self.block_valid_count = 0
             self.stim_trial_counter = 0
             #new_stage = max(self.stage - 1, 0)
-            new_stage = 3 if self.stage >= 2 else max(self.stage - 1, 0)
+            #new_stage = 3 if self.stage >= 2 else max(self.stage - 1, 0)
+            if self.stage == 2:
+                new_stage = 5
+            elif self.stage >= 3:
+                new_stage = self.stage - 1
+            else:  # stage == 1
+                new_stage = 1
+
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
                     self.moved_back_counter += 1
@@ -240,19 +254,22 @@ class TouchTeaching_Blob(Task):
         # Choose x positions:
         self.stim = [213, 214]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
-        blob_px_by_stage = {
+        blob_mm_by_stage = {
             1: 90,
             2: 90,
             3: 150,
             4: 130,
             5: 110,
+            6: 105,    # 10.5 cm
+            7: 100,   # 10 cm
+            8: 95,    # 9.5 cm
         }
 
-        blob_px = blob_px_by_stage.get(self.stage, 90)
+        blob_mm = blob_mm_by_stage.get(self.stage, 90)
 
         # Touch window is blob size + 10 mm
-        self.width = blob_px + 10
-        self.height = blob_px + 10
+        self.width = blob_mm + 10
+        self.height = blob_mm + 10
 
         if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
