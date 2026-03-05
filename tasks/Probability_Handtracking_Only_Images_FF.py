@@ -1114,7 +1114,7 @@ class Probability_Handtracking_Only_Images_FF(Task):
                 self.moved_back_counter = 0
 
             # Substage trial counters for only videos:
-            if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0):
+            if (self.substage == 1) or (self.substage == 2 and self.stage % 2 == 0) and (self.forced_choice_actual_trial == 0):
                 if self.substage == 1:
                     self.substage_counter_1 += 1
                 elif self.substage == 2:
