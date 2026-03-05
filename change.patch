@@ -31,7 +31,7 @@ index 9d9c3e3bfc092bd39c4c5454b5faccf8c83015ff..981f3e098e223ccfbc06b1f68adbdfcd
  #define ANGLECLOSE1 5// was 28   - 1
  #define ANGLEOPEN2 130 // was 5   - 2
  #define ANGLECLOSE2 168 //was 49     - 3
- #define ANGLESEMICLOSE2 1 //Harsh: what is this?
+ #define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
  
  
  
