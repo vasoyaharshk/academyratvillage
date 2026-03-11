@@ -2506,8 +2506,8 @@ def function231(): #Touchteaching read touchscreen
     py = settings.PIXELS_PER_MM_Y
     forced_choice_next_trial = int(utils.task.forced_choice_next_trial)
 
-    width = (utils.task.width + 30) * px
-    height = (utils.task.height + 30) * py
+    width = (utils.task.width + 50) * px
+    height = (utils.task.height + 50) * py
     x_correct = utils.task.x_correcth * px
     if forced_choice_next_trial == 1:
         x_incorrect = None
