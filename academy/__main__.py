@@ -64,11 +64,33 @@ def main():
             if not settings.TESTING:
                 exit_app()
 
+        import traceback
+        import inspect
+
         utils.log("Academy", "Stablishing connection with Bpod...", "ACTION")
-        if bpod.testing_connection():
-            utils.log_cam("Academy", "Connection with Bpod stablished", "START")
-        else:
-            utils.log_cam("Academy", "Connection to Bpod failed", "ERROR")
+
+        try:
+            utils.log("Academy", f"settings file: {inspect.getfile(settings)}", "ACTION")
+        except Exception:
+            pass
+
+        try:
+            utils.log("Academy", f"PYBPOD_SERIAL_PORT: {getattr(settings, 'PYBPOD_SERIAL_PORT', None)}", "ACTION")
+            utils.log("Academy", f"PYBPOD_BAUDRATE: {getattr(settings, 'PYBPOD_BAUDRATE', None)}", "ACTION")
+        except Exception:
+            pass
+
+        try:
+            ok = bpod.testing_connection()
+            if ok:
+                utils.log_cam("Academy", "Connection with Bpod stablished", "START")
+            else:
+                utils.log_cam("Academy", "Connection to Bpod failed (returned False)", "ERROR")
+                if not settings.TESTING:
+                    exit_app()
+        except Exception as e:
+            utils.log_cam("Academy", f"Connection to Bpod failed (exception): {repr(e)}", "ERROR")
+            utils.log_cam("Academy", traceback.format_exc(), "ERROR")
             if not settings.TESTING:
                 exit_app()
 
