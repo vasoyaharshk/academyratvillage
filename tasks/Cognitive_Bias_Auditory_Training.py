@@ -79,7 +79,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.correct_count = 0
         self.success = 0  # tracks if trial is correct or incorrect (1 or 0)
         self.trial_end_criteria = 320
-        self.accuracy_criteria = 0.80
+        self.accuracy_criteria = 0.70
         self.consecutive_good_blocks_criteria = 3
         self.consecutive_good_blocks = 0
         self.max_move_backs = 5
