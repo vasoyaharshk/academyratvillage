@@ -354,7 +354,7 @@ def select_task(df, subject):
 
         elif task == 'TouchTeaching_Blob':
             if task_number == 2:
-                task = 'Cognitive_Bias_Auditory_Training'
+                task = 'Cognitive_Bias_Auditory_Training_60'
                 stage = 0
                 task_number = 1
                 block_size = 40
@@ -879,8 +879,8 @@ def select_task(df, subject):
 
     elif 'Cognitive_Bias' in task:
         if 'Cognitive_Bias_Auditory_Training' in task:
-            base_name = 'Cognitive_Bias_Auditory_Training'
-            pr_name = 'Cognitive_Bias_Auditory_Training_PR'  # This is the task where partial reinforcement is 1/5
+            base_name = 'Cognitive_Bias_Auditory_Training_60'
+            pr_name = 'Cognitive_Bias_Auditory_Training_60_PR'  # This is the task where partial reinforcement is 1/5
 
             # For block wise progression:
             if task == base_name:
