@@ -34,7 +34,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             The non-reinforced trials are pseudorandomised so that no more than two consecutive trials of the same tone type (high or low) are unrewarded.
 
 
-        Criterion: ≥80% correct across 3 consecutive blocks (per Pair).
+        Criterion: ≥70% correct across 3 consecutive blocks (per Pair).
 
         Pairs (reference tones):
             Pair 1:  Low 2000 Hz,   High 3621 Hz
@@ -94,6 +94,15 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.total_trials = 0  # Total number of trials in that ROR irrespective of conditions
         self.block_correct_count = 0  # Tracks the number of corrects in the block
         self.block_valid_count = 0  ##Tracks the number of valid trials in the block
+
+        # Stimulus accuracy:
+        self.block_stim_correct_count_1 = 0  # Tracks the number of corrects in the block for low freq
+        self.block_stim_valid_count_1 = 0  ##Tracks the number of valid trials in the block for low freq
+        self.block_stim_accuracy_1 = 0.0  # Accuracy for that 40 trial block for low freq
+        self.block_stim_correct_count_2 = 0  # Tracks the number of corrects in the block for high freq
+        self.block_stim_valid_count_2 = 0  #Tracks the number of valid trials in the block for high freq
+        self.block_stim_accuracy_2 = 0.0  # Accuracy for that 40 trial block for high freq
+
 
         self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
         self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
@@ -193,20 +202,110 @@ class Cognitive_Bias_Auditory_Training(Task):
     def configure_gui(self):
         self.gui_input = ['group', 'pair', 'duration_max', 'block_size']
 
-    def generate_random_trials(self,last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
-        trials = []
-        # Define a 50% probability for each stimulus (two stimuli)
-        probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
-        while len(trials) < self.block_size:
-            # Use random.choices to select a candidate with 50% probability for each stimulus
-            candidate = random.choices(self.stim, probabilities)[0]
-            # Ensure no repetition more than twice in sequence
-            if len(trials) < 2 or not (candidate == trials[-1] == trials[-2]):
-                # Additionally, ensure the first trial doesn't repeat the last trial from the previous block
-                if last_trial is not None and len(trials) == 0 and candidate == last_trial:
-                    continue  # Skip if the first trial of new block matches last trial of previous block
+    def generate_random_trials(self, last_trial=None):
+        """
+        Generate one fully precomputed block with strict constraints.
+
+        Rules enforced here:
+        1. Equal or as-equal-as-possible counts for all values in self.stim
+        2. No more than 2 identical trials in a row
+        3. First trial of the new block cannot equal last_trial from previous block
+        4. No long alternation runs beyond max_alternation_streak (5)
+
+        Example:
+        self.stim = [0, 4], block_size = 60
+        -> exactly 30 zeros and 30 fours
+        """
+
+        max_attempts = 5000
+        max_alternation_streak = 5
+
+        stims = list(self.stim)
+        n_stims = len(stims)
+
+        if n_stims == 0:
+            raise ValueError("self.stim is empty")
+
+        def build_quota_counts():
+            base = self.block_size // n_stims
+            remainder = self.block_size % n_stims
+
+            counts = {stim: base for stim in stims}
+
+            if remainder > 0:
+                extras = random.sample(stims, remainder)
+                for stim in extras:
+                    counts[stim] += 1
+
+            return counts
+
+        def would_make_triple(trials, candidate):
+            return len(trials) >= 2 and candidate == trials[-1] == trials[-2]
+
+        def get_alternation_streak(trials):
+            """
+            Count consecutive alternating transitions at the end of the current sequence.
+
+            Example:
+            [0,4,0,4,0] -> streak = 4
+            [0,4,4]     -> streak = 0
+            [0]         -> streak = 0
+            """
+            if len(trials) < 2:
+                return 0
+
+            streak = 0
+            for i in range(len(trials) - 1, 0, -1):
+                if trials[i] != trials[i - 1]:
+                    streak += 1
+                else:
+                    break
+            return streak
+
+        for _ in range(max_attempts):
+            remaining_counts = build_quota_counts()
+            trials = []
+
+            while len(trials) < self.block_size:
+                valid = []
+
+                current_alt_streak = get_alternation_streak(trials)
+
+                for candidate in stims:
+                    if remaining_counts[candidate] <= 0:
+                        continue
+
+                    # Rule 3: first trial of new block cannot match previous block end
+                    if len(trials) == 0 and last_trial is not None and candidate == last_trial:
+                        continue
+
+                    # Rule 2: no AAA
+                    if would_make_triple(trials, candidate):
+                        continue
+
+                    # Rule 4: cap long alternation runs
+                    if len(trials) >= 1:
+                        if candidate != trials[-1]:
+                            if current_alt_streak >= max_alternation_streak:
+                                continue
+
+                    valid.append(candidate)
+
+                if not valid:
+                    break
+
+                candidate = random.choice(valid)
                 trials.append(candidate)
-        return trials
+                remaining_counts[candidate] -= 1
+
+            if len(trials) == self.block_size:
+                return trials
+
+        raise RuntimeError(
+            f"Failed to generate a valid balanced block. "
+            f"stim={self.stim}, block_size={self.block_size}, "
+            f"last_trial={last_trial}"
+        )
 
     #Function to map high, low sounds
     def derive_high_low(self, group: int, pair: int):
@@ -393,6 +492,13 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
+            #Stimulus criteria:
+            self.block_stim_correct_count_1 = 0
+            self.block_stim_valid_count_1 = 0
+            self.block_stim_accuracy_1 = 0.0
+            self.block_stim_correct_count_2 = 0
+            self.block_stim_valid_count_2 = 0
+            self.block_stim_accuracy_2 = 0.0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
@@ -440,25 +546,7 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.pr_carry_tone = ""
             self.pr_carry_deadline = -1
 
-        # --- session-local logic for first two trials in this session ---
-        if self.current_trial == 0:
-            # first trial in this session: random left/right
-            candidate = random.choice(self.stim)  # 0 or 4
-            self.session_first_stim = candidate
-        elif self.current_trial == 1:
-            # second trial in this session: forced opposite of first
-            if self.session_first_stim == 0:
-                candidate = 4
-            else:
-                candidate = 0
-        else:
-            # from 3rd trial onwards: normal block / bias-breaking logic
-            candidate = self.stim_trials[self.stim_trial_counter]
-
-        # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
-        if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
-            # flip side
-            candidate = 0 if candidate == 4 else 4
+        candidate = self.stim_trials[self.stim_trial_counter]
 
         if self.forced_choice_next_trial == 0:
             self.stim_trial = candidate
@@ -695,6 +783,11 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
+                    # Stimulus criteria:
+                    if self.stim_trial == 0:  # LOW
+                        self.block_stim_valid_count_1 += 1
+                    elif self.stim_trial == 4:  # HIGH
+                        self.block_stim_valid_count_2 += 1
                 self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
 
@@ -713,6 +806,13 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.success = 1
                     self.total_trials += 1
+                    #Stimulus criteria:
+                    if self.stim_trial == 0:  # LOW
+                        self.block_stim_correct_count_1 += 1
+                        self.block_stim_valid_count_1 += 1
+                    elif self.stim_trial == 4:  # HIGH
+                        self.block_stim_correct_count_2 += 1
+                        self.block_stim_valid_count_2 += 1
                 self.forced_choice_next_trial = 0
                 self.forced_choice_probe = None
 
@@ -727,6 +827,11 @@ class Cognitive_Bias_Auditory_Training(Task):
                     self.block_trial_counter += 1
                     self.total_trials += 1
                     self.stim_trial_counter += 1
+                    # Stimulus criteria:
+                    if self.stim_trial == 0:  # LOW
+                        self.block_stim_valid_count_1 += 1
+                    elif self.stim_trial == 4:  # HIGH
+                        self.block_stim_valid_count_2 += 1
                 self.forced_choice_next_trial = 1
                 self.forced_choice_probe = self.stim_trial
 
@@ -753,16 +858,40 @@ class Cognitive_Bias_Auditory_Training(Task):
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
+            self.block_stim_accuracy_1 = (
+                self.block_stim_correct_count_1 / self.block_stim_valid_count_1
+                if self.block_stim_valid_count_1 > 0 else 0
+            )
+
+            self.block_stim_accuracy_2 = (
+                self.block_stim_correct_count_2 / self.block_stim_valid_count_2
+                if self.block_stim_valid_count_2 > 0 else 0
+            )
+
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
                 self.last_block_accuracy = self.block_accuracy
 
+                #Delete:
+                self.tired = True
+                self.task_number = 2
+                message = f"Block Ended. Change criteria"
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+                #Delete
+
                 # update consecutive good blocks
-                if self.block_accuracy >= self.accuracy_criteria:
+                if (
+                        self.block_stim_accuracy_1 >= self.accuracy_criteria and
+                        self.block_stim_accuracy_2 >= self.accuracy_criteria
+                ):
                     self.consecutive_good_blocks += 1
                 else:
                     self.consecutive_good_blocks = 0
+
 
                 # forward criterion: 3 consecutive good blocks
                 if self.consecutive_good_blocks >= self.consecutive_good_blocks_criteria:
@@ -877,6 +1006,15 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.register_value('total_trials', self.total_trials)
         self.register_value('block_correct_count', self.block_correct_count)
         self.register_value('block_valid_count', self.block_valid_count)
+
+        #Stimulus Criteria:
+        self.register_value('block_stim_correct_count_1', self.block_stim_correct_count_1)
+        self.register_value('block_stim_valid_count_1', self.block_stim_valid_count_1)
+        self.register_value('block_stim_accuracy_1', self.block_stim_accuracy_1)
+
+        self.register_value('block_stim_correct_count_2', self.block_stim_correct_count_2)
+        self.register_value('block_stim_valid_count_2', self.block_stim_valid_count_2)
+        self.register_value('block_stim_accuracy_2', self.block_stim_accuracy_2)
 
         # Stimulus trial control
         self.register_value('stim_trial', self.stim_trial)

@@ -130,6 +130,12 @@ def select_task(df, subject):
     total_trials = get_val_from_df_or_default('total_trials', 0)
     block_correct_count = get_val_from_df_or_default('block_correct_count', 0)
     block_valid_count = get_val_from_df_or_default('block_valid_count', 0)
+    block_stim_correct_count_1 = get_val_from_df_or_default('block_stim_correct_count_1', 0)
+    block_stim_valid_count_1 = get_val_from_df_or_default('block_stim_valid_count_1', 0)
+    block_stim_accuracy_1 = get_val_from_df_or_default('block_stim_accuracy_1', 0.0)
+    block_stim_correct_count_2 = get_val_from_df_or_default('block_stim_correct_count_2', 0)
+    block_stim_valid_count_2 = get_val_from_df_or_default('block_stim_valid_count_2', 0)
+    block_stim_accuracy_2 = get_val_from_df_or_default('block_stim_accuracy_2', 0.0)
     condition_trial_counter = get_val_from_df_or_default('condition_trial_counter', 0)
     stage_forward_change = get_val_from_df_or_default('stage_forward_change', 0)
     stage_backward_change = get_val_from_df_or_default('stage_backward_change', 0)
@@ -321,6 +327,12 @@ def select_task(df, subject):
                 total_trials = 0  # Total trials across the task.
                 block_correct_count = 0  # Number of correct responses in the block
                 block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                block_stim_correct_count_1 = 0
+                block_stim_valid_count_1 = 0
+                block_stim_accuracy_1 = 0.0
+                block_stim_correct_count_2 = 0
+                block_stim_valid_count_2 = 0
+                block_stim_accuracy_2 = 0.0
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -358,6 +370,12 @@ def select_task(df, subject):
                 total_trials = 0  # Total trials across the task.
                 block_correct_count = 0  # Number of correct responses in the block
                 block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                block_stim_correct_count_1 = 0
+                block_stim_valid_count_1 = 0
+                block_stim_accuracy_1 = 0.0
+                block_stim_correct_count_2 = 0
+                block_stim_valid_count_2 = 0
+                block_stim_accuracy_2 = 0.0
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -439,6 +457,12 @@ def select_task(df, subject):
                 total_trials = 0  # Total trials across the task.
                 block_correct_count = 0  # Number of correct responses in the block
                 block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                block_stim_correct_count_1 = 0
+                block_stim_valid_count_1 = 0
+                block_stim_accuracy_1 = 0.0
+                block_stim_correct_count_2 = 0
+                block_stim_valid_count_2 = 0
+                block_stim_accuracy_2 = 0.0
                 condition_trial_counter = 0  # Counter for randomising conditions
                 last_forward_stage = 0  # The stage moved forward from after a forward change
                 last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -505,6 +529,12 @@ def select_task(df, subject):
                 # total_trials = 0  # Total trials across the task.
                 # block_correct_count = 0  # Number of correct responses in the block
                 # block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                # block_stim_correct_count_1 = 0
+                # block_stim_valid_count_1 = 0
+                # block_stim_accuracy_1 = 0.0
+                # block_stim_correct_count_2 = 0
+                # block_stim_valid_count_2 = 0
+                # block_stim_accuracy_2 = 0.0
                 # condition_trial_counter = 0  # Counter for randomising conditions
                 # last_forward_stage = 0  # The stage moved forward from after a forward change
                 # last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -633,6 +663,12 @@ def select_task(df, subject):
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
                     moved_back_counter = 0
                     task_number = 6
                     stage_forward_change = 0
@@ -675,6 +711,12 @@ def select_task(df, subject):
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0  ##Tracks the number of valid trials in the block
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
                     moved_back_counter = 0
                     task_number = 4
                     stage_forward_change = 0
@@ -751,6 +793,12 @@ def select_task(df, subject):
                     total_trials = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
                     stim_trial = 0
                     stim_trials = []
                     stim_trial_counter = 0
@@ -785,6 +833,12 @@ def select_task(df, subject):
                     substage = 0
                     block_correct_count = 0  # Tracks the number of corrects in the block
                     block_valid_count = 0
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
                     condition_trial_counter = 0
 
                     task = 'Probability_WebersLaw_Post'
@@ -841,6 +895,12 @@ def select_task(df, subject):
                     total_trials = 0  # Total trials across the task.
                     block_correct_count = 0  # Number of correct responses in the block
                     block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
                     condition_trial_counter = 0  # Counter for randomising conditions
                     last_forward_stage = 0  # The stage moved forward from after a forward change
                     last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -861,7 +921,8 @@ def select_task(df, subject):
                     pr_carry_pending = 0
                     consecutive_good_blocks = 0
 
-                    task = pr_name
+                    #task = pr_name
+                    task = xyz
                     message = (f"[CB Urgent] switch to {task} with same pair {pair} in group {group}")
                     print(message)
                     try:
@@ -872,6 +933,7 @@ def select_task(df, subject):
 
             if task == pr_name:
                 if task_number == 3:
+                    task = xyz
                     message = (
                         f"[CB URGENT] {my_subject}: From pair {old_pair} to pair {pair} in group {group}. returning to {task}")
                     print(message)
@@ -893,6 +955,12 @@ def select_task(df, subject):
                     # total_trials = 0  # Total trials across the task.
                     # block_correct_count = 0  # Number of correct responses in the block
                     # block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                    # block_stim_correct_count_1 = 0
+                    # block_stim_valid_count_1 = 0
+                    # block_stim_accuracy_1 = 0.0
+                    # block_stim_correct_count_2 = 0
+                    # block_stim_valid_count_2 = 0
+                    # block_stim_accuracy_2 = 0.0
                     # condition_trial_counter = 0  # Counter for randomising conditions
                     # last_forward_stage = 0  # The stage moved forward from after a forward change
                     # last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -1055,7 +1123,7 @@ def select_task(df, subject):
         block_size = 2
 
     #all of these are written in subjects.csv:
-    return task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair, prev_block_accuracy, last_block_accuracy, last_two_stim, unrewarded_list, pr_carry_tone, pr_carry_pending, consecutive_good_blocks
+    return (task, stage, substage, substage_bias, wait_seconds, stim_dur_ds, stim_dur_dm, stim_dur_dl, choice, block, conditions, completed_conditions, current_condition, repetition, current_repetition, trial_counter, stim_trial, stim_trials, stim_trial_counter, ror, completed_ror, current_ror, trial_counter_ror, moved_back_counter, block_size, block_trial_counter, block_accuracy, block_number, ror_change, block_change, last_stim_trial, last_condition_trial, total_trials, block_correct_count, block_valid_count, block_stim_correct_count_1, block_stim_valid_count_1, block_stim_accuracy_1, block_stim_correct_count_2, block_stim_valid_count_2, block_stim_accuracy_2, condition_trial_counter,stage_forward_change,stage_backward_change, task_number, last_forward_stage, last_backward_stage, reward_frequency, reward_db, reward_duration, stage_sequence, last_stage_trial, stage_sequence_counter, substage_counter_1, substage_counter_2, substage_counter_3, substage_counter_4, substage_counter_5, substage_counter_6, substage_counter_7,substage_counter_8, substage_counter_9, substage_counter_10, substage_counter_11, group, pair, prev_block_accuracy, last_block_accuracy, last_two_stim, unrewarded_list, pr_carry_tone, pr_carry_pending, consecutive_good_blocks)
 
 def str_append(my_str: str, value: str) -> str:
     """Simulate appending a value to a string representation of a list."""
