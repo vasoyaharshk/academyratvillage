@@ -268,8 +268,8 @@ class TouchTeaching_Blob(Task):
         blob_mm = blob_mm_by_stage.get(self.stage, 90)
 
         # Touch window is blob size + 10 mm
-        self.width = blob_mm + 10
-        self.height = blob_mm + 10
+        self.width = blob_mm + 50
+        self.height = blob_mm + 50
 
         if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
