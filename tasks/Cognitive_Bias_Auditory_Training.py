@@ -468,7 +468,6 @@ class Cognitive_Bias_Auditory_Training(Task):
 
         #Reset all tracked variables as session needs to be independent of the previous session:
         if self.current_trial == 0:
-            # session counters
             # stimulus scheduling
             self.stim = [0, 4]
             #self.block_size = 40
