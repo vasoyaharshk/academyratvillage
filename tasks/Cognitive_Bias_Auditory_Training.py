@@ -35,6 +35,7 @@ class Cognitive_Bias_Auditory_Training(Task):
 
 
         Criterion: ≥70% correct across 3 consecutive blocks (per Pair).
+        Block size changed to 60.
 
         Pairs (reference tones):
             Pair 1:  Low 2000 Hz,   High 3621 Hz
@@ -85,7 +86,7 @@ class Cognitive_Bias_Auditory_Training(Task):
         self.max_move_backs = 5
 
         # Tracked Variables - so that it is continuous within blocks (regardless of session)
-        self.block_size = 40  # Every 40 blocks the criteria will be tested.
+        self.block_size = 60  # Every 40 blocks the criteria will be tested.
         self.block_trial_counter = 0  # Counter for block
         self.block_accuracy = 0.0  # Accuracy for that 40 trial block
         self.block_number = 1
@@ -423,45 +424,6 @@ class Cognitive_Bias_Auditory_Training(Task):
                 idx = random.randrange(s, e)
             lst[idx] = 1
         return lst
-
-
-    #This gives alternating sequeunce:
-    # def partial_reinforcement_list_balanced(stim_seq, ratio=0.1):
-    #     """
-    #     Exactly 1 unrewarded per window (window = round(1/ratio)),
-    #     exact 50–50 high/low among unrewarded across the whole block,
-    #     and no runs ≥3 of same unrewarded tone (achieved by alternating pattern).
-    #     """
-    #     import random
-    #
-    #     n = len(stim_seq)
-    #     block = max(1, int(round(1.0 / float(ratio))))  # 0.1→10, 0.2→5
-    #     num_blocks = n // block
-    #     lst = [0] * n
-    #
-    #     # Build an alternating target sequence of tones for the num_blocks windows.
-    #     # Randomly choose whether to start with 'high' or 'low' so it doesn't always align the same way.
-    #     start_high = bool(random.getrandbits(1))
-    #     target_seq = [('high' if ((i % 2 == 0) == start_high) else 'low') for i in range(num_blocks)]
-    #
-    #     # Ensure exact 50–50 by flipping the last element if needed (only matters when num_blocks is even; here it is).
-    #     if target_seq.count('high') != num_blocks // 2:
-    #         target_seq[-1] = 'high' if target_seq[-1] == 'low' else 'low'
-    #
-    #     # For each window, pick an index matching the target tone.
-    #     for b in range(num_blocks):
-    #         s, e = b * block, (b + 1) * block
-    #         tone = target_seq[b]
-    #         candidates = [i for i in range(s, e) if (stim_seq[i] == 4 if tone == 'high' else stim_seq[i] == 0)]
-    #
-    #         if not candidates:
-    #             # Extremely unlikely with your stim generator; fallback to the opposite tone
-    #             alt = [i for i in range(s, e) if (stim_seq[i] == 0 if tone == 'high' else stim_seq[i] == 4)]
-    #             candidates = alt if alt else list(range(s, e))
-    #
-    #         lst[random.choice(candidates)] = 1
-    #
-    #     return lst
 
     def main_loop(self):
         self.touchoutside = 0
@@ -871,16 +833,6 @@ class Cognitive_Bias_Auditory_Training(Task):
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
                 self.last_block_accuracy = self.block_accuracy
-
-                #Delete:
-                self.tired = True
-                self.task_number = 2
-                message = f"Block Ended. Change criteria"
-                try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
-                except Exception as e:
-                    print(f"Telegram message not sent. Error: {e}")
-                #Delete
 
                 # update consecutive good blocks
                 if (

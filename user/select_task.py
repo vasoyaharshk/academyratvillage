@@ -886,7 +886,7 @@ def select_task(df, subject):
             if task == base_name:
                 if task_number == 2:
                     # Needed to create blocks of 40 trials for criterion to be assessed on:
-                    block_size = 40  # The number of trials in a block
+                    block_size = 60  # The number of trials in a block
                     block_trial_counter = 0  # Trial count within the current block
                     block_accuracy = 0.0  # Accuracy in the current block
                     block_number = 1  # Sequential block number
@@ -921,8 +921,7 @@ def select_task(df, subject):
                     pr_carry_pending = 0
                     consecutive_good_blocks = 0
 
-                    #task = pr_name
-                    task = xyz
+                    task = pr_name
                     message = (f"[CB Urgent] switch to {task} with same pair {pair} in group {group}")
                     print(message)
                     try:
@@ -933,69 +932,57 @@ def select_task(df, subject):
 
             if task == pr_name:
                 if task_number == 3:
-                    task = xyz
-                    message = (
-                        f"[CB URGENT] {my_subject}: From pair {old_pair} to pair {pair} in group {group}. returning to {task}")
-                    print(message)
-                    try:
-                        telegram_bot.alarm_finish_session(message, my_subject)
-                        telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
-                    except:
-                        print('Telegram message not sent')
+                    # Needed to create blocks of 40 trials for criterion to be assessed on:
+                    block_size = 60  # The number of trials in a block
+                    block_trial_counter = 0  # Trial count within the current block
+                    block_accuracy = 0.0  # Accuracy in the current block
+                    block_number = 1  # Sequential block number
+                    ror_change = 0  # If it is 1, ROR will change on the next trial.
+                    block_change = 0  # If it is 1, a new block will start on the next trial
+                    total_trials = 0  # Total trials across the task.
+                    block_correct_count = 0  # Number of correct responses in the block
+                    block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                    block_stim_correct_count_1 = 0
+                    block_stim_valid_count_1 = 0
+                    block_stim_accuracy_1 = 0.0
+                    block_stim_correct_count_2 = 0
+                    block_stim_valid_count_2 = 0
+                    block_stim_accuracy_2 = 0.0
+                    condition_trial_counter = 0  # Counter for randomising conditions
+                    last_forward_stage = 0  # The stage moved forward from after a forward change
+                    last_backward_stage = 0  # The stage moved backward to after the last backward change
+                    moved_back_counter = 0  # Counter for how many times the subject moved back a stage
+                    stage_forward_change = 0  # Whether stage move forward on the next trial
+                    stage_backward_change = 0  # Whether stage move backward on the next trial
+                    last_block_accuracy = 0
 
+                    # Left Right Function Randomisation variables:
+                    stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                    stim_trials = []  # List of correct stimulus function randomised.
+                    stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                    last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
 
+                    last_two_stim = []
+                    unrewarded_list = []
+                    pr_carry_tone = ""
+                    pr_carry_pending = 0
+                    consecutive_good_blocks = 0
 
-                    # # Needed to create blocks of 40 trials for criterion to be assessed on:
-                    # block_size = 40  # The number of trials in a block
-                    # block_trial_counter = 0  # Trial count within the current block
-                    # block_accuracy = 0.0  # Accuracy in the current block
-                    # block_number = 1  # Sequential block number
-                    # ror_change = 0  # If it is 1, ROR will change on the next trial.
-                    # block_change = 0  # If it is 1, a new block will start on the next trial
-                    # total_trials = 0  # Total trials across the task.
-                    # block_correct_count = 0  # Number of correct responses in the block
-                    # block_valid_count = 0  # Number of valid (non-missed) trials in the block
-                    # block_stim_correct_count_1 = 0
-                    # block_stim_valid_count_1 = 0
-                    # block_stim_accuracy_1 = 0.0
-                    # block_stim_correct_count_2 = 0
-                    # block_stim_valid_count_2 = 0
-                    # block_stim_accuracy_2 = 0.0
-                    # condition_trial_counter = 0  # Counter for randomising conditions
-                    # last_forward_stage = 0  # The stage moved forward from after a forward change
-                    # last_backward_stage = 0  # The stage moved backward to after the last backward change
-                    # moved_back_counter = 0  # Counter for how many times the subject moved back a stage
-                    # stage_forward_change = 0  # Whether stage move forward on the next trial
-                    # stage_backward_change = 0  # Whether stage move backward on the next trial
-                    # last_block_accuracy = 0
-                    #
-                    # # Left Right Function Randomisation variables:
-                    # stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
-                    # stim_trials = []  # List of correct stimulus function randomised.
-                    # stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
-                    # last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
-                    #
-                    # last_two_stim = []
-                    # unrewarded_list = []
-                    # pr_carry_tone = ""
-                    # pr_carry_pending = 0
-                    # consecutive_good_blocks = 0
-                    #
-                    # task_number = 1
-                    # order = pair_order_table[int(group)]
-                    # idx = order.index(int(pair))
-                    # if idx + 1 < len(order):
-                    #     new_pair = order[idx + 1]
-                    #     old_pair = pair
-                    #     pair = new_pair
-                    #     task = base_name  # go back to baseline for the new pair
-                    #     message = (f"[CB URGENT] {my_subject}: From pair {old_pair} to pair {pair} in group {group}. returning to {task}")
-                    #     print(message)
-                    #     try:
-                    #         telegram_bot.alarm_finish_session(message, my_subject)
-                    #         telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
-                    #     except:
-                    #         print('Telegram message not sent')
+                    task_number = 1
+                    order = pair_order_table[int(group)]
+                    idx = order.index(int(pair))
+                    if idx + 1 < len(order):
+                        new_pair = order[idx + 1]
+                        old_pair = pair
+                        pair = new_pair
+                        task = base_name  # go back to baseline for the new pair
+                        message = (f"[CB URGENT] {my_subject}: From pair {old_pair} to pair {pair} in group {group}. returning to {task}")
+                        print(message)
+                        try:
+                            telegram_bot.alarm_finish_session(message, my_subject)
+                            telegram_bot.alarm_completed_criteria(f"CB pair→{pair}", my_subject)
+                        except:
+                            print('Telegram message not sent')
                     else:
                         # already at the last pair, no wraparound
                         print(f"[CB] {my_subject}: all pairs completed. staying at pair {pair}.")
