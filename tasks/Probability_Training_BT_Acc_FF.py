@@ -396,22 +396,15 @@ class Probability_Training_BT_Acc_FF(Task):
         else:
             raise ValueError(f"Invalid stim_trial value: {stim_trial}")
 
-        spacer = "spacer" if stim_trial in [105, 106, 107, 108] else None
+        spacer = "spacer" if stim_trial in [105, 106] else None
 
         stage = int(stage)
 
         if stage == 1:
-            image_folder = "/home/harsh/academy/stimuli/urn_training/1_indication"
-            
-            suffix = None
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/1_discrimination_a"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 2:
-            image_folder = "/home/harsh/academy/stimuli/urn_training/2_discrimination_a"
-            suffix = "correct" if forced_choice_next_trial == 1 else "both"
-        elif stage == 3:
-            image_folder = "/home/harsh/academy/stimuli/urn_training/3_discrimination_b"
-            suffix = "correct" if forced_choice_next_trial == 1 else "both"
-        elif stage == 4:
-            image_folder = "/home/harsh/academy/stimuli/urn_training/4_discrimination_c"
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/2_discrimination_b"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
             raise ValueError(f"Invalid stage value: {stage}")
@@ -935,11 +928,11 @@ class Probability_Training_BT_Acc_FF(Task):
                         self.sameside = 'left'
                         self.bias_breaking = 1
                         print('Bias breaking active, side:', self.sameside)
-                        self.last_stim_trial = random.choice([102, 104, 106, 108])  # Ensure the new stim is on the right
+                        self.last_stim_trial = random.choice([102, 106])  # Ensure the new stim is on the right
                     elif all_right_side:
                         self.sameside = 'right'
                         self.bias_breaking = 1
-                        self.last_stim_trial = random.choice([101, 103, 105, 107])  # Ensure the new stim is on the left
+                        self.last_stim_trial = random.choice([101, 105])  # Ensure the new stim is on the left
                         print('Bias breaking active, side:', self.sameside)
 
                     self.response_x_array = []  # Clearing the array
@@ -948,11 +941,11 @@ class Probability_Training_BT_Acc_FF(Task):
                         self.sameside = 'left'
                         self.bias_breaking = 1
                         print('Bias breaking active, side:', self.sameside)
-                        self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
+                        self.last_stim_trial = random.choice([102])  # Ensure the new stim is on the right
                     elif all_right_side:
                         self.sameside = 'right'
                         self.bias_breaking = 1
-                        self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
+                        self.last_stim_trial = random.choice([101])  # Ensure the new stim is on the left
                         print('Bias breaking active, side:', self.sameside)
 
                     self.response_x_array = []      #Clearing the array
