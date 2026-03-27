@@ -159,19 +159,19 @@ class Probability_Extra_Training_Acc_FF_2(Task):
             raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
 
         if stage == 1:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_1_indication"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/0_extra_training/1_1_indication"
             suffix = None
         elif stage == 2:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/0_extra_training/1_2_discrimination_1"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 3:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/0_extra_training/1_3_discrimination_2"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 4:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/0_extra_training/1_4_discrimination_3"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 5:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/0_extra_training/1_5_discrimination_4"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
             raise ValueError(f"Invalid stage {stage}")
