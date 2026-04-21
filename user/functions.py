@@ -888,7 +888,6 @@ def loop52(timing):
 
 def function55():
     global last_function_called
-
     cam2.put_state("Correct")
     cam3.put_state("Correct")
 
@@ -1601,7 +1600,7 @@ def loop102(timing):
 def function103():  # When the correct stimuli is on left and big
     global last_function_called
     last_function_called = 103  # Track that function103 was called
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1612,7 +1611,7 @@ def loop103(timing):
 def function104():  # When the correct stimuli is on right and big
     global last_function_called
     last_function_called = 104  # Track that function104 was called
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1624,7 +1623,7 @@ def loop104(timing):
 def function105():  # When the correct stimuli is on left, small, with spacer
     global last_function_called
     last_function_called = 105
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1635,7 +1634,7 @@ def loop105(timing):
 def function106():  # When the correct stimuli is on right, small, with spacer
     global last_function_called
     last_function_called = 106
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1646,7 +1645,7 @@ def loop106(timing):
 def function107():  # When the correct stimuli is on left, big, with spacer
     global last_function_called
     last_function_called = 107
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_left.image = image_path
     image_jar_left.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
@@ -1657,7 +1656,7 @@ def loop107(timing):
 def function108():  # When the correct stimuli is on right, big, with spacer
     global last_function_called
     last_function_called = 108
-    image_path = utils.task.image_path_function
+        image_path = utils.task.image_path_function
     image_jar_right.image = image_path
     image_jar_right.pos = (settings.CENTRE_SCREEN[0], settings.CENTRE_SCREEN[1])
 
