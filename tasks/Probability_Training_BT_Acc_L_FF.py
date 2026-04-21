@@ -8,18 +8,17 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Training_BB_Size_Acc(Task):
+class Probability_Training_BT_Acc_L_FF(Task):
     def __init__(self):
         super().__init__()
 
         self.info = """
         This task displays the image of the jars which are touchable. This script is the main script now with side bias breaking.
-        This script is where the jars are a mix of small and big.
+        This script is where the jars are a mix of small and luminance.
+
         ########   TASK INFO   ########
-        Stage 1: Indication: Only blue jar of pegs stimulus appears Blue is rewarding and yellow unrewarding
-        Stage 2: Discrimination a: Blue and yellow jar of pegs appears (100% each). Combination of small and big jars.
-        Stage 3: Discrimination b: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars.
-        Stage 4: Discrimination c: Spacers: Blue and yellow jar of pegs appears (1 jar is 100% of unrewarded color yellow and the other is 50%). Combination of small and big jars with spacers.        
+        Stage 1: Discrimination a: Blue and yellow jar of pegs appears (100% each). Small jars only.
+        Stage 2: Discrimination b: 100% blue vs 100% yellow, small jars with the spacer under blue on half the trials and under yellow on half the trials
                 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -69,7 +68,6 @@ class Probability_Training_BB_Size_Acc(Task):
         self.accuracy_criteria = 0.80  # move forward criteria. 80% success on block_size(32/40 trials correct)
         self.trial_end_criteria = 320  # Move back criteria. Badly named - this is task end criteria.
         self.max_move_backs = 5  # number of times they can be moved back (i.e., they've done 320 trials 5 times) before we review
-        self.probabilities_size = [0.5, 0.5]
         self.probabilities_side = [0.5, 0.5]
         self.probabilities_spacer = [0.5, 0.5]
 
@@ -122,385 +120,310 @@ class Probability_Training_BB_Size_Acc(Task):
 
         self.task_end = False
 
+        # Forced-choice logic
+        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice
+        self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
+        self.forced_choice_probe = None  # 0 or 4, probe to repeat on forced-choice trials
+
+        self.touchoutside = 0
+
+        self.consecutive_good_blocks = 0
+        self.consecutive_good_blocks_criteria = 2
+
+        self.session_first_stim = None
+        self.last_two_stim = []
+
+        self.image_path_function = None
+        self.image_displayed = None
+        self.image_directory = None
+
+        # Luminnace:
+        self.image_type = None  # normal or luminance for current trial
+        self.block_correct_count_normal = 0
+        self.block_valid_count_normal = 0
+        self.block_accuracy_normal = 0.0
+        self.block_correct_count_luminance = 0
+        self.block_valid_count_luminance = 0
+        self.block_accuracy_luminance = 0.0
+
+    def flip_side(self, stim_val: int) -> int:
+        return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'task_number', 'block_size']
 
-    # def generate_random_trials_position_size(self, last_trial=None):
-    #     """
-    #     This function generates a sequence of trials ensuring the following constraints:
-    #     1. No more than two consecutive trials should have the same size ('small' or 'big').
-    #     2. No more than two consecutive trials should have the same position ('left' or 'right').
-    #     3. The first trial of the new block must also follow these constraints relative to the last trial of the previous block.
-    #     """
-    #     print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
-    #
-    #     def generate_trials():
-    #         all_trials = self.stim * 100  # Ensure enough trials to randomize from
-    #         random.shuffle(all_trials)
-    #         trials = []
-    #         max_attempts = 10000
-    #         attempts = 0
-    #
-    #         def get_size(trial):
-    #             return 'small' if trial in [101, 102] else 'big'
-    #
-    #         def get_position(trial):
-    #             return 'left' if trial in [101, 103] else 'right'
-    #
-    #         def is_valid_candidate(candidate, trials):
-    #             if len(trials) < 2:
-    #                 return True
-    #             return (
-    #                     get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])
-    #             ) and (
-    #                     get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-    #                 trials[-2])
-    #             )
-    #
-    #         first_trial_selected = False
-    #         while len(trials) < self.block_size:
-    #             attempts += 1
-    #             if attempts >= max_attempts:
-    #                 print("Reached max_attempts in generate_trials.")
-    #                 return None
-    #             if not all_trials:
-    #                 print("No candidates left in all_trials. Reinitializing.")
-    #                 all_trials = self.stim * 100
-    #                 random.shuffle(all_trials)
-    #             candidate = all_trials.pop(0)
-    #             if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-    #                 if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
-    #                         last_trial):
-    #                     continue
-    #                 first_trial_selected = True
-    #             if is_valid_candidate(candidate, trials):
-    #                 trials.append(candidate)
-    #             else:
-    #                 all_trials.append(candidate)
-    #         print("Generated trials:", trials)
-    #         return trials
-    #
-    #     try:
-    #         result = generate_trials()
-    #         if result is None:
-    #             print("generate_trials returned None.")
-    #         else:
-    #             print(f"Generated trials successfully: {result}")
-    #         return result
-    #     except Exception as e:
-    #         print(f"Error in generate_random_trials_ror1: {e}")
-    #         return None
+    def generate_random_trials_combined(self, last_trial=None):
+        """
+        Generate one fully precomputed block with strict constraints.
 
-    def generate_random_trials_position_size_weighted(self, last_trial=None):
-        print(f"Starting generate_random_trials_ror1 with last_trial: {last_trial}")
+        Stage 1 uses:
+        101 = left normal
+        102 = right normal
+        103 = left luminance
+        104 = right luminance
 
-        def generate_trials():
-            tolerance = 0.05
-            all_trials = self.stim * 100  # Ensure enough trials to randomize from
-            random.shuffle(all_trials)
-            trials = []
-            max_attempts = 10000
-            attempts = 0
+        Stage 2 uses:
+        101 = left no_spacer normal
+        102 = right no_spacer normal
+        103 = left no_spacer luminance
+        104 = right no_spacer luminance
+        105 = left spacer normal
+        106 = right spacer normal
+        107 = left spacer luminance
+        108 = right spacer luminance
 
-            def get_size(trial):
-                return 'small' if trial in [101, 102] else 'big'
+        Rules enforced here:
+        1. Equal counts for all values in self.stim
+        2. No more than 2 identical trials in a row
+        3. No more than 2 same-side trials in a row
+        4. No more than 2 same-image-type trials in a row
+        5. In stage 2, no more than 2 same-spacer-status trials in a row
+        6. First trial of the new block cannot equal last_trial from previous block
+        7. No long alternation runs beyond max_alternation_streak (5)
+        """
 
-            def get_position(trial):
-                return 'left' if trial in [101, 103] else 'right'
+        max_attempts = 5000
+        max_alternation_streak = 5
 
-            def current_counts(trials):
-                count_small = sum(1 for t in trials if get_size(t) == 'small')
-                count_big = len(trials) - count_small
-                count_left = sum(1 for t in trials if get_position(t) == 'left')
-                count_right = len(trials) - count_left
-                return count_small, count_big, count_left, count_right
+        stims = list(self.stim)
+        n_stims = len(stims)
 
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                same_size = get_size(candidate) == get_size(trials[-1]) == get_size(trials[-2])
-                same_pos = get_position(candidate) == get_position(trials[-1]) == get_position(trials[-2])
-                return not (same_size or same_pos)
+        if n_stims == 0:
+            raise ValueError("self.stim is empty")
 
-            self.random_block = self.block_size
-            max_small = round(self.probabilities_size[0] * self.random_block + tolerance * self.random_block)
-            max_big = round(self.probabilities_size[1] * self.random_block + tolerance * self.random_block)
-            max_left = round(self.probabilities_side[0] * self.random_block + tolerance * self.random_block)
-            max_right = round(self.probabilities_side[1] * self.random_block + tolerance * self.random_block)
+        def build_quota_counts():
+            base = self.block_size // n_stims
+            remainder = self.block_size % n_stims
 
-            first_trial_selected = False
-            while len(trials) < self.random_block:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * 100
-                    random.shuffle(all_trials)
-                candidate = all_trials.pop(0)
+            counts = {stim: base for stim in stims}
 
-                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if get_size(candidate) == get_size(last_trial) or get_position(candidate) == get_position(
-                            last_trial):
-                        continue
-                    first_trial_selected = True
+            if remainder > 0:
+                extras = random.sample(stims, remainder)
+                for stim in extras:
+                    counts[stim] += 1
 
-                count_small, count_big, count_left, count_right = current_counts(trials)
-                if get_size(candidate) == 'small' and count_small >= max_small:
-                    continue
-                if get_size(candidate) == 'big' and count_big >= max_big:
-                    continue
-                if get_position(candidate) == 'left' and count_left >= max_left:
-                    continue
-                if get_position(candidate) == 'right' and count_right >= max_right:
-                    continue
+            return counts
 
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
+        def get_position(trial):
+            if trial in [101, 103, 105, 107]:
+                return "left"
+            elif trial in [102, 104, 106, 108]:
+                return "right"
+            else:
+                raise ValueError(f"Unknown trial code for position: {trial}")
+
+        def get_image_type(trial):
+            if trial in [101, 102, 105, 106]:
+                return "normal"
+            elif trial in [103, 104, 107, 108]:
+                return "luminance"
+            else:
+                raise ValueError(f"Unknown trial code for image type: {trial}")
+
+        def get_spacer(trial):
+            if self.stage == 1:
+                return None
+            elif trial in [101, 102, 103, 104]:
+                return "no_spacer"
+            elif trial in [105, 106, 107, 108]:
+                return "spacer"
+            else:
+                raise ValueError(f"Unknown trial code for spacer: {trial}")
+
+        def would_make_triple(trials, candidate):
+            return len(trials) >= 2 and candidate == trials[-1] == trials[-2]
+
+        def would_make_side_triple(trials, candidate):
+            return (
+                len(trials) >= 2 and
+                get_position(candidate) == get_position(trials[-1]) == get_position(trials[-2])
+            )
+
+        def would_make_image_type_triple(trials, candidate):
+            return (
+                len(trials) >= 2 and
+                get_image_type(candidate) == get_image_type(trials[-1]) == get_image_type(trials[-2])
+            )
+
+        def would_make_spacer_triple(trials, candidate):
+            candidate_spacer = get_spacer(candidate)
+            if candidate_spacer is None:
+                return False
+            return (
+                len(trials) >= 2 and
+                get_spacer(trials[-1]) is not None and
+                get_spacer(trials[-2]) is not None and
+                candidate_spacer == get_spacer(trials[-1]) == get_spacer(trials[-2])
+            )
+
+        def get_alternation_streak(trials):
+            if len(trials) < 2:
+                return 0
+
+            streak = 0
+            for i in range(len(trials) - 1, 0, -1):
+                if trials[i] != trials[i - 1]:
+                    streak += 1
                 else:
-                    all_trials.append(candidate)
-            print("Generated trials:", trials)
-            return trials
+                    break
+            return streak
 
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
-            else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generate_random_trials_ror1: {e}")
-            return None
-
-    # def generate_random_trials_position_size_spacers(self, last_trial=None):
-    #     """
-    #     This function generates a sequence of trials ensuring the following constraints:
-    #     1. No more than two consecutive trials should have the same size ('small' or 'big').
-    #     2. No more than two consecutive trials should have the same position ('left' or 'right').
-    #     3. No more than two consecutive trials should have the spacer.
-    #     4. The first trial of the new block must also follow these three constraints relative to the last trial of the previous block.
-    #     """
-    #     print(f"Function failed to generate trials with last_trial: {last_trial}")
-    #
-    #     def generate_trials():
-    #         all_trials = self.stim * 100
-    #         random.shuffle(all_trials)
-    #         trials = []
-    #         max_attempts = 10000
-    #         attempts = 0
-    #
-    #         def get_size(trial):
-    #             return 'small' if trial in [101, 102, 105, 106] else 'big'
-    #
-    #         def get_position(trial):
-    #             return 'left' if trial in [101, 103, 105, 107] else 'right'
-    #
-    #         def get_spacer(trial):
-    #             return 'spacer' if trial in [105, 106, 107, 108] else 'no spacer'
-    #
-    #         def is_valid_candidate(candidate, trials):
-    #             if len(trials) < 2:
-    #                 return True
-    #             return (
-    #                     (get_size(candidate) != get_size(trials[-1]) or get_size(candidate) != get_size(trials[-2])) and
-    #                     (get_position(candidate) != get_position(trials[-1]) or get_position(candidate) != get_position(
-    #                         trials[-2])) and
-    #                     (get_spacer(candidate) != get_spacer(trials[-1]) or get_spacer(candidate) != get_spacer(
-    #                         trials[-2]))
-    #             )
-    #
-    #         first_trial_selected = False
-    #         while len(trials) < self.block_size:
-    #             attempts += 1
-    #             if attempts >= max_attempts:
-    #                 print("Reached max_attempts in generate_trials.")
-    #                 return None
-    #             if not all_trials:
-    #                 print("No candidates left in all_trials. Reinitializing.")
-    #                 all_trials = self.stim * 100
-    #                 random.shuffle(all_trials)
-    #             candidate = all_trials.pop(0)
-    #             if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-    #                 if (
-    #                         get_size(candidate) == get_size(last_trial) or
-    #                         get_position(candidate) == get_position(last_trial) or
-    #                         get_spacer(candidate) == get_spacer(last_trial)
-    #                 ):
-    #                     continue
-    #                 first_trial_selected = True
-    #             if is_valid_candidate(candidate, trials):
-    #                 trials.append(candidate)
-    #             else:
-    #                 all_trials.append(candidate)
-    #         print("Generated trials:", trials)
-    #         return trials
-    #
-    #     try:
-    #         result = generate_trials()
-    #         if result is None:
-    #             print("generate_trials returned None.")
-    #         else:
-    #             print(f"Generated trials successfully: {result}")
-    #         return result
-    #     except Exception as e:
-    #         print(f"Error in generating trial stims: {e}")
-    #         return None
-
-    def generate_random_trials_position_size_spacers_weighted(self, last_trial=None):
-        print(f"Starting generate_random_trials_position_size_spacers_weighted with last_trial: {last_trial}")
-
-        def generate_trials():
-            tolerance = 0.05
-            all_trials = self.stim * 100
-            random.shuffle(all_trials)
+        for _ in range(max_attempts):
+            remaining_counts = build_quota_counts()
             trials = []
-            max_attempts = 10000
-            attempts = 0
 
-            def get_size(trial):
-                return 'small' if trial in [101, 102, 105, 106] else 'big'
+            while len(trials) < self.block_size:
+                valid = []
+                current_alt_streak = get_alternation_streak(trials)
 
-            def get_position(trial):
-                return 'left' if trial in [101, 103, 105, 107] else 'right'
-
-            def get_spacer(trial):
-                return 'spacer' if trial in [105, 106, 107, 108] else 'no spacer'
-
-            def current_counts(trials):
-                count_small = sum(1 for t in trials if get_size(t) == 'small')
-                count_big = len(trials) - count_small
-                count_left = sum(1 for t in trials if get_position(t) == 'left')
-                count_right = len(trials) - count_left
-                count_spacer = sum(1 for t in trials if get_spacer(t) == 'spacer')
-                count_no_spacer = len(trials) - count_spacer
-                return count_small, count_big, count_left, count_right, count_spacer, count_no_spacer
-
-            def is_valid_candidate(candidate, trials):
-                if len(trials) < 2:
-                    return True
-                same_size = get_size(candidate) == get_size(trials[-1]) == get_size(trials[-2])
-                same_pos = get_position(candidate) == get_position(trials[-1]) == get_position(trials[-2])
-                same_spacer = get_spacer(candidate) == get_spacer(trials[-1]) == get_spacer(trials[-2])
-                return not (same_size or same_pos or same_spacer)
-
-            self.random_block = self.block_size
-            max_small = round(self.probabilities_size[0] * self.random_block + tolerance * self.random_block)
-            max_big = round(self.probabilities_size[1] * self.random_block + tolerance * self.random_block)
-            max_left = round(self.probabilities_side[0] * self.random_block + tolerance * self.random_block)
-            max_right = round(self.probabilities_side[1] * self.random_block + tolerance * self.random_block)
-            max_spacer = round(self.probabilities_spacer[0] * self.random_block + tolerance * self.random_block)
-            max_no_spacer = round(self.probabilities_spacer[1] * self.random_block + tolerance * self.random_block)
-
-            first_trial_selected = False
-            while len(trials) < self.random_block:
-                attempts += 1
-                if attempts >= max_attempts:
-                    print("Reached max_attempts in generate_trials.")
-                    return None
-                if not all_trials:
-                    print("No candidates left in all_trials. Reinitializing.")
-                    all_trials = self.stim * 100
-                    random.shuffle(all_trials)
-                candidate = all_trials.pop(0)
-
-                if len(trials) == 0 and last_trial is not None and not first_trial_selected:
-                    if (
-                        get_size(candidate) == get_size(last_trial) or
-                        get_position(candidate) == get_position(last_trial) or
-                        get_spacer(candidate) == get_spacer(last_trial)
-                    ):
+                for candidate in stims:
+                    if remaining_counts[candidate] <= 0:
                         continue
-                    first_trial_selected = True
 
-                count_small, count_big, count_left, count_right, count_spacer, count_no_spacer = current_counts(trials)
-                if get_size(candidate) == 'small' and count_small >= max_small:
-                    continue
-                if get_size(candidate) == 'big' and count_big >= max_big:
-                    continue
-                if get_position(candidate) == 'left' and count_left >= max_left:
-                    continue
-                if get_position(candidate) == 'right' and count_right >= max_right:
-                    continue
-                if get_spacer(candidate) == 'spacer' and count_spacer >= max_spacer:
-                    continue
-                if get_spacer(candidate) == 'no spacer' and count_no_spacer >= max_no_spacer:
-                    continue
+                    if len(trials) == 0 and last_trial is not None and candidate == last_trial:
+                        continue
 
-                if is_valid_candidate(candidate, trials):
-                    trials.append(candidate)
-                else:
-                    all_trials.append(candidate)
+                    if would_make_triple(trials, candidate):
+                        continue
 
-            print("Generated trials:", trials)
-            return trials
+                    if would_make_side_triple(trials, candidate):
+                        continue
 
-        try:
-            result = generate_trials()
-            if result is None:
-                print("generate_trials returned None.")
+                    if would_make_image_type_triple(trials, candidate):
+                        continue
+
+                    if self.stage == 2 and would_make_spacer_triple(trials, candidate):
+                        continue
+
+                    if len(trials) >= 1:
+                        if candidate != trials[-1]:
+                            if current_alt_streak >= max_alternation_streak:
+                                continue
+
+                    valid.append(candidate)
+
+                if not valid:
+                    break
+
+                candidate = random.choice(valid)
+                trials.append(candidate)
+                remaining_counts[candidate] -= 1
+
+            if len(trials) == self.block_size:
+                return trials
+
+        print(
+            f"WARNING: Failed to generate a valid balanced combined block after {max_attempts} attempts. "
+            f"stim={self.stim}, block_size={self.block_size}, last_trial={last_trial}"
+        )
+        return None
+
+    def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
+        if stage == 1:
+            if stim_trial == 101:
+                position, size, image_type, spacer = "left", "small", "normal", None
+            elif stim_trial == 102:
+                position, size, image_type, spacer = "right", "small", "normal", None
+            elif stim_trial == 103:
+                position, size, image_type, spacer = "left", "small", "luminance", None
+            elif stim_trial == 104:
+                position, size, image_type, spacer = "right", "small", "luminance", None
             else:
-                print(f"Generated trials successfully: {result}")
-            return result
-        except Exception as e:
-            print(f"Error in generating trial stims: {e}")
-            return None
+                raise ValueError(f"Invalid stage 1 stim_trial value: {stim_trial}")
 
-
-    def get_stim_image_path(self, stim_trial, stage):
-        image_path = None
-        image_folder = None
-        try:
-            if stim_trial in [101, 105]:
-                position = 'left'
-                size = 'small'
-            elif stim_trial in [102, 106]:
-                position = 'right'
-                size = 'small'
-            elif stim_trial in [103, 107]:
-                position = 'left'
-                size = 'big'
-            elif stim_trial in [104, 108]:
-                position = 'right'
-                size = 'big'
+        elif stage == 2:
+            if stim_trial == 101:
+                position, size, image_type, spacer = "left", "small", "normal", "no_spacer"
+            elif stim_trial == 102:
+                position, size, image_type, spacer = "right", "small", "normal", "no_spacer"
+            elif stim_trial == 103:
+                position, size, image_type, spacer = "left", "small", "luminance", "no_spacer"
+            elif stim_trial == 104:
+                position, size, image_type, spacer = "right", "small", "luminance", "no_spacer"
+            elif stim_trial == 105:
+                position, size, image_type, spacer = "left", "small", "normal", "spacer"
+            elif stim_trial == 106:
+                position, size, image_type, spacer = "right", "small", "normal", "spacer"
+            elif stim_trial == 107:
+                position, size, image_type, spacer = "left", "small", "luminance", "spacer"
+            elif stim_trial == 108:
+                position, size, image_type, spacer = "right", "small", "luminance", "spacer"
             else:
-                raise ValueError(f"Invalid stim_trial value: {stim_trial}.")
+                raise ValueError(f"Invalid stage 2 stim_trial value: {stim_trial}")
+        else:
+            raise ValueError(f"Invalid stage value: {stage}")
 
-            spacer = 'spacer' if stim_trial in [105, 106, 107, 108] else ''
+        self.image_type = image_type
+        stage = int(stage)
 
-            if stage == 1:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/1_indication'
-            elif stage == 2:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/2_discrimination_a'
-            elif stage == 3:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/3_discrimination_b'
-            elif stage == 4:
-                image_folder = '/home/harsh/academy/stimuli/urn_training/4_discrimination_c'
+        if stage == 1:
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/1_discrimination_a"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        elif stage == 2:
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/2_discrimination_b"
+            suffix = "correct" if forced_choice_next_trial == 1 else "both"
+        else:
+            raise ValueError(f"Invalid stage value: {stage}")
+
+        candidates = []
+        for f in os.listdir(image_folder):
+            fp = os.path.join(image_folder, f)
+            if not os.path.isfile(fp):
+                continue
+
+            fl = f.lower()
+
+            if position not in fl:
+                continue
+            if size not in fl:
+                continue
+
+            if image_type == "luminance":
+                if "luminance" not in fl:
+                    continue
             else:
-                raise ValueError(f"Invalid stage value: {stage}.")
+                if "luminance" in fl:
+                    continue
 
-            images = [f for f in os.listdir(image_folder) if
-                      os.path.isfile(os.path.join(image_folder, f)) and
-                      (position in f.lower() and 'both' in f.lower() and size in f.lower() and (
-                          spacer in f.lower() if spacer else True))]
-            if not images:
-                raise ValueError(
-                    f"No images found in {image_folder} for stage {stage}, position {position}, size {size}, and spacer {spacer}.")
+            if spacer is None:
+                if "spacer" in fl:
+                    continue
+            elif spacer == "no_spacer":
+                if "spacer" in fl:
+                    continue
+            else:
+                if "spacer" not in fl:
+                    continue
 
-            image_path = os.path.join(image_folder, random.choice(images))
-            print(f'Stage in function: {stage}')
-            print(f'Correct answer on {position}, {size}, {spacer} jar: {image_path}')
-        except Exception as e:
-            print(f"Error occurred: {e}")
+            if suffix is not None:
+                if f"_{suffix}_" not in fl:
+                    continue
+
+            candidates.append(f)
+
+        if not candidates:
+            raise ValueError(
+                f"No images found in {image_folder} for stage {stage}, "
+                f"position {position}, size {size}, spacer {spacer}, "
+                f"image_type {image_type}, suffix {suffix}"
+            )
+
+        image_path = os.path.join(image_folder, random.choice(candidates))
         return image_path
 
     def main_loop(self):
+        self.touchoutside = 0
+        self.bias_breaking = 0
+
         print('')
         if self.current_trial == 0:
             self.bias_breaking = 0
             self.accuracy = 0
+            self.forced_choice_next_trial = 0
+            self.duration_max = 3000
+            self.duration_min = 2100
+            self.duration_tired = 1800
+            self.tired = False
             # print("Move on to next ROR Accuracy Criteria: ", self.accuracy_criteria)
 
         print('Bias Breaking: ', self.bias_breaking)
@@ -513,11 +436,18 @@ class Probability_Training_BB_Size_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.block_correct_count_normal = 0
+            self.block_valid_count_normal = 0
+            self.block_accuracy_normal = 0.0
+            self.block_correct_count_luminance = 0
+            self.block_valid_count_luminance = 0
+            self.block_accuracy_luminance = 0.0
             self.stim_trial_counter = 0
 
         if self.stage_forward_change == 1:
             self.total_trials = 0
             self.stage_forward_change = 0
+            self.consecutive_good_blocks = 0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
             self.stage += 1
             message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
@@ -525,7 +455,7 @@ class Probability_Training_BB_Size_Acc(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 5:
+            if self.stage == 3:
                 self.task_number = 3
                 self.tired = True
 
@@ -536,6 +466,12 @@ class Probability_Training_BB_Size_Acc(Task):
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
+            self.block_correct_count_normal = 0
+            self.block_valid_count_normal = 0
+            self.block_accuracy_normal = 0.0
+            self.block_correct_count_luminance = 0
+            self.block_valid_count_luminance = 0
+            self.block_accuracy_luminance = 0.0
             self.stim_trial_counter = 0
             new_stage = max(self.stage - 1, 1)
             if new_stage == self.last_forward_stage:
@@ -556,72 +492,51 @@ class Probability_Training_BB_Size_Acc(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        if self.stage == 4:
-            self.stim = [101, 102, 103, 104, 105, 106, 107, 108]  # Correct Answer 101-102: small (left/right), 103-104: big (left/right) without spacer; 105-106: small (left/right), 107-108: big (left/right) with spacer. All odd numbers are for left and even numbers for right
+        if self.stage == 2:
+            self.stim = [101, 102, 103, 104, 105, 106, 107, 108]
         else:
             self.stim = [101, 102, 103, 104]
 
         if self.task_number == 2:
-            # Stimulus generation logic
-            if self.stage == 4:
-                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                    self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                    self.stim_trials = self.generate_random_trials_position_size_spacers_weighted(self.last_stim_trial)
-                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                    while self.stim_trials is None:
-                        print("Retrying to generate stimulus trials...")
-                        self.stim_trials = self.generate_random_trials_position_size_spacers_weighted(self.last_stim_trial)
-                        if self.stim_trials is None:
-                            print("generate_random_trials returned None. Retrying...")
-                        else:
-                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                    self.stim_trial_counter = 0
-            else:
-                if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
-                    # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-                    self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-                    self.stim_trials = self.generate_random_trials_position_size_weighted(self.last_stim_trial)
-                    print(f"Stimulus trials after first attempt: {self.stim_trials}")
-                    while self.stim_trials is None:
-                        print("Retrying to generate stimulus trials...")
-                        self.stim_trials = self.generate_random_trials_position_size_weighted(self.last_stim_trial)
-                        if self.stim_trials is None:
-                            print("generate_random_trials returned None. Retrying...")
-                        else:
-                            print(f"Successfully generated stimulus trials: {self.stim_trials}")
-                    self.stim_trial_counter = 0
+            if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:
+                last_trial = self.last_stim_trial if len(self.stim_trials) > 0 else None
+
+                self.stim_trials = self.generate_random_trials_combined(last_trial)
+                while self.stim_trials is None:
+                    print("Retrying block generation...")
+                    self.stim_trials = self.generate_random_trials_combined(last_trial)
+
+                print(f"Stimulus trials: {self.stim_trials}")
+                self.stim_trial_counter = 0
 
             if self.bias_breaking == 0:
-                self.stim_trial = self.stim_trials[self.stim_trial_counter]
+                candidate = self.stim_trials[self.stim_trial_counter]
             else:
-                self.stim_trial = self.last_stim_trial
-                print('last_stim_trial', self.last_stim_trial)
+                candidate = self.last_stim_trial
 
-            if self.stage == 1:  # We have only one stimuli in stage 1
-                self.image_display = 0
-                # Here, if we need to define the correcth_x position based on the stimulus. So function 101 displays stimulus with correct answer on the left (x=115) and 102 displays stimulus with correct answer on right (x=295)
-                if self.stim_trial in [101, 103, 105, 107]:
-                    self.x_correcth = self.x_correcth_pos[0]
-                    self.x_incorrecth = None  # No incorrect area in stage 1
-                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
-                elif self.stim_trial in [102, 104, 106, 108]:
-                    self.x_correcth = self.x_correcth_pos[1]
-                    self.x_incorrecth = None  # No incorrect area in stage 1
-                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
-            else:  # We have two stimuli after stage 1 with correct and incorrect areas
-                self.image_display = 3
-                if self.stim_trial in [101, 103, 105, 107]:
-                    self.x_correcth = self.x_correcth_pos[0]
-                    self.x_incorrecth = self.x_correcth_pos[1]
-                    print('Correct Answer: Left, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
-                elif self.stim_trial in [102, 104, 106, 108]:
-                    self.x_correcth = self.x_correcth_pos[1]
-                    self.x_incorrecth = self.x_correcth_pos[0]
-                    print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
+            if self.forced_choice_next_trial == 0:
+                self.stim_trial = candidate
+            else:
+                self.stim_trial = self.forced_choice_probe
+
+            # keep stimulus schedule aligned with actual delivered probe
+            if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
+                self.stim_trials[self.stim_trial_counter] = self.stim_trial
+
+            self.image_display = 3
+            if self.stim_trial in [101, 103, 105, 107]:
+                self.x_correcth = self.x_correcth_pos[0]
+                self.x_incorrecth = self.x_correcth_pos[1]
+            elif self.stim_trial in [102, 104, 106, 108]:
+                self.x_correcth = self.x_correcth_pos[1]
+                self.x_incorrecth = self.x_correcth_pos[0]
+
+            if self.forced_choice_next_trial == 1:
+                self.x_incorrecth = None
 
             if self.task_number == 2:
-                self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage)
+                self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage, self.forced_choice_next_trial)
+
                 print("image_path_function: ", self.image_path_function)
 
                 directory, filename = os.path.split(self.image_path_function)
@@ -631,6 +546,9 @@ class Probability_Training_BB_Size_Acc(Task):
             print('Stimulus trial: ', self.stim_trial)
             print('Stimulus Trial Counter', self.stim_trial_counter)
             print('Stage before Bpod', self.stage)
+            print('Forced Choice Next Trial', self.forced_choice_next_trial)
+            print("candidate", candidate, "stim_trial", self.stim_trial, "forced_next", self.forced_choice_next_trial,
+                  "forced_probe", self.forced_choice_probe)
 
         ############ STATE MACHINE ################
         #First trial:
@@ -645,7 +563,7 @@ class Probability_Training_BB_Size_Acc(Task):
 
                 self.sma.add_state(
                     state_name='Real_start',
-                    state_timer=self.valve_time * 2,
+                    state_timer=self.valve_time,
                     state_change_conditions={Bpod.Events.Tup: 'Wait_for_fixation'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.Valve, 1)])
                 # Closes corridor door 2 and delivers initial 50ul water.
@@ -710,8 +628,9 @@ class Probability_Training_BB_Size_Acc(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
-                output_actions=[])
+                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                                (Bpod.OutputChannels.SoftCode, 39)])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -778,29 +697,46 @@ class Probability_Training_BB_Size_Acc(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
-                self.valid_counter += 1
-                self.block_valid_count += 1
-                self.success = 0
-                self.block_trial_counter += 1
-                self.total_trials += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    if self.image_type == 'normal':
+                        self.block_valid_count_normal += 1
+                    elif self.image_type == 'luminance':
+                        self.block_valid_count_luminance += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 1
+                self.forced_choice_probe = self.stim_trial
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
             elif self.current_trial_states['Correct'][0][0] > 0:
                 self.trial_result = 'correct'
-                self.valid_counter += 1
                 self.reward_drunk += self.valve_reward * self.valve_factor_c
-                self.correct_count += 1
-                #print('Correct_count: ', self.correct_count)
-                self.block_correct_count += 1
-                self.block_valid_count += 1
-                self.block_trial_counter += 1
-                self.success = 1
-                self.total_trials += 1
-                if self.bias_breaking == 0:
-                    self.stim_trial_counter += 1
+                self.reward = self.valve_reward * self.valve_factor_c
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.correct_count += 1
+                    #print('Correct_count: ', self.correct_count)
+                    self.block_correct_count += 1
+                    self.block_valid_count += 1
+                    if self.image_type == 'normal':
+                        self.block_correct_count_normal += 1
+                        self.block_valid_count_normal += 1
+                    elif self.image_type == 'luminance':
+                        self.block_correct_count_luminance += 1
+                        self.block_valid_count_luminance += 1
+                    self.block_trial_counter += 1
+                    self.success = 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
                 print('Acc Correct_count: ', self.block_correct_count)
                 print('Acc Valid_count: ', self.block_valid_count)
 
@@ -815,11 +751,32 @@ class Probability_Training_BB_Size_Acc(Task):
 
             # ##### COUNT Touches outside the jar areas :
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.status = 'Touch_Outside'
+                self.trial_result = 'incorrect'
+                self.touchoutside = 1
+                if self.forced_choice_next_trial == 0:
+                    self.valid_counter += 1
+                    self.block_valid_count += 1
+                    if self.image_type == 'normal':
+                        self.block_valid_count_normal += 1
+                    elif self.image_type == 'luminance':
+                        self.block_valid_count_luminance += 1
+                    self.success = 0
+                    self.block_trial_counter += 1
+                    self.total_trials += 1
+                    if self.bias_breaking == 0:
+                        self.stim_trial_counter += 1
+                self.forced_choice_next_trial = 1
+                self.forced_choice_probe = self.stim_trial
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
             print('Trial length: ' + str(self.trial_length))
+
+            # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
+            if self.x_incorrecth is None:
+                self.forced_choice_actual_trial = 1
+            else:
+                self.forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:
@@ -837,22 +794,41 @@ class Probability_Training_BB_Size_Acc(Task):
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
+            self.block_accuracy_normal = (
+                self.block_correct_count_normal / self.block_valid_count_normal
+                if self.block_valid_count_normal > 0 else 0
+            )
+
+            self.block_accuracy_luminance = (
+                self.block_correct_count_luminance / self.block_valid_count_luminance
+                if self.block_valid_count_luminance > 0 else 0
+            )
+
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
+                self.last_block_accuracy = self.block_accuracy
+
+                # update consecutive good blocks
                 if self.block_accuracy >= self.accuracy_criteria:
-                    self.stage_forward_change = 1  # Indicate that a stage change is due
+                    self.consecutive_good_blocks += 1
                 else:
-                    print("Accuracy criteria not met.")
-                #Trial limit check (set backward ONLY if forward is NOT happening)
+                    self.consecutive_good_blocks = 0
+
+                # forward criterion: 3 consecutive good blocks
+                if self.consecutive_good_blocks >= self.consecutive_good_blocks_criteria:
+                    self.stage_forward_change = 1
+
+                # backward rule if many trials and still no forward move
                 if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                     self.stage_backward_change = 1
 
-            #Assign in pass what to do when the rat is moved back more than 5 times.
+            # Assign in pass what to do when the rat is moved back more than 5 times.
             if self.moved_back_counter > self.max_move_backs:
                 message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
                 try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
+                    print(message)
+                    # telegram_bot.alarm_finish_session(message, self.subject)
                 except:
                     print('Telegram message not sent')
                     pass
@@ -885,6 +861,11 @@ class Probability_Training_BB_Size_Acc(Task):
 
             self.last_stim_trial = self.stim_trial
 
+            # Update short history used to prevent triples
+            self.last_two_stim.append(self.stim_trial)
+            if len(self.last_two_stim) > 2:
+                self.last_two_stim.pop(0)
+
             try:
                 # Try converting response_x directly to a float
                 self.response_x_bias = float(self.response_x)
@@ -905,7 +886,7 @@ class Probability_Training_BB_Size_Acc(Task):
 
             # Append the response to the array:
             self.response_x_array.append(self.response_x_bias)
-                #print(f"Responses so far: {self.response_x_array}")
+            #print(f"Responses so far: {self.response_x_array}")
 
             #if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy < self.side_bias_trigger_acc:
             if len(self.response_x_array) >= self.side_bias_trigger and self.accuracy is not None and self.accuracy < self.side_bias_trigger_acc:
@@ -913,32 +894,32 @@ class Probability_Training_BB_Size_Acc(Task):
                 all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
                 all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
 
-                if self.stage == 4:
+                if self.stage == 2:
                     if all_left_side:
                         self.sameside = 'left'
                         self.bias_breaking = 1
                         print('Bias breaking active, side:', self.sameside)
-                        self.last_stim_trial = random.choice([102, 104, 106, 108])  # Ensure the new stim is on the right
+                        self.last_stim_trial = random.choice([102, 104, 106, 108])  # force right
                     elif all_right_side:
                         self.sameside = 'right'
                         self.bias_breaking = 1
-                        self.last_stim_trial = random.choice([101, 103, 105, 107])  # Ensure the new stim is on the left
+                        self.last_stim_trial = random.choice([101, 103, 105, 107])  # force left
                         print('Bias breaking active, side:', self.sameside)
 
-                    self.response_x_array = []  # Clearing the array
+                    self.response_x_array = []
                 else:
                     if all_left_side:
                         self.sameside = 'left'
                         self.bias_breaking = 1
                         print('Bias breaking active, side:', self.sameside)
-                        self.last_stim_trial = random.choice([102, 104])  # Ensure the new stim is on the right
+                        self.last_stim_trial = random.choice([102, 104])  # force right
                     elif all_right_side:
                         self.sameside = 'right'
                         self.bias_breaking = 1
-                        self.last_stim_trial = random.choice([101, 103])  # Ensure the new stim is on the left
+                        self.last_stim_trial = random.choice([101, 103])  # force left
                         print('Bias breaking active, side:', self.sameside)
 
-                    self.response_x_array = []      #Clearing the array
+                    self.response_x_array = []
         else:
             print("Task 2 ended because Core training completed. Task is now 3 so will move to Weber's law in next session.")
             self.trial_length = 0.1
@@ -1014,6 +995,26 @@ class Probability_Training_BB_Size_Acc(Task):
         self.register_value('response_y', self.response_y)
         self.register_value('trial_length', self.trial_length)
         self.register_value('trial_result', self.trial_result)
+
+        self.register_value('touchoutside', self.touchoutside)
+
+        self.register_value('session_first_stim', self.session_first_stim)
+        self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
+        self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
+        self.register_value('forced_choice_probe', self.forced_choice_probe)
+
+        self.register_value('last_two_stim', self.last_two_stim)
+        self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
+        self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+
+
+        self.register_value('image_type', self.image_type)
+        self.register_value('block_correct_count_normal', self.block_correct_count_normal)
+        self.register_value('block_valid_count_normal', self.block_valid_count_normal)
+        self.register_value('block_accuracy_normal', self.block_accuracy_normal)
+        self.register_value('block_correct_count_luminance', self.block_correct_count_luminance)
+        self.register_value('block_valid_count_luminance', self.block_valid_count_luminance)
+        self.register_value('block_accuracy_luminance', self.block_accuracy_luminance)
 
 
 

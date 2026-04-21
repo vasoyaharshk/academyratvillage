@@ -401,10 +401,10 @@ class Probability_Training_BT_Acc_FF(Task):
         stage = int(stage)
 
         if stage == 1:
-            image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/urn_training/1_discrimination_a"
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/1_discrimination_a"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 2:
-            image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/urn_training/2_discrimination_b"
+            image_folder = "/home/harsh/academy/stimuli/bastos_taylor/urn_training/2_discrimination_b"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
             raise ValueError(f"Invalid stage value: {stage}")

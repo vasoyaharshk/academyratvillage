@@ -484,16 +484,16 @@ class Probability_Training_BB_Size_Acc_FF(Task):
         stage = int(stage)
 
         if stage == 1:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/1_indication"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/1_indication"
             suffix = None
         elif stage == 2:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/2_discrimination_a"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/2_discrimination_a"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 3:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/3_discrimination_b"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/3_discrimination_b"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 4:
-            image_folder = "/home/ratvillage01/academy/stimuli/urn_training/4_discrimination_c"
+            image_folder = "/home/harsh/academy/stimuli/urn_training/4_discrimination_c"
             suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
             raise ValueError(f"Invalid stage value: {stage}")
