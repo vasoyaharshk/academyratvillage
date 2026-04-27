@@ -4,21 +4,55 @@
 #include <Arduino.h>
 #include "Adafruit_SHT31.h"
 
+// DOOR 3 STEPPER NO LIMIT SWITCHES START
+#include <TMCStepper.h>
+#include <SoftwareSerial.h>
+
+#define DOOR3_STEP_PIN 6
+#define DOOR3_DIR_PIN 7
+#define DOOR3_R_SENSE 0.11
+
+#define DOOR3_UART_RX_PIN 10
+
+// Door 3 uses only Arduino pin 10 for the TMC UART line.
+// SoftwareSerial still needs RX and TX arguments, so the same pin is used for both.
+SoftwareSerial door3TMCSerial(DOOR3_UART_RX_PIN, DOOR3_UART_RX_PIN);
+TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
+
+float door3_open_rotations = 5.5;
+float door3_close_rotations = 5.5;
+const long door3_stepsPerRotation = 3200;
+
+const int door3_minDelay = 300;
+const int door3_startDelay = 1200;
+const int door3_rampPercent = 2;
+
+bool door3_moving = false;
+bool door3_stopRequested = false;
+
+enum Door3PositionState {
+  DOOR3_UNKNOWN,
+  DOOR3_AT_TOP,
+  DOOR3_AT_BOTTOM,
+  DOOR3_MOVING_UP,
+  DOOR3_MOVING_DOWN,
+  DOOR3_STOPPED_MIDWAY
+};
+
+Door3PositionState door3_state = DOOR3_UNKNOWN;
+
+
+// DOOR 3 STEPPER NO LIMIT SWITCHES END
+
 // servo1
 #define TIMEOPEN1 150
 #define TIMECLOSE1 350
-#define SERVOPIN1 9
-
+#define SERVOPIN1 4
 
 // servo2
 #define TIMEOPEN2 200
 #define TIMECLOSE2 200
-#define SERVOPIN2 10
-
-// servo3 (NEW: independent timing & angles, but opens/closes with door 2)
-#define TIMEOPEN3 600       // set your preferred speed for door 3
-#define TIMECLOSE3 600
-#define SERVOPIN3 11        // set the actual pin you wired door 3 to
+#define SERVOPIN2 9
 
 // always 90 degrees from open to close
 
@@ -28,10 +62,6 @@
 #define ANGLEOPEN2 130 // was 5   - 2
 #define ANGLECLOSE2 168 //was 49     - 3
 #define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
-
-// Door 3: independent angles (change to match your mechanics)
-#define ANGLEOPEN3 30
-#define ANGLECLOSE3 175
 
 // scale
 #define CELL1 2   
@@ -61,15 +91,88 @@ int delayopen2 = TIMEOPEN2 / steps2;
 int delayclose2 = TIMECLOSE2 / steps2;
 int state2 = 0;
 
-// servo3 (NEW)
-Servo myservo3;
-int steps3 = abs(ANGLEOPEN3 - ANGLECLOSE3);
-int delayopen3 = TIMEOPEN3 / steps3;
-int delayclose3 = TIMECLOSE3 / steps3;
-int state3 = 0;
-
 // rfid
 char tag[10];
+
+// DOOR 3 STEPPER NO LIMIT SWITCHES START
+void setupDoor3Stepper()
+{
+  pinMode(DOOR3_STEP_PIN, OUTPUT);
+  pinMode(DOOR3_DIR_PIN, OUTPUT);
+  door3TMCSerial.begin(115200);
+
+  door3Driver.begin();
+  door3Driver.rms_current(900);
+  door3Driver.microsteps(16);
+
+  // quiet mode
+  door3Driver.en_spreadCycle(false);
+  door3Driver.pwm_autoscale(true);
+}
+
+void moveDoor3Stepper(bool directionUp, float rotations)
+{
+  door3_moving = true;
+  door3_stopRequested = false;
+
+  long totalSteps = (long)(rotations * door3_stepsPerRotation);
+  long rampSteps = totalSteps * door3_rampPercent / 100;
+
+  digitalWrite(DOOR3_DIR_PIN, directionUp ? HIGH : LOW);
+  delayMicroseconds(50);
+
+  door3_state = directionUp ? DOOR3_MOVING_UP : DOOR3_MOVING_DOWN;
+
+  int currentDelay = door3_startDelay;
+
+  for (long step = 0; step < totalSteps; step++) {
+
+    if (door3_stopRequested) {
+      door3_state = DOOR3_STOPPED_MIDWAY;
+      break;
+    }
+
+
+    if (step < rampSteps) {
+      currentDelay -= 20;
+      if (currentDelay < door3_minDelay) currentDelay = door3_minDelay;
+    }
+    else if (step > totalSteps - rampSteps) {
+      currentDelay += 20;
+      if (currentDelay > door3_startDelay) currentDelay = door3_startDelay;
+    }
+    else {
+      currentDelay = door3_minDelay;
+    }
+
+    digitalWrite(DOOR3_STEP_PIN, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(DOOR3_STEP_PIN, LOW);
+    delayMicroseconds(currentDelay);
+  }
+
+  if (!door3_stopRequested) {
+    door3_state = directionUp ? DOOR3_AT_TOP : DOOR3_AT_BOTTOM;
+  }
+
+  door3_moving = false;
+}
+
+void openDoor3()
+{
+  if (!door3_moving) {
+    moveDoor3Stepper(true, door3_open_rotations);
+  }
+}
+
+void closeDoor3()
+{
+  if (!door3_moving) {
+    moveDoor3Stepper(false, door3_close_rotations);
+  }
+}
+
+// DOOR 3 STEPPER NO LIMIT SWITCHES END
 
 
 void openDoor1()
@@ -214,66 +317,6 @@ void noiseDoor2()
 }
 
 
-// -------------------- Door 3 (NEW) --------------------
-void openDoor3()
-{
-  if (state3 != 1) {
-    state3 = 1;
-    myservo3.attach(SERVOPIN3);
-
-    if (ANGLECLOSE3 >= ANGLEOPEN3) {
-      for (int pos = ANGLECLOSE3; pos >= ANGLEOPEN3; pos -= 1) {
-        myservo3.write(pos);
-        delay(delayopen3);
-      }
-    } else {
-      for (int pos = ANGLECLOSE3; pos <= ANGLEOPEN3; pos += 1) {
-        myservo3.write(pos);
-        delay(delayopen3);
-      }
-    }
-    myservo3.detach();
-  }
-}
-
-void closeDoor3()
-{
-  if (state3 != 2) {
-    state3 = 2;
-    myservo3.attach(SERVOPIN3);
-
-    if (ANGLEOPEN3 >= ANGLECLOSE3) {
-      for (int pos = ANGLEOPEN3; pos >= ANGLECLOSE3; pos -= 1) {
-        myservo3.write(pos);
-        delay(delayclose3);
-      }
-    } else {
-      for (int pos = ANGLEOPEN3; pos <= ANGLECLOSE3; pos += 1) {
-        myservo3.write(pos);
-        delay(delayclose3);
-      }
-    }
-    myservo3.detach();
-  }
-}
-
-// Open Door 2 and Door 3 "together" (start back-to-back)
-void openDoor2_and_3()
-{
-  // Start 2, then 3 — the gap is only the function call overhead (a few ms)
-  openDoor2();
-  openDoor3();
-}
-
-// Close Door 2 and Door 3 "together"
-void closeDoor2_and_3()
-{
-  closeDoor2();
-  closeDoor3();
-}
-// ------------------------------------------------------
-
-
 void turnLedOn()
 {
   digitalWrite(LED, HIGH);
@@ -377,6 +420,8 @@ void setup()
   LoadCell.begin(CELL1, CELL2); // start connection to HX711
   LoadCell.set_scale(CELLCALIBRATION);
   LoadCell.tare();
+
+  setupDoor3Stepper();
 
   tempAndScale();
 }

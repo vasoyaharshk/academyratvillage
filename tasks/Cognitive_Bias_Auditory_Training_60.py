@@ -737,6 +737,7 @@ class Cognitive_Bias_Auditory_Training_60(Task):
             ##### COUNT PUNISH
             elif self.current_trial_states['Punish'][0][0] > 0:
                 self.trial_result = 'incorrect'
+                print('incorrect')
                 if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.block_valid_count += 1
@@ -781,6 +782,7 @@ class Cognitive_Bias_Auditory_Training_60(Task):
             elif self.current_trial_states['Touch_Outside'][0][0] > 0:
                 self.trial_result = 'incorrect'
                 self.touchoutside = 1
+                print('touch_outside')
                 if self.forced_choice_next_trial == 0:
                     self.valid_counter += 1
                     self.block_valid_count += 1
