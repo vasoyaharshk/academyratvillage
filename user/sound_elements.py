@@ -3,12 +3,9 @@ import sounddevice as sd
 import numpy as np
 import time
 from scipy.signal import firwin, lfilter
-import os
-import json
-
 
 DEFAULT_FS = 48000
-CB_FS = 192000 # or 192000 if that’s your device limit. This is essential for the high tones. # high rate for ultrasonic part
+CB_FS = 48000 # or 192000 if that’s your device limit. This is essential for the high tones. # high rate for ultrasonic part
 DEFAULT_RAMP_DURATION = 0.01  # 10 ms
 REFERENCE_DB = 97.7          # Measured SPL reference
 
@@ -18,41 +15,6 @@ ULTRA_CH_INDEX = 0      # CH1 ultrasonic
 NORMAL_L_CH_INDEX = 2   # CH3 normal
 NORMAL_R_CH_INDEX = 3   # CH4 normal
 CROSSOVER_HZ = 10000    #
-
-# -------------------------------------------------------------
-# SPL calibration loading (from spl_calibration.json)
-# -------------------------------------------------------------
-CALIBRATION_FILE = "spl_calibration.json"
-
-FREQ_GAIN = {}
-
-calib_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CALIBRATION_FILE)
-
-try:
-    with open(calib_path, "r", encoding="utf-8") as f:
-        _calib_raw = json.load(f)
-    # JSON structure: { "freq_str": { "measured_db": ..., "gain": ... }, ... }
-    FREQ_GAIN = {
-        str(k): float(v.get("gain", 1.0))
-        for k, v in _calib_raw.items()
-    }
-    print(f"[sound_elements] Loaded SPL calibration for {len(FREQ_GAIN)} freqs from {calib_path}")
-except FileNotFoundError:
-    print(f"[sound_elements] No {CALIBRATION_FILE} found, using unity gain.")
-except Exception as e:
-    print(f"[sound_elements] Error loading {CALIBRATION_FILE}: {e}. Using unity gain.")
-
-def apply_calibration_gain(tone: np.ndarray, freq: float) -> np.ndarray:
-    """
-    Multiply tone by precomputed gain for this frequency, if available.
-    freq must match what was used in calibration_standalone (same float value).
-    """
-    key = str(float(freq))
-    gain = FREQ_GAIN.get(key, 1.0)
-    if gain != 1.0:
-        tone = tone * gain
-    return tone.astype(np.float32)
-
 
 class SoundR:
     def __init__(self):
@@ -81,11 +43,7 @@ class SoundR:
         if self.device_index is None:
             raise RuntimeError("No Babyface Pro FS or UACDemoV1.0 audio device found.")
 
-    def route_to_channels(self, soundVec, freq=None):
-        """
-        Take a 1-D mono vector and route it into a multichannel buffer
-        according to freq and Babyface channel layout.
-        """
+    def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
         out = np.zeros((len(soundVec), self.n_out), dtype=np.float32)
 
         if self.n_out >= 4:
@@ -97,21 +55,6 @@ class SoundR:
         else:  # 2-channel fallback mode
             out[:, 0] = soundVec
             out[:, 1] = soundVec
-
-        return out.astype(np.float32)
-
-    def play(self, soundVec, FsOut=DEFAULT_FS, freq=None):
-        """
-        If soundVec is already multichannel with correct width, send it as-is.
-        Otherwise, treat it as mono and route it.
-        """
-        # If soundVec is 2-D and already matches the output channel count,
-        # avoid rebuilding the multichannel buffer.
-        if isinstance(soundVec, np.ndarray) and soundVec.ndim == 2 and soundVec.shape[1] == self.n_out:
-            out = soundVec
-        else:
-            # assume mono 1-D and route
-            out = self.route_to_channels(soundVec, freq=freq)
 
         sd.play(out, samplerate=FsOut, device=self.device_index)
 
@@ -195,9 +138,8 @@ soundStream = SoundR()
 #soundVec2 = pureToneGen(0.4, 4000, 1)
 #soundVec3 = pureToneGen(0.4, 4000, 1)
 
-base_1368 = pureToneGen_dB(1368.5, 1, 70, FsOut=DEFAULT_FS)
-soundVec2 = apply_calibration_gain(base_1368, 1368.5)
-soundVec3 = apply_calibration_gain(base_1368, 1368.5)
+soundVec2 = pureToneGen_dB(1368.5, 1, 70, FsOut=DEFAULT_FS)
+soundVec3 = pureToneGen_dB(1368.5, 1, 70, FsOut=DEFAULT_FS)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {
@@ -209,23 +151,15 @@ reward_frequency_map = {
     'ross': 525.1,
     'innes': 609.1,
     'pol': 706.6,
-    'm3': 100.0,
+    'm3': 100,
 }
 
 # Pre-generated tone vectors
-rat_tones = {}
-for name, freq in reward_frequency_map.items():
-    # 1) generate mono tone at target dB
-    base_tone = pureToneGen_dB(freq, 180, db=70, FsOut=DEFAULT_FS)
-    # 2) apply calibration gain for this frequency
-    calibrated = apply_calibration_gain(base_tone, freq)
-    # 3) expand to multichannel ONCE using the routing logic
-    rat_tones[name] = soundStream.route_to_channels(calibrated, freq=freq)
+rat_tones = {name: pureToneGen_dB(freq, 1800, db=70, FsOut=DEFAULT_FS) for name, freq in reward_frequency_map.items()}
 
 #Sound Testing:
 def play_any_frequency(frequency, duration=1, db=70, FsOut=DEFAULT_FS):
     tone = pureToneGen_dB(frequency, duration, db, FsOut)
-    tone = apply_calibration_gain(tone, frequency)
     soundStream.play(tone, FsOut=FsOut, freq=frequency)
 
 #Function to set the reference db:
@@ -243,14 +177,7 @@ cb_tones_hz = {
     4: [23913.0, 27739.0, 32177.0, 37326.0, 43298.0]
 }
 
-# Pre-generate 2s tones with ramp, calibrated and routed to channels once
+# Pre-generate 2s tones with ramp
 cb_tones = {}
 for pair, freqs in cb_tones_hz.items():
-    tones = []
-    for f in freqs:
-        base_tone = pureToneGen_dB(f, 2.0, db=70, FsOut=CB_FS)
-        calibrated = apply_calibration_gain(base_tone, f)
-        # pre-spread to multichannel using the same routing logic
-        routed = soundStream.route_to_channels(calibrated, freq=f)
-        tones.append(routed)
-    cb_tones[pair] = tones
+    cb_tones[pair] = [pureToneGen_dB(f, 2.0, db=20, FsOut=CB_FS) for f in freqs]

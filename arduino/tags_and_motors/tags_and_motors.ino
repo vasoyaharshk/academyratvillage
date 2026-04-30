@@ -61,7 +61,7 @@ Door3PositionState door3_state = DOOR3_UNKNOWN;
 #define ANGLECLOSE1 5// was 28   - 1
 #define ANGLEOPEN2 130 // was 5   - 2
 #define ANGLECLOSE2 168 //was 49     - 3
-#define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
+#define ANGLESEMICLOSE2 1 //harsh: what is this?
 
 // scale
 #define CELL1 2   
