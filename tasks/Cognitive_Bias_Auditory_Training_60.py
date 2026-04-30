@@ -140,7 +140,7 @@ class Cognitive_Bias_Auditory_Training_60(Task):
         #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # Correcth location and size:
-        self.x_correcth_pos = [75, 345]  # Positions of the stim on the screen
+        self.x_correcth_pos = [75, 350]  # Positions of the stim on the screen
         self.y_correcth = 155
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
@@ -728,12 +728,6 @@ class Cognitive_Bias_Auditory_Training_60(Task):
 
     def after_trial(self):
         if self.task_number == 1:
-
-            # Mark touch outside if it happened at any point, but do not count it as a trial outcome.
-            if self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.touchoutside = 1
-            else:
-                self.touchoutside = 0
 
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
