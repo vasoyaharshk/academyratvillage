@@ -628,9 +628,8 @@ class Probability_Training_BT_Acc_L_FF(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 39)])
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                output_actions=[])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -690,6 +689,12 @@ class Probability_Training_BT_Acc_L_FF(Task):
         if self.task_number == 2:
                 # self.block_trial_counter += 1  # For counting the blocks
 
+            # Mark touch outside if it happened at any point, but do not count it as a trial outcome.
+            if self.current_trial_states['Touch_Outside'][0][0] > 0:
+                self.touchoutside = 1
+            else:
+                self.touchoutside = 0
+
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
                 self.trial_result = 'miss'
@@ -747,26 +752,6 @@ class Probability_Training_BT_Acc_L_FF(Task):
                         self.bias_breaking = 0  # End bias breaking
                         self.stim_trial_counter = 0
                         self.biased_consecutive_corrects_counter = 0  # Reset the consecutive corrects counter
-
-
-            # ##### COUNT Touches outside the jar areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.trial_result = 'incorrect'
-                self.touchoutside = 1
-                if self.forced_choice_next_trial == 0:
-                    self.valid_counter += 1
-                    self.block_valid_count += 1
-                    if self.image_type == 'normal':
-                        self.block_valid_count_normal += 1
-                    elif self.image_type == 'luminance':
-                        self.block_valid_count_luminance += 1
-                    self.success = 0
-                    self.block_trial_counter += 1
-                    self.total_trials += 1
-                    if self.bias_breaking == 0:
-                        self.stim_trial_counter += 1
-                self.forced_choice_next_trial = 1
-                self.forced_choice_probe = self.stim_trial
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
