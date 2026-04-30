@@ -140,7 +140,7 @@ class Cognitive_Bias_Auditory_Training_60(Task):
         #self.valve_factor_i = 2.8 #Low reward, 60 ul
 
         # Correcth location and size:
-        self.x_correcth_pos = [75, 345]  # Positions of the stim on the screen
+        self.x_correcth_pos = [80, 330]  # Positions of the stim on the screen
         self.y_correcth = 155
         self.width = 100  # Stimulus width in mm. Original size for peg is 120mm.
         self.height = 100  # Stimulus height in mm. Original size for jar is 110mm.
@@ -669,9 +669,8 @@ class Cognitive_Bias_Auditory_Training_60(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 232)])
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                output_actions=[])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -778,25 +777,6 @@ class Cognitive_Bias_Auditory_Training_60(Task):
                 self.forced_choice_next_trial = 0
                 self.forced_choice_probe = None
 
-            # ##### COUNT Touches outside the shape areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.trial_result = 'incorrect'
-                self.touchoutside = 1
-                print('touch_outside')
-                if self.forced_choice_next_trial == 0:
-                    self.valid_counter += 1
-                    self.block_valid_count += 1
-                    self.success = 0
-                    self.block_trial_counter += 1
-                    self.total_trials += 1
-                    self.stim_trial_counter += 1
-                    # Stimulus criteria:
-                    if self.stim_trial == 0:  # LOW
-                        self.block_stim_valid_count_1 += 1
-                    elif self.stim_trial == 4:  # HIGH
-                        self.block_stim_valid_count_2 += 1
-                self.forced_choice_next_trial = 1
-                self.forced_choice_probe = self.stim_trial
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]

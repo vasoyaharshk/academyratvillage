@@ -667,9 +667,8 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
             self.sma.add_state(
                 state_name='Touch_Outside',
                 state_timer=0,
-                state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
-                                (Bpod.OutputChannels.SoftCode, 232)])
+                state_change_conditions={Bpod.Events.Tup: 'Response_window'},
+                output_actions=[])
             # Goes back to response window in case of touch outside the two jar areas
 
             self.sma.add_state(
@@ -775,24 +774,6 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
                 self.forced_choice_next_trial = 0
                 self.forced_choice_probe = None
 
-            # ##### COUNT Touches outside the shape areas :
-            elif self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.trial_result = 'incorrect'
-                self.touchoutside = 1
-                if self.forced_choice_next_trial == 0:
-                    self.valid_counter += 1
-                    self.block_valid_count += 1
-                    self.success = 0
-                    self.block_trial_counter += 1
-                    self.total_trials += 1
-                    self.stim_trial_counter += 1
-                    # Stimulus criteria:
-                    if self.stim_trial == 0:  # LOW
-                        self.block_stim_valid_count_1 += 1
-                    elif self.stim_trial == 4:  # HIGH
-                        self.block_stim_valid_count_2 += 1
-                self.forced_choice_next_trial = 1
-                self.forced_choice_probe = self.stim_trial
 
             # End-trial calculations
             self.trial_length = self.current_trial_states['Exit'][0][0] - self.current_trial_states['Start_task'][0][0]
