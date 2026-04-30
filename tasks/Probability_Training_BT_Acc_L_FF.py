@@ -689,12 +689,6 @@ class Probability_Training_BT_Acc_L_FF(Task):
         if self.task_number == 2:
                 # self.block_trial_counter += 1  # For counting the blocks
 
-            # Mark touch outside if it happened at any point, but do not count it as a trial outcome.
-            if self.current_trial_states['Touch_Outside'][0][0] > 0:
-                self.touchoutside = 1
-            else:
-                self.touchoutside = 0
-
             ##### COUNT MISSES:
             if self.current_trial_states['No_Touch'][0][0] > 0:  # misses modify the acc
                 self.trial_result = 'miss'
