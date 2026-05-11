@@ -160,14 +160,14 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
 void openDoor3()
 {
-  if (!door3_moving) {
+  if (!door3_moving && door3_state != DOOR3_AT_BOTTOM) {
     moveDoor3Stepper(true, door3_open_rotations);
   }
 }
 
 void closeDoor3()
 {
-  if (!door3_moving) {
+  if (!door3_moving && door3_state != DOOR3_AT_TOP) {
     moveDoor3Stepper(false, door3_close_rotations);
   }
 }
