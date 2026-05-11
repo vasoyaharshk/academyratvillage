@@ -12,7 +12,7 @@
 #define DOOR3_DIR_PIN 7
 #define DOOR3_R_SENSE 0.11
 
-#define DOOR3_UART_RX_PIN 10
+#define DOOR3_UART_RX_PIN 14
 
 // Door 3 uses only Arduino pin 10 for the TMC UART line.
 // SoftwareSerial still needs RX and TX arguments, so the same pin is used for both.
@@ -160,14 +160,14 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
 void openDoor3()
 {
-  if (!door3_moving) {
+  if (!door3_moving && door3_state != DOOR3_AT_TOP) {
     moveDoor3Stepper(true, door3_open_rotations);
   }
 }
 
 void closeDoor3()
 {
-  if (!door3_moving) {
+  if (!door3_moving && door3_state != DOOR3_AT_BOTTOM) {
     moveDoor3Stepper(false, door3_close_rotations);
   }
 }
