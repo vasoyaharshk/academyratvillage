@@ -4,23 +4,20 @@
 #include <Arduino.h>
 #include "Adafruit_SHT31.h"
 
-// DOOR 3 STEPPER WITH LIMIT SWITCHES START
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE START
 #include <TMCStepper.h>
 #include <SoftwareSerial.h>
 
 #define DOOR3_STEP_PIN 6
 #define DOOR3_DIR_PIN 7
+#define DOOR3_R_SENSE 0.11
 
-// Limit switches are wired as active LOW using INPUT_PULLUP.
-// Switch closed/triggered = LOW. Switch open/not triggered = HIGH.
 #define DOOR3_LIMIT_TOP_PIN 24
 #define DOOR3_LIMIT_BOTTOM_PIN 25
 
-#define DOOR3_R_SENSE 0.11
-
 #define DOOR3_UART_RX_PIN 14
 
-// Door 3 uses Arduino pin 14 for the TMC UART line.
+// Door 3 uses only Arduino pin 10 for the TMC UART line.
 // SoftwareSerial still needs RX and TX arguments, so the same pin is used for both.
 SoftwareSerial door3TMCSerial(DOOR3_UART_RX_PIN, DOOR3_UART_RX_PIN);
 TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
@@ -48,8 +45,31 @@ enum Door3PositionState {
 
 Door3PositionState door3_state = DOOR3_UNKNOWN;
 
+bool isDoor3TopLimitTriggered()
+{
+  return digitalRead(DOOR3_LIMIT_TOP_PIN) == LOW;
+}
 
-// DOOR 3 STEPPER WITH LIMIT SWITCHES END
+bool isDoor3BottomLimitTriggered()
+{
+  return digitalRead(DOOR3_LIMIT_BOTTOM_PIN) == LOW;
+}
+
+void updateDoor3StateFromLimits()
+{
+  bool top = isDoor3TopLimitTriggered();
+  bool bottom = isDoor3BottomLimitTriggered();
+
+  if (top && !bottom) {
+    door3_state = DOOR3_AT_TOP;
+  }
+  else if (bottom && !top) {
+    door3_state = DOOR3_AT_BOTTOM;
+  }
+}
+
+
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE END
 
 // servo1
 #define TIMEOPEN1 150
@@ -71,8 +91,8 @@ Door3PositionState door3_state = DOOR3_UNKNOWN;
 #define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
 
 // scale
-#define CELL1 2
-#define CELL2 3
+#define CELL1 2   
+#define CELL2 3  
 #define CELLCALIBRATION 1062 // calibration factor for load cell => strongly dependent on your individual setup
 HX711 LoadCell;
 bool scaleOn = false;
@@ -101,14 +121,13 @@ int state2 = 0;
 // rfid
 char tag[10];
 
-// DOOR 3 STEPPER WITH LIMIT SWITCHES START
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE START
 void setupDoor3Stepper()
 {
   pinMode(DOOR3_STEP_PIN, OUTPUT);
   pinMode(DOOR3_DIR_PIN, OUTPUT);
   pinMode(DOOR3_LIMIT_TOP_PIN, INPUT_PULLUP);
   pinMode(DOOR3_LIMIT_BOTTOM_PIN, INPUT_PULLUP);
-
   door3TMCSerial.begin(115200);
 
   door3Driver.begin();
@@ -118,54 +137,22 @@ void setupDoor3Stepper()
   // quiet mode
   door3Driver.en_spreadCycle(false);
   door3Driver.pwm_autoscale(true);
-}
 
-bool door3TopLimitTriggered()
-{
-  return digitalRead(DOOR3_LIMIT_TOP_PIN) == LOW;
-}
+  updateDoor3StateFromLimits();
 
-bool door3BottomLimitTriggered()
-{
-  return digitalRead(DOOR3_LIMIT_BOTTOM_PIN) == LOW;
-}
-
-void updateDoor3PositionFromLimitSwitches()
-{
-  bool topTriggered = door3TopLimitTriggered();
-  bool bottomTriggered = door3BottomLimitTriggered();
-
-  if (topTriggered && !bottomTriggered) {
-    door3_state = DOOR3_AT_TOP;
+  if (door3_state == DOOR3_AT_TOP) {
+    Serial.println("D3:SETUP_TOP_LIMIT_TRIGGERED");
   }
-  else if (bottomTriggered && !topTriggered) {
-    door3_state = DOOR3_AT_BOTTOM;
+  else if (door3_state == DOOR3_AT_BOTTOM) {
+    Serial.println("D3:SETUP_BOTTOM_LIMIT_TRIGGERED");
   }
-  else if (topTriggered && bottomTriggered) {
-    // This should not happen mechanically. Keep the motor stopped until wiring is checked.
-    door3_state = DOOR3_UNKNOWN;
+  else {
+    Serial.println("D3:SETUP_POSITION_UNKNOWN");
   }
 }
 
 void moveDoor3Stepper(bool directionUp, float rotations)
 {
-  updateDoor3PositionFromLimitSwitches();
-
-  if (directionUp && door3TopLimitTriggered()) {
-    door3_state = DOOR3_AT_TOP;
-    return;
-  }
-
-  if (!directionUp && door3BottomLimitTriggered()) {
-    door3_state = DOOR3_AT_BOTTOM;
-    return;
-  }
-
-  if (door3TopLimitTriggered() && door3BottomLimitTriggered()) {
-    door3_state = DOOR3_UNKNOWN;
-    return;
-  }
-
   door3_moving = true;
   door3_stopRequested = false;
   door3_limitHit = false;
@@ -178,24 +165,34 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
   door3_state = directionUp ? DOOR3_MOVING_UP : DOOR3_MOVING_DOWN;
 
+  if (directionUp) {
+    Serial.println("D3:OPENING");
+  }
+  else {
+    Serial.println("D3:CLOSING");
+  }
+
   int currentDelay = door3_startDelay;
 
   for (long step = 0; step < totalSteps; step++) {
 
     if (door3_stopRequested) {
       door3_state = DOOR3_STOPPED_MIDWAY;
+      Serial.println("D3:STOP_REQUESTED");
       break;
     }
 
-    if (directionUp && door3TopLimitTriggered()) {
+    if (directionUp && isDoor3TopLimitTriggered()) {
       door3_state = DOOR3_AT_TOP;
       door3_limitHit = true;
+      Serial.println("D3:TOP_LIMIT_HIT");
       break;
     }
 
-    if (!directionUp && door3BottomLimitTriggered()) {
+    if (!directionUp && isDoor3BottomLimitTriggered()) {
       door3_state = DOOR3_AT_BOTTOM;
       door3_limitHit = true;
+      Serial.println("D3:BOTTOM_LIMIT_HIT");
       break;
     }
 
@@ -219,6 +216,13 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
   if (!door3_stopRequested && !door3_limitHit) {
     door3_state = directionUp ? DOOR3_AT_TOP : DOOR3_AT_BOTTOM;
+
+    if (directionUp) {
+      Serial.println("D3:OPEN_COMPLETE_ROTATIONS");
+    }
+    else {
+      Serial.println("D3:CLOSE_COMPLETE_ROTATIONS");
+    }
   }
 
   door3_moving = false;
@@ -226,23 +230,41 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
 void openDoor3()
 {
-  updateDoor3PositionFromLimitSwitches();
+  updateDoor3StateFromLimits();
 
-  if (!door3_moving && door3_state != DOOR3_AT_TOP && !door3TopLimitTriggered()) {
-    moveDoor3Stepper(true, door3_open_rotations);
+  if (door3_moving) {
+    Serial.println("D3:OPEN_IGNORED_ALREADY_MOVING");
+    return;
   }
+
+  if (isDoor3TopLimitTriggered() || door3_state == DOOR3_AT_TOP) {
+    door3_state = DOOR3_AT_TOP;
+    Serial.println("D3:OPEN_IGNORED_ALREADY_TOP");
+    return;
+  }
+
+  moveDoor3Stepper(true, door3_open_rotations);
 }
 
 void closeDoor3()
 {
-  updateDoor3PositionFromLimitSwitches();
+  updateDoor3StateFromLimits();
 
-  if (!door3_moving && door3_state != DOOR3_AT_BOTTOM && !door3BottomLimitTriggered()) {
-    moveDoor3Stepper(false, door3_close_rotations);
+  if (door3_moving) {
+    Serial.println("D3:CLOSE_IGNORED_ALREADY_MOVING");
+    return;
   }
+
+  if (isDoor3BottomLimitTriggered() || door3_state == DOOR3_AT_BOTTOM) {
+    door3_state = DOOR3_AT_BOTTOM;
+    Serial.println("D3:CLOSE_IGNORED_ALREADY_BOTTOM");
+    return;
+  }
+
+  moveDoor3Stepper(false, door3_close_rotations);
 }
 
-// DOOR 3 STEPPER WITH LIMIT SWITCHES END
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE END
 
 
 void openDoor1()
@@ -409,7 +431,7 @@ void tempAndScale()
   float h = sht31.readHumidity();
   Serial.print("Temperature;"); Serial.print(t); Serial.print("\t");
   Serial.print("Humidity; "); Serial.print(h);
-
+  
   LoadCell.tare();
   scaleOn = true;
 }
@@ -420,9 +442,9 @@ void getTemperature()
 {
   float t = sht31.readTemperature();
   float h = sht31.readHumidity();
-
-  Serial.print("Temperature; ");
-  Serial.print(t);
+  
+  Serial.print("Temperature; "); 
+  Serial.print(t); 
   Serial.print("H ");
   Serial.print(h);
 }

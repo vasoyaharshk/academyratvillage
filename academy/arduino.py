@@ -48,7 +48,9 @@ class Arduino:
                 tag = None
 
             if tag:
-                if ':' in tag:
+                if tag.startswith('D3:'):
+                    utils.log('Door3', tag.strip(), 'INFO')
+                elif ':' in tag:
                     try:
                         pos = tag.index(':')
                         weight = str(float(tag[pos + 1:]))
