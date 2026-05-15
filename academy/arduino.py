@@ -49,7 +49,16 @@ class Arduino:
 
             if tag:
                 if tag.startswith('D3:'):
-                    utils.log('Door3', tag.strip(), 'INFO')
+                    door3_message = tag.strip()
+                    utils.log('Door3', door3_message, 'INFO')
+
+                    if door3_message in ['D3:TOP_LIMIT_HIT', 'D3:BOTTOM_LIMIT_HIT']:
+                        try:
+                            from academy import telegram_bot
+                            telegram_bot.alarm_door3_limit(door3_message)
+                        except Exception as e:
+                            utils.log('Door3', 'Telegram alarm failed: ' + str(e), 'ERROR')
+
                 elif ':' in tag:
                     try:
                         pos = tag.index(':')
