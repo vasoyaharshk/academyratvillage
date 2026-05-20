@@ -4,13 +4,16 @@
 #include <Arduino.h>
 #include "Adafruit_SHT31.h"
 
-// DOOR 3 STEPPER NO LIMIT SWITCHES START
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE START
 #include <TMCStepper.h>
 #include <SoftwareSerial.h>
 
 #define DOOR3_STEP_PIN 6
 #define DOOR3_DIR_PIN 7
 #define DOOR3_R_SENSE 0.11
+
+#define DOOR3_LIMIT_TOP_PIN 24
+#define DOOR3_LIMIT_BOTTOM_PIN 25
 
 #define DOOR3_UART_RX_PIN 14
 
@@ -21,6 +24,7 @@ TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
 
 float door3_open_rotations = 5.5;
 float door3_close_rotations = 5.5;
+float door3_limit_reverse_rotations = 0.0;
 const long door3_stepsPerRotation = 3200;
 
 const int door3_minDelay = 300;
@@ -29,6 +33,10 @@ const int door3_rampPercent = 2;
 
 bool door3_moving = false;
 bool door3_stopRequested = false;
+bool door3_limitHit = false;
+
+bool door3_lastTopLimitState = HIGH;
+bool door3_lastBottomLimitState = HIGH;
 
 enum Door3PositionState {
   DOOR3_UNKNOWN,
@@ -41,8 +49,61 @@ enum Door3PositionState {
 
 Door3PositionState door3_state = DOOR3_UNKNOWN;
 
+bool isDoor3TopLimitTriggered()
+{
+  return digitalRead(DOOR3_LIMIT_TOP_PIN) == LOW;
+}
 
-// DOOR 3 STEPPER NO LIMIT SWITCHES END
+bool isDoor3BottomLimitTriggered()
+{
+  return digitalRead(DOOR3_LIMIT_BOTTOM_PIN) == LOW;
+}
+
+void updateDoor3StateFromLimits()
+{
+  bool top = isDoor3TopLimitTriggered();
+  bool bottom = isDoor3BottomLimitTriggered();
+
+  if (top && !bottom) {
+    door3_state = DOOR3_AT_TOP;
+  }
+  else if (bottom && !top) {
+    door3_state = DOOR3_AT_BOTTOM;
+  }
+}
+
+void monitorDoor3LimitSwitches()
+{
+  bool topState = digitalRead(DOOR3_LIMIT_TOP_PIN);
+  bool bottomState = digitalRead(DOOR3_LIMIT_BOTTOM_PIN);
+
+  if (topState != door3_lastTopLimitState) {
+    if (topState == LOW) {
+      Serial.println("D3:TOP_LIMIT_SWITCH_PRESSED");
+    }
+    else {
+      Serial.println("D3:TOP_LIMIT_SWITCH_RELEASED");
+    }
+
+    door3_lastTopLimitState = topState;
+  }
+
+  if (bottomState != door3_lastBottomLimitState) {
+    if (bottomState == LOW) {
+      Serial.println("D3:BOTTOM_LIMIT_SWITCH_PRESSED");
+    }
+    else {
+      Serial.println("D3:BOTTOM_LIMIT_SWITCH_RELEASED");
+    }
+
+    door3_lastBottomLimitState = bottomState;
+  }
+
+  updateDoor3StateFromLimits();
+}
+
+
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE END
 
 // servo1
 #define TIMEOPEN1 150
@@ -94,11 +155,17 @@ int state2 = 0;
 // rfid
 char tag[10];
 
-// DOOR 3 STEPPER NO LIMIT SWITCHES START
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE START
 void setupDoor3Stepper()
 {
   pinMode(DOOR3_STEP_PIN, OUTPUT);
   pinMode(DOOR3_DIR_PIN, OUTPUT);
+  pinMode(DOOR3_LIMIT_TOP_PIN, INPUT_PULLUP);
+  pinMode(DOOR3_LIMIT_BOTTOM_PIN, INPUT_PULLUP);
+
+  door3_lastTopLimitState = digitalRead(DOOR3_LIMIT_TOP_PIN);
+  door3_lastBottomLimitState = digitalRead(DOOR3_LIMIT_BOTTOM_PIN);
+
   door3TMCSerial.begin(115200);
 
   door3Driver.begin();
@@ -108,30 +175,137 @@ void setupDoor3Stepper()
   // quiet mode
   door3Driver.en_spreadCycle(false);
   door3Driver.pwm_autoscale(true);
+
+  updateDoor3StateFromLimits();
+
+  if (door3_state == DOOR3_AT_TOP) {
+    Serial.println("D3:SETUP_TOP_LIMIT_TRIGGERED");
+  }
+  else if (door3_state == DOOR3_AT_BOTTOM) {
+    Serial.println("D3:SETUP_BOTTOM_LIMIT_TRIGGERED");
+  }
+  else {
+    Serial.println("D3:SETUP_POSITION_UNKNOWN");
+  }
+}
+
+void moveDoor3StepsOnly(bool directionUp, float rotations)
+{
+  long totalSteps = (long)(rotations * door3_stepsPerRotation);
+  long rampSteps = totalSteps * door3_rampPercent / 100;
+
+  digitalWrite(DOOR3_DIR_PIN, directionUp ? LOW : HIGH);
+  delayMicroseconds(50);
+
+  int currentDelay = door3_startDelay;
+
+  for (long step = 0; step < totalSteps; step++) {
+    monitorDoor3LimitSwitches();
+
+    if (door3_stopRequested) {
+      Serial.println("D3:BACKOFF_STOP_REQUESTED");
+      break;
+    }
+
+    if (directionUp && isDoor3TopLimitTriggered()) {
+      Serial.println("D3:BACKOFF_STOPPED_TOP_LIMIT");
+      break;
+    }
+
+    if (!directionUp && isDoor3BottomLimitTriggered()) {
+      Serial.println("D3:BACKOFF_STOPPED_BOTTOM_LIMIT");
+      break;
+    }
+
+    if (step < rampSteps) {
+      currentDelay -= 20;
+      if (currentDelay < door3_minDelay) currentDelay = door3_minDelay;
+    }
+    else if (step > totalSteps - rampSteps) {
+      currentDelay += 20;
+      if (currentDelay > door3_startDelay) currentDelay = door3_startDelay;
+    }
+    else {
+      currentDelay = door3_minDelay;
+    }
+
+    digitalWrite(DOOR3_STEP_PIN, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(DOOR3_STEP_PIN, LOW);
+    delayMicroseconds(currentDelay);
+  }
+}
+
+void backOffDoor3FromLimit(bool hitTopLimit)
+{
+  bool reverseDirectionUp = !hitTopLimit;
+
+  if (hitTopLimit) {
+    Serial.println("D3:BACKOFF_FROM_TOP_START");
+  }
+  else {
+    Serial.println("D3:BACKOFF_FROM_BOTTOM_START");
+  }
+
+  moveDoor3StepsOnly(reverseDirectionUp, door3_limit_reverse_rotations);
+
+  door3_state = DOOR3_STOPPED_MIDWAY;
+
+  if (hitTopLimit) {
+    Serial.println("D3:BACKOFF_FROM_TOP_COMPLETE");
+  }
+  else {
+    Serial.println("D3:BACKOFF_FROM_BOTTOM_COMPLETE");
+  }
 }
 
 void moveDoor3Stepper(bool directionUp, float rotations)
 {
   door3_moving = true;
   door3_stopRequested = false;
+  door3_limitHit = false;
 
   long totalSteps = (long)(rotations * door3_stepsPerRotation);
   long rampSteps = totalSteps * door3_rampPercent / 100;
 
-  digitalWrite(DOOR3_DIR_PIN, directionUp ? HIGH : LOW);
+  digitalWrite(DOOR3_DIR_PIN, directionUp ? LOW : HIGH);
   delayMicroseconds(50);
 
   door3_state = directionUp ? DOOR3_MOVING_UP : DOOR3_MOVING_DOWN;
 
+  if (directionUp) {
+    Serial.println("D3:CLOSING");
+  }
+  else {
+    Serial.println("D3:OPENING");
+  }
+
   int currentDelay = door3_startDelay;
 
   for (long step = 0; step < totalSteps; step++) {
+    monitorDoor3LimitSwitches();
 
     if (door3_stopRequested) {
       door3_state = DOOR3_STOPPED_MIDWAY;
+      Serial.println("D3:STOP_REQUESTED");
       break;
     }
 
+    if (directionUp && isDoor3TopLimitTriggered()) {
+      door3_state = DOOR3_AT_TOP;
+      door3_limitHit = true;
+      Serial.println("D3:TOP_LIMIT_HIT");
+      backOffDoor3FromLimit(true);
+      break;
+    }
+
+    if (!directionUp && isDoor3BottomLimitTriggered()) {
+      door3_state = DOOR3_AT_BOTTOM;
+      door3_limitHit = true;
+      Serial.println("D3:BOTTOM_LIMIT_HIT");
+      backOffDoor3FromLimit(false);
+      break;
+    }
 
     if (step < rampSteps) {
       currentDelay -= 20;
@@ -151,8 +325,15 @@ void moveDoor3Stepper(bool directionUp, float rotations)
     delayMicroseconds(currentDelay);
   }
 
-  if (!door3_stopRequested) {
+  if (!door3_stopRequested && !door3_limitHit) {
     door3_state = directionUp ? DOOR3_AT_TOP : DOOR3_AT_BOTTOM;
+
+    if (directionUp) {
+      Serial.println("D3:CLOSE_COMPLETE_ROTATIONS");
+    }
+    else {
+      Serial.println("D3:OPEN_COMPLETE_ROTATIONS");
+    }
   }
 
   door3_moving = false;
@@ -160,19 +341,41 @@ void moveDoor3Stepper(bool directionUp, float rotations)
 
 void openDoor3()
 {
-  if (!door3_moving && door3_state != DOOR3_AT_TOP) {
-    moveDoor3Stepper(true, door3_open_rotations);
+  updateDoor3StateFromLimits();
+
+  if (door3_moving) {
+    Serial.println("D3:OPEN_IGNORED_ALREADY_MOVING");
+    return;
   }
+
+  if (isDoor3BottomLimitTriggered() || door3_state == DOOR3_AT_BOTTOM) {
+    door3_state = DOOR3_AT_BOTTOM;
+    Serial.println("D3:OPEN_IGNORED_ALREADY_BOTTOM");
+    return;
+  }
+
+  moveDoor3Stepper(false, door3_open_rotations);
 }
 
 void closeDoor3()
 {
-  if (!door3_moving && door3_state != DOOR3_AT_BOTTOM) {
-    moveDoor3Stepper(false, door3_close_rotations);
+  updateDoor3StateFromLimits();
+
+  if (door3_moving) {
+    Serial.println("D3:CLOSE_IGNORED_ALREADY_MOVING");
+    return;
   }
+
+  if (isDoor3TopLimitTriggered() || door3_state == DOOR3_AT_TOP) {
+    door3_state = DOOR3_AT_TOP;
+    Serial.println("D3:CLOSE_IGNORED_ALREADY_TOP");
+    return;
+  }
+
+  moveDoor3Stepper(true, door3_close_rotations);
 }
 
-// DOOR 3 STEPPER NO LIMIT SWITCHES END
+// DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE END
 
 
 void openDoor1()
@@ -463,6 +666,8 @@ void serialEvent()
 
 void loop()
 {
+  monitorDoor3LimitSwitches();
+
   if (Serial1.available() > 0)
   {
     delay(30);
