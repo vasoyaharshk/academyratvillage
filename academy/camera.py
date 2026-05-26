@@ -272,17 +272,6 @@ class Video(Process):
                         if self.cam_number == 2:
                             #print("camera2 active")
                             self.path_video = os.path.join(
-                                self.path, self.name_video + "_lickport.avi"
-                            )
-                            self.path_npz = os.path.join(
-                                self.path, self.name_video + "_lickport.npz"
-                            )
-                            self.path_csv = os.path.join(
-                                self.path, self.name_video + "_lickport.csv"
-                            )
-                        elif self.cam_number == 3:
-                            #print("camera3 active")
-                            self.path_video = os.path.join(
                                 self.path, self.name_video + "_screen.avi"
                             )
                             self.path_npz = os.path.join(
@@ -290,6 +279,17 @@ class Video(Process):
                             )
                             self.path_csv = os.path.join(
                                 self.path, self.name_video + "_screen.csv"
+                            )
+                        elif self.cam_number == 3:
+                            #print("camera3 active")
+                            self.path_video = os.path.join(
+                                self.path, self.name_video + "_lickport.avi"
+                            )
+                            self.path_npz = os.path.join(
+                                self.path, self.name_video + "_lickport.npz"
+                            )
+                            self.path_csv = os.path.join(
+                                self.path, self.name_video + "_lickport.csv"
                             )
                         self.out_video = cv2.VideoWriter(
                             self.path_video,
@@ -328,7 +328,7 @@ class Video(Process):
                     self.chrono.reset()
                     name_video = state[4:]
                     path = os.path.join(self.path, name_video.split("_")[0])
-                    if self.cam_number == 2:
+                    if self.cam_number == 3:
                         self.title = name_video
                         self.path_video = os.path.join(path, name_video + "_lickport.avi")
                         self.path_npz = os.path.join(path, name_video + "_lickport.npz")
@@ -975,27 +975,28 @@ except:
     cam2 = FakeVideo()
 
 try:
-    cam3 = Video(
-        port=settings.CAMERA3_PORT,
-        cam_number=settings.CAM3_NUMBER,
-        name_video=settings.CAM3_NAME_VIDEO,
-        path=settings.VIDEOS_DIRECTORY,
-        width=settings.CAM3_WIDTH,
-        height=settings.CAM3_HEIGHT,
-        fps=settings.CAM3_FPS,
-        codec_video=settings.CAM3_CODEC_VIDEO,
-        cam_states=settings.CAM3_STATES,
-        duration_video=settings.CAM3_DURATION_VIDEO,
-        number_of_videos=settings.CAM3_NUMBER_OF_VIDEOS,
-        threshold=settings.CAM3_THRESHOLD,
-        cage_zone=settings.CAM3_CAGE_ZONE,
-        doors1_zone=settings.CAM3_DOORS1_ZONE,
-        doors2_zone=settings.CAM3_DOORS2_ZONE,
-        floor1_zone=settings.CAM3_FLOOR1_ZONE,
-        floor2_zone=settings.CAM3_FLOOR2_ZONE,
-        tracking_position=settings.CAM3_TRACKING_POSITION,
-    )
-    print("camera3 OK")
+    # cam3 = Video(
+    #     port=settings.CAMERA3_PORT,
+    #     cam_number=settings.CAM3_NUMBER,
+    #     name_video=settings.CAM3_NAME_VIDEO,
+    #     path=settings.VIDEOS_DIRECTORY,
+    #     width=settings.CAM3_WIDTH,
+    #     height=settings.CAM3_HEIGHT,
+    #     fps=settings.CAM3_FPS,
+    #     codec_video=settings.CAM3_CODEC_VIDEO,
+    #     cam_states=settings.CAM3_STATES,
+    #     duration_video=settings.CAM3_DURATION_VIDEO,
+    #     number_of_videos=settings.CAM3_NUMBER_OF_VIDEOS,
+    #     threshold=settings.CAM3_THRESHOLD,
+    #     cage_zone=settings.CAM3_CAGE_ZONE,
+    #     doors1_zone=settings.CAM3_DOORS1_ZONE,
+    #     doors2_zone=settings.CAM3_DOORS2_ZONE,
+    #     floor1_zone=settings.CAM3_FLOOR1_ZONE,
+    #     floor2_zone=settings.CAM3_FLOOR2_ZONE,
+    #     tracking_position=settings.CAM3_TRACKING_POSITION,
+    # )
+    # print("camera3 OK")
+    cam3 = FakeVideo()
 
 except:
     print("error in camera3")
@@ -1003,4 +1004,4 @@ except:
 
 cam1.play()
 cam2.play()
-cam3.play()
+# cam3.play()

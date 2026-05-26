@@ -394,11 +394,11 @@ class Gui(tk.Frame):
             self.image_label1 = tk.Label(self, anchor="w", justify="left")
             self.image_label1.place(x=640, y=0, width=640, height=380)
 
-            self.image_label2 = tk.Label(self, anchor="w", justify="left")
-            self.image_label2.place(x=0, y=480, width=640, height=340)
+            self.image_label2 = tk.Label(self, anchor="nw", justify="left")
+            self.image_label2.place(x=0, y=0, width=640, height=480)
 
-            self.image_label3 = tk.Label(self, anchor="w", justify="left")
-            self.image_label3.place(x=0, y=0, width=640, height=480)
+            # self.image_label3 = tk.Label(self, anchor="w", justify="left")
+            # self.image_label3.place(x=0, y=0, width=640, height=480)
 
             # events
             y = 820
@@ -724,12 +724,12 @@ class Gui(tk.Frame):
             self.cams_on_off.configure(text="Hide Cams")
             self.cams_on_off.configure(style="red.TButton")
             cam2.put_state("active")
-            cam3.put_state("active")
+            # cam3.put_state("active")
         else:
             self.cams_on_off.configure(text="Preview Cams")
             self.cams_on_off.configure(style="green.TButton")
             cam2.put_state("inactive")
-            cam3.put_state("inactive")
+            # cam3.put_state("inactive")
 
     @staticmethod
     def task_action(name):
@@ -800,21 +800,22 @@ class Gui(tk.Frame):
 
         try:
             frame = cam2.image_queue.get_nowait()
-            a = Image.fromarray(frame[140:, :, :])
+            a = Image.fromarray(frame)
+            a = a.resize((640, 360), Image.Resampling.LANCZOS)
             b = ImageTk.PhotoImage(image=a, master=self.window)
             self.image_label2.configure(image=b)
-            self.image_label2._image_cache = b  # avoid garbage collection
+            self.image_label2._image_cache = b
         except Exception:
             pass
 
-        try:
-            frame = cam3.image_queue.get_nowait()
-            a = Image.fromarray(frame)
-            b = ImageTk.PhotoImage(image=a, master=self.window)
-            self.image_label3.configure(image=b)
-            self.image_label3._image_cache = b  # avoid garbage collection
-        except Exception:
-            pass
+        # try:
+        #     frame = cam3.image_queue.get_nowait()
+        #     a = Image.fromarray(frame)
+        #     b = ImageTk.PhotoImage(image=a, master=self.window)
+        #     self.image_label3.configure(image=b)
+        #     self.image_label3._image_cache = b  # avoid garbage collection
+        # except Exception:
+        #     pass
 
     def update_events(self):
         if utils.state != 7:

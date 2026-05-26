@@ -649,9 +649,9 @@ def go_to_state(num):
         utils.list_of_trial_timings = []
         task_collection.subjects_dict = task_collection.create_subjects_dict()
         cam2.put_state('inactive')
-        cam3.put_state("inactive")
+        # cam3.put_state("inactive")
         cam2.put_state('black')
-        cam3.put_state("black")
+        # cam3.put_state("black")
         if utils.reading_tags > 0:
             arduino.turn_led_on()
         utils.log("Academy", "Go to state 0", "ACTION")
@@ -897,9 +897,9 @@ def go_to_state(num):
 
     elif num == 7:  # setting task
         cam2.put_state('inactive')
-        cam3.put_state("inactive")
+        # cam3.put_state("inactive")
         cam2.put_state('black')
-        cam3.put_state("black")
+        # cam3.put_state("black")
         arduino.turn_led_off()
         utils.log("Academy", "Go to state 7", "ACTION")
         screen.tag = None
@@ -941,12 +941,12 @@ def exit_app():
     arduino.turn_led_off()
     cam1.put_state("inactive")
     cam2.put_state("inactive")
-    cam3.put_state("inactive")
+    # cam3.put_state("inactive")
     for i in range(500):
         gui.reload()
     cam1.stop()
     cam2.stop()
-    cam3.stop()
+    # cam3.stop()
     f = open(os.devnull, "w")
     sys.stdout = f
     sys.stderr = f
@@ -966,7 +966,7 @@ def relaunch():
     time.sleep(1)
     cam1.put_state("inactive")
     cam2.put_state("inactive")
-    cam3.put_state("inactive")
+    # cam3.put_state("inactive")
     for i in range(500):
         gui.reload()
     cam1.stop()
