@@ -62,6 +62,25 @@ def alarm_temperature(temperature):
         pass
 
 
+def alarm_door3_limit(door3_message):
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+
+        if door3_message == 'D3:TOP_LIMIT_HIT':
+            message = 'ALARM: Door 3 top limit switch hit. Door 3 reversed away from the top limit.'
+        elif door3_message == 'D3:BOTTOM_LIMIT_HIT':
+            message = 'ALARM: Door 3 bottom limit switch hit. Door 3 reversed away from the bottom limit.'
+        else:
+            message = 'ALARM: Door 3 limit switch event: ' + str(door3_message)
+
+        utils.alarms.add_new_item({'message': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+
+        request.urlopen(url, data.encode('utf-8'))
+    except:
+        pass
+
+
 def alarm_session_time(seconds, subject_name):
     try:
         url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN

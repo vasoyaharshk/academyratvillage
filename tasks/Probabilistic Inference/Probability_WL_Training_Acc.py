@@ -145,7 +145,7 @@ class Probability_WL_Training_Acc(Task):
         Determines whether stim_trial is 71 or 72, retrieves the corresponding image path, and returns it.
         """
         image_path = None
-        image_folder = f'/home/ratvillage03/academy/stimuli/webers_law/5_webers_law_training/{condition}'
+        image_folder = f'/home/ratvillage02/academy/stimuli/webers_law/5_webers_law_training/{condition}'
 
         try:
             if stim_trial == 61:

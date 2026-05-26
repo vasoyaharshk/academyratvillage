@@ -327,9 +327,9 @@ class Probability_Handtracking_Yellow_Final(Task):
 
             # Define image folder based on stage
             if stage == 1:
-                image_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             elif stage == 2:
-                image_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
+                image_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/images'
             else:
                 raise ValueError(f"Invalid stage value: {stage}. Expected 1, 2, or 3.")
 
@@ -390,7 +390,7 @@ class Probability_Handtracking_Yellow_Final(Task):
                 raise ValueError(f"Invalid stim_trial value: {stim_trial}. Expected 115, or 116.")
             # Define video folder based on stage
             if stage == 2:
-                video_folder = '/home/ratvillage03/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
+                video_folder = '/home/ratvillage02/academy/stimuli/bastos_taylor/hand_tracking/stage_3_hand_tracking_video_yellow_token/videos'
             else:
                 raise ValueError(f"Invalid stage: {stage}")
 
