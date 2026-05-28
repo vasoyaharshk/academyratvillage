@@ -108,20 +108,20 @@ void monitorDoor3LimitSwitches()
 // servo1
 #define TIMEOPEN1 150
 #define TIMECLOSE1 350
-#define SERVOPIN1 4
+#define SERVOPIN1 12
 
 // servo2
 #define TIMEOPEN2 200
 #define TIMECLOSE2 200
-#define SERVOPIN2 9
+#define SERVOPIN2 13
 
 // always 90 degrees from open to close
 
 // academy1
-#define ANGLEOPEN1 90 //was 80    - 0
-#define ANGLECLOSE1 5// was 28   - 1
-#define ANGLEOPEN2 130 // was 5   - 2
-#define ANGLECLOSE2 168 //was 49     - 3
+#define ANGLEOPEN1 100 //was 80    - 0
+#define ANGLECLOSE1 170// was 28   - 1
+#define ANGLEOPEN2 110 // was 5   - 2
+#define ANGLECLOSE2 148 //was 49     - 3
 #define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
 
 // scale
