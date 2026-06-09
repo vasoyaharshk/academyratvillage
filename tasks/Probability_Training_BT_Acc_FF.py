@@ -490,6 +490,7 @@ class Probability_Training_BT_Acc_FF(Task):
             self.total_trials = 0
             self.stage_backward_change = 0
             self.block_accuracy = 0.0
+            self.consecutive_good_blocks = 0
             self.block_trial_counter = 0  # Reset the counter after the block
             self.block_correct_count = 0
             self.block_valid_count = 0
