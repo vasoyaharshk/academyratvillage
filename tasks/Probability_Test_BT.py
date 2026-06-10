@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Test_BT_FF(Task):
+class Probability_Test_BT(Task):
     def __init__(self):
         super().__init__()
 
