@@ -40,7 +40,7 @@ class Probability_Test_BT(Task):
         self.task_number = 4  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 2  # The number of trials in a block
+        self.block_size = 40  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
@@ -402,11 +402,11 @@ class Probability_Test_BT(Task):
 
         stage = int(stage)
 
-        if stage == 1:
+        if stage == 2:
             image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_1"
-        elif stage == 2:
-            image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_2"
         elif stage == 3:
+            image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_2"
+        elif stage == 4:
             image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_3"
         else:
             raise ValueError(f"Invalid stage value: {stage}")
@@ -829,7 +829,7 @@ class Probability_Test_BT(Task):
                 # if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
                 #     self.stage_backward_change = 1
 
-                elif self.stage == 3:
+                elif self.stage == 4:
                     if self.total_trials >= 80:
                         self.task_end = True
                         self.tired = True
@@ -905,7 +905,7 @@ class Probability_Test_BT(Task):
                 all_left_side = all(45 < x < 145 for x in self.response_x_array)            #Check if all the reponses fall on left
                 all_right_side = all(231 < x < 331 for x in self.response_x_array)          #Check if all the reponses fall on right
 
-                if self.stage == 2:
+                if self.stage == 1:
                     if all_left_side:
                         self.sameside = 'left'
                         self.bias_breaking = 1
