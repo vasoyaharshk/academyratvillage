@@ -448,6 +448,9 @@ class Probability_Test_BT(Task):
     def main_loop(self):
         self.touchoutside = 0
         self.bias_breaking = 0
+        self.forced_choice_next_trial = 0
+        self.forced_choice_actual_trial = 0
+        self.forced_choice_probe = None
 
         print('')
         if self.current_trial == 0:
@@ -544,10 +547,7 @@ class Probability_Test_BT(Task):
             else:
                 candidate = self.last_stim_trial
 
-            if self.forced_choice_next_trial == 0:
-                self.stim_trial = candidate
-            else:
-                self.stim_trial = self.forced_choice_probe
+            self.stim_trial = candidate
 
             # keep stimulus schedule aligned with actual delivered probe
             if self.forced_choice_next_trial == 0 and 0 <= self.stim_trial_counter < len(self.stim_trials):
@@ -575,8 +575,6 @@ class Probability_Test_BT(Task):
                     self.x_incorrecth = self.x_correcth_pos[0]
                     print('Correct Answer: Right, ', 'X position = ', self.x_correcth, 'Incorrect position: ', self.x_incorrecth)
 
-                if self.forced_choice_next_trial == 1:
-                    self.x_incorrecth = None
 
             if self.task_number == 4:
                 self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage, self.forced_choice_next_trial)
@@ -748,8 +746,8 @@ class Probability_Test_BT(Task):
                     self.total_trials += 1
                     if self.bias_breaking == 0:
                         self.stim_trial_counter += 1
-                self.forced_choice_next_trial = 1
-                self.forced_choice_probe = self.stim_trial
+                self.forced_choice_next_trial = 0
+                self.forced_choice_probe = None
                 print('Acc Valid_count: ', self.block_valid_count)
 
             ##### COUNT CORRECTS FIRST POKE
@@ -786,10 +784,7 @@ class Probability_Test_BT(Task):
             print('Trial length: ' + str(self.trial_length))
 
             # Actual forced choice flag. In this task, a forced choice trial disables the incorrect side
-            if self.x_incorrecth is None:
-                self.forced_choice_actual_trial = 1
-            else:
-                self.forced_choice_actual_trial = 0
+            self.forced_choice_actual_trial = 0
 
             ### Long trials
             if utils.chrono.get_seconds() >= self.duration_tired and self.trial_length > 45:

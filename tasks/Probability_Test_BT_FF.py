@@ -40,7 +40,7 @@ class Probability_Test_BT_FF(Task):
         self.task_number = 4  # Each task has a unique number. See RV script guide.
 
         # Needed to create blocks of 40 trials for criterion to be assessed on:
-        self.block_size = 2  # The number of trials in a block
+        self.block_size = 40  # The number of trials in a block
         self.block_trial_counter = 0  # Trial count within the current block
         self.block_accuracy = 0.0  # Accuracy in the current block
         self.block_number = 0  # Sequential block number
