@@ -138,6 +138,8 @@ class Probability_Test_BT_FF(Task):
         self.image_displayed = None
         self.image_directory = None
 
+        self.message_sent = False
+
     def flip_side(self, stim_val: int) -> int:
         return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
 
@@ -462,6 +464,7 @@ class Probability_Test_BT_FF(Task):
         # print('stim_trials: ', self.stim_trials)
 
         if self.block_change == 1:
+            self.message_sent = False
             self.block_number += 1
             self.block_change = 0
             self.block_accuracy = 0.0
@@ -804,10 +807,11 @@ class Probability_Test_BT_FF(Task):
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
-            if self.total_trials in [40, 80, 120]:
+            if self.total_trials in [40, 80, 120] and self.message_sent == False and self.forced_choice_actual_trial == 0:
                 message = f"Trials completed {self.total_trials} for {self.subject} in {self.task} for {self.stage}"
                 try:
                     telegram_bot.alarm_finish_session(message, self.subject)
+                    self.message_sent = True
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
@@ -911,11 +915,11 @@ class Probability_Test_BT_FF(Task):
                         self.sameside = 'left'
                         self.bias_breaking = 1
                         print('Bias breaking active, side:', self.sameside)
-                        self.last_stim_trial = random.choice([102, 106])  # Ensure the new stim is on the right
+                        self.last_stim_trial = random.choice([102])  # Ensure the new stim is on the right
                     elif all_right_side:
                         self.sameside = 'right'
                         self.bias_breaking = 1
-                        self.last_stim_trial = random.choice([101, 105])  # Ensure the new stim is on the left
+                        self.last_stim_trial = random.choice([101])  # Ensure the new stim is on the left
                         print('Bias breaking active, side:', self.sameside)
 
                     self.response_x_array = []  # Clearing the array
