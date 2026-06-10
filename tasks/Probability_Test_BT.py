@@ -139,6 +139,7 @@ class Probability_Test_BT(Task):
         self.image_directory = None
 
         self.message_sent = False
+        self.last_stage_end_criteria = 80
 
     def flip_side(self, stim_val: int) -> int:
         return stim_val + 1 if (stim_val % 2 == 1) else stim_val - 1
@@ -830,7 +831,7 @@ class Probability_Test_BT(Task):
                 #     self.stage_backward_change = 1
 
                 elif self.stage == 4:
-                    if self.total_trials >= 80:
+                    if self.total_trials >= self.last_stage_end_criteria:
                         self.task_end = True
                         self.tired = True
 
@@ -1017,6 +1018,7 @@ class Probability_Test_BT(Task):
         self.register_value('last_two_stim', self.last_two_stim)
         self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
         self.register_value('consecutive_good_blocks_criteria', self.consecutive_good_blocks_criteria)
+        self.register_value('last_stage_end_criteria', self.last_stage_end_criteria)
 
 
 
