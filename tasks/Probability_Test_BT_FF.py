@@ -804,6 +804,13 @@ class Probability_Test_BT_FF(Task):
             self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
+            if self.total_trials in [40, 80, 120]:
+                message = f"Trials completed {self.total_trials} for {self.subject} in {self.task} for {self.stage}"
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
             if self.block_trial_counter == self.block_size:
                 self.block_change = 1
@@ -828,15 +835,15 @@ class Probability_Test_BT_FF(Task):
                         self.task_end = True
                         self.tired = True
 
-            # Assign in pass what to do when the rat is moved back more than 5 times.
-            if self.moved_back_counter > self.max_move_backs:
-                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
-                try:
-                    print(message)
-                    # telegram_bot.alarm_finish_session(message, self.subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
+            # # Assign in pass what to do when the rat is moved back more than 5 times.
+            # if self.moved_back_counter > self.max_move_backs:
+            #     message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
+            #     try:
+            #         print(message)
+            #         # telegram_bot.alarm_finish_session(message, self.subject)
+            #     except:
+            #         print('Telegram message not sent')
+            #         pass
 
             if self.stage > self.last_backward_stage + 1:
                 self.moved_back_counter = 0
