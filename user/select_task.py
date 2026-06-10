@@ -803,7 +803,8 @@ def select_task(df, subject):
 
         elif task == 'Probability_Training_BT_Acc_FF':
             if task_number == 4:
-                task = 'Probability_Test_BT'
+                #task = 'Probability_Test_BT'
+                task = 'XYZ'
                 message = f"URGENT: Criteria passed for Bastos Taylor Training. {stage} for {my_subject}. New {task}."
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
