@@ -810,7 +810,7 @@ def select_task(df, subject):
                 except Exception as e:
                     print(f"Telegram message not sent. Error: {e}")
 
-                stage = 1  # Current stage within the task
+                stage = 2  # Current stage within the task
                 substage = 0  # Current substage within the stage
                 substage_bias = 0  # Side bias stage for substage behavior
                 task_number = 4  # Each task has a unique number. See RV script guide.

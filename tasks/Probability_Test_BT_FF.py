@@ -34,7 +34,7 @@ class Probability_Test_BT_FF(Task):
         # Tracked Variables
         # ==============================
         # Needed in Each Task:
-        self.stage = 1  # Current stage within the task
+        self.stage = 2  # Current stage within the task
         self.substage = 0  # Current substage within the stage
         self.substage_bias = 0  # Side bias stage for substage behavior
         self.task_number = 4  # Each task has a unique number. See RV script guide.
@@ -484,7 +484,7 @@ class Probability_Test_BT_FF(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 4:
+            if self.stage == 5:
                 self.task_number = 5
                 self.tired = True
                 message = f"Bastos and Taylor experiment completed for {self.subject} in {self.task}"
