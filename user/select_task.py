@@ -837,7 +837,7 @@ def select_task(df, subject):
                 stim_trials = []  # List of correct stimulus function randomised.
                 stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
                 last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
-
+                consecutive_good_blocks = 0
 
 
 
