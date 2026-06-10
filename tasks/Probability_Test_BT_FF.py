@@ -8,7 +8,7 @@ import os
 import re
 from academy import telegram_bot
 
-class Probability_Test_BT(Task):
+class Probability_Test_BT_FF(Task):
     def __init__(self):
         super().__init__()
 
@@ -391,28 +391,25 @@ class Probability_Test_BT(Task):
     #         return None
 
     def get_stim_image_path(self, stim_trial, stage, forced_choice_next_trial):
-        if stim_trial in [101, 105]:
-            position, size = "left", "small"
-        elif stim_trial in [102, 106]:
-            position, size = "right", "small"
+        if stim_trial == 101:
+            position = "left"
+        elif stim_trial == 102:
+            position = "right"
         else:
             raise ValueError(f"Invalid stim_trial value: {stim_trial}")
-
-        spacer = "spacer" if stim_trial in [105, 106] else None
 
         stage = int(stage)
 
         if stage == 1:
             image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_1"
-            suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 2:
             image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_2"
-            suffix = "correct" if forced_choice_next_trial == 1 else "both"
         elif stage == 3:
             image_folder = "/home/ratvillage01/academy/stimuli/bastos_taylor/conditions/condition_3"
-            suffix = "correct" if forced_choice_next_trial == 1 else "both"
         else:
             raise ValueError(f"Invalid stage value: {stage}")
+
+        suffix = "correct" if forced_choice_next_trial == 1 else "both"
 
         candidates = []
         for f in os.listdir(image_folder):
@@ -424,26 +421,23 @@ class Probability_Test_BT(Task):
 
             if position not in fl:
                 continue
-            if size not in fl:
+            if "small" not in fl:
                 continue
-
-            if spacer is None:
-                if "spacer" in fl:
-                    continue
-            else:
-                if "spacer" not in fl:
-                    continue
-
-            if suffix is not None:
-                if f"_{suffix}_" not in fl:
-                    continue
+            if "big" in fl:
+                continue
+            if "spacer" in fl:
+                continue
+            if "luminance" in fl:
+                continue
+            if f"_{suffix}_" not in fl:
+                continue
 
             candidates.append(f)
 
         if not candidates:
             raise ValueError(
                 f"No images found in {image_folder} for stage {stage}, "
-                f"position {position}, size {size}, spacer {spacer}, suffix {suffix}"
+                f"position {position}, suffix {suffix}"
             )
 
         image_path = os.path.join(image_folder, random.choice(candidates))
@@ -487,9 +481,14 @@ class Probability_Test_BT(Task):
                 telegram_bot.alarm_finish_session(message, self.subject)
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 3:
-                self.task_number = 3
+            if self.stage == 4:
+                self.task_number = 5
                 self.tired = True
+                message = f"Bastos and Taylor experiment completed for {self.subject} in {self.task}"
+                try:
+                    telegram_bot.alarm_finish_session(message, self.subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
 
         # if self.stage_backward_change == 1:
         #     self.total_trials = 0
@@ -521,7 +520,7 @@ class Probability_Test_BT(Task):
         # Choose x positions:
         self.stim = [101, 102]
 
-        if self.task_number == 2:
+        if self.task_number == 4:
             # Stimulus generation logic
             if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 10 trials
                 # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
@@ -576,7 +575,7 @@ class Probability_Test_BT(Task):
                 if self.forced_choice_next_trial == 1:
                     self.x_incorrecth = None
 
-            if self.task_number == 2:
+            if self.task_number == 4:
                 self.image_path_function = self.get_stim_image_path(self.stim_trial, self.stage, self.forced_choice_next_trial)
 
                 print("image_path_function: ", self.image_path_function)
@@ -594,7 +593,7 @@ class Probability_Test_BT(Task):
 
         ############ STATE MACHINE ################
         #First trial:
-        if self.task_number == 2:
+        if self.task_number == 4:
             if self.current_trial == 0:
                 self.sma.add_state(
                     state_name='Start_task',
@@ -728,7 +727,7 @@ class Probability_Test_BT(Task):
 
 
     def after_trial(self):
-        if self.task_number == 2:
+        if self.task_number == 4:
                 # self.block_trial_counter += 1  # For counting the blocks
 
             ##### COUNT MISSES:

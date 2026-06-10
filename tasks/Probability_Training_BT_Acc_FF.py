@@ -483,7 +483,7 @@ class Probability_Training_BT_Acc_FF(Task):
             except Exception as e:
                 print(f"Telegram message not sent. Error: {e}")
             if self.stage == 3:
-                self.task_number = 3
+                self.task_number = 4
                 self.tired = True
 
         if self.stage_backward_change == 1:

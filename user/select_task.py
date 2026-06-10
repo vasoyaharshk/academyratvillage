@@ -801,6 +801,45 @@ def select_task(df, subject):
                         print('Telegram message not sent')
                         pass
 
+        elif task == 'Probability_Training_BT_Acc_FF':
+            if task_number == 4:
+                task = 'Probability_Test_BT_FF'
+                message = f"URGENT: Criteria passed for Bastos Taylor Training. {stage} for {my_subject}. New {task}."
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                except Exception as e:
+                    print(f"Telegram message not sent. Error: {e}")
+
+                stage = 1  # Current stage within the task
+                substage = 0  # Current substage within the stage
+                substage_bias = 0  # Side bias stage for substage behavior
+                task_number = 4  # Each task has a unique number. See RV script guide.
+
+                # Needed to create blocks of 40 trials for criterion to be assessed on:
+                block_size = 40  # The number of trials in a block
+                block_trial_counter = 0  # Trial count within the current block
+                block_accuracy = 0.0  # Accuracy in the current block
+                block_number = 1  # Sequential block number
+                ror_change = 0  # If it is 1, ROR will change on the next trial.
+                block_change = 0  # If it is 1, a new block will start on the next trial
+                total_trials = 0  # Total trials across the task.
+                block_correct_count = 0  # Number of correct responses in the block
+                block_valid_count = 0  # Number of valid (non-missed) trials in the block
+                condition_trial_counter = 0  # Counter for randomising conditions
+                last_forward_stage = 0  # The stage moved forward from after a forward change
+                last_backward_stage = 0  # The stage moved backward to after the last backward change
+                moved_back_counter = 0  # Counter for how many times the animal moved back a stage
+                stage_forward_change = 0  # Whether stage move forward on the next trial
+                stage_backward_change = 0  # Whether stage move backward on the next trial
+
+                # Left Right Function Randomisation variables:
+                stim_trial = 0  # The function number of the correct stimulus in the current trial. This designates trial type, e.g. from Discrim. C: left is correct, big jar is correct, spacer in correct
+                stim_trials = []  # List of correct stimulus function randomised.
+                stim_trial_counter = 0  # It counts the number of trials within a randomization block. Doesnt change when Bias breaking is active.
+                last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
+
+
+
 
 
     #AUTOMATIC WATER CRITERIA: LAST 5 DAYS, EXCLUDING POST-AW DAYS ========
