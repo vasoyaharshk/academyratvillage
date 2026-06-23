@@ -330,15 +330,25 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
 
         # Shapes table (subject : rotation for pairs 1..4)
         rotations = {
-            "chand": ["triangle", "circle", "square", "star"],
-            "felix": ["circle", "square", "star", "triangle"],
-            "joey": ["square", "star", "triangle", "circle"],
-            "ross": ["star", "triangle", "circle", "square"],
-            "fergus": ["triangle", "circle", "square", "star"],
-            "geralt": ["circle", "square", "star", "triangle"],
-            "innes": ["square", "star", "triangle", "circle"],
-            "pol": ["star", "triangle", "circle", "square"],
-            "m3": ["triangle", "circle", "square", "star"],  # fallback subject used in your code
+            "astrid": ["triangle", "circle", "square", "star"],
+            "boira": ["circle", "square", "star", "triangle"],
+            "claire": ["square", "star", "triangle", "circle"],
+            "elaanor": ["star", "triangle", "circle", "square"],
+
+            "erza": ["triangle", "circle", "square", "star"],
+            "jessie": ["circle", "square", "star", "triangle"],
+            "kora": ["square", "star", "triangle", "circle"],
+            "mona": ["star", "triangle", "circle", "square"],
+
+            "nana": ["triangle", "circle", "square", "star"],
+            "rebeca": ["circle", "square", "star", "triangle"],
+            "sakura": ["square", "star", "triangle", "circle"],
+            "wendy": ["star", "triangle", "circle", "square"],
+
+            "xata": ["triangle", "circle", "square", "star"],
+            "xochil": ["circle", "square", "star", "triangle"],
+
+            "m3": ["triangle", "circle", "square", "star"],
         }
 
         seq = rotations.get(name)

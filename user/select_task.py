@@ -31,14 +31,20 @@ def select_task(df, subject):
     #Reward Frequencies assigned again after the task:
     # Map each rat to its centre frequency
     reward_frequency_map = {
-        'chand': 250.0,
-        'felix': 290.0,
-        'fergus': 336.4,
-        'geralt': 390.2,
-        'joey': 452.7,
-        'ross': 525.1,
-        'innes': 609.1,
-        'pol': 706.6,
+        'astrid': 250.0,
+        'boira': 290.0,
+        'claire': 336.4,
+        'elaanor': 390.2,
+        'erza': 452.7,
+        'jessie': 525.1,
+        'kora': 609.1,
+        'mona': 706.6,
+        'nana': 819.6,
+        'rebeca': 950.7,
+        'sakura': 1102.9,
+        'wendy': 250.0,
+        'xata': 525.1,
+        'xochil': 1102.9,
         'm3': 100.0,
     }
 
@@ -396,19 +402,21 @@ def select_task(df, subject):
                 consecutive_good_blocks = 0
 
                 group_assignment = {
-                    # Group 1
-                    'chand': 1,
-                    'innes': 1,
-                    'm3': 1,
-                    # Group 2
-                    'fergus': 2,
-                    'joey': 2,
-                    # Group 3
-                    'geralt': 3,
-                    'ross': 3,
-                    # Group 4
-                    'felix': 4,
-                    'pol': 4,
+                    "astrid": 1,
+                    "boira": 2,
+                    "claire": 3,
+                    "elaanor": 4,
+                    "erza": 1,
+                    "jessie": 2,
+                    "kora": 3,
+                    "mona": 4,
+                    "nana": 1,
+                    "rebeca": 2,
+                    "sakura": 3,
+                    "wendy": 4,
+                    "xata": 1,
+                    "xochil": 2,
+                    "m3": 1,
                 }
 
                 # Set group from table
@@ -570,19 +578,21 @@ def select_task(df, subject):
 
                 # # Cognitive Bias:
                 group_assignment = {
-                    # Group 1
-                    'chand': 1,
-                    'innes': 1,
-                    'm3': 1,
-                    # Group 2
-                    'fergus': 2,
-                    'joey': 2,
-                    # Group 3
-                    'geralt': 3,
-                    'ross': 3,
-                    # Group 4
-                    'felix': 4,
-                    'pol': 4,
+                    "astrid": 1,
+                    "boira": 2,
+                    "claire": 3,
+                    "elaanor": 4,
+                    "erza": 1,
+                    "jessie": 2,
+                    "kora": 3,
+                    "mona": 4,
+                    "nana": 1,
+                    "rebeca": 2,
+                    "sakura": 3,
+                    "wendy": 4,
+                    "xata": 1,
+                    "xochil": 2,
+                    "m3": 1,
                 }
 
                 # Set group from table

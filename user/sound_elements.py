@@ -201,14 +201,20 @@ soundVec3 = apply_calibration_gain(base_1368, 1368.5)
 
 # Frequency definitions (Hz) per subject
 reward_frequency_map = {
-    'chand': 250.0,
-    'felix': 290.0,
-    'fergus': 336.4,
-    'geralt': 390.2,
-    'joey': 452.7,
-    'ross': 525.1,
-    'innes': 609.1,
-    'pol': 706.6,
+    'astrid': 250.0,
+    'boira': 290.0,
+    'claire': 336.4,
+    'elaanor': 390.2,
+    'erza': 452.7,
+    'jessie': 525.1,
+    'kora': 609.1,
+    'mona': 706.6,
+    'nana': 819.6,
+    'rebeca': 950.7,
+    'sakura': 1102.9,
+    'wendy': 250.0,
+    'xata': 525.1,
+    'xochil': 1102.9,
     'm3': 100.0,
 }
 

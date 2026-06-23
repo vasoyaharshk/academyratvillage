@@ -23,8 +23,8 @@ class Habituation(Task):
 
     def init_variables(self):
         # general
-        self.duration_min = 25
-        self.duration_max = 30
+        self.duration_min = 600
+        self.duration_max = 660
         self.tired = False
         self.stage = 0
         self.substage = 0
