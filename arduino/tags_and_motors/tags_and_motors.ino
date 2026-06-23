@@ -22,8 +22,8 @@
 SoftwareSerial door3TMCSerial(DOOR3_UART_RX_PIN, DOOR3_UART_RX_PIN);
 TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
 
-float door3_open_rotations = 5.5;
-float door3_close_rotations = 5.5;
+float door3_open_rotations = 4.8;
+float door3_close_rotations = 4.8;
 float door3_limit_reverse_rotations = 0.0;
 const long door3_stepsPerRotation = 3200;
 
@@ -108,20 +108,23 @@ void monitorDoor3LimitSwitches()
 // servo1
 #define TIMEOPEN1 150
 #define TIMECLOSE1 350
-#define SERVOPIN1 4
+#define SERVOPIN1 9
 
 // servo2
 #define TIMEOPEN2 200
 #define TIMECLOSE2 200
-#define SERVOPIN2 9
+#define SERVOPIN2 10
 
 // always 90 degrees from open to close
 
 // academy1
-#define ANGLEOPEN1 90 //was 80    - 0
-#define ANGLECLOSE1 5// was 28   - 1
-#define ANGLEOPEN2 130 // was 5   - 2
-#define ANGLECLOSE2 168 //was 49     - 3
+// DOOR 1 ADJUSTMENT    BUTTON 0 - open    1 - Close
+#define ANGLEOPEN1 100 //was 80    - 0   
+#define ANGLECLOSE1 230// was 28   - 1
+
+//DOOR 2 ADJUSTMENT    BUTTON 2 - open    3 - Close
+#define ANGLEOPEN2 120 // was 5   - 2
+#define ANGLECLOSE2 170 //was 49     - 3
 #define ANGLESEMICLOSE2 1 //ratvillage02: what is this?
 
 // scale
