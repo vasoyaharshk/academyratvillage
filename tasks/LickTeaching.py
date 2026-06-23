@@ -81,7 +81,7 @@ class LickTeaching(Task):
                 state_name='Start_task',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.LED, 3)])
+                output_actions = [(Bpod.OutputChannels.SoftCode, 234), (Bpod.OutputChannels.LED, 3)])  # Draws black screen
                 # global LED ON
 
             self.sma.add_state(
