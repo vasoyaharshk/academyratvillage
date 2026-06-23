@@ -374,7 +374,7 @@ class TouchTeaching_Blob(Task):
                 self.sma.add_state(
                     state_name='Fixation',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.PA1_Port2In: 'Response_window'},
+                    state_change_conditions={'PA1_Port2In': 'Response_window'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
