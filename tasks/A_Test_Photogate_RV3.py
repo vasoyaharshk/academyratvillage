@@ -8,6 +8,8 @@ class A_Test_Photogate_RV3(Task):
 
         self.info = """
         Checking photogates.
+        Port5In with port module is PA1_Port1In
+        Port5In with port module is PA1_Port1In
         """
 
     def init_variables(self):
@@ -27,7 +29,7 @@ class A_Test_Photogate_RV3(Task):
                                      'Port3In': 'Cross_corridor',
                                      'Port4In': 'Cross_corridor',
                                      'PA1_Port1In': 'Cross_corridor',      #Port5In with port module is PA1_Port1In
-                                     'PA1_Port2In': 'Cross_corridor',       #Port6In with port module is PA1_Port2In
+                                     'PA1_Port2In': 'Cross_corridor',       #Port5In with port module is PA1_Port1In
                                      Bpod.Events.Tup: 'exit'},
             output_actions=[])
 
