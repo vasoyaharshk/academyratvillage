@@ -279,7 +279,7 @@ def select_task(df, subject):
                 pass
             wait_seconds = 3600 * 2
             if n_trials >= 75:
-                task = 'TouchTeaching_no_mask'
+                task = 'TouchTeaching_Blob'
                 stage = 1.0
                 message = 'Advance from Lickteaching to Touchteaching'
                 try:
