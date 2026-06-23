@@ -55,10 +55,11 @@ class Cognitive_Bias_Auditory_Training_60(Task):
         ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
         Port 2 - PHOTOGATES 2: Photogates next to lickport 
-        Port 3 - PHOTOGATES 3: Photogates 
+        Port 3 - PHOTOGATES 3: Photogates, global LED
         Port 4 - PHOTOGATES 4: Photogates 
-        Port 5 - PHOTOGATES 5: Photogates 
-        Port 6 - PHOTOGATES 6: Photogates next to screen, global LED
+        Port 5 - PHOTOGATES 5: Photogates. PA1_Port1In
+        Port 6 - PHOTOGATES 6: Photogates next to screen. PA1_Port2In
+        
 
         Task Number = 1
         """
