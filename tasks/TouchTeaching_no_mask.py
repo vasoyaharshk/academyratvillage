@@ -270,7 +270,7 @@ class TouchTeaching_no_mask(Task):
             state_name='Miss',
             state_timer=1,
             state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+            output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                             (Bpod.OutputChannels.SoftCode, 12)])
         # waterLED ON, global LED ON
 

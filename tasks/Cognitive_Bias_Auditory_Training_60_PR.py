@@ -685,7 +685,7 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
                 state_name='Punish',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Punish_image_display'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                                 (Bpod.OutputChannels.SoftCode, 232)])
             # Turns on Global LED and water port LED on
 
@@ -693,7 +693,7 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
                 state_name='Punish_image_display',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6)])
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3)])
             # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
 
             self.sma.add_state(
@@ -707,7 +707,7 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
                 state_name='Flip_screen_no_reward',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port1In: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                                 (Bpod.OutputChannels.SoftCode, 40)])
             # Turns on Water port LED and plays correct sound and flips screen after 3 seconds
 
@@ -715,7 +715,7 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
                 state_name='No_Touch',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port1In: 'Exit', Bpod.Events.Port2In: 'Exit'},
-                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 6),
+                output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                                 (Bpod.OutputChannels.SoftCode, 37)])
             # Turns on Water port LED and Global LED and displays message on camera for miss and flips the screen to displays blank,
 

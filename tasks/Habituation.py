@@ -47,33 +47,33 @@ class Habituation(Task):
                 state_timer=self.valve_time,
                 state_change_conditions={Bpod.Events.Tup: 'Start_task2'},
                 output_actions=[(Bpod.OutputChannels.Valve, 1),
-                                (Bpod.OutputChannels.PWM6, 5)])
+                                (Bpod.OutputChannels.PWM3, 5)])
                 # deliver 100 ul reward, and global LED ON
 
             self.sma.add_state(
                 state_name='Start_task2',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Port2In: 'Real_start'},
-                output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+                output_actions=[(Bpod.OutputChannels.PWM3, 5)])
 
             self.sma.add_state(
                 state_name='Real_start',
                 state_timer=0,
                 state_change_conditions={Bpod.Events.Tup: 'Habituation'},
-                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM6, 5)])
+                output_actions=[(Bpod.OutputChannels.SoftCode, 20), (Bpod.OutputChannels.PWM3, 5)])
                 # close corridor door 2 when subject enters to behavioral box
 
         self.sma.add_state(
             state_name='Habituation',
             state_timer=self.duration_min/4,
             state_change_conditions={Bpod.Events.Tup: 'Exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM3, 5)])
 
         self.sma.add_state(
             state_name='Exit',
             state_timer=0,
             state_change_conditions={Bpod.Events.Tup: 'exit'},
-            output_actions=[(Bpod.OutputChannels.PWM6, 5)])
+            output_actions=[(Bpod.OutputChannels.PWM3, 5)])
 
 
     def after_trial(self):
