@@ -36,6 +36,7 @@ class Habituation(Task):
         self.valve_time = utils.water_calibration.read_last_value('port', 1).pulse_duration
         self.valve_reward = utils.water_calibration.read_last_value('port', 1).water
         self.valve_time = self.reward_drunk * self.valve_time / self.valve_reward
+        self.valve_factor_c = 3.0
 
     def configure_gui(self): # Variables that appear in the GUI
         pass
@@ -44,7 +45,7 @@ class Habituation(Task):
         if self.current_trial == 0:
             self.sma.add_state(
                 state_name='Start_task',
-                state_timer=self.valve_time,
+                state_timer=self.valve_time*self.valve_factor_c,
                 state_change_conditions={Bpod.Events.Tup: 'Start_task2'},
                 output_actions=[(Bpod.OutputChannels.Valve, 1),
                                 (Bpod.OutputChannels.LED, 3)])

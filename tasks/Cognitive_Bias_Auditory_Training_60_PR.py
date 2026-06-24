@@ -562,7 +562,7 @@ class Cognitive_Bias_Auditory_Training_60_PR(Task):
         is_high_probe = (self.stim_trial == 4)  # 4 = high, 0 = low
 
         large_now = (is_high_probe and hr_tone == 'high') or ((not is_high_probe) and hr_tone == 'low')
-        self.valve_factor_c = 1.4 if large_now else 0.7
+        self.valve_factor_c = 1.5 if large_now else 0.75
 
         # --- Partial reinforcement: propose skip (applied ONLY if correct) ---
         self.skip_proposed = 0
