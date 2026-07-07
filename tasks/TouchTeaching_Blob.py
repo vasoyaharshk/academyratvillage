@@ -184,15 +184,16 @@ class TouchTeaching_Blob(Task):
             self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            if self.stage == 2:
+            if self.stage == 1:
+                self.stage = 2
+            elif self.stage == 2:
                 self.stage = 9
-            if self.stage == 3:
+            elif self.stage == 3:
                 self.stage = 4
             elif self.stage == 4:
                 self.stage = 5
             elif self.stage == 5:
                 self.stage = 6
-            # Extra stages only
             elif self.stage == 6:
                 self.stage = 7
             elif self.stage == 7:
@@ -225,14 +226,12 @@ class TouchTeaching_Blob(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            #new_stage = max(self.stage - 1, 0)
-            #new_stage = 3 if self.stage >= 2 else max(self.stage - 1, 0)
             if self.stage == 2:
-                new_stage = 5
-            elif self.stage >= 3:
+                new_stage = 3
+            elif self.stage >= 4:
                 new_stage = self.stage - 1
-            else:  # stage == 1
-                new_stage = 1
+            else:  # stage == 1 or 3
+                new_stage = self.stage
 
             if new_stage == self.last_forward_stage:
                 if self.last_backward_stage == new_stage:
@@ -499,7 +498,7 @@ class TouchTeaching_Blob(Task):
                 self.sma.add_state(
                     state_name='Fixation',
                     state_timer=0,
-                    state_change_conditions={Bpod.Events.PA1_Port2In: 'Response_window'},
+                    state_change_conditions={'PA1_Port2In': 'Response_window'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, self.stim_trial)])
                 # Changes the state to response window after photogate near the screen has been crossed. Here display the stimulus for trials after first trial.
 
