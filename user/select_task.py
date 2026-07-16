@@ -289,6 +289,21 @@ def select_task(df, subject):
                     print('Telegram message not sent')
                     pass
 
+                task_number = 1
+                block_size = 40
+                block_trial_counter = 0
+                block_accuracy = 0.0
+                block_number = 1
+                block_change = 0
+                total_trials = 0
+                block_correct_count = 0
+                block_valid_count = 0
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
+                condition_trial_counter = 0
+                last_stim_trial = 0
+
         elif task == 'TouchTeaching_no_mask':
             if n_trials >= 50:
                 message = f"{my_subject} advance to next stage in Touchteaching from {stage}'"

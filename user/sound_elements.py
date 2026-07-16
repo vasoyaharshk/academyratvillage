@@ -215,7 +215,7 @@ reward_frequency_map = {
     'wendy': 250.0,
     'xata': 525.1,
     'xochil': 1102.9,
-    'm3': 100.0,
+    'm2': 100.0,
 }
 
 # Pre-generated tone vectors
