@@ -74,12 +74,87 @@ def alarm_door3_limit(door3_message):
             message = 'ALARM: Door 3 limit switch event: ' + str(door3_message)
 
         utils.alarms.add_new_item({'message': message})
-        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT, 'text': message})
+        data = parse.urlencode({'chat_id': settings.TELEGRAM_CHAT_2, 'text': message})
 
         request.urlopen(url, data.encode('utf-8'))
     except:
         pass
 
+def alarm_door3_roof_switch(door3_message):
+    try:
+        url = 'https://api.telegram.org/bot%s/sendMessage' % settings.TELEGRAM_TOKEN
+
+        if door3_message == 'D3:ROOF_SAFETY_SWITCH_PRESSED':
+            message = (
+                'ALARM: URGENT: Door 3 roof safety switch pressed.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_HIT':
+            message = (
+                'ALARM: URGENT: Door 3 roof safety switch was triggered '
+                'while Door 3 was closing. The door stopped closing.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_RECOVERY_START':
+            message = (
+                'ALARM: Door 3 safety recovery started. '
+                'The door is moving downward.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_RECOVERY_STOP_REQUESTED':
+            message = (
+                'ALARM: Door 3 safety recovery was stopped before completion.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_WAIT_START':
+            message = (
+                'STATUS: Door 3 moved downward and is waiting '
+                'before attempting to close again.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_RETRY_CLOSE':
+            message = (
+                'ALARM: Door 3 safety waiting period finished. '
+                'Door 3 is attempting to close again.'
+            )
+
+        elif door3_message == 'D3:ROOF_SAFETY_SWITCH_RELEASED':
+            message = (
+                'STATUS: Door 3 roof safety switch released.'
+            )
+
+        elif door3_message == 'D3:BACKOFF_STOPPED_ROOF_SAFETY':
+            message = (
+                'ALARM: Door 3 upward back-off movement was stopped '
+                'because the roof safety switch was active.'
+            )
+
+        elif door3_message == 'D3:SETUP_ROOF_SAFETY_TRIGGERED':
+            message = (
+                'ALARM: Door 3 roof safety switch was active during '
+                'Arduino startup. Check the switch and wiring before '
+                'operating Door 3.'
+            )
+
+        else:
+            message = (
+                'ALARM: Door 3 roof safety switch event: '
+                + str(door3_message)
+            )
+
+        utils.alarms.add_new_item({'message': message})
+
+        data = parse.urlencode({
+            'chat_id': settings.TELEGRAM_CHAT,
+            'text': message
+        })
+
+        request.urlopen(url, data.encode('utf-8'))
+
+    except Exception as e:
+        logger.error(
+            f"Error sending Door 3 roof safety alarm: {e}"
+        )
 
 def alarm_session_time(seconds, subject_name):
     try:

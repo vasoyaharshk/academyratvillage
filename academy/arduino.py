@@ -65,6 +65,27 @@ class Arduino:
                         except Exception as e:
                             utils.log('Door3', 'Telegram alarm failed: ' + str(e), 'ERROR')
 
+                    elif door3_message in [
+                        'D3:ROOF_SAFETY_SWITCH_PRESSED',
+                        'D3:ROOF_SAFETY_HIT',
+                        'D3:ROOF_SAFETY_RECOVERY_START',
+                        'D3:ROOF_SAFETY_RECOVERY_STOP_REQUESTED',
+                        'D3:ROOF_SAFETY_WAIT_START',
+                        'D3:ROOF_SAFETY_RETRY_CLOSE',
+                        'D3:ROOF_SAFETY_SWITCH_RELEASED',
+                        'D3:BACKOFF_STOPPED_ROOF_SAFETY',
+                        'D3:SETUP_ROOF_SAFETY_TRIGGERED'
+                    ]:
+                        try:
+                            from academy import telegram_bot
+                            telegram_bot.alarm_door3_roof_switch(door3_message)
+                        except Exception as e:
+                            utils.log(
+                                'Door3',
+                                'Telegram roof safety alarm failed: ' + str(e),
+                                'ERROR'
+                            )
+
                 elif ':' in tag:
                     try:
                         pos = tag.index(':')

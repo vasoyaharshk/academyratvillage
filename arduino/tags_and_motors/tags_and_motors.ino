@@ -14,6 +14,8 @@
 
 #define DOOR3_LIMIT_TOP_PIN 24
 #define DOOR3_LIMIT_BOTTOM_PIN 25
+// Active LOW: connect the roof safety switch between pin 26 and GND.
+#define DOOR3_ROOF_SAFETY_PIN 22
 
 #define DOOR3_UART_RX_PIN 14
 
@@ -25,6 +27,9 @@ TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
 float door3_open_rotations = 4.8;
 float door3_close_rotations = 4.8;
 float door3_limit_reverse_rotations = 0.0;
+// Roof safety recovery settings: move down, wait, and retry closing.
+float door3_safety_reverse_rotations = 2.0;
+unsigned long door3_safety_wait_seconds = 10;
 const long door3_stepsPerRotation = 3200;
 
 const int door3_minDelay = 300;
@@ -34,9 +39,11 @@ const int door3_rampPercent = 2;
 bool door3_moving = false;
 bool door3_stopRequested = false;
 bool door3_limitHit = false;
+bool door3_safetyLimitHit = false;
 
 bool door3_lastTopLimitState = HIGH;
 bool door3_lastBottomLimitState = HIGH;
+bool door3_lastRoofSafetyState = HIGH;
 
 enum Door3PositionState {
   DOOR3_UNKNOWN,
@@ -59,6 +66,11 @@ bool isDoor3BottomLimitTriggered()
   return digitalRead(DOOR3_LIMIT_BOTTOM_PIN) == LOW;
 }
 
+bool isDoor3RoofSafetyTriggered()
+{
+  return digitalRead(DOOR3_ROOF_SAFETY_PIN) == LOW;
+}
+
 void updateDoor3StateFromLimits()
 {
   bool top = isDoor3TopLimitTriggered();
@@ -76,6 +88,7 @@ void monitorDoor3LimitSwitches()
 {
   bool topState = digitalRead(DOOR3_LIMIT_TOP_PIN);
   bool bottomState = digitalRead(DOOR3_LIMIT_BOTTOM_PIN);
+  bool roofSafetyState = digitalRead(DOOR3_ROOF_SAFETY_PIN);
 
   if (topState != door3_lastTopLimitState) {
     if (topState == LOW) {
@@ -97,6 +110,17 @@ void monitorDoor3LimitSwitches()
     }
 
     door3_lastBottomLimitState = bottomState;
+  }
+
+  if (roofSafetyState != door3_lastRoofSafetyState) {
+    if (roofSafetyState == LOW) {
+      Serial.println("D3:ROOF_SAFETY_SWITCH_PRESSED");
+    }
+    else {
+      Serial.println("D3:ROOF_SAFETY_SWITCH_RELEASED");
+    }
+
+    door3_lastRoofSafetyState = roofSafetyState;
   }
 
   updateDoor3StateFromLimits();
@@ -165,9 +189,11 @@ void setupDoor3Stepper()
   pinMode(DOOR3_DIR_PIN, OUTPUT);
   pinMode(DOOR3_LIMIT_TOP_PIN, INPUT_PULLUP);
   pinMode(DOOR3_LIMIT_BOTTOM_PIN, INPUT_PULLUP);
+  pinMode(DOOR3_ROOF_SAFETY_PIN, INPUT_PULLUP);
 
   door3_lastTopLimitState = digitalRead(DOOR3_LIMIT_TOP_PIN);
   door3_lastBottomLimitState = digitalRead(DOOR3_LIMIT_BOTTOM_PIN);
+  door3_lastRoofSafetyState = digitalRead(DOOR3_ROOF_SAFETY_PIN);
 
   door3TMCSerial.begin(115200);
 
@@ -189,6 +215,10 @@ void setupDoor3Stepper()
   }
   else {
     Serial.println("D3:SETUP_POSITION_UNKNOWN");
+  }
+
+  if (isDoor3RoofSafetyTriggered()) {
+    Serial.println("D3:SETUP_ROOF_SAFETY_TRIGGERED");
   }
 }
 
@@ -215,6 +245,11 @@ void moveDoor3StepsOnly(bool directionUp, float rotations)
       break;
     }
 
+    if (directionUp && isDoor3RoofSafetyTriggered()) {
+      Serial.println("D3:BACKOFF_STOPPED_ROOF_SAFETY");
+      break;
+    }
+
     if (!directionUp && isDoor3BottomLimitTriggered()) {
       Serial.println("D3:BACKOFF_STOPPED_BOTTOM_LIMIT");
       break;
@@ -237,6 +272,31 @@ void moveDoor3StepsOnly(bool directionUp, float rotations)
     digitalWrite(DOOR3_STEP_PIN, LOW);
     delayMicroseconds(currentDelay);
   }
+}
+
+void recoverDoor3FromRoofSafety()
+{
+  Serial.println("D3:ROOF_SAFETY_RECOVERY_START");
+
+  moveDoor3StepsOnly(false, door3_safety_reverse_rotations);
+  door3_state = DOOR3_STOPPED_MIDWAY;
+
+  if (door3_stopRequested) {
+    Serial.println("D3:ROOF_SAFETY_RECOVERY_STOP_REQUESTED");
+    return;
+  }
+
+  Serial.println("D3:ROOF_SAFETY_WAIT_START");
+
+  unsigned long waitStart = millis();
+  unsigned long waitDuration = door3_safety_wait_seconds * 1000UL;
+
+  while (millis() - waitStart < waitDuration) {
+    monitorDoor3LimitSwitches();
+    delay(1);
+  }
+
+  Serial.println("D3:ROOF_SAFETY_RETRY_CLOSE");
 }
 
 void backOffDoor3FromLimit(bool hitTopLimit)
@@ -267,6 +327,7 @@ void moveDoor3Stepper(bool directionUp, float rotations)
   door3_moving = true;
   door3_stopRequested = false;
   door3_limitHit = false;
+  door3_safetyLimitHit = false;
 
   long totalSteps = (long)(rotations * door3_stepsPerRotation);
   long rampSteps = totalSteps * door3_rampPercent / 100;
@@ -291,6 +352,13 @@ void moveDoor3Stepper(bool directionUp, float rotations)
     if (door3_stopRequested) {
       door3_state = DOOR3_STOPPED_MIDWAY;
       Serial.println("D3:STOP_REQUESTED");
+      break;
+    }
+
+    if (directionUp && isDoor3RoofSafetyTriggered()) {
+      door3_state = DOOR3_STOPPED_MIDWAY;
+      door3_safetyLimitHit = true;
+      Serial.println("D3:ROOF_SAFETY_HIT");
       break;
     }
 
@@ -328,7 +396,7 @@ void moveDoor3Stepper(bool directionUp, float rotations)
     delayMicroseconds(currentDelay);
   }
 
-  if (!door3_stopRequested && !door3_limitHit) {
+  if (!door3_stopRequested && !door3_limitHit && !door3_safetyLimitHit) {
     door3_state = directionUp ? DOOR3_AT_TOP : DOOR3_AT_BOTTOM;
 
     if (directionUp) {
@@ -375,7 +443,14 @@ void closeDoor3()
     return;
   }
 
-  moveDoor3Stepper(true, door3_close_rotations);
+  do {
+    moveDoor3Stepper(true, door3_close_rotations);
+
+    if (door3_safetyLimitHit && !door3_stopRequested) {
+      recoverDoor3FromRoofSafety();
+    }
+  }
+  while (door3_safetyLimitHit && !door3_stopRequested);
 }
 
 // DOOR 3 STEPPER WITH LIMIT SWITCH FAILSAFE END
