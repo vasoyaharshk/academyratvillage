@@ -2130,90 +2130,34 @@ def function214():  # Blob on right
 def loop214(timing):
     image_jar_right.draw()
     window.flip()
-#
-# def function215():  # Tone pair 3, negative reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec8)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop215(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function216():  # Tone pair 3, positive reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec9)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop216(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function217():  # Tone pair 4, negative reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec10)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop217(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function218():  # Tone pair 4, positive reinforcement
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec11)
-#
-#     square.pos = (int(utils.task.x_correct_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-#     square2.pos = (
-#     int(utils.task.x_incorrect_square * settings.PIXELS_PER_MM), int(utils.task.y * settings.PIXELS_PER_MM))
-#     square2.width = int(utils.task.width * settings.PIXELS_PER_MM)
-#     square2.height = int(utils.task.height * settings.PIXELS_PER_MM)
-#     print('Stimulus Shown')
-#
-# def loop218(timing):
-#     square.draw()
-#     square2.draw()
-#     window.flip()
-#
-# def function219():  #White noise, TBD
-#     if isinstance(soundStream, SoundR):
-#         soundStream.play(soundVec14)
+
+
+def function215():  # Fullscreen blob for Stage 0
+    global last_function_called, image_path
+    last_function_called = 215
+
+    try:
+        image_path = "/home/ratvillage03/academy/stimuli/touchteaching_blob/full.png"
+
+        if not os.path.isfile(image_path):
+            raise FileNotFoundError(f"Fullscreen image not found: {image_path}")
+
+        image_jar_left.image = image_path
+        image_jar_left.pos = (
+            settings.CENTRE_SCREEN[0],
+            settings.CENTRE_SCREEN[1]
+        )
+
+        print("Stage:", utils.task.stage)
+        print("Fullscreen image:", image_path)
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+def loop215(timing):
+    image_jar_left.draw()
+    window.flip()
 
 #New Correct sound function: Replace function 11 with this.
 def function220():

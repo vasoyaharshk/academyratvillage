@@ -46,7 +46,7 @@ class TouchTeaching_Blob(Task):
         self.trials_tired = 5  # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
         self.tired = False
         self.task_number = 1
-        self.stage = 1
+        self.stage = 0
         self.substage = 0
         self.substage_bias = 0  # 1 = 90:10, 2 = 75:25, 3 = 50:50
         self.response_duration = 60
@@ -184,7 +184,9 @@ class TouchTeaching_Blob(Task):
             self.consecutive_good_blocks = 0
             self.prev_block_accuracy = -1.0
             self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            if self.stage == 1:
+            if self.stage == 0:
+                self.stage = 1
+            elif self.stage == 1:
                 self.stage = 2
             elif self.stage == 2:
                 self.stage = 9
@@ -226,11 +228,13 @@ class TouchTeaching_Blob(Task):
             self.block_correct_count = 0
             self.block_valid_count = 0
             self.stim_trial_counter = 0
-            if self.stage == 2:
+            if self.stage == 1:
+                new_stage = 0
+            elif self.stage == 2:
                 new_stage = 3
             elif self.stage >= 4:
                 new_stage = self.stage - 1
-            else:  # stage == 1 or 3
+            else:
                 new_stage = self.stage
 
             if new_stage == self.last_forward_stage:
@@ -251,9 +255,13 @@ class TouchTeaching_Blob(Task):
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
-        self.stim = [213, 214]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
+        if self.stage == 0:
+            self.stim = [215]
+        else:
+            self.stim = [213, 214] # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
         blob_mm_by_stage = {
+            0: 410,
             1: 90,
             2: 90,
             3: 150,
@@ -266,9 +274,14 @@ class TouchTeaching_Blob(Task):
 
         blob_mm = blob_mm_by_stage.get(self.stage, 90)
 
-        # Touch window is blob size + 10 mm
-        self.width = blob_mm + 50
-        self.height = blob_mm + 50
+        if self.stage == 0:
+            # Full touchscreen response area
+            self.width = settings.WIN_RESOLUTION[0]
+            self.height = settings.WIN_RESOLUTION[1]
+        else:
+            # Normal blob response window
+            self.width = blob_mm + 50
+            self.height = blob_mm + 50
 
         if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
             # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
@@ -285,18 +298,17 @@ class TouchTeaching_Blob(Task):
             self.stim_trial_counter = 0
 
         # --- session-local logic for first two trials in this session ---
-        if self.current_trial == 0:
-            # first trial in this session: random left/right
-            candidate = random.choice(self.stim)  # 213 or 214
+        if self.stage == 0:
+            candidate = 215
+        elif self.current_trial == 0:
+            candidate = random.choice(self.stim)
             self.session_first_stim = candidate
         elif self.current_trial == 1:
-            # second trial in this session: forced opposite of first
             if self.session_first_stim == 213:
                 candidate = 214
             else:
                 candidate = 213
         else:
-            # from 3rd trial onwards: normal block / bias-breaking logic
             if self.bias_breaking == 0:
                 candidate = self.stim_trials[self.stim_trial_counter]
             else:
@@ -319,14 +331,19 @@ class TouchTeaching_Blob(Task):
             self.stim_trials[self.stim_trial_counter] = self.stim_trial
 
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
-        if self.stim_trial == 213:
+        if self.stim_trial == 215:
+            # Centre of complete 410 × 250 mm touchscreen
+            self.x_correcth_pos = settings.CENTRE_SCREEN[0]   # 640 = center of the screen. Screen width is 401mmm
+            self.y_correcth_pos = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
+            self.x_incorrecth = None
+
+        elif self.stim_trial == 213:
             self.x_correcth = self.x_correcth_pos[0]
-            self.x_incorrecth = None  # No incorrect area in stage 1
-            # print('Correct Answer: Left, ', 'X position = ', self.x_correcth)
+            self.x_incorrecth = None
+
         elif self.stim_trial == 214:
             self.x_correcth = self.x_correcth_pos[1]
-            self.x_incorrecth = None  # No incorrect area in stage 1
-            # print('Correct Answer: Right, ', 'X position = ', self.x_correcth)
+            self.x_incorrecth = None
 
         print('Stage: ', self.stage)
         print('Stimulus trial: ', self.stim_trial)
@@ -339,7 +356,7 @@ class TouchTeaching_Blob(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
-            if self.stage == 1:  #Stage 1 has only correct, if they touch outside, they can retry
+            if self.stage in [0, 1]:  #Stage 1 has only correct, if they touch outside, they can retry
                 if self.current_trial == 0:
                     self.sma.add_state(
                         state_name='Start_task',

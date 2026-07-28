@@ -280,7 +280,7 @@ def select_task(df, subject):
             wait_seconds = 3600 * 2
             if n_trials >= 75:
                 task = 'TouchTeaching_Blob'
-                stage = 1.0
+                stage = 0.0
                 message = 'Advance from Lickteaching to Touchteaching'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -375,7 +375,8 @@ def select_task(df, subject):
 
         elif task == 'TouchTeaching_Blob':
             if task_number == 2:
-                task = 'Cognitive_Bias_Auditory_Training_60'
+                #task = 'Cognitive_Bias_Auditory_Training_60'
+                task = 'abc'
                 stage = 0
                 task_number = 1
                 block_size = 40

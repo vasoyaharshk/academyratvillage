@@ -24,8 +24,8 @@
 SoftwareSerial door3TMCSerial(DOOR3_UART_RX_PIN, DOOR3_UART_RX_PIN);
 TMC2208Stepper door3Driver(&door3TMCSerial, DOOR3_R_SENSE);
 
-float door3_open_rotations = 4.8;
-float door3_close_rotations = 4.8;
+float door3_open_rotations = 3.5;
+float door3_close_rotations = 3.8;
 float door3_limit_reverse_rotations = 0.0;
 // Roof safety recovery settings: move down, wait, and retry closing.
 float door3_safety_reverse_rotations = 2.0;
