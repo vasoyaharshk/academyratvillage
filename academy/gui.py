@@ -724,12 +724,12 @@ class Gui(tk.Frame):
             self.cams_on_off.configure(text="Hide Cams")
             self.cams_on_off.configure(style="red.TButton")
             cam2.put_state("active")
-            # cam3.put_state("active")
+            cam3.put_state("active")
         else:
             self.cams_on_off.configure(text="Preview Cams")
             self.cams_on_off.configure(style="green.TButton")
             cam2.put_state("inactive")
-            # cam3.put_state("inactive")
+            cam3.put_state("inactive")
 
     @staticmethod
     def task_action(name):
@@ -808,14 +808,14 @@ class Gui(tk.Frame):
         except Exception:
             pass
 
-        # try:
-        #     frame = cam3.image_queue.get_nowait()
-        #     a = Image.fromarray(frame)
-        #     b = ImageTk.PhotoImage(image=a, master=self.window)
-        #     self.image_label3.configure(image=b)
-        #     self.image_label3._image_cache = b  # avoid garbage collection
-        # except Exception:
-        #     pass
+        try:
+            frame = cam3.image_queue.get_nowait()
+            a = Image.fromarray(frame)
+            b = ImageTk.PhotoImage(image=a, master=self.window)
+            self.image_label3.configure(image=b)
+            self.image_label3._image_cache = b  # avoid garbage collection
+        except Exception:
+            pass
 
     def update_events(self):
         if utils.state != 7:

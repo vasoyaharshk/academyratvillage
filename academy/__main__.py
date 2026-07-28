@@ -64,33 +64,11 @@ def main():
             if not settings.TESTING:
                 exit_app()
 
-        import traceback
-        import inspect
-
         utils.log("Academy", "Stablishing connection with Bpod...", "ACTION")
-
-        try:
-            utils.log("Academy", f"settings file: {inspect.getfile(settings)}", "ACTION")
-        except Exception:
-            pass
-
-        try:
-            utils.log("Academy", f"PYBPOD_SERIAL_PORT: {getattr(settings, 'PYBPOD_SERIAL_PORT', None)}", "ACTION")
-            utils.log("Academy", f"PYBPOD_BAUDRATE: {getattr(settings, 'PYBPOD_BAUDRATE', None)}", "ACTION")
-        except Exception:
-            pass
-
-        try:
-            ok = bpod.testing_connection()
-            if ok:
-                utils.log_cam("Academy", "Connection with Bpod stablished", "START")
-            else:
-                utils.log_cam("Academy", "Connection to Bpod failed (returned False)", "ERROR")
-                if not settings.TESTING:
-                    exit_app()
-        except Exception as e:
-            utils.log_cam("Academy", f"Connection to Bpod failed (exception): {repr(e)}", "ERROR")
-            utils.log_cam("Academy", traceback.format_exc(), "ERROR")
+        if bpod.testing_connection():
+            utils.log_cam("Academy", "Connection with Bpod stablished", "START")
+        else:
+            utils.log_cam("Academy", "Connection to Bpod failed", "ERROR")
             if not settings.TESTING:
                 exit_app()
 
@@ -649,9 +627,9 @@ def go_to_state(num):
         utils.list_of_trial_timings = []
         task_collection.subjects_dict = task_collection.create_subjects_dict()
         cam2.put_state('inactive')
-        # cam3.put_state("inactive")
+        cam3.put_state("inactive")
         cam2.put_state('black')
-        # cam3.put_state("black")
+        cam3.put_state("black")
         if utils.reading_tags > 0:
             arduino.turn_led_on()
         utils.log("Academy", "Go to state 0", "ACTION")
@@ -897,9 +875,9 @@ def go_to_state(num):
 
     elif num == 7:  # setting task
         cam2.put_state('inactive')
-        # cam3.put_state("inactive")
+        cam3.put_state("inactive")
         cam2.put_state('black')
-        # cam3.put_state("black")
+        cam3.put_state("black")
         arduino.turn_led_off()
         utils.log("Academy", "Go to state 7", "ACTION")
         screen.tag = None
@@ -941,12 +919,12 @@ def exit_app():
     arduino.turn_led_off()
     cam1.put_state("inactive")
     cam2.put_state("inactive")
-    # cam3.put_state("inactive")
+    cam3.put_state("inactive")
     for i in range(500):
         gui.reload()
     cam1.stop()
     cam2.stop()
-    # cam3.stop()
+    cam3.stop()
     f = open(os.devnull, "w")
     sys.stdout = f
     sys.stderr = f
@@ -966,7 +944,7 @@ def relaunch():
     time.sleep(1)
     cam1.put_state("inactive")
     cam2.put_state("inactive")
-    # cam3.put_state("inactive")
+    cam3.put_state("inactive")
     for i in range(500):
         gui.reload()
     cam1.stop()
