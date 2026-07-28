@@ -346,8 +346,8 @@ class TouchTeaching_Blob(Task):
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 215:
             # Centre of complete 410 × 250 mm touchscreen
-            self.x_correcth = settings.CENTRE_SCREEN[0]   # 640 = center of the screen. Screen width is 401mmm
-            self.y_correcth = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
+            self.x_correcth = settings.WIN_SIZE[0] / 2
+            self.y_correcth = settings.WIN_SIZE[1] / 2
             self.x_incorrecth = None
 
         elif self.stim_trial == 213:
