@@ -276,17 +276,26 @@ class TouchTeaching_Blob(Task):
 
         if self.stage == 0:
             # Full touchscreen response area
-            self.width = settings.WIN_RESOLUTION[0]
-            self.height = settings.WIN_RESOLUTION[1]
+            self.width = settings.WIN_SIZE[0]
+            self.height = settings.WIN_SIZE[1]
         else:
             # Normal blob response window
             self.width = blob_mm + 50
             self.height = blob_mm + 50
 
-        if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:  # Re-randomize every 20 trials
-            # If not the first block_size, pass the last stimulus of the previous block_size to avoid repetition
-            self.last_stim_trial = self.stim_trials[self.stim_trial_counter - 1] if self.stim_trial_counter > 0 else None
-            self.stim_trials = self.generate_random_trials(self.last_stim_trial)
+        if self.stim_trial_counter % self.block_size == 0 and self.bias_breaking == 0:
+            self.last_stim_trial = (
+                self.stim_trials[self.stim_trial_counter - 1]
+                if self.stim_trial_counter > 0
+                else None
+            )
+            if self.stage == 0:
+                self.stim_trials = [215] * 1000
+            else:
+                self.stim_trials = self.generate_random_trials(
+                    self.last_stim_trial
+                )
+            self.stim_trial_counter = 0
             # print(f"Stimulus trials after first attempt: {self.stim_trials}")
             while self.stim_trials is None:
                 # print("Retrying to generate stimulus trials...")
@@ -315,8 +324,12 @@ class TouchTeaching_Blob(Task):
                 candidate = self.last_stim_trial
 
         # --- global guard: never allow 3 same-side stimuli in a row across sessions ---
-        if len(self.last_two_stim) >= 2 and candidate == self.last_two_stim[-1] == self.last_two_stim[-2]:
-            # flip side
+        if (
+                self.stage != 0
+                and len(self.last_two_stim) >= 2
+                and candidate == self.last_two_stim[-1]
+                and candidate == self.last_two_stim[-2]
+        ):
             candidate = 213 if candidate == 214 else 214
 
         self.forced_choice_actual_trial = self.forced_choice_next_trial
@@ -333,8 +346,8 @@ class TouchTeaching_Blob(Task):
             # Here, if we need to define the correcth_x position based on the stimulus. So function 31 displays stimulus with correct answer on the left (x=115) and 32 displays stimulus with correct answer on right (x=295)
         if self.stim_trial == 215:
             # Centre of complete 410 × 250 mm touchscreen
-            self.x_correcth_pos = settings.CENTRE_SCREEN[0]   # 640 = center of the screen. Screen width is 401mmm
-            self.y_correcth_pos = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
+            self.x_correcth = settings.CENTRE_SCREEN[0]   # 640 = center of the screen. Screen width is 401mmm
+            self.y_correcth = settings.CENTRE_SCREEN[1]  # 640 = center of the screen. Screen height is 250mmm
             self.x_incorrecth = None
 
         elif self.stim_trial == 213:
