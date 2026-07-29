@@ -397,8 +397,8 @@ class Gui(tk.Frame):
             self.image_label2 = tk.Label(self, anchor="nw", justify="left")
             self.image_label2.place(x=0, y=0, width=640, height=480)
 
-            # self.image_label3 = tk.Label(self, anchor="w", justify="left")
-            # self.image_label3.place(x=0, y=0, width=640, height=480)
+            self.image_label3 = tk.Label(self, anchor="center", justify="left")
+            self.image_label3.place(x=0, y=360, width=640, height=340)
 
             # events
             y = 820
