@@ -25,6 +25,15 @@ def select_task(df, subject):
 
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
 
+    # Automatic Water is a temporary task. Read all tracked progress from the
+    # last non-Automatic-Water trial so a blank or newly added field in the
+    # Automatic Water session can never reset the subject's original task.
+    state_row = last_row
+    if task == 'Automatic_Water' and 'task' in df.columns:
+        previous_non_auto_rows = df[df['task'] != 'Automatic_Water']
+        if not previous_non_auto_rows.empty:
+            state_row = previous_non_auto_rows.iloc[-1]
+
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
 

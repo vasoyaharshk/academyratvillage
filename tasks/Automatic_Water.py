@@ -76,7 +76,7 @@ class Automatic_Water(Task):
         self.trial_counter = 0  # Total number of trials run in the current block
 
         # Weber's Law Training:
-        self.ror = 0  # Ratio of Ratios (ROR) for Weber's Law Training
+        self.ror = []  # Ratio of Ratios (ROR) for Weber's Law Training
         self.completed_ror = []  # List of completed ROR levels
         self.current_ror = 0  # Current ROR of the trial
         self.trial_counter_ror = 0  # Counter for trials under current ROR
@@ -92,6 +92,12 @@ class Automatic_Water(Task):
         self.total_trials = 0  # Total trials across the task.
         self.block_correct_count = 0  # Number of correct responses in the block
         self.block_valid_count = 0  # Number of valid (non-missed) trials in the block
+        self.block_stim_correct_count_1 = 0
+        self.block_stim_valid_count_1 = 0
+        self.block_stim_accuracy_1 = 0.0
+        self.block_stim_correct_count_2 = 0
+        self.block_stim_valid_count_2 = 0
+        self.block_stim_accuracy_2 = 0.0
         self.condition_trial_counter = 0  # Counter for randomising conditions
         self.last_forward_stage = 0  # The stage moved forward from after a forward change
         self.last_backward_stage = 0  # The stage moved backward to after the last backward change
@@ -105,6 +111,30 @@ class Automatic_Water(Task):
         self.last_stim_trial = 0  # the function of the last trial of the previous block. Used to ensure first trial of next block is different
         self.max_move_backs = 0
         self.stage_sequence = []
+
+        # Stage and Cognitive Bias continuity
+        self.last_stage_trial = 0
+        self.stage_sequence_counter = 0
+        self.substage_counter_1 = 0
+        self.substage_counter_2 = 0
+        self.substage_counter_3 = 0
+        self.substage_counter_4 = 0
+        self.substage_counter_5 = 0
+        self.substage_counter_6 = 0
+        self.substage_counter_7 = 0
+        self.substage_counter_8 = 0
+        self.substage_counter_9 = 0
+        self.substage_counter_10 = 0
+        self.substage_counter_11 = 0
+        self.group = 0
+        self.pair = 0
+        self.prev_block_accuracy = -1.0
+        self.last_block_accuracy = 0.0
+        self.last_two_stim = []
+        self.unrewarded_list = []
+        self.pr_carry_tone = ""
+        self.pr_carry_pending = 0
+        self.consecutive_good_blocks = 0
 
         self.intertrial_interval = 60
         self.trial_result = None
@@ -216,8 +246,8 @@ class Automatic_Water(Task):
             self.trial_result = 'correct_first'
             self.miss_acc_counter = 0
 
-        if self.current_trial_states['Deliver_Water'][0][0] > 0:
-            self.reward_drunk += self.valve_reward
+        if self.current_trial_states['Automatic_reward'][0][0] > 0:
+            self.reward_drunk += self.valve_reward * self.valve_factor_c
 
 
         # General counters
@@ -262,6 +292,12 @@ class Automatic_Water(Task):
         self.register_value('total_trials', self.total_trials)
         self.register_value('block_correct_count', self.block_correct_count)
         self.register_value('block_valid_count', self.block_valid_count)
+        self.register_value('block_stim_correct_count_1', self.block_stim_correct_count_1)
+        self.register_value('block_stim_valid_count_1', self.block_stim_valid_count_1)
+        self.register_value('block_stim_accuracy_1', self.block_stim_accuracy_1)
+        self.register_value('block_stim_correct_count_2', self.block_stim_correct_count_2)
+        self.register_value('block_stim_valid_count_2', self.block_stim_valid_count_2)
+        self.register_value('block_stim_accuracy_2', self.block_stim_accuracy_2)
 
         # Condition and stage tracking
         self.register_value('condition_trial_counter', self.condition_trial_counter)
@@ -272,6 +308,35 @@ class Automatic_Water(Task):
         self.register_value('stage_backward_change', self.stage_backward_change)
         self.register_value('max_move_backs', self.max_move_backs)
         self.register_value('stage_sequence', self.stage_sequence)
+        self.register_value('last_stage_trial', self.last_stage_trial)
+        self.register_value('stage_sequence_counter', self.stage_sequence_counter)
+        self.register_value('substage_counter_1', self.substage_counter_1)
+        self.register_value('substage_counter_2', self.substage_counter_2)
+        self.register_value('substage_counter_3', self.substage_counter_3)
+        self.register_value('substage_counter_4', self.substage_counter_4)
+        self.register_value('substage_counter_5', self.substage_counter_5)
+        self.register_value('substage_counter_6', self.substage_counter_6)
+        self.register_value('substage_counter_7', self.substage_counter_7)
+        self.register_value('substage_counter_8', self.substage_counter_8)
+        self.register_value('substage_counter_9', self.substage_counter_9)
+        self.register_value('substage_counter_10', self.substage_counter_10)
+        self.register_value('substage_counter_11', self.substage_counter_11)
+
+        # Cognitive Bias state
+        self.register_value('group', self.group)
+        self.register_value('pair', self.pair)
+        self.register_value('prev_block_accuracy', self.prev_block_accuracy)
+        self.register_value('last_block_accuracy', self.last_block_accuracy)
+        self.register_value('last_two_stim', self.last_two_stim)
+        self.register_value('unrewarded_list', self.unrewarded_list)
+        self.register_value('pr_carry_tone', self.pr_carry_tone)
+        self.register_value('pr_carry_pending', self.pr_carry_pending)
+        self.register_value('consecutive_good_blocks', self.consecutive_good_blocks)
+
+        # Reward sound settings
+        self.register_value('reward_frequency', self.reward_frequency)
+        self.register_value('reward_db', self.reward_db)
+        self.register_value('reward_duration', self.reward_duration)
 
         # Stimulus randomisation
         self.register_value('stim_trial', self.stim_trial)
