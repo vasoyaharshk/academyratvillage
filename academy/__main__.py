@@ -722,6 +722,12 @@ def go_to_state(num):
         utils.subject.total_trials = int(utils.subject.total_trials)  #Cast to int
         utils.subject.block_correct_count = int(utils.subject.block_correct_count)  #Cast to int
         utils.subject.block_valid_count = int(utils.subject.block_valid_count)  #Cast to int
+        utils.subject.block_stim_correct_count_1 = int(utils.subject.block_stim_correct_count_1)
+        utils.subject.block_stim_valid_count_1 = int(utils.subject.block_stim_valid_count_1)
+        utils.subject.block_stim_accuracy_1 = float(utils.subject.block_stim_accuracy_1)
+        utils.subject.block_stim_correct_count_2 = int(utils.subject.block_stim_correct_count_2)
+        utils.subject.block_stim_valid_count_2 = int(utils.subject.block_stim_valid_count_2)
+        utils.subject.block_stim_accuracy_2 = float(utils.subject.block_stim_accuracy_2)
         utils.subject.condition_trial_counter = int(utils.subject.condition_trial_counter)  #Cast to int
         utils.subject.stage_forward_change = int(utils.subject.stage_forward_change)  #Cast to int
         utils.subject.stage_backward_change = int(utils.subject.stage_backward_change)  #Cast to int
@@ -804,6 +810,12 @@ def go_to_state(num):
         utils.task.total_trials = utils.subject.total_trials
         utils.task.block_correct_count = utils.subject.block_correct_count
         utils.task.block_valid_count = utils.subject.block_valid_count
+        utils.task.block_stim_correct_count_1 = utils.subject.block_stim_correct_count_1
+        utils.task.block_stim_valid_count_1 = utils.subject.block_stim_valid_count_1
+        utils.task.block_stim_accuracy_1 = utils.subject.block_stim_accuracy_1
+        utils.task.block_stim_correct_count_2 = utils.subject.block_stim_correct_count_2
+        utils.task.block_stim_valid_count_2 = utils.subject.block_stim_valid_count_2
+        utils.task.block_stim_accuracy_2 = utils.subject.block_stim_accuracy_2
         utils.task.condition_trial_counter = utils.subject.condition_trial_counter
         utils.task.stage_forward_change = utils.subject.stage_forward_change
         utils.task.stage_backward_change = utils.subject.stage_backward_change
