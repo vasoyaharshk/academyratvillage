@@ -385,8 +385,7 @@ def select_task(df, subject):
 
         elif task == 'TouchTeaching_Blob':
             if task_number == 2:
-                #task = 'Cognitive_Bias_Auditory_Training_60'
-                task = 'abc'
+                task = 'Cognitive_Bias_Auditory_Training_60'
                 stage = 0
                 task_number = 1
                 block_size = 40
