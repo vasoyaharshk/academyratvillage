@@ -144,6 +144,9 @@ class Task(object):
 
     def set_and_run(self, subject, subject_name, subject_weight, task_manager):
 
+        self.task_end = False
+        self.tired = False
+
         utils.control_softcodes = 0
         utils.control_serials = 0
 
