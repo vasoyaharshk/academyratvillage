@@ -2,6 +2,7 @@ import numpy as np
 from wx.lib.pubsub.py2and3 import print_
 from academy import telegram_bot
 from user import settings
+from user import automatic_water_check
 import random
 import json
 import pandas as pd
@@ -14,6 +15,59 @@ from datetime import datetime, timedelta
 # df is the session dataframe for the subject
 
 
+RETURN_FIELDS = ['task', 'stage', 'substage', 'substage_bias', 'wait_seconds', 'stim_dur_ds', 'stim_dur_dm', 'stim_dur_dl', 'choice', 'block', 'conditions', 'completed_conditions', 'current_condition', 'repetition', 'current_repetition', 'trial_counter', 'stim_trial', 'stim_trials', 'stim_trial_counter', 'ror', 'completed_ror', 'current_ror', 'trial_counter_ror', 'moved_back_counter', 'block_size', 'block_trial_counter', 'block_accuracy', 'block_number', 'ror_change', 'block_change', 'last_stim_trial', 'last_condition_trial', 'total_trials', 'block_correct_count', 'block_valid_count', 'block_stim_correct_count_1', 'block_stim_valid_count_1', 'block_stim_accuracy_1', 'block_stim_correct_count_2', 'block_stim_valid_count_2', 'block_stim_accuracy_2', 'condition_trial_counter', 'stage_forward_change', 'stage_backward_change', 'task_number', 'last_forward_stage', 'last_backward_stage', 'reward_frequency', 'reward_db', 'reward_duration', 'stage_sequence', 'last_stage_trial', 'stage_sequence_counter', 'substage_counter_1', 'substage_counter_2', 'substage_counter_3', 'substage_counter_4', 'substage_counter_5', 'substage_counter_6', 'substage_counter_7', 'substage_counter_8', 'substage_counter_9', 'substage_counter_10', 'substage_counter_11', 'group', 'pair', 'prev_block_accuracy', 'last_block_accuracy', 'last_two_stim', 'unrewarded_list', 'pr_carry_tone', 'pr_carry_pending', 'consecutive_good_blocks']
+
+
+def select_touch_task(history, subject, defaults):
+    criteria = automatic_water_check.touch_criteria()
+    return_trials = criteria["AUTOMATIC_WATER_TOUCH_RETURN_TRIALS"]
+    return_accuracy = criteria["AUTOMATIC_WATER_TOUCH_RETURN_ACCURACY"]
+    states = automatic_water_check._read_states()
+    name = str(subject.name)
+    state = states.get(name)
+    if not state or "original" not in state:
+        # A manually assigned intervention cannot safely reconstruct a subject
+        # record from trial history. Keep the task fixed and request review.
+        automatic_water_check._notify("URGENT: Missing saved original task for " + automatic_water_check.TOUCH_TASK +
+                ". Review this subject before restoring progress.", name)
+        values = dict(defaults)
+    else:
+        assigned = datetime.fromisoformat(state["assigned_at"])
+        # Combine all sessions within each calendar day of this intervention.
+        rows = automatic_water_check._trial_rows(history)
+        rows = rows[rows["task"] == automatic_water_check.TOUCH_TASK].copy()
+        dates = automatic_water_check._dates(rows)
+        rows = rows[dates >= assigned.date()]
+        dates = automatic_water_check._dates(rows)
+        stats = []
+        for day in sorted(dates.dropna().unique()):
+            valid = rows[(dates == day) & (rows["trial_result"] != "miss")]
+            n = len(valid)
+            correct = valid["trial_result"].isin(["correct", "correct_first"]).sum()
+            stats.append((day, n, float(correct / n) if n else 0.0))
+        qualified = [item for item in stats
+                     if item[1] >= return_trials and item[2] >= return_accuracy]
+        if qualified:
+            values = dict(defaults)
+            values.update(state["original"])
+            # Keep the snapshot until the caller durably writes the subject.
+            # Repeating selection after a failed write remains safe.
+            day, trials, accuracy = qualified[-1]
+            automatic_water_check._notify(f"{automatic_water_check.TOUCH_TASK} return criteria met on {day}: "
+                    f"{trials} valid trials, {accuracy:.1%} accuracy. "
+                    f"Restoring {values['task']}, stage {values['stage']}, "
+                    "with saved progression.", name)
+            values["wait_seconds"] = 3600 * settings.TIME_TO_ENTER
+            return tuple(values[field] for field in RETURN_FIELDS)
+        automatic_water_check._alert_overdue(name, state, history, datetime.now())
+        automatic_water_check._write_states(states)
+        values = dict(defaults)
+
+    values.update(task=automatic_water_check.TOUCH_TASK, stage=2, task_number=1,
+                  stage_forward_change=0, stage_backward_change=0)
+    return tuple(values[field] for field in RETURN_FIELDS)
+
+
 def select_task(df, subject):
     task = subject.task
     wait_seconds = 3600 * settings.TIME_TO_ENTER
@@ -24,6 +78,15 @@ def select_task(df, subject):
                 df['trial_length'].isna() | (df['trial_length'] == '')))].copy()
 
     last_row = df.iloc[-1]  # Get the last row of the DataFrame
+
+    # Automatic Water is a temporary task. Read all tracked progress from the
+    # last non-Automatic-Water trial so a blank or newly added field in the
+    # Automatic Water session can never reset the subject's original task.
+    state_row = last_row
+    if task == 'Automatic_Water' and 'task' in df.columns:
+        previous_non_auto_rows = df[df['task'] != 'Automatic_Water']
+        if not previous_non_auto_rows.empty:
+            state_row = previous_non_auto_rows.iloc[-1]
 
     #Assign reward decibels: Needs to be a dictionary if different for each individual.
     reward_db = 70.0
@@ -90,7 +153,7 @@ def select_task(df, subject):
 
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
-            val = last_row[column_name]
+            val = state_row[column_name]
             if pd.isna(val):
                 return default_val
             return val
@@ -211,6 +274,12 @@ def select_task(df, subject):
     except Exception as e:
         print("Telegram message not sent. Error:", e)
 
+    if task == automatic_water_check.TOUCH_TASK:
+        # Bypass every original-task progression rule during the intervention.
+        # The saved subject record includes progression already selected at the
+        # end of the previous original-task session, not merely its last trial.
+        return select_touch_task(df, subject, locals())
+
     # Check if task does not contain the word 'Probability'
     if ('Probability' not in task) and ('Cognitive_Bias' not in task):  #Excludes all the task without the word Probability or cognitive bias. Early Training Tasks.
         #dataframes
@@ -227,29 +296,30 @@ def select_task(df, subject):
         n_trials = df_last1[df_last1.trial_result != 'miss'].trial.count()
         n_trials_prev = df_last2[df_last2.trial_result != 'miss'].groupby('session')['trial'].count().values[0]
 
-        #if task == 'Automatic_Water':
         if task == 'Automatic_Water':
-            # Get last two sessions for this subject
-            last2_sessions = df_last2['session'].unique()
+            # Return to the previous task after one Automatic Water session
+            df_before_auto = df[df['session'] < last_session]
+            previous_non_auto = df_before_auto[
+                df_before_auto['task'] != 'Automatic_Water'
+                ]
 
-            # Check if both of them are Automatic_Water
-            recent_tasks = df[df['session'].isin(last2_sessions)]['task'].unique()
-            if all(t == 'Automatic_Water' for t in recent_tasks):
-                # Look at the session before those two
-                min_session_in_auto = min(last2_sessions)
-                df_before_auto = df[df['session'] < min_session_in_auto]
-                previous_non_auto = df_before_auto[df_before_auto['task'] != 'Automatic_Water']
+            if not previous_non_auto.empty:
+                last_valid_session = previous_non_auto.sort_values(
+                    by='session'
+                ).iloc[-1]
 
-                if not previous_non_auto.empty:
-                    last_valid_session = previous_non_auto.sort_values(by='session').iloc[-1]
-                    task = last_valid_session.task
+                task = last_valid_session.task
 
-                    # message = f"Completed 2 sessions of Automatic_Water. Reverting to task: {task}, stage: {stage}"
-                    # try:
-                    #     telegram_bot.alarm_finish_session(message, my_subject)
-                    #     telegram_bot.alarm_completed_criteria(task, my_subject)
-                    # except:
-                    #     print('Telegram message not sent')
+                message = (
+                    f"Completed 1 session of Automatic_Water. "
+                    f"Reverting to task: {task}, stage: {stage}"
+                )
+
+                try:
+                    telegram_bot.alarm_finish_session(message, my_subject)
+                    telegram_bot.alarm_completed_criteria(task, my_subject)
+                except:
+                    print('Telegram message not sent')
 
 
         if task == 'Habituation':
@@ -265,7 +335,7 @@ def select_task(df, subject):
                     pass
 
         elif task == 'LickTeaching':
-            message = f"DEBUG: Subject={my_subject}, Task={task}, Valid trials in last session={n_trials}"
+            message = f"Subject={my_subject}, Task={task}, Valid trials in last session={n_trials}"
             try:
                 telegram_bot.alarm_finish_session(message, my_subject)
             except:
@@ -273,8 +343,8 @@ def select_task(df, subject):
                 pass
             wait_seconds = 3600 * 2
             if n_trials >= 75:
-                task = 'TouchTeaching_no_mask'
-                stage = 1.0
+                task = 'TouchTeaching_Blob'
+                stage = 0.0
                 message = 'Advance from Lickteaching to Touchteaching'
                 try:
                     telegram_bot.alarm_finish_session(message, my_subject)
@@ -282,6 +352,21 @@ def select_task(df, subject):
                 except:
                     print('Telegram message not sent')
                     pass
+
+                task_number = 1
+                block_size = 40
+                block_trial_counter = 0
+                block_accuracy = 0.0
+                block_number = 1
+                block_change = 0
+                total_trials = 0
+                block_correct_count = 0
+                block_valid_count = 0
+                stim_trial = 0
+                stim_trials = []
+                stim_trial_counter = 0
+                condition_trial_counter = 0
+                last_stim_trial = 0
 
         elif task == 'TouchTeaching_no_mask':
             if n_trials >= 50:
@@ -354,7 +439,7 @@ def select_task(df, subject):
 
         elif task == 'TouchTeaching_Blob':
             if task_number == 2:
-                task = 'cyx'
+                task = 'Cognitive_Bias_Auditory_Training_60'
                 stage = 0
                 task_number = 1
                 block_size = 40
