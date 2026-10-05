@@ -15,6 +15,10 @@ from academy.camera import cam1, cam2, cam3
 from user import settings
 import ast
 from user.functions import function255
+from user.automatic_water_check import (
+    automatic_water_check_is_due,
+    run_scheduled_automatic_water_check,
+)
 
 
 # 0 waiting
@@ -28,6 +32,7 @@ from user.functions import function255
 # 8 running direct task
 # 9 after max time, data not saved, direct task
 # 10 multiple animals inside, data not saved, animal not back
+# 11 automatic water daily check
 
 
 def main():
@@ -128,6 +133,11 @@ def main_loop():
             go_to_state(utils.change_to_state)
             utils.state = utils.change_to_state
 
+        if utils.state == 11:
+            run_scheduled_automatic_water_check()
+            utils.change_to_state = 0
+            continue
+
         gui.reload()
 
         # if utils.chrono.get_seconds() >= settings.MAXIMUM_TIME + utils.alarm_mouse_time:
@@ -180,6 +190,10 @@ def main_loop():
         if utils.state == 0:  # waiting
             if utils.relaunch:
                 relaunch()
+
+            if status is None and not enter_flag and automatic_water_check_is_due():
+                utils.change_to_state = 11
+                continue
 
             if status == "s":
                 try:
@@ -926,6 +940,9 @@ def go_to_state(num):
         # bpod.open_inner_door()
         utils.log("Academy", "Go to state 10", "ACTION")
 
+    elif num == 11:  # automatic water daily check
+        utils.log("Academy", "Go to state 11: Automatic Water daily check", "ACTION")
+
 
 def exit_app():
     utils.log("Academy", "EXIT", "END")
@@ -982,3 +999,4 @@ def relaunch():
 
 if __name__ == "__main__":
     main()
+
