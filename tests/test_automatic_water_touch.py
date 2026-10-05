@@ -51,9 +51,16 @@ class TouchPolicyTests(unittest.TestCase):
         self.water = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.water)
         user.automatic_water_check = self.water
+        wx = types.ModuleType('wx.lib.pubsub.py2and3')
+        wx.print_ = print
+        with patch.dict(sys.modules, {'wx.lib.pubsub.py2and3': wx}):
+            spec = importlib.util.spec_from_file_location(
+                'select_task_test', ROOT / 'user/select_task.py')
+            self.select = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(self.select)
         self.messages = []
         self.water._notify = lambda message, name: self.messages.append((message, name))
-        self.original = {field: 7 for field in self.water.RETURN_FIELDS}
+        self.original = {field: 7 for field in self.select.RETURN_FIELDS}
         self.original.update(name='rat', task='Probability_Test', stage=5,
                              stim_trials='[1, 2]', reward_frequency=123.0)
         self.subject = types.SimpleNamespace(**self.original)
@@ -141,24 +148,24 @@ class TouchPolicyTests(unittest.TestCase):
         assigned = self.assign()
         df = self.touch_rows(100, 79)
         df.loc[df.trial_result == 'incorrect', 'trial_result'] = 'miss'
-        self.assertEqual(self.water.select_touch_task(df, assigned, self.original)[0],
+        self.assertEqual(self.select.select_touch_task(df, assigned, self.original)[0],
                          self.water.TOUCH_TASK)
 
     def test_return_sums_sessions_and_preserves_all_fields(self):
         assigned = self.assign()
         df = pd.concat([self.touch_rows(40, 32), self.touch_rows(40, 32, session=4)])
-        defaults = {field: -100 for field in self.water.RETURN_FIELDS}
-        result = dict(zip(self.water.RETURN_FIELDS,
-                          self.water.select_touch_task(df, assigned, defaults)))
-        for field in self.water.RETURN_FIELDS:
+        defaults = {field: -100 for field in self.select.RETURN_FIELDS}
+        result = dict(zip(self.select.RETURN_FIELDS,
+                          self.select.select_touch_task(df, assigned, defaults)))
+        for field in self.select.RETURN_FIELDS:
             self.assertEqual(result[field], 3600 if field == 'wait_seconds'
                              else self.original[field])
 
     def test_no_return_for_79_trials_or_less_than_80_percent(self):
         assigned = self.assign()
         for df in (self.touch_rows(79, 79), self.touch_rows(80, 63)):
-            result = dict(zip(self.water.RETURN_FIELDS,
-                              self.water.select_touch_task(df, assigned, self.original)))
+            result = dict(zip(self.select.RETURN_FIELDS,
+                              self.select.select_touch_task(df, assigned, self.original)))
             self.assertEqual((result['task'], result['stage']), (self.water.TOUCH_TASK, 2))
 
     def test_trials_from_different_days_are_not_combined(self):
@@ -168,7 +175,7 @@ class TouchPolicyTests(unittest.TestCase):
         self.water._write_states(states)
         df = pd.concat([self.touch_rows(40, 40, self.today-timedelta(days=1)),
                         self.touch_rows(40, 40)])
-        result = self.water.select_touch_task(df, assigned, self.original)
+        result = self.select.select_touch_task(df, assigned, self.original)
         self.assertEqual(result[0], self.water.TOUCH_TASK)
 
     def test_overdue_alert_without_trials_once_per_day(self):
@@ -192,7 +199,7 @@ class TouchPolicyTests(unittest.TestCase):
             select = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(select)
         df = self.touch_rows()
-        result = dict(zip(self.water.RETURN_FIELDS, select.select_task(df, assigned)))
+        result = dict(zip(self.select.RETURN_FIELDS, select.select_task(df, assigned)))
         self.assertEqual(result['task'], self.original['task'])
         self.assertEqual(result['stage'], self.original['stage'])
         self.assertEqual(result['stage_forward_change'], self.original['stage_forward_change'])

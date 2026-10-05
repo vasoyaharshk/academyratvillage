@@ -15,6 +15,55 @@ from datetime import datetime, timedelta
 # df is the session dataframe for the subject
 
 
+RETURN_FIELDS = ['task', 'stage', 'substage', 'substage_bias', 'wait_seconds', 'stim_dur_ds', 'stim_dur_dm', 'stim_dur_dl', 'choice', 'block', 'conditions', 'completed_conditions', 'current_condition', 'repetition', 'current_repetition', 'trial_counter', 'stim_trial', 'stim_trials', 'stim_trial_counter', 'ror', 'completed_ror', 'current_ror', 'trial_counter_ror', 'moved_back_counter', 'block_size', 'block_trial_counter', 'block_accuracy', 'block_number', 'ror_change', 'block_change', 'last_stim_trial', 'last_condition_trial', 'total_trials', 'block_correct_count', 'block_valid_count', 'block_stim_correct_count_1', 'block_stim_valid_count_1', 'block_stim_accuracy_1', 'block_stim_correct_count_2', 'block_stim_valid_count_2', 'block_stim_accuracy_2', 'condition_trial_counter', 'stage_forward_change', 'stage_backward_change', 'task_number', 'last_forward_stage', 'last_backward_stage', 'reward_frequency', 'reward_db', 'reward_duration', 'stage_sequence', 'last_stage_trial', 'stage_sequence_counter', 'substage_counter_1', 'substage_counter_2', 'substage_counter_3', 'substage_counter_4', 'substage_counter_5', 'substage_counter_6', 'substage_counter_7', 'substage_counter_8', 'substage_counter_9', 'substage_counter_10', 'substage_counter_11', 'group', 'pair', 'prev_block_accuracy', 'last_block_accuracy', 'last_two_stim', 'unrewarded_list', 'pr_carry_tone', 'pr_carry_pending', 'consecutive_good_blocks']
+
+
+def select_touch_task(history, subject, defaults):
+    states = automatic_water_check._read_states()
+    name = str(subject.name)
+    state = states.get(name)
+    if not state or "original" not in state:
+        # A manually assigned intervention cannot safely reconstruct a subject
+        # record from trial history. Keep the task fixed and request review.
+        automatic_water_check._notify("URGENT: Missing saved original task for " + automatic_water_check.TOUCH_TASK +
+                ". Review this subject before restoring progress.", name)
+        values = dict(defaults)
+    else:
+        assigned = datetime.fromisoformat(state["assigned_at"])
+        # Combine all sessions within each calendar day of this intervention.
+        rows = automatic_water_check._trial_rows(history)
+        rows = rows[rows["task"] == automatic_water_check.TOUCH_TASK].copy()
+        dates = automatic_water_check._dates(rows)
+        rows = rows[dates >= assigned.date()]
+        dates = automatic_water_check._dates(rows)
+        stats = []
+        for day in sorted(dates.dropna().unique()):
+            valid = rows[(dates == day) & (rows["trial_result"] != "miss")]
+            n = len(valid)
+            correct = valid["trial_result"].isin(["correct", "correct_first"]).sum()
+            stats.append((day, n, float(correct / n) if n else 0.0))
+        qualified = [item for item in stats if item[1] >= 80 and item[2] >= 0.8]
+        if qualified:
+            values = dict(defaults)
+            values.update(state["original"])
+            # Keep the snapshot until the caller durably writes the subject.
+            # Repeating selection after a failed write remains safe.
+            day, trials, accuracy = qualified[-1]
+            automatic_water_check._notify(f"{automatic_water_check.TOUCH_TASK} return criteria met on {day}: "
+                    f"{trials} valid trials, {accuracy:.1%} accuracy. "
+                    f"Restoring {values['task']}, stage {values['stage']}, "
+                    "with saved progression.", name)
+            values["wait_seconds"] = 3600 * settings.TIME_TO_ENTER
+            return tuple(values[field] for field in RETURN_FIELDS)
+        automatic_water_check._alert_overdue(name, state, history, datetime.now())
+        automatic_water_check._write_states(states)
+        values = dict(defaults)
+
+    values.update(task=automatic_water_check.TOUCH_TASK, stage=2, task_number=1,
+                  stage_forward_change=0, stage_backward_change=0)
+    return tuple(values[field] for field in RETURN_FIELDS)
+
+
 def select_task(df, subject):
     task = subject.task
     wait_seconds = 3600 * settings.TIME_TO_ENTER
@@ -231,7 +280,7 @@ def select_task(df, subject):
         # Bypass every original-task progression rule during the intervention.
         # The saved subject record includes progression already selected at the
         # end of the previous original-task session, not merely its last trial.
-        return automatic_water_check.select_touch_task(df, subject, locals())
+        return select_touch_task(df, subject, locals())
 
     # Check if task does not contain the word 'Probability'
     if ('Probability' not in task) and ('Cognitive_Bias' not in task):  #Excludes all the task without the word Probability or cognitive bias. Early Training Tasks.

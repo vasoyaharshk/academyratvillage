@@ -57,7 +57,6 @@ def _active_subject_names():
     return sorted(names)
 
 
-RETURN_FIELDS = ['task', 'stage', 'substage', 'substage_bias', 'wait_seconds', 'stim_dur_ds', 'stim_dur_dm', 'stim_dur_dl', 'choice', 'block', 'conditions', 'completed_conditions', 'current_condition', 'repetition', 'current_repetition', 'trial_counter', 'stim_trial', 'stim_trials', 'stim_trial_counter', 'ror', 'completed_ror', 'current_ror', 'trial_counter_ror', 'moved_back_counter', 'block_size', 'block_trial_counter', 'block_accuracy', 'block_number', 'ror_change', 'block_change', 'last_stim_trial', 'last_condition_trial', 'total_trials', 'block_correct_count', 'block_valid_count', 'block_stim_correct_count_1', 'block_stim_valid_count_1', 'block_stim_accuracy_1', 'block_stim_correct_count_2', 'block_stim_valid_count_2', 'block_stim_accuracy_2', 'condition_trial_counter', 'stage_forward_change', 'stage_backward_change', 'task_number', 'last_forward_stage', 'last_backward_stage', 'reward_frequency', 'reward_db', 'reward_duration', 'stage_sequence', 'last_stage_trial', 'stage_sequence_counter', 'substage_counter_1', 'substage_counter_2', 'substage_counter_3', 'substage_counter_4', 'substage_counter_5', 'substage_counter_6', 'substage_counter_7', 'substage_counter_8', 'substage_counter_9', 'substage_counter_10', 'substage_counter_11', 'group', 'pair', 'prev_block_accuracy', 'last_block_accuracy', 'last_two_stim', 'unrewarded_list', 'pr_carry_tone', 'pr_carry_pending', 'consecutive_good_blocks']
 
 TOUCH_TASK = "Automatic_Water_Touch"
 
@@ -150,41 +149,6 @@ def _alert_overdue(subject_name, state, history, now):
         "Criteria have NOT been reduced automatically.", subject_name,
     )
     state["last_alert_date"] = now.date().isoformat()
-
-
-def select_touch_task(history, subject, defaults):
-    states = _read_states()
-    name = str(subject.name)
-    state = states.get(name)
-    if not state or "original" not in state:
-        # A manually assigned intervention cannot safely reconstruct a subject
-        # record from trial history. Keep the task fixed and request review.
-        _notify("URGENT: Missing saved original task for " + TOUCH_TASK +
-                ". Review this subject before restoring progress.", name)
-        values = dict(defaults)
-    else:
-        assigned = datetime.fromisoformat(state["assigned_at"])
-        stats = _touch_day_stats(history, assigned)
-        qualified = [item for item in stats if item[1] >= 80 and item[2] >= 0.8]
-        if qualified:
-            values = dict(defaults)
-            values.update(state["original"])
-            # Keep the snapshot until the caller durably writes the subject.
-            # Repeating selection after a failed write remains safe.
-            day, trials, accuracy = qualified[-1]
-            _notify(f"{TOUCH_TASK} return criteria met on {day}: "
-                    f"{trials} valid trials, {accuracy:.1%} accuracy. "
-                    f"Restoring {values['task']}, stage {values['stage']}, "
-                    "with saved progression.", name)
-            values["wait_seconds"] = 3600 * settings.TIME_TO_ENTER
-            return tuple(values[field] for field in RETURN_FIELDS)
-        _alert_overdue(name, state, history, datetime.now())
-        _write_states(states)
-        values = dict(defaults)
-
-    values.update(task=TOUCH_TASK, stage=2, task_number=1,
-                  stage_forward_change=0, stage_backward_change=0)
-    return tuple(values[field] for field in RETURN_FIELDS)
 
 
 def run_daily_automatic_water_check(check_date):
