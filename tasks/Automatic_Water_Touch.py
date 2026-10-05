@@ -151,6 +151,13 @@ class Automatic_Water_Touch(Task):
         return trials
 
     def main_loop(self):
+        # This intervention must remain at stage 2 (the 9 cm blob). Ignore
+        # saved or generated stage changes so the shared training logic cannot
+        # advance it to stage 9 or move it back to the 15 cm stage.
+        self.stage = 2
+        self.task_number = 1
+        self.stage_forward_change = 0
+        self.stage_backward_change = 0
         ### Randomizing the stimulus positions for both the images:
         print('')
         self.bias_breaking = 0
@@ -829,6 +836,14 @@ class Automatic_Water_Touch(Task):
             self.response_y = None
             self.trial_result = None
             self.task_end = True
+
+        # Keep both the in-memory task and saved trial values locked at stage 2.
+        # Block-performance logic below/above may calculate stage-change flags,
+        # but those flags must never progress this intervention.
+        self.stage = 2
+        self.task_number = 1
+        self.stage_forward_change = 0
+        self.stage_backward_change = 0
 
         ############ REGISTER VALUES ################
         # Task-related
