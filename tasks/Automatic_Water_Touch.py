@@ -17,14 +17,8 @@ class Automatic_Water_Touch(Task):
         ########   TASK INFO   ########
         Rats learn to touch the screen during the response window to obtain the reward.
         
-        Stages:
-        Stage 1: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but also can touch anywhere else.
-        Stage 2: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but if touches anywhere else is incorrect.
-        
-        If rats struggle:
-        Stage 3: A white irregular blob half the size of the screen. 150*150
-        Stage 4: A white irregular blob reduced by 63%. 130*130
-        Stage 5: A white irregular blob reduced by 33%. 110*110
+        Fixed stage 2: 9 cm white blob. Touching outside is incorrect.
+        No forward or backward stage progression in this temporary task.
 
                 ########   PORTS INFO   ########
         Port 1 - WATER PORT: LED, photogates and pump
@@ -46,7 +40,7 @@ class Automatic_Water_Touch(Task):
         self.trials_tired = 5  # if they do 5 trials of long duration, the door will open after 30 mins rather than 35
         self.tired = False
         self.task_number = 1
-        self.stage = 0
+        self.stage = 2
         self.substage = 0
         self.substage_bias = 0  # 1 = 90:10, 2 = 75:25, 3 = 50:50
         self.response_duration = 60
@@ -178,80 +172,12 @@ class Automatic_Water_Touch(Task):
             self.block_valid_count = 0
             self.stim_trial_counter = 0
 
-        if self.stage_forward_change == 1:
-            self.total_trials = 0
-            self.stage_forward_change = 0
-            self.consecutive_good_blocks = 0
-            self.prev_block_accuracy = -1.0
-            self.last_forward_stage = self.stage  # Save current BEFORE increasing
-            if self.stage == 0:
-                self.stage = 1
-            elif self.stage == 1:
-                self.stage = 2
-            elif self.stage == 2:
-                self.stage = 9
-            elif self.stage == 3:
-                self.stage = 4
-            elif self.stage == 4:
-                self.stage = 5
-            elif self.stage == 5:
-                self.stage = 6
-            elif self.stage == 6:
-                self.stage = 7
-            elif self.stage == 7:
-                self.stage = 8
-            elif self.stage == 8:
-                self.stage = 2
-            else:
-                self.stage = self.stage
-
-            message = f"Stage moved forward to {self.stage} for {self.subject} in {self.task}"
-            try:
-                telegram_bot.alarm_finish_session(message, self.subject)
-            except Exception as e:
-                print(f"Telegram message not sent. Error: {e}")
-            if self.stage == 9:
-                self.task_number = 2
-                self.tired = True
-                message = f"URGENT: Stage moved forward to {self.stage} for {self.subject} in {self.task}. Email ALEX."
-                try:
-                    telegram_bot.alarm_finish_session(message, self.subject)
-                except Exception as e:
-                    print(f"Telegram message not sent. Error: {e}")
-
-        if self.stage_backward_change == 1:
-            self.total_trials = 0
-            self.stage_backward_change = 0
-            self.block_accuracy = 0.0
-            self.prev_block_accuracy = -1.0
-            self.block_trial_counter = 0  # Reset the counter after the block
-            self.block_correct_count = 0
-            self.block_valid_count = 0
-            self.stim_trial_counter = 0
-            if self.stage == 1:
-                new_stage = 0
-            elif self.stage == 2:
-                new_stage = 3
-            elif self.stage >= 4:
-                new_stage = self.stage - 1
-            else:
-                new_stage = self.stage
-
-            if new_stage == self.last_forward_stage:
-                if self.last_backward_stage == new_stage:
-                    self.moved_back_counter += 1
-                else:
-                    self.moved_back_counter = 1
-                    self.last_backward_stage = new_stage
-            else:
-                self.moved_back_counter = 1
-                self.last_backward_stage = new_stage
-            self.stage = new_stage
-            message = f"Stage moved backward to {self.stage} for {self.subject} in {self.task}"
-            try:
-                telegram_bot.alarm_finish_session(message, self.subject)
-            except:
-                print("Telegram message not sent")
+        # Subject values are copied into the task at session start. Enforce
+        # the fixed intervention even if an old record carries stage flags.
+        self.stage = 2
+        self.task_number = 1
+        self.stage_forward_change = 0
+        self.stage_backward_change = 0
 
         ### Randomizing the stimulus positions for both the images:
         # Choose x positions:
@@ -717,32 +643,9 @@ class Automatic_Water_Touch(Task):
                 self.block_change = 1
                 self.last_block_accuracy = self.block_accuracy
 
-                if self.block_accuracy >= self.accuracy_criteria:
-                    if self.prev_block_accuracy >= self.accuracy_criteria:
-                        self.stage_forward_change = 1
-                        print("Two consecutive blocks >= criterion. Advancing stage.")
-                    else:
-                        self.prev_block_accuracy = self.block_accuracy
-                        print("Good block. One more needed.")
-                else:
-                    print("Block failed. Resetting previous block.")
-                    self.prev_block_accuracy = -1.0
-
-                if self.total_trials >= self.trial_end_criteria and self.stage_forward_change == 0:
-                    self.stage_backward_change = 1
-
-            # Assign in pass what to do when the rat is moved back more than 5 times.
-            if self.moved_back_counter > self.max_move_backs:
-                message = f"URGENT: Moved back {self.moved_back_counter} for {self.subject}. CHECK DATA."
-                try:
-                    print(message)
-                    # telegram_bot.alarm_finish_session(message, self.subject)
-                except:
-                    print('Telegram message not sent')
-                    pass
-
-            if self.stage > self.last_backward_stage + 1:
-                self.moved_back_counter = 0
+                # Blocks remain available for logging; never change stage.
+                self.stage_forward_change = 0
+                self.stage_backward_change = 0
 
             # Side Bias Breaking formula:
 
@@ -927,3 +830,4 @@ class Automatic_Water_Touch(Task):
         self.register_value('forced_choice_actual_trial', self.forced_choice_actual_trial)
         self.register_value('forced_choice_next_trial', self.forced_choice_next_trial)
         self.register_value('forced_choice_probe', self.forced_choice_probe)
+

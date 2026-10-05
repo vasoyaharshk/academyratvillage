@@ -1,4 +1,5 @@
 import os
+import json
 import time
 from datetime import datetime, timedelta
 
@@ -56,133 +57,221 @@ def _active_subject_names():
     return sorted(names)
 
 
-def run_daily_automatic_water_check(check_date):
+RETURN_FIELDS = ['task', 'stage', 'substage', 'substage_bias', 'wait_seconds', 'stim_dur_ds', 'stim_dur_dm', 'stim_dur_dl', 'choice', 'block', 'conditions', 'completed_conditions', 'current_condition', 'repetition', 'current_repetition', 'trial_counter', 'stim_trial', 'stim_trials', 'stim_trial_counter', 'ror', 'completed_ror', 'current_ror', 'trial_counter_ror', 'moved_back_counter', 'block_size', 'block_trial_counter', 'block_accuracy', 'block_number', 'ror_change', 'block_change', 'last_stim_trial', 'last_condition_trial', 'total_trials', 'block_correct_count', 'block_valid_count', 'block_stim_correct_count_1', 'block_stim_valid_count_1', 'block_stim_accuracy_1', 'block_stim_correct_count_2', 'block_stim_valid_count_2', 'block_stim_accuracy_2', 'condition_trial_counter', 'stage_forward_change', 'stage_backward_change', 'task_number', 'last_forward_stage', 'last_backward_stage', 'reward_frequency', 'reward_db', 'reward_duration', 'stage_sequence', 'last_stage_trial', 'stage_sequence_counter', 'substage_counter_1', 'substage_counter_2', 'substage_counter_3', 'substage_counter_4', 'substage_counter_5', 'substage_counter_6', 'substage_counter_7', 'substage_counter_8', 'substage_counter_9', 'substage_counter_10', 'substage_counter_11', 'group', 'pair', 'prev_block_accuracy', 'last_block_accuracy', 'last_two_stim', 'unrewarded_list', 'pr_carry_tone', 'pr_carry_pending', 'consecutive_good_blocks']
+
+TOUCH_TASK = "Automatic_Water_Touch"
+
+
+def _state_path():
+    return os.path.join(settings.DATA_DIRECTORY, "automatic_water_touch_state.json")
+
+
+def _read_states():
     try:
-        days_to_check = max(
-            1,
-            int(
-                getattr(
-                    settings,
-                    "AUTOMATIC_WATER_DAYS_TO_CHECK",
-                    2,
-                )
-            ),
-        )
-    except (TypeError, ValueError):
-        days_to_check = 2
-        _notify(
-            "Invalid AUTOMATIC_WATER_DAYS_TO_CHECK setting. "
-            "Using 2 days.",
-            "Academy",
-        )
+        with open(_state_path()) as stream:
+            return json.load(stream)
+    except FileNotFoundError:
+        return {}
 
-    days_checked = [
-        check_date - timedelta(days=days_ago)
-        for days_ago in range(1, days_to_check + 1)
-    ]
 
-    excluded_subjects = set(
-        getattr(
-            settings,
-            "AUTOMATIC_WATER_EXCLUDED_SUBJECTS",
-            ["m3"],
+def _json_value(value):
+    if hasattr(value, "item"):
+        return value.item()
+    raise TypeError("Cannot save original task value: " + repr(value))
+
+
+def _write_states(states):
+    # Save before assigning the intervention; a failure must not lose progress.
+    path = _state_path()
+    with open(path + ".tmp", "w") as stream:
+        json.dump(states, stream, default=_json_value)
+    os.replace(path + ".tmp", path)
+
+
+def _trial_rows(history):
+    if "trial_result" not in history:
+        raise ValueError("session history has no trial_result column")
+    # Exclude administrative tasks and blank phantom/end-of-task rows.
+    rows = history[history["trial_result"].isin(
+        ["correct", "correct_first", "incorrect", "miss"]
+    )].copy()
+    if "task" in rows:
+        rows = rows[~rows["task"].isin(
+            ["manual_water", "control_weight", "basal_weight"]
+        )]
+    return rows
+
+
+def _dates(history):
+    # Academy writes local dates; accept both its slash format and ISO dates.
+    if history.empty:
+        return pd.Series(index=history.index, dtype="object")
+    parsed = pd.to_datetime(history["date"], errors="coerce")
+    failed = parsed.isna() & history["date"].notna()
+    if failed.any():
+        parsed.loc[failed] = history.loc[failed, "date"].map(
+            lambda value: pd.to_datetime(value, errors="coerce")
         )
+    return parsed.dt.date
+
+
+def _touch_day_stats(history, assigned_at):
+    rows = _trial_rows(history)
+    rows = rows[rows["task"] == TOUCH_TASK].copy()
+    dates = _dates(rows)
+    rows = rows[dates >= assigned_at.date()]
+    dates = _dates(rows)
+    stats = []
+    for day in sorted(dates.dropna().unique()):
+        day_rows = rows[dates == day]
+        valid = day_rows[day_rows["trial_result"] != "miss"]
+        n = len(valid)
+        correct = valid["trial_result"].isin(["correct", "correct_first"]).sum()
+        stats.append((day, n, float(correct / n) if n else 0.0))
+    return stats
+
+
+def _alert_overdue(subject_name, state, history, now):
+    assigned = datetime.fromisoformat(state["assigned_at"])
+    if now - assigned <= timedelta(days=3):
+        return
+    # At most one urgent notification each day, also when there are no sessions.
+    if state.get("last_alert_date") == now.date().isoformat():
+        return
+    stats = _touch_day_stats(history, assigned)
+    latest = stats[-1] if stats else None
+    performance = (f"Latest day {latest[0]}: {latest[1]} valid trials, "
+                   f"{latest[2]:.1%} accuracy. " if latest else "No touch trials. ")
+    _notify(
+        f"URGENT: {subject_name} has remained on {TOUCH_TASK} for more than "
+        f"3 days (assigned {assigned:%Y-%m-%d %H:%M}). " + performance +
+        "Return criteria: at least 80 valid trials and 80% accuracy in one "
+        "calendar day. Please discuss with Alex whether to reduce the criteria. "
+        "Criteria have NOT been reduced automatically.", subject_name,
     )
-    excluded_subjects.update(
-        getattr(settings, "INACTIVE_SUBJECTS", [])
-    )
+    state["last_alert_date"] = now.date().isoformat()
 
-    changed_subjects = []
-    skipped_subjects = []
 
-    for subject_name in _active_subject_names():
-        if subject_name in excluded_subjects:
+def select_touch_task(history, subject, defaults):
+    states = _read_states()
+    name = str(subject.name)
+    state = states.get(name)
+    if not state or "original" not in state:
+        # A manually assigned intervention cannot safely reconstruct a subject
+        # record from trial history. Keep the task fixed and request review.
+        _notify("URGENT: Missing saved original task for " + TOUCH_TASK +
+                ". Review this subject before restoring progress.", name)
+        values = dict(defaults)
+    else:
+        assigned = datetime.fromisoformat(state["assigned_at"])
+        stats = _touch_day_stats(history, assigned)
+        qualified = [item for item in stats if item[1] >= 80 and item[2] >= 0.8]
+        if qualified:
+            values = dict(defaults)
+            values.update(state["original"])
+            # Keep the snapshot until the caller durably writes the subject.
+            # Repeating selection after a failed write remains safe.
+            day, trials, accuracy = qualified[-1]
+            _notify(f"{TOUCH_TASK} return criteria met on {day}: "
+                    f"{trials} valid trials, {accuracy:.1%} accuracy. "
+                    f"Restoring {values['task']}, stage {values['stage']}, "
+                    "with saved progression.", name)
+            values["wait_seconds"] = 3600 * settings.TIME_TO_ENTER
+            return tuple(values[field] for field in RETURN_FIELDS)
+        _alert_overdue(name, state, history, datetime.now())
+        _write_states(states)
+        values = dict(defaults)
+
+    values.update(task=TOUCH_TASK, stage=2, task_number=1,
+                  stage_forward_change=0, stage_backward_change=0)
+    return tuple(values[field] for field in RETURN_FIELDS)
+
+
+def run_daily_automatic_water_check(check_date):
+    # Always examine the two preceding COMPLETE days independently.
+    days = [check_date - timedelta(days=i) for i in (2, 1)]
+    excluded = set(getattr(settings, "AUTOMATIC_WATER_EXCLUDED_SUBJECTS", ["m3"]))
+    excluded.update(getattr(settings, "INACTIVE_SUBJECTS", []))
+    states = _read_states()
+    changed = False
+    for name in _active_subject_names():
+        if name in excluded:
             continue
-
         subject = utils.subjects.read_last_value_excluding(
-            "name",
-            subject_name,
-            "task",
-            ["manual_water", "control_weight", "basal_weight"],
+            "name", name, "task", ["manual_water", "control_weight", "basal_weight"]
         )
-
         if subject is None:
-            skipped_subjects.append(
-                subject_name + ": current subject record not found"
-            )
+            _notify("Touch engagement check skipped: current record missing", name)
             continue
-
-        if subject.task == "Automatic_Water":
-            continue
-
-        subject_path = os.path.join(
-            settings.SESSIONS_DIRECTORY,
-            subject_name,
-            subject_name + ".csv",
-        )
-
-        if not os.path.exists(subject_path):
-            skipped_subjects.append(
-                subject_name + ": session history file not found"
-            )
-            continue
-
+        path = os.path.join(settings.SESSIONS_DIRECTORY, name, name + ".csv")
         try:
-            subject_history = pd.read_csv(
-                subject_path,
-                sep=";",
-                low_memory=False,
-            )
+            history = pd.read_csv(path, sep=";", low_memory=False)
+            if "date" not in history or "task" not in history:
+                raise ValueError("session history needs date and task columns")
+            rows = _trial_rows(history)
+            dates = _dates(rows)
+            if rows["date"].notna().any() and dates.isna().any():
+                raise ValueError("unparseable trial dates")
         except Exception as error:
-            skipped_subjects.append(
-                subject_name + ": session history could not be read: "
-                + str(error)
-            )
+            _notify("Touch engagement check skipped: " + str(error), name)
             continue
 
-        if "date" not in subject_history.columns:
-            skipped_subjects.append(
-                subject_name + ": session history has no date column"
-            )
+        state = states.get(name)
+        if subject.task == TOUCH_TASK:
+            if state and "original" in state:
+                _alert_overdue(name, state, history, datetime.now())
+                _write_states(states)
+            else:
+                _notify("URGENT: Touch task has no saved original task state", name)
+            continue
+        if subject.task == "Automatic_Water":
+            # Preserve legacy one-session water assignments until they finish.
             continue
 
-        history_dates = pd.to_datetime(
-            subject_history["date"],
-            errors="coerce",
-        ).dt.date
-
-        trials_in_check_period = int(
-            history_dates.isin(days_checked).sum()
+        counts = [int((dates == day).sum()) for day in days]
+        if not all(count < 40 for count in counts):
+            continue
+        # Assignment records enforce cooldown even if the rat never enters.
+        cutoff = check_date - timedelta(days=7)
+        if (state and not state.get("assignment_pending", False) and
+                datetime.fromisoformat(state["assigned_at"]).date() >= cutoff):
+            continue
+        if ((rows["task"] == TOUCH_TASK) & (dates >= cutoff)).any():
+            continue
+        # Also catch manual assignments with no trials, using subjects history.
+        recent_assignment = any(
+            getattr(item, "name", None) == name and
+            getattr(item, "task", None) == TOUCH_TASK and
+            pd.notna(pd.to_datetime(getattr(item, "date", None), errors="coerce")) and
+            pd.to_datetime(item.date).date() >= cutoff
+            for item in utils.subjects.items
         )
+        if recent_assignment:
+            continue
 
-        if trials_in_check_period == 0:
-            utils.subjects.add_new_item(
-                {
-                    "task": "Automatic_Water",
-                    "wait_seconds": 0.0,
-                },
-                item=subject,
-            )
-            changed_subjects.append(subject_name)
-            _notify(
-                "Automatic Water assigned because 0 trials were "
-                "recorded from "
-                + days_checked[-1].isoformat()
-                + " to "
-                + days_checked[0].isoformat()
-                + " ("
-                + str(days_to_check)
-                + " full days)",
-                subject_name,
-            )
-
-    for skipped_subject in skipped_subjects:
-        _notify(
-            "Automatic Water check skipped " + skipped_subject,
-            "Academy",
-        )
-
-    return bool(changed_subjects)
+        states[name] = {"assigned_at": datetime.now().isoformat(),
+                        "assignment_pending": True,
+                        "original": subject.__dict__.copy()}
+        _write_states(states)
+        utils.subjects.add_new_item({
+            "task": TOUCH_TASK, "stage": 2, "task_number": 1,
+            "wait_seconds": 0.0, "block_size": 40, "block_number": 1,
+            "block_trial_counter": 0, "block_correct_count": 0,
+            "block_valid_count": 0, "block_accuracy": 0.0, "block_change": 0,
+            "total_trials": 0, "stim_trials": "[]", "stim_trial_counter": 0,
+            "last_stim_trial": 0, "last_two_stim": "[]",
+            "stage_forward_change": 0, "stage_backward_change": 0,
+            "moved_back_counter": 0, "prev_block_accuracy": -1.0,
+            "last_block_accuracy": 0.0,
+        }, item=subject)
+        states[name]["assignment_pending"] = False
+        _write_states(states)
+        changed = True
+        _notify(f"{TOUCH_TASK} assigned at fixed stage 2 (9 cm blob): "
+                f"{days[0]} = {counts[0]} trials; {days[1]} = {counts[1]} trials "
+                "(each fewer than 40). No touch task in previous 7 days. "
+                "Original task progression saved.", name)
+    return changed
 
 
 def automatic_water_check_is_due():

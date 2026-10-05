@@ -2,6 +2,7 @@ import numpy as np
 from wx.lib.pubsub.py2and3 import print_
 from academy import telegram_bot
 from user import settings
+from user import automatic_water_check
 import random
 import json
 import pandas as pd
@@ -105,7 +106,7 @@ def select_task(df, subject):
 
     def get_val_from_df_or_default(column_name, default_val):
         if column_name in df.columns:
-            val = last_row[column_name]
+            val = state_row[column_name]
             if pd.isna(val):
                 return default_val
             return val
@@ -225,6 +226,12 @@ def select_task(df, subject):
         telegram_bot.alarm_finish_session_details(msg, my_subject)
     except Exception as e:
         print("Telegram message not sent. Error:", e)
+
+    if task == automatic_water_check.TOUCH_TASK:
+        # Bypass every original-task progression rule during the intervention.
+        # The saved subject record includes progression already selected at the
+        # end of the previous original-task session, not merely its last trial.
+        return automatic_water_check.select_touch_task(df, subject, locals())
 
     # Check if task does not contain the word 'Probability'
     if ('Probability' not in task) and ('Cognitive_Bias' not in task):  #Excludes all the task without the word Probability or cognitive bias. Early Training Tasks.
@@ -1265,3 +1272,4 @@ def calculate_move_forward_criteria(df_last2, sessions, trial_count, trial_crite
         if trial_count < trial_criteria or accuracy < accuracy_forward_criteria:
             return False  # If either condition is not met in any session, do not move forward
     return True  # Move forward if all sessions meet the criteria
+
