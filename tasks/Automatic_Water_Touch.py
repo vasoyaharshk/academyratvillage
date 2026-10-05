@@ -16,11 +16,11 @@ class Automatic_Water_Touch(Task):
 
         ########   TASK INFO   ########
         Rats learn to touch the screen during the response window to obtain the reward.
-        
+
         Stages:
         Stage 1: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but also can touch anywhere else.
         Stage 2: A white irregular blob the same size and same location as the pegs (90*90). Rat has to touch the white blob but if touches anywhere else is incorrect.
-        
+
         If rats struggle:
         Stage 3: A white irregular blob half the size of the screen. 150*150
         Stage 4: A white irregular blob reduced by 63%. 130*130
@@ -35,7 +35,7 @@ class Automatic_Water_Touch(Task):
         Port 6 - PHOTOGATES 6: Photogates next to screen , global LED
 
         NOTE: FOR NEW SOUNDS, FUNCTION38 NEEDS TO BE REPLACED WITH 220 EVERYWHERE.
-        
+
         Here, correction trial means the same trial is repeated after an incorrect. 
         """
 
@@ -109,8 +109,8 @@ class Automatic_Water_Touch(Task):
         self.block_correct_count = 0  # Tracks the number of corrects in the block
         self.block_valid_count = 0  ##Tracks the number of valid trials in the block
 
-        self.prev_block_accuracy = -1.0  #Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
-        self.last_block_accuracy = 0.0 #This stores the accuracy of the last complete block
+        self.prev_block_accuracy = -1.0  # Stores the block_accuracy for previous block, Set to -1 because cannot use None. #This stores the last block accuracy only if criteria met otherwise it is -1.
+        self.last_block_accuracy = 0.0  # This stores the accuracy of the last complete block
 
         self.stim_trial = 0
         self.stim_trials = []
@@ -125,17 +125,18 @@ class Automatic_Water_Touch(Task):
         self.task_end = False
 
         self.session_first_stim = None  # first stim of this session (left or right)
-        self.last_two_stim = []         # history of last two stim_trial values across sessions. Tracked.
+        self.last_two_stim = []  # history of last two stim_trial values across sessions. Tracked.
 
         # Forced-choice logic
-        self.forced_choice_actual_trial = 0 # type of the current trial, 0 for normal 1 for forced choice. Forced choice trial here is the incorrect being repeated at the same location as previously till they get it correct.
+        self.forced_choice_actual_trial = 0  # type of the current trial, 0 for normal 1 for forced choice. Forced choice trial here is the incorrect being repeated at the same location as previously till they get it correct.
         self.forced_choice_next_trial = 0  # type of the next trial, 0 for normal 1 for forced choice
         self.forced_choice_probe = None  # Stimulus to repeat on forced-choice trials
 
     def configure_gui(self):
         self.gui_input = ['stage', 'substage', 'duration_max', 'block_size']
 
-    def generate_random_trials(self, last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
+    def generate_random_trials(self,
+                               last_trial=None):  # Generates a series of stim outputs where none are repeated more than 2 times in sequence.
         trials = []
         # Define a 50% probability for each stimulus (two stimuli)
         probabilities = [0.5, 0.5]  # Adjust this if you have more than two stimuli
@@ -258,7 +259,8 @@ class Automatic_Water_Touch(Task):
         if self.stage == 0:
             self.stim = [215]
         else:
-            self.stim = [213, 214] # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
+            self.stim = [213,
+                         214]  # These are teh axis for the functions 211 for sqaure on the left and 212 for sqaure on the right
 
         blob_mm_by_stage = {
             0: 410,
@@ -267,9 +269,9 @@ class Automatic_Water_Touch(Task):
             3: 150,
             4: 130,
             5: 110,
-            6: 105,    # 10.5 cm
-            7: 100,   # 10 cm
-            8: 95,    # 9.5 cm
+            6: 105,  # 10.5 cm
+            7: 100,  # 10 cm
+            8: 95,  # 9.5 cm
         }
 
         blob_mm = blob_mm_by_stage.get(self.stage, 90)
@@ -369,7 +371,7 @@ class Automatic_Water_Touch(Task):
         ############ STATE MACHINE ################
         # First trial:
         if self.task_number == 1:
-            if self.stage in [0, 1]:  #Stage 1 has only correct, if they touch outside, they can retry
+            if self.stage in [0, 1]:  # Stage 1 has only correct, if they touch outside, they can retry
                 if self.current_trial == 0:
                     self.sma.add_state(
                         state_name='Start_task',
@@ -410,7 +412,8 @@ class Automatic_Water_Touch(Task):
                 self.sma.add_state(
                     state_name='Response_window',
                     state_timer=self.response_duration,
-                    state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside', 'SoftCode4': 'Punish',
+                    state_change_conditions={'SoftCode1': 'Correct', 'SoftCode3': 'Touch_Outside',
+                                             'SoftCode4': 'Punish',
                                              Bpod.Events.Tup: 'No_Touch'},
                     output_actions=[(Bpod.OutputChannels.SoftCode, 204)])
                 # Starts to read the touchscreen with one touch processing
@@ -425,7 +428,8 @@ class Automatic_Water_Touch(Task):
                 self.sma.add_state(
                     state_name='Correct_image_display',
                     state_timer=self.image_display,
-                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward',
+                                             Bpod.Events.Tup: 'Flip_screen_reward'},
                     output_actions=[(Bpod.OutputChannels.PWM1, 5)])
                 # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
@@ -461,7 +465,8 @@ class Automatic_Water_Touch(Task):
                 self.sma.add_state(
                     state_name='Punish_image_display',
                     state_timer=self.image_display,
-                    state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+                    state_change_conditions={Bpod.Events.Port1In: 'After_punish',
+                                             Bpod.Events.Tup: 'Flip_screen_no_reward'},
                     output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                                     (Bpod.OutputChannels.SoftCode, 57)])
                 # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
@@ -494,7 +499,7 @@ class Automatic_Water_Touch(Task):
                     state_timer=0,
                     state_change_conditions={Bpod.Events.Tup: 'exit'},
                     output_actions=[])
-            else: #Stage 2 has only correct, if they touch outside, it is incorrect
+            else:  # Stage 2 has only correct, if they touch outside, it is incorrect
                 if self.current_trial == 0:
                     self.sma.add_state(
                         state_name='Start_task',
@@ -550,7 +555,8 @@ class Automatic_Water_Touch(Task):
                 self.sma.add_state(
                     state_name='Correct_image_display',
                     state_timer=self.image_display,
-                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward', Bpod.Events.Tup: 'Flip_screen_reward'},
+                    state_change_conditions={Bpod.Events.Port1In: 'Correct_reward',
+                                             Bpod.Events.Tup: 'Flip_screen_reward'},
                     output_actions=[(Bpod.OutputChannels.PWM1, 5)])
                 # Turns on Water port LED and plays correct sound and displays correct stimuli for image_display (3 seconds)
 
@@ -586,7 +592,8 @@ class Automatic_Water_Touch(Task):
                 self.sma.add_state(
                     state_name='Punish_image_display',
                     state_timer=self.image_display,
-                    state_change_conditions={Bpod.Events.Port1In: 'After_punish', Bpod.Events.Tup: 'Flip_screen_no_reward'},
+                    state_change_conditions={Bpod.Events.Port1In: 'After_punish',
+                                             Bpod.Events.Tup: 'Flip_screen_no_reward'},
                     output_actions=[(Bpod.OutputChannels.PWM1, 5), (Bpod.OutputChannels.LED, 3),
                                     (Bpod.OutputChannels.SoftCode, 57)])
                 # Turns on Global LED and water port LED on, and displays incorrect stimuli for image_display (3 seconds) nad plays punish sound for 1 second.
@@ -709,7 +716,8 @@ class Automatic_Water_Touch(Task):
                 self.tired_counter = 0
 
             # Check accuracy for every block of 40 trials
-            self.block_accuracy = (self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
+            self.block_accuracy = (
+                self.block_correct_count / self.block_valid_count if self.block_valid_count > 0 else 0)
             print("Block Accuracy: ", self.block_accuracy)
 
             # Change block_trial_counter to block_trial_counter, and then block_counter should be the number of block.
