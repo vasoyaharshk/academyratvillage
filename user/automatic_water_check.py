@@ -185,6 +185,10 @@ def _alert_overdue(subject_name, state, history, now):
 
 
 def run_daily_automatic_water_check(check_date):
+    # Disable the entire check before any polling, history reads, or writes.
+    if not getattr(settings, "AUTOMATIC_WATER_ASSIGNMENT_ENABLED", False):
+        return False
+
     criteria = touch_criteria()
     days_to_check = criteria["AUTOMATIC_WATER_DAYS_TO_CHECK"]
     trial_threshold = criteria["AUTOMATIC_WATER_TRIAL_THRESHOLD"]
@@ -282,6 +286,10 @@ def run_daily_automatic_water_check(check_date):
 def automatic_water_check_is_due():
     global _last_poll_time
 
+    # Disable the entire check before any polling, history reads, or writes.
+    if not getattr(settings, "AUTOMATIC_WATER_ASSIGNMENT_ENABLED", False):
+        return False
+
     now_monotonic = time.monotonic()
     poll_seconds = getattr(
         settings,
@@ -313,6 +321,10 @@ def automatic_water_check_is_due():
 
 
 def run_scheduled_automatic_water_check():
+    # Disable the entire check before any polling, history reads, or writes.
+    if not getattr(settings, "AUTOMATIC_WATER_ASSIGNMENT_ENABLED", False):
+        return False
+
     today = datetime.now().date()
 
     # Defensive check in case the state is entered twice on the same day.
