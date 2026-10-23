@@ -10,6 +10,7 @@ from academy.arduino import arduino
 from academy.touch import touch
 from academy.screen import screen
 from academy.task_manager import TaskManager
+from academy.vocalisation import vocalisation
 from academy.softcode import softcode
 from academy.camera import cam1, cam2, cam3
 from user import settings
@@ -410,6 +411,7 @@ def main_loop():
 
 def stop_and_save_task():
     softcode.kill()
+    vocalisation.stop()
     screen.win.flip()
     screen.tag = None
     screen.first = False
@@ -865,6 +867,7 @@ def go_to_state(num):
             + str(int(float(utils.task.substage)))
         )
         utils.log_cam(utils.subject.name, name_task, "START")
+        vocalisation.start(settings, utils.task, utils.subject.name)
         utils.task.set_and_run(
             utils.subject, utils.subject.name, utils.subject.weight, utils.task_manager
         )
@@ -935,6 +938,7 @@ def go_to_state(num):
 
         utils.log_cam(subject_name, utils.task.task, "START")
         gui.name = subject_name + " - " + utils.task.task
+        vocalisation.start(settings, utils.task, subject_name)
         utils.task.set_and_run(
             gui.subject, subject_name, utils.task.subject_weight, utils.task_manager
         )
@@ -957,6 +961,7 @@ def go_to_state(num):
 
 
 def exit_app():
+    vocalisation.stop()
     utils.log("Academy", "EXIT", "END")
     time.sleep(1)
     arduino.turn_led_off()
@@ -981,6 +986,7 @@ def exit_app():
 
 
 def relaunch():
+    vocalisation.stop()
 
     num = str(utils.reading_tags)
 
