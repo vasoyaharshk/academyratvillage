@@ -380,7 +380,6 @@ def main_loop():
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")
                     arduino.move_doors_to_go_home()
-                    arduino.close_door3()
 
                     screen.win.flip()
                     screen.tag = None
@@ -896,7 +895,6 @@ def go_to_state(num):
 
     elif num == 4:  # after min_time, data not saved, animal back
         arduino.move_doors_to_go_home()
-        arduino.close_door3()
         utils.log_cam(utils.subject.name, "Returning home", "ACTION")
         utils.log("Academy", "Go to state 4", "ACTION")
 
