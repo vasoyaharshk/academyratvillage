@@ -5,13 +5,15 @@ Add this block to the **working `user/settings.py` on each PC**. Academy copies 
 ```python
 # Session vocalisations
 VOCALISATION_ENABLED = True  # False disables recording for subsequent sessions.
-VOCALISATION_DIRECTORY = '/home/ratvillage03/Important/Vocalisations'
+VOCALISATION_DIRECTORY = '/home/ratvillage03/academy/data/vocals'
 VOCALISATION_DEVICE_NAME = 'Pettersson'
-VOCALISATION_DEVICE = None  # Automatic detection; optionally use 'hw:2,0'.
+VOCALISATION_DEVICE = None  # Auto-detect by name; optionally set a fixed ALSA device, e.g. 'hw:3,0'.
 VOCALISATION_TIMEZONE = 'Europe/Madrid'
 ```
 
-For RV2 choose its own writable folder, e.g. `/home/ratvillage02/important/Academy_Outside/Vocalisations`. Restart Academy after editing settings. The default is False; missing options also disable recording. Keep all existing PC-specific settings. The uploaded RV3 settings do not need to replace RV2's settings.
+For RV2 set `VOCALISATION_DIRECTORY` to its own writable folder, for example `/home/ratvillage02/academy/data/vocals`. Restart Academy after editing settings. The default is False; missing options also disable recording. Keep all existing PC-specific settings. The uploaded RV3 settings do not need to replace RV2's settings.
+
+`VOCALISATION_DEVICE` is an optional ALSA hardware ID override. Leave it as `None` to search the capture-device list for a unique device whose card name contains `VOCALISATION_DEVICE_NAME` (`Pettersson`). Set it to an ID such as `hw:3,0` only if automatic detection is ambiguous or fails; ALSA card numbers can change after a restart.
 
 In the same environment used to run Academy:
 
@@ -24,7 +26,7 @@ Stop the standalone continuous recorder before using Academy: both cannot own th
 
 ## Session behaviour
 
-Automatic and direct/manual sessions launch the recorder immediately before `set_and_run`. Capture ends in `stop_and_save_task`, including early exit and multiple-animal cancellation, and on application exit or relaunch. Capture starts after the subprocess has loaded its audio libraries and opened ALSA; it is not a sample-synchronous trigger to Bpod. The analysis timestamps describe acquisition, not the filename's session launch time. Both PCs should use their normal Europe/Madrid system clock for filenames, as the existing session files do.
+Automatic and direct/manual sessions launch the recorder immediately before `set_and_run`. The vocalisation filename reuses `TaskManager.filename`, including the exact timestamp already used for behavioural session files (Academy's local `YYYYMMDD-HHMMSS` filename format). Capture ends in `stop_and_save_task`, including early exit and multiple-animal cancellation, and on application exit or relaunch. Capture starts after the subprocess has loaded its audio libraries and opened ALSA; it is not a sample-synchronous trigger to Bpod. The CSV retains the recorder's sample-level UTC and local ISO timestamps.
 
 Each session writes into the configured folder:
 

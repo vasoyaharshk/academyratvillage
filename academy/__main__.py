@@ -380,7 +380,6 @@ def main_loop():
                     except:
                         utils.log("Academy", "returning home after relaunch", "ACTION")
                     arduino.move_doors_to_go_home()
-                    arduino.close_door3()
 
                     screen.win.flip()
                     screen.tag = None
@@ -867,7 +866,7 @@ def go_to_state(num):
             + str(int(float(utils.task.substage)))
         )
         utils.log_cam(utils.subject.name, name_task, "START")
-        vocalisation.start(settings, utils.task, utils.subject.name)
+        vocalisation.start(settings, utils.task, utils.subject.name, utils.task_manager)
         utils.task.set_and_run(
             utils.subject, utils.subject.name, utils.subject.weight, utils.task_manager
         )
@@ -896,7 +895,6 @@ def go_to_state(num):
 
     elif num == 4:  # after min_time, data not saved, animal back
         arduino.move_doors_to_go_home()
-        arduino.close_door3()
         utils.log_cam(utils.subject.name, "Returning home", "ACTION")
         utils.log("Academy", "Go to state 4", "ACTION")
 
@@ -938,7 +936,7 @@ def go_to_state(num):
 
         utils.log_cam(subject_name, utils.task.task, "START")
         gui.name = subject_name + " - " + utils.task.task
-        vocalisation.start(settings, utils.task, subject_name)
+        vocalisation.start(settings, utils.task, subject_name, utils.task_manager)
         utils.task.set_and_run(
             gui.subject, subject_name, utils.task.subject_weight, utils.task_manager
         )
@@ -1017,4 +1015,3 @@ def relaunch():
 
 if __name__ == "__main__":
     main()
-

@@ -16,7 +16,7 @@ class VocalisationRecorder:
         self.log_file = None
         atexit.register(self.stop)
 
-    def start(self, settings, task, subject_name):
+    def start(self, settings, task, subject_name, task_manager=None):
         self.stop()
         if not getattr(settings, 'VOCALISATION_ENABLED', False):
             return
@@ -24,10 +24,15 @@ class VocalisationRecorder:
             # Snapshot metadata before task execution or stage progression.
             def safe(value):
                 return re.sub(r'[^A-Za-z0-9_.-]+', '_', str(value))
-            stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-            name = '{}_{}-{}-{}_{}_Vocals'.format(
-                safe(subject_name), safe(task.task), int(float(task.stage)),
-                int(float(task.substage)), stamp)
+            if task_manager is not None and task_manager.filename:
+                # TaskManager already created the behavioural session's canonical
+                # subject/task/stage/substage/timestamp basename.
+                name = task_manager.filename + '_Vocals'
+            else:
+                stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+                name = '{}_{}-{}-{}_{}_Vocals'.format(
+                    safe(subject_name), safe(task.task), int(float(task.stage)),
+                    int(float(task.substage)), stamp)
             folder = Path(settings.VOCALISATION_DIRECTORY).expanduser()
             folder.mkdir(parents=True, exist_ok=True)
             # Never overwrite a previous recording, including very rapid restarts.

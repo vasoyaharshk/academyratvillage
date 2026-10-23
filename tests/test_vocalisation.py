@@ -64,7 +64,9 @@ class VocalisationTests(unittest.TestCase):
                 settings = SimpleNamespace(VOCALISATION_ENABLED=True,
                                            VOCALISATION_DIRECTORY=folder / 'output')
                 task = SimpleNamespace(task='Touch_Demotivation', stage=2.0, substage=0)
-                recorder.start(settings, task, 'astrid')
+                task_manager = SimpleNamespace(
+                    filename='astrid_Touch_Demotivation-2-0_20261023-050950')
+                recorder.start(settings, task, 'astrid', task_manager)
                 process = recorder.process
                 deadline = time.monotonic() + 10
                 while not list((folder / 'output').glob('*.flac')):
@@ -78,9 +80,10 @@ class VocalisationTests(unittest.TestCase):
                 self.assertEqual(process.returncode, 0)
                 audio = next((folder / 'output').glob('*.flac'))
                 self.assertEqual(sf.info(str(audio)).frames, 38400)
-                self.assertTrue(audio.name.startswith('astrid_Touch_Demotivation-2-0_'))
+                self.assertEqual(audio.name,
+                                 'astrid_Touch_Demotivation-2-0_20261023-050950_Vocals.flac')
                 # Restart immediately: both sessions must survive.
-                recorder.start(settings, task, 'astrid')
+                recorder.start(settings, task, 'astrid', task_manager)
                 time.sleep(1)
                 recorder.stop()
                 self.assertEqual(len(list((folder / 'output').glob('*.flac'))), 2)
